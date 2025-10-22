@@ -1,0 +1,46 @@
+services:
+  pg:
+    image: postgres
+    container_name: psgr
+    environment:
+      POSTGRES_USER: admin1
+      POSTGRES_PASSWORD: 1122
+      POSTGRES_DB: tdb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      app_net:
+        ipv4_address: 192.168.100.2
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin1
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    networks:
+      app_net:
+        ipv4_address: 192.168.100.3
+    depends_on:
+      - pg
+
+networks:
+  app_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.100.0/24"
+          gateway: 192.168.100.1
+
+volumes:
+  pgdata:
