@@ -1,15 +1,27 @@
 from collections.abc import MutableMapping
+from sqlalchemy.orm import deferred
 from enum import StrEnum
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, Form, HTTPException, status
+from sqlalchemy.engine.result import Result
+from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy.sql.expression import text, select
 
-from users.schemas import UserSchema
+from auth.utils import hash_password
+from core.models import db_api, User
+from users.schemas import UserSchema, CreateUser
 
 from auth import utils as auth_utils
 
 from pydantic import BaseModel
 
 router = APIRouter(prefix='/jwt', tags=["JWT"])
+
+session =  Annotated[
+    AsyncSession,
+    Depends(db_api.session_getter),
+]
 
 
 class TokenFields(StrEnum):
@@ -27,25 +39,6 @@ class TokenInfo(BaseModel):
     token_type: str
 
 
-pimmo = UserSchema(
-    id=1,
-    username='Pimmo',
-    password=auth_utils.hash_password('1234'),
-    is_active=True,
-    is_admin=True
-)
-nyanya = UserSchema(
-    id=2,
-    username='Nyanya',
-    password=auth_utils.hash_password('3456'),
-    is_active=True,
-)
-
-demo_db: MutableMapping[str, UserSchema] = {
-    pimmo.username: pimmo,
-    nyanya.username: nyanya
-}
-
 def validate_auth_user(username: str = Form(), password: str = Form(),):
     unauthed_exc =  HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='invalid username or password')
     if not (user := demo_db.get(username)):
@@ -55,6 +48,35 @@ def validate_auth_user(username: str = Form(), password: str = Form(),):
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='inactive user')
     return user
+
+
+@router.get('/users/')
+async def auth_user_issue_jwt(
+        sess: session,
+):
+    stmt = select(
+        User.id,
+        User.first_name,
+        User.last_name,
+        User.username,
+        User.email,
+        User.is_active,
+        User.is_admin,
+        User.is_superuser,
+        User.role,
+        User.phone_number,
+        User.telegram,
+        User.description,
+    ).order_by(User.id)
+    result: Result = await sess.execute(stmt)
+    users = result.mappings().all()
+    usrs = list(users)
+    print(f'{usrs=} ')
+    # for u in usrs:
+    #     print(f'{u} ')
+    #     print(f'type_u: {type(u)}')
+    return usrs
+
 
 
 @router.post('/login/')
@@ -71,4 +93,16 @@ def auth_user_issue_jwt(
         access_token=token,
         token_type=str(TokenFields.bearer),
     )
-print(auth_utils.hash_password('1234'))
+
+@router.post('/create/')
+async def auth_user_issue_jwt(
+        user: CreateUser,
+        sess: session,
+):
+    user.password = hash_password(user.password)
+    new_user = User(**user.model_dump())
+    sess.add(new_user)
+    await sess.commit()
+    res = await sess.execute(text("SELECT * FROM users"))
+    print(res)
+    return user

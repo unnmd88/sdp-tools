@@ -1,12 +1,26 @@
-from typing import Annotated
+from typing import Annotated, AnyStr
 from annotated_types import MinLen, MaxLen
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, EmailStr, ConfigDict, Field
+
+from users.roles import Roles
 
 
 class CreateUser(BaseModel):
     # username: str = Field(..., min_length=3, max_length=20)
+
+    model_config = ConfigDict(use_enum_values=True)
+    first_name: Annotated[str, MaxLen(32), Field(default='')]
+    last_name: Annotated[str, MaxLen(32), Field(default='')]
     username: Annotated[str, MinLen(3), MaxLen(20)]
-    email: EmailStr
+    email: Annotated[EmailStr, Field(default=None)]
+    password: str | bytes
+    is_active: bool
+    is_admin: bool
+    is_superuser: bool
+    role: Roles
+    phone_number: Annotated[str, MaxLen(10), Field(default='')]
+    telegram: Annotated[str, MaxLen(32), Field(default='')]
+    description: Annotated[str, Field(default='')]
 
 
 class UserSchema(BaseModel):
