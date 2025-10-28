@@ -1,6 +1,7 @@
-from typing import Annotated, AnyStr
-from annotated_types import MinLen, MaxLen
-from pydantic import BaseModel, EmailStr, ConfigDict, Field
+from typing import Annotated
+
+from annotated_types import MaxLen, MinLen
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from users.organizations import Organizations
 from users.roles import Roles

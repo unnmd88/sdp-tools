@@ -1,24 +1,17 @@
-from collections.abc import MutableMapping
-from sqlalchemy.orm import deferred
 from enum import StrEnum
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Form, HTTPException, status
-from sqlalchemy.engine.result import Result
-from sqlalchemy.ext.asyncio.session import AsyncSession
-from sqlalchemy.sql.expression import text, select
-
-from auth.utils import hash_password
-from core.models import db_api, User
-from users.schemas import UserSchema, CreateUser
-
 from auth import utils as auth_utils
-
+from core.models import db_api
+from fastapi import APIRouter, Depends, Form, HTTPException, status
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio.session import AsyncSession
 
-router = APIRouter(prefix='/jwt', tags=["JWT"])
+from users.schemas import UserSchema
 
-session =  Annotated[
+router = APIRouter(prefix='/jwt', tags=['JWT'])
+
+session = Annotated[
     AsyncSession,
     Depends(db_api.session_getter),
 ]
@@ -39,25 +32,28 @@ class TokenInfo(BaseModel):
     token_type: str
 
 
-def validate_auth_user(username: str = Form(), password: str = Form(),):
-    unauthed_exc =  HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='invalid username or password')
+def validate_auth_user(
+    username: str = Form(),
+    password: str = Form(),
+):
+    unauthed_exc = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED, detail='invalid username or password'
+    )
     if not (user := demo_db.get(username)):
         raise unauthed_exc
-    if not auth_utils.validate_password(password=password, hashed_password=user.password):
+    if not auth_utils.validate_password(
+        password=password, hashed_password=user.password
+    ):
         raise unauthed_exc
     if not user.is_active:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='inactive user')
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail='inactive user'
+        )
     return user
 
 
-
-
-
-
 @router.post('/login/')
-def auth_user_issue_jwt(
-        user: UserSchema = Depends(validate_auth_user)
-):
+def auth_user_issue_jwt(user: UserSchema = Depends(validate_auth_user)):
     jwt_payload = {
         str(TokenFields.sub): user.id,
         str(TokenFields.username): user.username,
@@ -68,6 +64,7 @@ def auth_user_issue_jwt(
         access_token=token,
         token_type=str(TokenFields.bearer),
     )
+
 
 # @router.post('/create/')
 # async def auth_user_issue_jwt(

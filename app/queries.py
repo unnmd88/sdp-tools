@@ -1,14 +1,11 @@
 import psycopg2
 from contextlib import contextmanager
 
+
 @contextmanager
 def get_db_connection():
     conn = psycopg2.connect(
-        dbname="tdb",
-        user="admin1",
-        password="1122",
-        host="localhost",
-        port="5432"
+        dbname='tdb', user='admin1', password='1122', host='localhost', port='5432'
     )
     try:
         yield conn
@@ -19,13 +16,13 @@ def get_db_connection():
 def get_all(tablename):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(f"SELECT * FROM {tablename}")
+            cur.execute(f'SELECT * FROM {tablename}')
             results = cur.fetchall()
             print(results)
 
 
 def drop_tables():
-    stmt =  """
+    stmt = """
             DO $$ 
             DECLARE 
                 r RECORD;
@@ -75,7 +72,7 @@ def insert_data_tlo():
         with conn.cursor() as cur:
             with open('data_tlo', 'r') as file:
                 for l in file:
-                    cur.execute( f"INSERT INTO TLO (name, district, fk_tlo) VALUES {l}")
+                    cur.execute(f'INSERT INTO TLO (name, district, fk_tlo) VALUES {l}')
             conn.commit()
 
 
@@ -84,7 +81,7 @@ def insert_data_regions():
         with conn.cursor() as cur:
             with open('data_regions', 'r') as file:
                 for l in file:
-                    cur.execute( f"INSERT INTO regions (city, region) VALUES {l}")
+                    cur.execute(f'INSERT INTO regions (city, region) VALUES {l}')
             conn.commit()
 
 
@@ -93,7 +90,7 @@ def join1():
         with conn.cursor() as cur:
             with open('data_regions', 'r') as file:
                 for l in file:
-                    cur.execute( f"INSERT INTO regions (city, region) VALUES {l}")
+                    cur.execute(f'INSERT INTO regions (city, region) VALUES {l}')
             conn.commit()
 
 

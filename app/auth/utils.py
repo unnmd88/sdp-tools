@@ -13,7 +13,7 @@ def encode_jwt(
     payload: dict,
     private_key: str = settings.auth_jwt.private_key_path.read_text(encoding='utf-8'),
     algorithm: str = settings.auth_jwt.algorithm,
-expire_timedelta: timedelta | None =  None,
+    expire_timedelta: timedelta | None = None,
     expire_minutes: int = settings.auth_jwt.access_expire_minutes,
 ) -> str:
     now = dt.now(datetime.UTC)

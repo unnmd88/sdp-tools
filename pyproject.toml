@@ -27,6 +27,22 @@ dev = [
 line-length = 88
 indent-width = 4
 
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
+
 [tool.ruff.format]
 quote-style = "single"
 indent-style = "space"

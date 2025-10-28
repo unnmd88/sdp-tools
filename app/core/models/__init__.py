@@ -1,9 +1,4 @@
-__all__ = (
-    "db_api",
-    "Base",
-    "User"
-
-)
+__all__ = ('db_api', 'Base', 'User')
 
 from .base import Base
 from .user import User

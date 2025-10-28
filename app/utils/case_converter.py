@@ -1,4 +1,3 @@
-
 """
 Taken from
 https://github.com/mahenzon/ri-sdk-python-wrapper/blob/master/ri_sdk_codegen/utils/case_converter.py
@@ -7,11 +6,11 @@ https://github.com/mahenzon/ri-sdk-python-wrapper/blob/master/ri_sdk_codegen/uti
 
 def camel_case_to_snake_case(input_str: str) -> str:
     """
-    >>> camel_case_to_snake_case("SomeSDK")
+    >>> camel_case_to_snake_case('SomeSDK')
     'some_sdk'
-    >>> camel_case_to_snake_case("RServoDrive")
+    >>> camel_case_to_snake_case('RServoDrive')
     'r_servo_drive'
-    >>> camel_case_to_snake_case("SDKDemo")
+    >>> camel_case_to_snake_case('SDKDemo')
     'sdk_demo'
     """
     chars = []
@@ -25,6 +24,6 @@ def camel_case_to_snake_case(input_str: str) -> str:
             if prev_char.isupper() and flag:
                 pass
             else:
-                chars.append("_")
+                chars.append('_')
         chars.append(char.lower())
-    return "".join(chars)
+    return ''.join(chars)

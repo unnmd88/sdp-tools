@@ -18,6 +18,4 @@ async def get_users(
     #     Depends(db_helper.session_getter),
     # ],
 ):
-
     return {'TLO': 'Traffic-light-objects'}
-

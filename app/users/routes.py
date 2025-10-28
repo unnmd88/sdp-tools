@@ -1,18 +1,16 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Form, HTTPException, status
-from sqlalchemy.engine.result import Result
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio.session import AsyncSession
-from sqlalchemy.sql.expression import select
 
-from core.models import db_api, User
+from core.models import db_api
 from users import crud as users_crud
 from users.schemas import CreateUser
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
 
-session =  Annotated[
+session = Annotated[
     AsyncSession,
     Depends(db_api.session_getter),
 ]
@@ -45,24 +43,25 @@ session =  Annotated[
 #     #     print(f'type_u: {type(u)}')
 #     return usrs
 
-@router.get("/{user_id}/")
-async def get_users(
-        user_id: int,
-        sess: session,
+
+@router.get('/{user_id}/')
+async def get_user(
+    user_id: int,
+    sess: session,
 ):
     return await users_crud.get_user(user_id, sess)
 
 
 @router.get('/')
 async def get_users(
-        sess: session,
+    sess: session,
 ):
     return await users_crud.get_users(sess)
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
 async def auth_user_issue_jwt(
-        user: CreateUser,
-        sess: session,
+    user: CreateUser,
+    sess: session,
 ):
     return await users_crud.create_user(user, sess)
