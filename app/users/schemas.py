@@ -2,6 +2,7 @@ from typing import Annotated, AnyStr
 from annotated_types import MinLen, MaxLen
 from pydantic import BaseModel, EmailStr, ConfigDict, Field
 
+from users.organizations import Organizations
 from users.roles import Roles
 
 
@@ -12,6 +13,7 @@ class CreateUser(BaseModel):
     first_name: Annotated[str, MaxLen(32), Field(default='')]
     last_name: Annotated[str, MaxLen(32), Field(default='')]
     username: Annotated[str, MinLen(3), MaxLen(20)]
+    organization: Organizations
     email: Annotated[EmailStr, Field(default=None)]
     password: str | bytes
     is_active: bool

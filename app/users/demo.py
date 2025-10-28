@@ -50,32 +50,7 @@ def validate_auth_user(username: str = Form(), password: str = Form(),):
     return user
 
 
-@router.get('/users/')
-async def auth_user_issue_jwt(
-        sess: session,
-):
-    stmt = select(
-        User.id,
-        User.first_name,
-        User.last_name,
-        User.username,
-        User.email,
-        User.is_active,
-        User.is_admin,
-        User.is_superuser,
-        User.role,
-        User.phone_number,
-        User.telegram,
-        User.description,
-    ).order_by(User.id)
-    result: Result = await sess.execute(stmt)
-    users = result.mappings().all()
-    usrs = list(users)
-    print(f'{usrs=} ')
-    # for u in usrs:
-    #     print(f'{u} ')
-    #     print(f'type_u: {type(u)}')
-    return usrs
+
 
 
 
@@ -94,15 +69,15 @@ def auth_user_issue_jwt(
         token_type=str(TokenFields.bearer),
     )
 
-@router.post('/create/')
-async def auth_user_issue_jwt(
-        user: CreateUser,
-        sess: session,
-):
-    user.password = hash_password(user.password)
-    new_user = User(**user.model_dump())
-    sess.add(new_user)
-    await sess.commit()
-    res = await sess.execute(text("SELECT * FROM users"))
-    print(res)
-    return user
+# @router.post('/create/')
+# async def auth_user_issue_jwt(
+#         user: CreateUser,
+#         sess: session,
+# ):
+#     user.password = hash_password(user.password)
+#     new_user = User(**user.model_dump())
+#     sess.add(new_user)
+#     await sess.commit()
+#     res = await sess.execute(text("SELECT * FROM users"))
+#     print(res)
+#     return user

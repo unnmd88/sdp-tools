@@ -14,10 +14,12 @@
 }
 
 {
-  "first_name": "",
-  "last_name": "",
-  "username": "root1",
-  "email": "user@example.com",
+  "first_name": "Chook",
+  "last_name": "Gekk",
+  "username": "chookAndGekk",
+  "organization": "Spetsdorproject",
+  "email": "chook@example.com",
+  "password": "string",
   "is_active": true,
   "is_admin": true,
   "is_superuser": true,

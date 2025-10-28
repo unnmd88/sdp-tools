@@ -1,22 +1,18 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String
-from sqlalchemy import UniqueConstraint
 
 from core.models import Base
 import sqlalchemy as sa
-# class User(Base):
-#     username: Mapped[str] = mapped_column(unique=True)
-#     # foo: Mapped[int]
-#     # bar: Mapped[int]
-#     #
-#     # __table_args__ = (
-#     #     UniqueConstraint('foo', 'bar'),
-#     # )
 
-class User(Base):
+from core.models.mixins.integer_pk_id import IntegerIdPkMixin
+from core.models.mixins.timestamp import UpdatedAtMixin, CreatedAtMixin
+
+
+class User(IntegerIdPkMixin,CreatedAtMixin, UpdatedAtMixin, Base,):
 
     first_name: Mapped[str] = mapped_column(String(32), nullable=False,)
     last_name: Mapped[str] = mapped_column(String(32), nullable=False,)
+    organization: Mapped[str] = mapped_column(String(32), nullable=False)
     username: Mapped[str] = mapped_column(String(32), unique=True, nullable=False,)
     email: Mapped[str] = mapped_column(unique=True, nullable=False, default='', server_default='',)
     password: Mapped[bytes] = mapped_column(unique=True, nullable=False,)
@@ -34,3 +30,4 @@ class User(Base):
     # __table_args__ = (
     #     UniqueConstraint('foo', 'bar'),
     # )
+
