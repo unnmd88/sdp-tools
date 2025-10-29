@@ -29,13 +29,13 @@ class User(
         nullable=False,
     )
     email: Mapped[str] = mapped_column(
-        unique=True,
+        # unique=True,
         nullable=False,
         default='',
         server_default='',
     )
     password: Mapped[bytes] = mapped_column(
-        unique=True,
+        # unique=True,
         nullable=False,
     )
     is_active: Mapped[bool] = mapped_column(
