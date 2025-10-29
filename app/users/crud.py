@@ -1,10 +1,14 @@
 import logging
+from collections.abc import Sequence
+from typing import Annotated
+
+import sqlalchemy
 
 from app_logging.dev.config import USERS_LOGGER
 from auth import utils as auth_utils
 from core.config import BASE_DIR
-from core.models import User
-from fastapi import HTTPException
+from core.models import User, db_api
+from fastapi import HTTPException, Depends
 from sqlalchemy.engine.result import Result
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio.session import AsyncSession
@@ -31,8 +35,31 @@ logger = logging.getLogger(USERS_LOGGER)
 #     handlers=[console_handler, file_handler],
 # )
 
+async def get_user_by_username_or_none(
+    username: str,
+    session: AsyncSession
+):
+    stmt = select(User).where(User.username == username)
+    try:
+        result: Result = await session.execute(stmt)
+        return result.scalars().one()
+    except sqlalchemy.exc.NoResultFound:
+        pass
+    return None
 
-async def get_user(
+    print(resultt)
+    return resultt
+    # if (res := await session.execute(stmt)):
+    #     raise HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND,
+    #         detail=f"User {user_id!r} not found",
+    #     )
+    # # res = await session.get(User, user_id)
+    # # print(f'res: {res}')
+    # return UserFromDbFullSchema.model_validate(res)
+
+
+async def get_user_by_id(
     user_id: int,
     session: AsyncSession,
 ):
@@ -49,23 +76,25 @@ async def get_user(
 async def get_users(
     session: AsyncSession,
 ):
-    stmt = select(
-        User.id,
-        User.first_name,
-        User.last_name,
-        User.username,
-        User.email,
-        User.is_active,
-        User.is_admin,
-        User.is_superuser,
-        User.role,
-        User.phone_number,
-        User.telegram,
-        User.description,
-    ).order_by(User.id)
+    # stmt = select(
+    #     User.id,
+    #     User.first_name,
+    #     User.last_name,
+    #     User.username,
+    #     User.email,
+    #     User.is_active,
+    #     User.is_admin,
+    #     User.is_superuser,
+    #     User.role,
+    #     User.phone_number,
+    #     User.telegram,
+    #     User.description,
+    # ).order_by(User.id)
+    stmt = select(User).order_by(User.id)
     result: Result = await session.execute(stmt)
-    users = result.mappings().all()
-    return list(users)
+    # print(result.mappings().all())
+    return [UserFromDbFullSchema.model_validate(res) for res in result.scalars().all()]
+    return result.mappings().all()
 
 
 async def create_user(user: CreateUser, sess, from_app=False):
