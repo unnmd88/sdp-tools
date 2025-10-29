@@ -26,7 +26,7 @@ class CreateUser(BaseModel):
     description: Annotated[str, Field(default='')]
 
 
-class UserFullSchema(CreateUser):
+class UserFromDbFullSchema(CreateUser):
     model_config = ConfigDict(from_attributes=True)
 
     email: EmailStr | str

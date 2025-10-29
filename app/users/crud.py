@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select, text
 from starlette import status
 
-from users.schemas import CreateUser, UserFullSchema
+from users.schemas import CreateUser, UserFromDbFullSchema
 
 logger = logging.getLogger(USERS_LOGGER)
 # logger = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ async def get_user(
         )
     # res = await session.get(User, user_id)
     # print(f'res: {res}')
-    return UserFullSchema.model_validate(res)
+    return UserFromDbFullSchema.model_validate(res)
 
 
 async def get_users(
