@@ -11,8 +11,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select, text
 from starlette import status
 
-from users.schemas import CreateUser
-
+from users.schemas import CreateUser, UserFullSchema
 
 logger = logging.getLogger(USERS_LOGGER)
 # logger = logging.getLogger(__name__)
@@ -37,7 +36,14 @@ async def get_user(
     user_id: int,
     session: AsyncSession,
 ):
-    return await session.get(User, user_id)
+    if (res := await session.get(User, user_id)) is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User {user_id} not found",
+        )
+    # res = await session.get(User, user_id)
+    # print(f'res: {res}')
+    return UserFullSchema.model_validate(res)
 
 
 async def get_users(
@@ -59,12 +65,7 @@ async def get_users(
     ).order_by(User.id)
     result: Result = await session.execute(stmt)
     users = result.mappings().all()
-    usrs = list(users)
-    print(f'{usrs=} ')
-    # for u in usrs:
-    #     print(f'{u} ')
-    #     print(f'type_u: {type(u)}')
-    return usrs
+    return list(users)
 
 
 async def create_user(user: CreateUser, sess, from_app=False):
@@ -80,6 +81,7 @@ async def create_user(user: CreateUser, sess, from_app=False):
     sess.add(new_user)
     try:
         await sess.commit()
+        await sess.refresh(new_user)
     except IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,

@@ -26,6 +26,14 @@ class CreateUser(BaseModel):
     description: Annotated[str, Field(default='')]
 
 
+class UserFullSchema(CreateUser):
+    model_config = ConfigDict(from_attributes=True)
+
+    email: EmailStr | str
+    password: Annotated[str | bytes, Field(repr=False), Field(exclude=True)]
+
+
+
 class UserSchema(BaseModel):
     model_config = ConfigDict(strict=True)
 
