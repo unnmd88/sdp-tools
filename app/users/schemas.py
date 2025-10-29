@@ -29,17 +29,8 @@ class CreateUser(BaseModel):
 class UserFromDbFullSchema(CreateUser):
     model_config = ConfigDict(from_attributes=True)
 
+    id: int
     email: EmailStr | str
     password: Annotated[str | bytes, Field(repr=False), Field(exclude=True)]
 
 
-
-class UserSchema(BaseModel):
-    model_config = ConfigDict(strict=True)
-
-    id: int
-    username: str
-    password: bytes
-    email: EmailStr | None = None
-    is_active: bool = True
-    is_admin: bool = False
