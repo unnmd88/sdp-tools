@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy.testing.config import db_url
 
 from core.models import db_api
 from users import crud as users_crud
@@ -10,7 +11,7 @@ from users.schemas import CreateUser
 router = APIRouter(prefix='/users', tags=['Users'])
 
 
-session = Annotated[
+db_session = Annotated[
     AsyncSession,
     Depends(db_api.session_getter),
 ]
@@ -47,14 +48,14 @@ session = Annotated[
 @router.get('/{user_id}/')
 async def get_user(
     user_id: int,
-    sess: session,
+    sess: db_session,
 ):
     return await users_crud.get_user(user_id, sess)
 
 
 @router.get('/')
 async def get_users(
-    sess: session,
+    sess: db_session,
 ):
     return await users_crud.get_users(sess)
 
@@ -62,6 +63,6 @@ async def get_users(
 @router.post('/', status_code=status.HTTP_201_CREATED)
 async def auth_user_issue_jwt(
     user: CreateUser,
-    sess: session,
+    sess: db_session,
 ):
     return await users_crud.create_user(user, sess)
