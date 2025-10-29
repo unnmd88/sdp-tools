@@ -1,4 +1,8 @@
+import logging
+
+from app_logging.dev.config import USERS_LOGGER
 from auth import utils as auth_utils
+from core.config import BASE_DIR
 from core.models import User
 from fastapi import HTTPException
 from sqlalchemy.engine.result import Result
@@ -8,6 +12,25 @@ from sqlalchemy.sql.expression import select, text
 from starlette import status
 
 from users.schemas import CreateUser
+
+
+logger = logging.getLogger(USERS_LOGGER)
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
+# console_handler = logging.StreamHandler()
+# file_handler = logging.FileHandler(BASE_DIR / 'users/logs/users.log')
+# formatter = logging.Formatter('%(levelname)s %(message)s %(asctime)s %(name)s %(lineno)s')
+# console_handler.setFormatter(formatter)
+# file_handler.setFormatter(formatter)
+# logger.addHandler(console_handler)
+# logger.addHandler(file_handler)
+
+# logging.basicConfig(
+#     level=logging.DEBUG,
+#     datefmt='%Y-%m-%d %H:%M:%S',
+#     format='%(levelname)s %(message)s %(asctime)s %(name)s %(lineno)s',
+#     handlers=[console_handler, file_handler],
+# )
 
 
 async def get_user(
@@ -45,8 +68,6 @@ async def get_users(
 
 
 async def create_user(user: CreateUser, sess, from_app=False):
-    res = await sess.execute(text('SELECT * FROM users'))
-    print(res)
 
     if user.username == 'root' and from_app is False:
         raise HTTPException(
@@ -62,9 +83,9 @@ async def create_user(user: CreateUser, sess, from_app=False):
     except IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f'user with that username already exists: {user.username!r}',
+            detail=f'User with that username already exists: {user.username!r}',
         )
+    # logger.debug('Created user: %r', user)
+    logger.info('Created user: %r', user)
+    return user.model_dump(exclude={'password'})
 
-    res = await sess.execute(text('SELECT * FROM users'))
-    print(res)
-    return user
