@@ -1,11 +1,7 @@
 import asyncio
-from typing import Annotated
 
-from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from core.models import db_api
 
-from auth.utils import hash_password
-from core.models import db_api, User
 from users import crud as crud_users
 from users.organizations import Organizations
 from users.roles import Roles
