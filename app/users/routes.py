@@ -16,41 +16,21 @@ db_session = Annotated[
     Depends(db_api.session_getter),
 ]
 
-# @router.get("/{user_id}/")
-# async def get_users(
-#         user_id: int,
-#         sess: session,
+
+# @router.get('/username/{username}/', description='Get user by username')
+# async def get_user_by_username(
+#     username: str,
+#     sess: db_session,
 # ):
-#     stmt = select(
-#         User.id,
-#         User.first_name,
-#         User.last_name,
-#         User.username,
-#         User.email,
-#         User.is_active,
-#         User.is_admin,
-#         User.is_superuser,
-#         User.role,
-#         User.phone_number,
-#         User.telegram,
-#         User.description,
-#     ).order_by(User.id)
-#     result: Result = await sess.execute(stmt)
-#     users = result.mappings().all()
-#     usrs = list(users)
-#     print(f'{usrs=} ')
-#     # for u in usrs:
-#     #     print(f'{u} ')
-#     #     print(f'type_u: {type(u)}')
-#     return usrs
+#     return await users_crud.get_user_by_username_or_none(username, sess)
 
 
-@router.get('/{user_id}/')
+@router.get('/{user_id}/', description='Get user by id')
 async def get_user(
     user_id: int,
     sess: db_session,
 ):
-    return await users_crud.get_user(user_id, sess)
+    return await users_crud.get_user_by_id(user_id, sess)
 
 
 @router.get('/')
@@ -61,7 +41,7 @@ async def get_users(
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
-async def auth_user_issue_jwt(
+async def create_user(
     user: CreateUser,
     sess: db_session,
 ):
