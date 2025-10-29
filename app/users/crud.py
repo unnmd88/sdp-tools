@@ -44,9 +44,15 @@ async def get_users(
     return usrs
 
 
-async def create_user(user: CreateUser, sess):
+async def create_user(user: CreateUser, sess, from_app=False):
     res = await sess.execute(text('SELECT * FROM users'))
     print(res)
+
+    if user.username == 'root' and from_app is False:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f'username "root" is not allowed',
+        )
 
     user.password = auth_utils.hash_password(user.password)
     new_user = User(**user.model_dump())
