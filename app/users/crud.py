@@ -42,33 +42,15 @@ async def get_user_by_id(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User with id={user_id} not found",
         )
-    # res = await session.get(User, user_id)
-    # print(f'res: {res}')
     return UserFromDbFullSchema.model_validate(res)
 
 
 async def get_users(
     session: AsyncSession,
 ):
-    # stmt = select(
-    #     User.id,
-    #     User.first_name,
-    #     User.last_name,
-    #     User.username,
-    #     User.email,
-    #     User.is_active,
-    #     User.is_admin,
-    #     User.is_superuser,
-    #     User.role,
-    #     User.phone_number,
-    #     User.telegram,
-    #     User.description,
-    # ).order_by(User.id)
     stmt = select(User).order_by(User.id)
     result: Result = await session.execute(stmt)
-    # print(result.mappings().all())
     return [UserFromDbFullSchema.model_validate(res) for res in result.scalars().all()]
-    return result.mappings().all()
 
 
 async def create_user(user: CreateUser, sess, from_app=False):
