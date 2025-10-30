@@ -18,22 +18,7 @@ from starlette import status
 from users.schemas import CreateUser, UserFromDbFullSchema
 
 logger = logging.getLogger(USERS_LOGGER)
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
-# console_handler = logging.StreamHandler()
-# file_handler = logging.FileHandler(BASE_DIR / 'users/logs/users.log')
-# formatter = logging.Formatter('%(levelname)s %(message)s %(asctime)s %(name)s %(lineno)s')
-# console_handler.setFormatter(formatter)
-# file_handler.setFormatter(formatter)
-# logger.addHandler(console_handler)
-# logger.addHandler(file_handler)
 
-# logging.basicConfig(
-#     level=logging.DEBUG,
-#     datefmt='%Y-%m-%d %H:%M:%S',
-#     format='%(levelname)s %(message)s %(asctime)s %(name)s %(lineno)s',
-#     handlers=[console_handler, file_handler],
-# )
 
 async def get_user_by_username_or_none(
     username: str,

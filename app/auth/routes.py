@@ -31,8 +31,6 @@ db_session = Annotated[
     response_model=TokenInfo,
 )
 async def auth_user_issue_jwt(user: UserSchema = Depends(validate_auth_user)):
-    print('-------LOGIN JWT--------')
-    print(user)
     return TokenInfo(
         access_token=create_access_jwt(user),
         refresh_token=create_refresh_jwt(user),
@@ -44,19 +42,10 @@ async def auth_user_issue_jwt(user: UserSchema = Depends(validate_auth_user)):
     response_model_exclude_none=True,
 )
 async def auth_refresh_jwt(
-    # todo: validate user is active!!
-    # payload: Annotated[HTTPAuthorizationCredentials, Depends(extract_payload_from_jwt)],
     payload: Annotated[dict, Depends(extract_payload_from_jwt)],
     sess: db_session
-
-        # credentials2 = Depends(http_bearer),
-    # user: UserSchema = Depends(get_current_auth_uscer_for_refresh),
-    # user: UserSchema = Depends(get_auth_user_from_token_of_type(REFRESH_TOKEN_TYPE)),
-    # user: UserSchema = Depends(UserGetterFromToken(REFRESH_TOKEN_TYPE)),
 ):
     token_type = payload.get(TokenFields.typ)
-    print('--------REFRESH JWT--------')
-    print(f'token_type: {token_type}')
     check_token_type(
         token_type=token_type,
         expected_type=TokenTypes.refresh,
@@ -67,7 +56,7 @@ async def auth_refresh_jwt(
     return TokenInfo(
         access_token=create_access_jwt(user),
     )
-    print(f'payload: {payload}')
+
 
 
 

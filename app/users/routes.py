@@ -17,14 +17,6 @@ db_session = Annotated[
 ]
 
 
-# @router.get('/username/{username}/', description='Get user by username')
-# async def get_user_by_username(
-#     username: str,
-#     sess: db_session,
-# ):
-#     return await users_crud.get_user_by_username_or_none(username, sess)
-
-
 @router.get('/{user_id}/', description='Get user by id')
 async def get_user(
     user_id: int,
