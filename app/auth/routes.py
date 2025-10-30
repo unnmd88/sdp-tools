@@ -17,7 +17,7 @@ from auth.schemas import UserSchema
 from users.crud import get_user_by_id
 from users.schemas import UserFromDbFullSchema
 
-router = APIRouter(prefix="/auth", tags=["Authentication"])
+router = APIRouter(prefix='/auth', tags=['Authentication'])
 
 
 db_session = Annotated[
@@ -27,7 +27,7 @@ db_session = Annotated[
 
 
 @router.post(
-'/login/',
+    '/login/',
     response_model=TokenInfo,
 )
 async def auth_user_issue_jwt(user: UserSchema = Depends(validate_auth_user)):
@@ -36,14 +36,14 @@ async def auth_user_issue_jwt(user: UserSchema = Depends(validate_auth_user)):
         refresh_token=create_refresh_jwt(user),
     )
 
+
 @router.post(
-    "/refresh/",
+    '/refresh/',
     response_model=TokenInfo,
     response_model_exclude_none=True,
 )
 async def auth_refresh_jwt(
-    payload: Annotated[dict, Depends(extract_payload_from_jwt)],
-    sess: db_session
+    payload: Annotated[dict, Depends(extract_payload_from_jwt)], sess: db_session
 ):
     token_type = payload.get(TokenFields.typ)
     check_token_type(
@@ -56,8 +56,6 @@ async def auth_refresh_jwt(
     return TokenInfo(
         access_token=create_access_jwt(user),
     )
-
-
 
 
 # @router.post(

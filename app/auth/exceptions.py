@@ -34,5 +34,5 @@ def get_invalid_type_jwt_exception(
 ) -> HTTPException:
     return HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail=f"invalid token type: {str(current_token)!r}, expected {str(expected_token)!r}",
+        detail=f'invalid token type: {str(current_token)!r}, expected {str(expected_token)!r}',
     )

@@ -17,7 +17,7 @@ class TokenInfo(BaseModel):
 
 
 class UserSchema(BaseModel):
-    model_config = ConfigDict(strict=True, extra="ignore")
+    model_config = ConfigDict(strict=True, extra='ignore')
 
     id: int
     username: str
@@ -26,5 +26,6 @@ class UserSchema(BaseModel):
     is_admin: bool
     is_superuser: bool
     role: Annotated[Roles, BeforeValidator(lambda val: Roles(val))]
-    organization: Annotated[Organizations, BeforeValidator(lambda val: Organizations(val))]
-
+    organization: Annotated[
+        Organizations, BeforeValidator(lambda val: Organizations(val))
+    ]

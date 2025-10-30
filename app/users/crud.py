@@ -40,7 +40,7 @@ async def get_user_by_id(
     if (res := await session.get(User, user_id)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with id={user_id} not found",
+            detail=f'User with id={user_id} not found',
         )
     return UserFromDbFullSchema.model_validate(res)
 
@@ -54,7 +54,6 @@ async def get_users(
 
 
 async def create_user(user: CreateUser, sess, from_app=False):
-
     if user.username == 'root' and from_app is False:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -75,4 +74,3 @@ async def create_user(user: CreateUser, sess, from_app=False):
     # logger.debug('Created user: %r', user)
     logger.info('Created user: %r', user)
     return user.model_dump(exclude={'password'})
-

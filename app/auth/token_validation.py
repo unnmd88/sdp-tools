@@ -6,8 +6,13 @@ from jwt import InvalidTokenError, ExpiredSignatureError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.constants import TokenTypes, TokenFields
-from auth.exceptions import InvalidErrorJWT, ExpiredSignatureJWT, get_invalid_type_jwt_exception, InactiveUserError, \
-    ForbiddenSelfUser
+from auth.exceptions import (
+    InvalidErrorJWT,
+    ExpiredSignatureJWT,
+    get_invalid_type_jwt_exception,
+    InactiveUserError,
+    ForbiddenSelfUser,
+)
 from auth.utils import decode_jwt
 from core.models import db_api
 from users.crud import get_user_by_id
@@ -17,7 +22,7 @@ http_bearer = HTTPBearer()
 
 
 def extract_payload_from_jwt(
-        credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
 ) -> dict:
     try:
         payload = decode_jwt(credentials.credentials)
@@ -48,7 +53,7 @@ async def check_is_active_superuser(
 
 def check_token_type(
     token_type: TokenTypes,
-    expected_type: TokenTypes
+    expected_type: TokenTypes,
 ) -> bool:
     if token_type != expected_type:
         raise get_invalid_type_jwt_exception(token_type, expected_type)

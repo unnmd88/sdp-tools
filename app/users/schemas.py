@@ -32,5 +32,3 @@ class UserFromDbFullSchema(CreateUser):
     id: int
     email: EmailStr | str
     password: Annotated[str | bytes, Field(repr=False), Field(exclude=True)]
-
-
