@@ -12,8 +12,9 @@ BASE_DIR = Path(__file__).parent.parent
 
 
 class RunConfig(BaseModel):
-    host: str = '0.0.0.0'
-    port: int = 8000
+    # host: str = '0.0.0.0'
+    host: str = '192.168.45.248'
+    port: int = 8001
     reload: bool = True
 
 
@@ -31,9 +32,8 @@ class AuthJWT(BaseModel):
     private_key_path: Path = BASE_DIR / 'certs' / 'private.pem'
     public_key_path: Path = BASE_DIR / 'certs' / 'public.pem'
     algorithm: str = 'RS256'
-    access_expire_minutes: int = 60 * 12
-    access_expire_days: int = 3
-    refresh_expire_days: int = 60 * 12
+    access_expire_minutes: int = 3
+    refresh_expire_days: int = 1
 
 
 class DatabaseConfig(BaseModel):
