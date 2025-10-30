@@ -12,23 +12,28 @@ unauthed_exc = HTTPException(
 )
 
 
+def check_user_is_active(user_is_active: bool) -> bool:
+    if not user_is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail='inactive user'
+        )
+    return True
+
+
+def check_password_is_valid(plain_password: str, hashed_password: bytes) -> bool:
+    if not auth_utils.validate_password(
+        password=plain_password, hashed_password=hashed_password
+    ):
+        raise unauthed_exc
+    return True
+
+
 async def validate_auth_user(
     username: str = Form(),
     password: str = Form(),
 ):
-    async with db_api.session_factory() as session:
-        if (user := await get_user_by_username_or_none(username, session)) is None:
-            raise unauthed_exc
-
-    print(f'db_pass: {user.password}')
-    print(f'plain_pass: {password}')
-
-    if not auth_utils.validate_password(
-        password=password, hashed_password=user.password
-    ):
+    if (user := await get_user_by_username_or_none(username)) is None:
         raise unauthed_exc
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail='inactive user'
-        )
+    check_password_is_valid(password, user.password)
+    check_user_is_active(user.is_active)
     return UserSchema.model_validate(user, from_attributes=True)
