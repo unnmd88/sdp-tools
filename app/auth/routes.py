@@ -53,12 +53,4 @@ async def auth_refresh_jwt(
     )
 
 
-# @router.post(
-#     "/auth-test/",
-# )
-# def auth_refresh_jwt(
-#     credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
-# ):
-#     extract_payload_from_jwt(credentials.credentials)
-#     print(f'credentials: {credentials}')
-#     # print(f'credentials2: {credentials2}')
+

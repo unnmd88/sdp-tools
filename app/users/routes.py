@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from users import crud as users_crud
-from users.schemas import CreateUser
+from users.schemas import CreateUser, UserFromDbFullSchema
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
@@ -56,3 +56,13 @@ async def create_user(
     sess: db_session,
 ):
     return await users_crud.create_user(user, sess)
+
+
+@router.post(
+    "/whoami/",
+    dependencies=[Depends(check_is_active_superuser)]
+)
+def whoami(
+    user: Annotated[UserFromDbFullSchema, Depends(check_is_active_superuser)],
+):
+    return user
