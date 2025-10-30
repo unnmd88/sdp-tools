@@ -25,30 +25,31 @@ jwt_payload = Annotated[dict, Depends(extract_payload_from_jwt)]
 @router.get(
     '/{user_id}/',
     description='Get user by id',
+    response_model=UserFromDbFullSchema,
     dependencies=[Depends(check_user_is_active)],
 )
-async def get_user(
+async def get_all_user(
     user_id: int,
     sess: db_session,
-    payload: jwt_payload,
 ):
     return await users_crud.get_user_by_id(user_id, sess)
 
 
-@router.get('/', dependencies=[Depends(check_is_active_superuser)])
+@router.get(
+'/',
+    response_model=list[UserFromDbFullSchema],
+    dependencies=[Depends(check_is_active_superuser)]
+)
 async def get_users(
     sess: db_session,
-    # payload: jwt_payload,
-    # payload: Annotated[dict, Depends(check_user_is_active)],
 ):
-    # print(f'PAYLOAD: {payload}')
-    return await users_crud.get_users(sess)
     return await users_crud.get_users(sess)
 
 
 @router.post(
     '/',
     status_code=status.HTTP_201_CREATED,
+    response_model=UserFromDbFullSchema,
     dependencies=[Depends(check_is_active_superuser)],
 )
 async def create_user(
@@ -60,7 +61,8 @@ async def create_user(
 
 @router.post(
     "/whoami/",
-    dependencies=[Depends(check_is_active_superuser)]
+    status_code=status.HTTP_200_OK,
+    response_model=UserFromDbFullSchema,
 )
 def whoami(
     user: Annotated[UserFromDbFullSchema, Depends(check_is_active_superuser)],
