@@ -11,6 +11,12 @@ InactiveUserError = HTTPException(
     status_code=status.HTTP_403_FORBIDDEN, detail='inactive user'
 )
 
+
+ForbiddenSelfUser = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN, detail='access denied'
+)
+
+
 InvalidErrorJWT = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail='Invalid token error',
