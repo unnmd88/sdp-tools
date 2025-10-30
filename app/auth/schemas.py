@@ -2,6 +2,7 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field, ConfigDict, EmailStr, BeforeValidator
 
+from auth.constants import TokenTypes
 from users.organizations import Organizations
 from users.roles import Roles
 
@@ -11,7 +12,7 @@ REFRESH_TOKEN_TYPE = 'refresh'
 
 class TokenInfo(BaseModel):
     access_token: str
-    # refresh_token: str
+    refresh_token: str | None = None
     token_type: str = 'Bearer'
 
 
@@ -26,3 +27,4 @@ class UserSchema(BaseModel):
     is_superuser: bool
     role: Annotated[Roles, BeforeValidator(lambda val: Roles(val))]
     organization: Annotated[Organizations, BeforeValidator(lambda val: Organizations(val))]
+
