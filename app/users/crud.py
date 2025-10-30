@@ -37,26 +37,15 @@ logger = logging.getLogger(USERS_LOGGER)
 
 async def get_user_by_username_or_none(
     username: str,
-    session: AsyncSession
-):
+) -> User | None:
     stmt = select(User).where(User.username == username)
     try:
-        result: Result = await session.execute(stmt)
+        async with db_api.session_factory() as session:
+            result: Result = await session.execute(stmt)
         return result.scalars().one()
     except sqlalchemy.exc.NoResultFound:
         pass
     return None
-
-    print(resultt)
-    return resultt
-    # if (res := await session.execute(stmt)):
-    #     raise HTTPException(
-    #         status_code=status.HTTP_404_NOT_FOUND,
-    #         detail=f"User {user_id!r} not found",
-    #     )
-    # # res = await session.get(User, user_id)
-    # # print(f'res: {res}')
-    # return UserFromDbFullSchema.model_validate(res)
 
 
 async def get_user_by_id(
