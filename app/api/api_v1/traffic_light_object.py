@@ -1,11 +1,7 @@
-from typing import Annotated
 
 from fastapi import (
     APIRouter,
-    Depends,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
-
 
 router = APIRouter(tags=['Traffic-light-objects'])
 

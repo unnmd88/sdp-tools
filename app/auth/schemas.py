@@ -1,8 +1,6 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field, ConfigDict, EmailStr, BeforeValidator
-
-from auth.constants import TokenTypes
+from pydantic import BaseModel, BeforeValidator, ConfigDict, EmailStr
 from users.organizations import Organizations
 from users.roles import Roles
 

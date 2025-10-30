@@ -1,10 +1,11 @@
 from datetime import timedelta as td
 
-from auth.constants import TokenTypes, TokenFields
-from auth.schemas import UserSchema
-from auth.utils import encode_jwt
 from core.config import settings
 from users.schemas import UserFromDbFullSchema
+
+from auth.constants import TokenFields, TokenTypes
+from auth.schemas import UserSchema
+from auth.utils import encode_jwt
 
 
 def create_token(

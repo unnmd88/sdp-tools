@@ -1,11 +1,10 @@
-from sqlalchemy.orm import Mapped, mapped_column
+import sqlalchemy as sa
 from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from core.models import Base
-import sqlalchemy as sa
-
 from core.models.mixins.integer_pk_id import IntegerIdPkMixin
-from core.models.mixins.timestamp import UpdatedAtMixin, CreatedAtMixin
+from core.models.mixins.timestamp import CreatedAtMixin, UpdatedAtMixin
 
 
 class User(

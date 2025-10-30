@@ -1,9 +1,9 @@
 from fastapi import Form
+from users.crud import get_user_by_username_or_none
 
 from auth import utils as auth_utils
 from auth.exceptions import AuthenticationError, InactiveUserError
 from auth.schemas import UserSchema
-from users.crud import get_user_by_username_or_none
 
 
 def check_user_is_active(user_is_active: bool) -> bool:

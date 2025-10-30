@@ -1,21 +1,16 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
-
-from auth import utils as auth_utils
-from auth.create_tokens import create_token, create_refresh_jwt, create_access_jwt
-from auth.exceptions import InactiveUserError
-from auth.services import validate_auth_user
-from auth.constants import TokenFields, TokenTypes
-from auth.schemas import TokenInfo
-from auth.token_validation import extract_payload_from_jwt, check_token_type
 from core.models import db_api
-from auth.schemas import UserSchema
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 from users.crud import get_user_by_id
-from users.schemas import UserFromDbFullSchema
+
+from auth.constants import TokenFields, TokenTypes
+from auth.create_tokens import create_access_jwt, create_refresh_jwt
+from auth.exceptions import InactiveUserError
+from auth.schemas import TokenInfo, UserSchema
+from auth.services import validate_auth_user
+from auth.token_validation import check_token_type, extract_payload_from_jwt
 
 router = APIRouter(prefix='/auth', tags=['Authentication'])
 

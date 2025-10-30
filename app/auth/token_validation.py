@@ -1,22 +1,21 @@
 from typing import Annotated
 
-from fastapi import Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jwt import InvalidTokenError, ExpiredSignatureError
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from auth.constants import TokenTypes, TokenFields
-from auth.exceptions import (
-    InvalidErrorJWT,
-    ExpiredSignatureJWT,
-    get_invalid_type_jwt_exception,
-    InactiveUserError,
-    ForbiddenSelfUser,
-)
-from auth.utils import decode_jwt
 from core.models import db_api
+from fastapi import Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jwt import ExpiredSignatureError, InvalidTokenError
 from users.crud import get_user_by_id
 from users.schemas import UserFromDbFullSchema
+
+from auth.constants import TokenFields, TokenTypes
+from auth.exceptions import (
+    ExpiredSignatureJWT,
+    ForbiddenSelfUser,
+    InactiveUserError,
+    InvalidErrorJWT,
+    get_invalid_type_jwt_exception,
+)
+from auth.utils import decode_jwt
 
 http_bearer = HTTPBearer()
 

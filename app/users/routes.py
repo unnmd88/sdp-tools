@@ -1,15 +1,14 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
-from sqlalchemy.ext.asyncio.session import AsyncSession
-from sqlalchemy.testing.config import db_url
-
 from auth.token_validation import (
-    extract_payload_from_jwt,
-    check_user_is_active,
     check_is_active_superuser,
+    check_user_is_active,
+    extract_payload_from_jwt,
 )
 from core.models import db_api
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio.session import AsyncSession
+
 from users import crud as users_crud
 from users.schemas import CreateUser
 

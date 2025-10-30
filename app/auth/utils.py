@@ -1,11 +1,10 @@
 import datetime
-from datetime import timedelta
 from datetime import datetime as dt
+from datetime import timedelta
 from typing import AnyStr
 
 import bcrypt
 import jwt
-
 from core.config import settings
 
 

@@ -1,11 +1,10 @@
 import uvicorn
 
-from app.core.config import settings
-from fastapi import FastAPI
-
 # from users.demo import router as demo_auth_router
 from api import router as api_v1_router
+from fastapi import FastAPI
 
+from app.core.config import settings
 
 app = FastAPI()
 app.include_router(router=api_v1_router)

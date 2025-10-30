@@ -1,5 +1,6 @@
-import psycopg2
 from contextlib import contextmanager
+
+import psycopg2
 
 
 @contextmanager
@@ -14,11 +15,10 @@ def get_db_connection():
 
 
 def get_all(tablename):
-    with get_db_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f'SELECT * FROM {tablename}')
-            results = cur.fetchall()
-            print(results)
+    with get_db_connection() as conn, conn.cursor() as cur:
+        cur.execute(f'SELECT * FROM {tablename}')
+        results = cur.fetchall()
+        print(results)
 
 
 def drop_tables():
@@ -32,10 +32,9 @@ def drop_tables():
                 END LOOP; 
             END $$;
             """
-    with get_db_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(stmt)
-            conn.commit()
+    with get_db_connection() as conn, conn.cursor() as cur:
+        cur.execute(stmt)
+        conn.commit()
 
 
 def create_tlo_table():
@@ -47,10 +46,9 @@ def create_tlo_table():
             fk_tlo        int REFERENCES REGIONS(pk_regions_id)
             );
             """
-    with get_db_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(stmt)
-            conn.commit()
+    with get_db_connection() as conn, conn.cursor() as cur:
+        cur.execute(stmt)
+        conn.commit()
 
 
 def create_regions_table():
@@ -61,37 +59,33 @@ def create_regions_table():
             region            int UNIQUE
             );
             """
-    with get_db_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(stmt)
-            conn.commit()
+    with get_db_connection() as conn, conn.cursor() as cur:
+        cur.execute(stmt)
+        conn.commit()
 
 
 def insert_data_tlo():
-    with get_db_connection() as conn:
-        with conn.cursor() as cur:
-            with open('data_tlo', 'r') as file:
-                for l in file:
-                    cur.execute(f'INSERT INTO TLO (name, district, fk_tlo) VALUES {l}')
-            conn.commit()
+    with get_db_connection() as conn, conn.cursor() as cur:
+        with open('data_tlo') as file:
+            for l in file:
+                cur.execute(f'INSERT INTO TLO (name, district, fk_tlo) VALUES {l}')
+        conn.commit()
 
 
 def insert_data_regions():
-    with get_db_connection() as conn:
-        with conn.cursor() as cur:
-            with open('data_regions', 'r') as file:
-                for l in file:
-                    cur.execute(f'INSERT INTO regions (city, region) VALUES {l}')
-            conn.commit()
+    with get_db_connection() as conn, conn.cursor() as cur:
+        with open('data_regions') as file:
+            for l in file:
+                cur.execute(f'INSERT INTO regions (city, region) VALUES {l}')
+        conn.commit()
 
 
 def join1():
-    with get_db_connection() as conn:
-        with conn.cursor() as cur:
-            with open('data_regions', 'r') as file:
-                for l in file:
-                    cur.execute(f'INSERT INTO regions (city, region) VALUES {l}')
-            conn.commit()
+    with get_db_connection() as conn, conn.cursor() as cur:
+        with open('data_regions') as file:
+            for l in file:
+                cur.execute(f'INSERT INTO regions (city, region) VALUES {l}')
+        conn.commit()
 
 
 if __name__ == '__main__':

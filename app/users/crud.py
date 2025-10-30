@@ -1,18 +1,14 @@
 import logging
-from collections.abc import Sequence
-from typing import Annotated
 
 import sqlalchemy
-
 from app_logging.dev.config import USERS_LOGGER
 from auth import utils as auth_utils
-from core.config import BASE_DIR
 from core.models import User, db_api
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from sqlalchemy.engine.result import Result
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio.session import AsyncSession
-from sqlalchemy.sql.expression import select, text
+from sqlalchemy.sql.expression import select
 from starlette import status
 
 from users.schemas import CreateUser, UserFromDbFullSchema
@@ -57,7 +53,7 @@ async def create_user(user: CreateUser, sess, from_app=False):
     if user.username == 'root' and from_app is False:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f'username "root" is not allowed',
+            detail='username "root" is not allowed',
         )
 
     user.password = auth_utils.hash_password(user.password)
