@@ -1,7 +1,5 @@
 from typing import Annotated
 
-from starlette import status
-
 from core.models import db_api
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,7 +37,6 @@ async def auth_user_issue_jwt(user: UserSchema = Depends(validate_auth_user)):
     response_model=TokenInfo,
     response_model_exclude_none=True,
 )
-
 async def auth_refresh_jwt(
     payload: Annotated[dict, Depends(extract_payload_from_jwt)], sess: db_session
 ):
