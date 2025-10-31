@@ -23,6 +23,17 @@ jwt_payload = Annotated[dict, Depends(extract_payload_from_jwt)]
 
 
 @router.get(
+    "/whoami/",
+    status_code=status.HTTP_200_OK,
+    response_model=UserFromDbFullSchema,
+)
+def whoami(
+    user: Annotated[UserFromDbFullSchema, Depends(check_is_active_superuser)],
+):
+    return user
+
+
+@router.get(
     '/{user_id}/',
     description='Get user by id',
     response_model=UserFromDbFullSchema,
@@ -59,12 +70,3 @@ async def create_user(
     return await users_crud.create_user(user, sess)
 
 
-@router.post(
-    "/whoami/",
-    status_code=status.HTTP_200_OK,
-    response_model=UserFromDbFullSchema,
-)
-def whoami(
-    user: Annotated[UserFromDbFullSchema, Depends(check_is_active_superuser)],
-):
-    return user
