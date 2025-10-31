@@ -1,4 +1,5 @@
 import uvicorn
+from starlette.middleware.cors import CORSMiddleware
 
 # from users.demo import router as demo_auth_router
 from api import router as api_v1_router
@@ -8,7 +9,16 @@ from app.core.config import settings
 
 app = FastAPI()
 app.include_router(router=api_v1_router)
-# app.include_router(router=demo_auth_router, prefix=settings.api.v1.prefix)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    # allow_origins=["http://192.168.45.66", "http://192.168.45.90"],  # или ["http://localhost:5173", "http://твой_домен"]
+    allow_origins=["*"],  # или ["http://localhost:5173", "http://твой_домен"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get('/')
