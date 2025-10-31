@@ -89,13 +89,14 @@ def join1():
 
 
 if __name__ == '__main__':
-    drop_tables()
-
-    """ Mutable section """
-    create_regions_table()
-    insert_data_regions()
-    create_tlo_table()
-    insert_data_tlo()
-
-    get_all('tlo')
-    get_all('regions')
+    pass
+    # drop_tables()
+    #
+    # """ Mutable section """
+    # create_regions_table()
+    # insert_data_regions()
+    # create_tlo_table()
+    # insert_data_tlo()
+    #
+    # get_all('tlo')
+    # get_all('regions')
