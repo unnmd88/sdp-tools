@@ -1,7 +1,6 @@
-from starlette.testclient import TestClient
-
 from core.config import settings
 from main import app
+from starlette.testclient import TestClient
 
 BASE_URL = (
     f'http://{settings.run.host}:{settings.run.port}'
