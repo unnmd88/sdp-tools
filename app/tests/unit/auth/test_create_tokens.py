@@ -10,6 +10,10 @@ from users.schemas import UserFromDbFullSchema
 
 @pytest.fixture
 def user_schemas() -> Sequence[UserSchema | UserFromDbFullSchema]:
+    """
+    Формирует последовательность схем.
+    :return: Последовательность схем юзера.
+    """
     return [
         UserSchema(
             id=1,
@@ -39,9 +43,9 @@ def user_schemas() -> Sequence[UserSchema | UserFromDbFullSchema]:
 
 def test_create_jwt(user_schemas):
     """
-    Тестирует создание jwt
-    :param user_schemas:
-    :return:
+    Тестирует создание jwt.
+    :param user_schemas: Схема данных сущности  User.
+    :return: None
     """
 
     access_tokens = [create_access_jwt(u) for u in user_schemas]
