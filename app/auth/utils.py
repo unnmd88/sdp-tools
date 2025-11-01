@@ -21,7 +21,6 @@ def encode_jwt(
     else:
         expire = now + timedelta(minutes=expire_minutes)
     encoded = jwt.encode(
-        # payload.copy() | {'exp': expire, 'iat': now},
         {k: v for k, v in payload.items()} | {'exp': expire, 'iat': now},
         private_key,
         algorithm,
