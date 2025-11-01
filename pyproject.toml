@@ -51,3 +51,7 @@ quote-style = "single"
 indent-style = "space"
 docstring-code-format = true
 skip-magic-trailing-comma = false
+
+# Pytest config
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
