@@ -18,7 +18,5 @@ class CreatedAtMixin:
 
 class UpdatedAtMixin:
     updated_at: Mapped[datetime] = mapped_column(
-        default=get_current_dt,
-        server_default=func.now(),
-        onupdate=get_current_dt
+        default=get_current_dt, server_default=func.now(), onupdate=get_current_dt
     )

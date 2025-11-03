@@ -66,9 +66,7 @@ class User(
     )
 
     def __repr__(self):
-        return (
-            f'{self.__class__.__name__}(id={self.id} username={self.username})'
-        )
+        return f'{self.__class__.__name__}(id={self.id} username={self.username})'
 
     # foo: Mapped[int]
     # bar: Mapped[int]

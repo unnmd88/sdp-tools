@@ -1,10 +1,12 @@
 import pytest
 
 from core.config import settings
-from core.models import Base
+from core.models import Base, User
 from core.models.database_api import DatabaseAPI
 from main import app
 from starlette.testclient import TestClient
+
+from users.user_examples import users as user_examples
 
 BASE_URL = (
     f'http://{settings.run.host}:{settings.run.port}'
@@ -15,6 +17,7 @@ client = TestClient(
     app=app,
     base_url=BASE_URL,
 )
+
 
 @pytest.fixture(scope='session')
 def t_dp_api():
@@ -38,6 +41,10 @@ async def t_session(t_dp_api):
 async def create_tables(t_dp_api):
     async with t_dp_api.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        yield
+        await conn.run_sync(Base.metadata.drop_all)
 
 
-
+@pytest.fixture
+def user_models():
+    return [User(**u) for u in user_examples]

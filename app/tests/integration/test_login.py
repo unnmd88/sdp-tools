@@ -1,6 +1,3 @@
-
-
-
 # @pytest_asyncio.fixture
 # async def async_client():
 #     # async with AsyncClient(base_url=BASE_URL) as client:
