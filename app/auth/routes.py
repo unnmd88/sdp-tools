@@ -51,5 +51,3 @@ async def auth_refresh_jwt(
     return TokenInfo(
         access_token=create_access_jwt(user),
     )
-
-

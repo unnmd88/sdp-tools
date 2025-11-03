@@ -1,81 +1,34 @@
 import pytest
+from sqlalchemy.engine.result import Result
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy.sql.expression import select
 
 from core.models import User
-"""
-    first_name: Mapped[str] = mapped_column(
-        String(32),
-        nullable=False,
-    )
-    last_name: Mapped[str] = mapped_column(
-        String(32),
-        nullable=False,
-    )
-    organization: Mapped[str] = mapped_column(String(32), nullable=False)
-    username: Mapped[str] = mapped_column(
-        String(32),
-        unique=True,
-        nullable=False,
-    )
-    email: Mapped[str] = mapped_column(
-        # unique=True,
-        nullable=False,
-        default='',
-        server_default='',
-    )
-    password: Mapped[bytes] = mapped_column(
-        # unique=True,
-        nullable=False,
-    )
-    is_active: Mapped[bool] = mapped_column(
-        nullable=False,
-        default=True,
-        server_default=sa.sql.expression.true(),
-    )
-    is_admin: Mapped[bool] = mapped_column(
-        nullable=False,
-        default=True,
-        server_default=sa.sql.expression.false(),
-    )
-    is_superuser: Mapped[bool] = mapped_column(
-        nullable=False,
-        default=True,
-        server_default=sa.sql.expression.false(),
-    )
-    role: Mapped[str] = mapped_column(String(32), nullable=False)
-    phone_number: Mapped[str] = mapped_column(
-        String(32), nullable=False, default='', server_default=''
-    )
-    telegram: Mapped[str] = mapped_column(
-        String(32), nullable=False, default='', server_default=''
-    )
-    description: Mapped[str] = mapped_column(
-        nullable=False,
-        default='',
-        server_default='',
-    )
+from tests.integration.conftest import user_models
 
-"""
 
-@pytest.mark.asyncio(loop_scope="session")
-async def test_create_user(t_session: AsyncSession):
-    print(f'{type(t_session)=}')
-    new_user = User(
-        first_name='chook',
-        last_name='gekk',
-        organization='SDP',
-        username='chook@gekk',
-        password=b'password1',
-        is_active=True,
-        is_admin=True,
-        is_superuser=True,
-        role='superman',
-    )
-
-    t_session.add(new_user)
+@pytest.mark.asyncio(loop_scope='session')
+async def test_create_user(t_session: AsyncSession, user_models):
+    t_session.add_all(user_models)
     await t_session.commit()
-    # await t_session.refresh(new_user)
+    _users: Result = await t_session.execute(select(User))
+    assert _users.scalars().all() == user_models
 
 
+# @pytest.mark.asyncio(loop_scope="session")
+# async def test_create_user(t_session: AsyncSession):
+#     new_user = User(
+#         first_name='chook',
+#         last_name='gekk',
+#         organization='SDP',
+#         username='chook@gekk',
+#         password=b'password1',
+#         is_active=True,
+#         is_admin=True,
+#         is_superuser=True,
+#         role='superman',
+#     )
 
-    print(new_user)
+#     t_session.add(new_user)
+#     await t_session.commit()
+#     # await t_session.refresh(new_user)

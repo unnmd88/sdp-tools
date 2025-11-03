@@ -14,7 +14,6 @@ async def test_check_is_active_superuser(user_schemas):
         user.is_superuser = False
 
     with pytest.raises(HTTPException):
-        users = await asyncio.gather(*[check_is_active_superuser(u) for u in user_schemas])
-
-
-
+        users = await asyncio.gather(
+            *[check_is_active_superuser(u) for u in user_schemas]
+        )
