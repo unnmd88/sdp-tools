@@ -1,14 +1,14 @@
 services:
   pg:
-    image: postgres:17
+    image: postgres:18
     container_name: psgr
     environment:
       POSTGRES_USER: admin1
       POSTGRES_PASSWORD: 1122
       POSTGRES_DB: tdb
-      #PGDATA: /var/lib/postgresql/data_regions
+      PGDATA: /var/lib/postgresql
     volumes:
-      - pgdata:/var/lib/postgresql/data_regions
+      - pgdata:/var/lib/postgresql
     ports:
       - "5432:5432"
     networks:
@@ -21,7 +21,7 @@ services:
       retries: 3
 
   pg_test:
-    image: postgres:17
+    image: postgres:18
     container_name: psgr_test
     environment:
       POSTGRES_USER: admin2
@@ -74,3 +74,4 @@ networks:
 
 volumes:
   pgdata:
+    external: true
