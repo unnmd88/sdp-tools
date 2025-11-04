@@ -1,4 +1,7 @@
 import datetime
+import random
+import secrets
+import string
 from datetime import datetime as dt
 from datetime import timedelta
 from typing import AnyStr
@@ -58,3 +61,11 @@ def validate_password(
         password=password.encode('utf-8'),
         hashed_password=hashed_password,
     )
+
+def gen_password(
+    min_length: int = settings.auth_jwt.passwd.min_length,
+    max_length: int = settings.auth_jwt.passwd.max_length,
+) -> str:
+    chars = string.ascii_letters + string.digits + string.punctuation
+    return  ''.join(secrets.choice(chars) for _ in range(random.randint(min_length, max_length)))
+
