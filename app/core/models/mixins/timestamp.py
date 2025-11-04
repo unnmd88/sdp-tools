@@ -1,22 +1,24 @@
-from datetime import UTC, datetime
+from datetime import UTC
+from datetime import datetime as dt_datetime
 
-from sqlalchemy import func
+from sqlalchemy import func, Column, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 
 
-def get_current_dt() -> datetime:
-    dt = datetime.now(tz=UTC)
+def get_current_dt() -> dt_datetime:
+    dt = dt_datetime.now(tz=UTC)
     return dt.replace(microsecond=0, tzinfo=None)
 
 
 class CreatedAtMixin:
-    created_at: Mapped[datetime] = mapped_column(
-        default=get_current_dt,
-        server_default=func.now(),
+
+    created_at: Mapped[DateTime] = mapped_column(
+        DateTime(), server_default=func.now(), default=get_current_dt,
     )
 
 
 class UpdatedAtMixin:
-    updated_at: Mapped[datetime] = mapped_column(
-        default=get_current_dt, server_default=func.now(), onupdate=get_current_dt
+
+    updated_at: Mapped[DateTime] = mapped_column(
+        DateTime(), server_default=func.now(), onupdate=func.now(), server_onupdate=func.now(),
     )
