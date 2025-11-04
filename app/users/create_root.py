@@ -38,15 +38,13 @@ async def create_root(session: AsyncSession = None):
     )
     sess: AsyncSession = session or db_api.session_factory()
     try:
+
         sess.add(user_root)
         await sess.commit()
         await sess.refresh(user_root)
-        logger.info('User root was created with id=%s.', user_root.id)
+        logger.info('User %r was created with id=%s.', name, user_root.id)
     except IntegrityError:
-        logger.warning('User root already exists.')
-    except AssertionError as e:
-        logger.critical('Fatal error. User root was not created: %s', e)
-        raise
+        logger.warning('User %r already exists.', name)
     finally:
         await sess.aclose()
 
