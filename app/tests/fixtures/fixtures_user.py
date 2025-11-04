@@ -23,7 +23,7 @@ def user_schemas() -> Sequence[UserSchema | UserFromDbFullSchema]:
             is_admin=True,
             is_superuser=True,
             role=Roles.superuser,
-            organization=Organizations.spetsdorproject,
+            organization=Organizations.SDP,
         ),
         UserFromDbFullSchema(
             id=4,
@@ -31,7 +31,7 @@ def user_schemas() -> Sequence[UserSchema | UserFromDbFullSchema]:
             first_name='gekk',
             last_name='gekkov',
             username='iamgekk',
-            organization=Organizations.spetsdorproject,
+            organization=Organizations.SDP,
             password=b'ofshpsabdhf',
             is_active=True,
             is_admin=True,
