@@ -26,12 +26,19 @@ class ApiPrefix(BaseModel):
     v1: ApiV1Prefix = ApiV1Prefix()
 
 
+
+class Password(BaseModel):
+    min_length: int = 6
+    max_length: int = 30
+
+
 class AuthJWT(BaseModel):
     private_key_path: Path = BASE_DIR / 'certs' / 'private.pem'
     public_key_path: Path = BASE_DIR / 'certs' / 'public.pem'
     algorithm: str = 'RS256'
     access_expire_minutes: int = 3
     refresh_expire_days: int = 1
+    passwd: Password = Password()
 
 
 class DatabaseConfig(BaseModel):
