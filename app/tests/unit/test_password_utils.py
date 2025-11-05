@@ -9,10 +9,9 @@ from contextlib import nullcontext
 
 
 class TestPasswordUtils:
-
     @pytest.fixture
     def passwords(self) -> list[str]:
-        return  [gen_password() for _ in range(4)]
+        return [gen_password() for _ in range(4)]
 
     def test_gen_password(self):
         for passwd_length in range(10, 21):
@@ -27,8 +26,8 @@ class TestPasswordUtils:
             ('osdnf', nullcontext()),
             (1, pytest.raises(AttributeError)),
             ([1, 2, 3], pytest.raises(AttributeError)),
-            (list('1234fbi'), pytest.raises(AttributeError))
-        ]
+            (list('1234fbi'), pytest.raises(AttributeError)),
+        ],
     )
     def test_hash_password(self, password, expected):
         with expected:
@@ -37,13 +36,15 @@ class TestPasswordUtils:
 
     def test_validate_password_true(self, passwords):
         for passwd in passwords:
-            hashed_passwd =  hash_password(passwd)
+            hashed_passwd = hash_password(passwd)
             assert validate_password(passwd, hashed_passwd)
 
     def test_validate_password_false(self, passwords):
         chars = string.ascii_letters + string.digits + string.punctuation
         for passwd in passwords:
-            hashed_passwd =  hash_password(passwd)
-            chars_added_to_passwd = "".join(random.choices(chars, k=random.randint(1, 10)))
+            hashed_passwd = hash_password(passwd)
+            chars_added_to_passwd = ''.join(
+                random.choices(chars, k=random.randint(1, 10))
+            )
             mut_passwd = passwd + chars_added_to_passwd
             assert not validate_password(mut_passwd, hashed_passwd)

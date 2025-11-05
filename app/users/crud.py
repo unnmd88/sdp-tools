@@ -67,7 +67,5 @@ async def create_user(user: CreateUser, sess, from_app=False):
             status_code=status.HTTP_409_CONFLICT,
             detail=f'User with that username already exists: {user.username!r}',
         )
-    # logger.debug('Created user: %r', user)
     logger.info('Created user: %r', user)
     return new_user
-    # return user.model_dump(exclude={'password'})

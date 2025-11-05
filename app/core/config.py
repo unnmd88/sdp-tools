@@ -26,7 +26,6 @@ class ApiPrefix(BaseModel):
     v1: ApiV1Prefix = ApiV1Prefix()
 
 
-
 class Password(BaseModel):
     min_length: int = 6
     max_length: int = 30

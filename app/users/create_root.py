@@ -38,7 +38,6 @@ async def create_root(session: AsyncSession = None):
     )
     sess: AsyncSession = session or db_api.session_factory()
     try:
-
         sess.add(user_root)
         await sess.commit()
         await sess.refresh(user_root)

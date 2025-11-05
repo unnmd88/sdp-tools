@@ -11,14 +11,17 @@ def get_current_dt() -> dt_datetime:
 
 
 class CreatedAtMixin:
-
     created_at: Mapped[DateTime] = mapped_column(
-        DateTime(), server_default=func.now(), default=get_current_dt,
+        DateTime(),
+        server_default=func.now(),
+        default=get_current_dt,
     )
 
 
 class UpdatedAtMixin:
-
     updated_at: Mapped[DateTime] = mapped_column(
-        DateTime(), server_default=func.now(), onupdate=func.now(), server_onupdate=func.now(),
+        DateTime(),
+        server_default=func.now(),
+        onupdate=func.now(),
+        server_onupdate=func.now(),
     )
