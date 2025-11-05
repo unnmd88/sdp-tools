@@ -1,7 +1,7 @@
 from datetime import UTC
 from datetime import datetime as dt_datetime
 
-from sqlalchemy import func, Column, DateTime
+from sqlalchemy import func, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 
 
