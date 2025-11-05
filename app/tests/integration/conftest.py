@@ -40,9 +40,10 @@ async def t_session(t_dp_api):
 @pytest.fixture(scope='session', autouse=True)
 async def create_tables(t_dp_api):
     async with t_dp_api.engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-        yield
         await conn.run_sync(Base.metadata.drop_all)
+    async with t_dp_api.engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
 
 
 @pytest.fixture
