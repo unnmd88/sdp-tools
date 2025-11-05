@@ -69,4 +69,5 @@ async def create_user(user: CreateUser, sess, from_app=False):
         )
     # logger.debug('Created user: %r', user)
     logger.info('Created user: %r', user)
-    return user.model_dump(exclude={'password'})
+    return new_user
+    # return user.model_dump(exclude={'password'})
