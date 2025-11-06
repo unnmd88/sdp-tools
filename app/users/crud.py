@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Sequence
 
 import sqlalchemy
 from app_logging.dev.config import USERS_LOGGER
@@ -11,6 +12,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select
 from starlette import status
 
+from core.models.database_api import async_session_factory
 from users.schemas import CreateUser, UserFromDbFullSchema
 
 logger = logging.getLogger(USERS_LOGGER)
@@ -32,7 +34,7 @@ async def get_user_by_username_or_none(
 async def get_user_by_id(
     user_id: int,
     session: AsyncSession,
-):
+) -> UserFromDbFullSchema:
     if (res := await session.get(User, user_id)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -43,7 +45,7 @@ async def get_user_by_id(
 
 async def get_users(
     session: AsyncSession,
-):
+) -> Sequence[UserFromDbFullSchema]:
     stmt = select(User).order_by(User.id)
     result: Result = await session.execute(stmt)
     return [UserFromDbFullSchema.model_validate(res) for res in result.scalars().all()]
