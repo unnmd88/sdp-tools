@@ -18,7 +18,6 @@ class TrafficLightObject(
         String(32),
         nullable=False,
         unique=True,
-        primary_key=True,
     )
     district: Mapped[str] = mapped_column(
         default='',
