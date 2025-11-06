@@ -1,9 +1,9 @@
 __all__ = (
-    # 'db_api',
     'Base',
-    'User'
+    'User',
+    'TrafficLightObject',
 )
 
 from .base import Base
-# from core.database.database_api import db_api
+from .tlo import TrafficLightObject
 from .user import User
