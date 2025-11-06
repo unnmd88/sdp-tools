@@ -1,6 +1,9 @@
 import asyncio
+from typing import Annotated
 
+from fastapi import Depends
 from sqlalchemy import Result
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import update, select
 
 from core.models import db_api, User
@@ -26,6 +29,55 @@ t_dp_api = DatabaseAPI(
 )
 
 
+users = [
+    {
+        'first_name': 'Gimmo',
+        'last_name': 'Gimmo',
+        'username': 'Gimmo',
+        'organization': 'Spetsdorproject',
+        'email': 'user@example.com',
+        'password': b'1234',
+        'is_active': True,
+        'is_admin': True,
+        'is_superuser': True,
+        'role': 'superuser',
+        'phone_number': '',
+        'telegram': '',
+        'description': 'Тестовый юзер 2',
+    },
+    # {
+    #     'first_name': 'Test',
+    #     'last_name': 'Testov',
+    #     'username': 'test1',
+    #     'organization': 'Spetsdorproject',
+    #     'email': 'user@example.com',
+    #     'password': b'1234',
+    #     'is_active': True,
+    #     'is_admin': True,
+    #     'is_superuser': True,
+    #     'role': 'superuser',
+    #     'phone_number': '',
+    #     'telegram': '',
+    #     'description': 'Тестовый юзер 1',
+    # },
+    # {
+    #     'first_name': 'Test1',
+    #     'last_name': 'Testov1',
+    #     'username': 'test2',
+    #     'organization': 'Spetsdorproject',
+    #     'email': 'user@example.com',
+    #     'password': b'1234',
+    #     'is_active': True,
+    #     'is_admin': True,
+    #     'is_superuser': True,
+    #     'role': 'superuser',
+    #     'phone_number': '',
+    #     'telegram': '',
+    #     'description': 'Тестовый юзер 2',
+    # },
+]
+
+
 async def update_telegram():
     async with db_api.session_factory() as session:
         stmt = update(User).where(User.id == 1).values(telegram='@patrick')
@@ -40,8 +92,17 @@ async def search():
         print(result.scalars().all())
 
 
+async def create_users():
+    async for session in t_dp_api.session_getter_commit():
+        print(f's: {session}')
+        print(f'type(s): {type(session)}')
+        session.add_all([User(**u) for u in users])
+        # await session.commit()
+
+
 async def main():
-    await search()
+    # await search()
+    await create_users()
 
 
 if __name__ == '__main__':
