@@ -1,5 +1,9 @@
-from collections.abc import AsyncGenerator
+import functools
+from collections.abc import AsyncGenerator, Callable
+from typing import Any
 
+import sqlalchemy
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -36,9 +40,44 @@ class DatabaseAPI:
         await self.engine.dispose()
         # log.info("Database engine disposed")
 
+    def base_session_getter(
+            self,
+            commit: bool = False,
+            rollback: bool = False,
+    ):
+        async def wrapper():
+            async with self.session_factory() as session:
+                try:
+                    print('BEFORE yield session!' * 100)
+                    yield session
+                    if commit:
+                        await session.commit()
+                    print('AFTER yield session!' * 100)
+                except Exception:  # todo logging
+                    if rollback:
+                        await session.rollback()
+                finally:
+                    await session.close()
+                    with open('lllog.log', 'a+') as f:
+                        f.write('NEW GEN!' * 100)
+        return wrapper
+
     async def session_getter(self) -> AsyncGenerator[AsyncSession, None]:
         async with self.session_factory() as session:
             yield session
+
+    async def session_getter_commit(self) -> AsyncGenerator[AsyncSession, None]:
+        async with self.session_factory() as session:
+            yield session
+            await session.commit()
+
+    async def session_getter_commit_and_rollback_if_err(self) -> AsyncGenerator[AsyncSession, None]:
+        async with self.session_factory() as session:
+            try:
+                yield session
+                await session.commit()
+            except Exception:  # todo logging
+                await session.rollback()
 
 
 db_api = DatabaseAPI(
@@ -48,3 +87,22 @@ db_api = DatabaseAPI(
     pool_size=settings.db.pool_size,
     max_overflow=settings.db.max_overflow,
 )
+
+
+def async_session_factory(commit: bool = True, rollback: bool = True):
+    def wrapper(func: Callable) -> Callable:
+        @functools.wraps(func)
+        async def wrapped(*args, **kwargs) -> Any:
+            async with db_api.session_factory() as session:
+                try:
+                    return await func(*args, session=session,**kwargs)
+                except Exception: # todo logging
+                    if rollback:
+                        await session.rollback()
+                finally:
+                    if commit:
+                        await session.commit()
+        return wrapped
+    return wrapper
+
+
