@@ -3,7 +3,7 @@ import asyncio
 from sqlalchemy import Result
 from sqlalchemy.sql.expression import update, select
 
-from core.models import db_api, User
+from core.models import User, TrafficLightObject
 from core.database.api import DatabaseAPI
 
 
@@ -75,13 +75,6 @@ users = [
 ]
 
 
-async def update_telegram():
-    async with db_api.session_factory() as session:
-        stmt = update(User).where(User.id == 1).values(telegram='@patrick')
-        await session.execute(stmt)
-        await session.commit()
-
-
 async def search():
     async with t_dp_api.session_factory() as session:
         stmt = select(User).where(User.username.in_(['test1', 'test2']))
@@ -91,15 +84,27 @@ async def search():
 
 async def create_users():
     async for session in t_dp_api.session_getter_commit():
-        print(f's: {session}')
-        print(f'type(s): {type(session)}')
         session.add_all([User(**u) for u in users])
-        # await session.commit()
+
+
+async def create_traffic_light_objects():
+    objects = [
+        TrafficLightObject(
+            region=1,
+            name='laba_test',
+            district='ЦАО',
+            street='BAZA BEREG'
+
+        )
+    ]
+    async for session in t_dp_api.session_getter_commit():
+        session.add_all(objects)
 
 
 async def main():
     # await search()
-    await create_users()
+    # await create_users()
+    await create_traffic_light_objects()
 
 
 if __name__ == '__main__':
