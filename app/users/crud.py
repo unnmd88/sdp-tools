@@ -4,7 +4,8 @@ from collections.abc import Sequence
 import sqlalchemy
 from app_logging.dev.config import USERS_LOGGER
 from auth import utils as auth_utils
-from core.models import User, db_api
+from core.database import db_api
+from core.models import User
 from fastapi import HTTPException
 from sqlalchemy.engine.result import Result
 from sqlalchemy.exc import IntegrityError

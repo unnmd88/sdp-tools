@@ -1,13 +1,10 @@
 import asyncio
-from typing import Annotated
 
-from fastapi import Depends
 from sqlalchemy import Result
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import update, select
 
 from core.models import db_api, User
-from core.models.database_api import DatabaseAPI
+from core.database.api import DatabaseAPI
 
 
 # def t_dp_api():

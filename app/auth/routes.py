@@ -1,8 +1,9 @@
 from typing import Annotated
 
-from core.models import db_api
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from core.database import db_api
 from users.crud import get_user_by_id
 
 from auth.constants import TokenFields, TokenTypes

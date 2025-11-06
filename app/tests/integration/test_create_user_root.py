@@ -5,7 +5,7 @@ from sqlalchemy.engine.result import Result
 from sqlalchemy.sql.expression import select
 
 from core.models import User
-from core.models.database_api import DatabaseAPI
+from core.database.api import DatabaseAPI
 from users.create_root import create_root
 
 

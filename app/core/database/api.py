@@ -2,8 +2,6 @@ import functools
 from collections.abc import AsyncGenerator, Callable
 from typing import Any
 
-import sqlalchemy
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,

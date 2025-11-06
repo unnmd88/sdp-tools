@@ -2,7 +2,7 @@ import pytest
 
 from core.config import settings
 from core.models import Base, User
-from core.models.database_api import DatabaseAPI
+from core.database.api import DatabaseAPI
 from main import app
 from starlette.testclient import TestClient
 
