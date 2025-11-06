@@ -41,9 +41,9 @@ class DatabaseAPI:
         # log.info("Database engine disposed")
 
     def base_session_getter(
-            self,
-            commit: bool = False,
-            rollback: bool = False,
+        self,
+        commit: bool = False,
+        rollback: bool = False,
     ):
         async def wrapper():
             async with self.session_factory() as session:
@@ -60,6 +60,7 @@ class DatabaseAPI:
                     await session.close()
                     with open('lllog.log', 'a+') as f:
                         f.write('NEW GEN!' * 100)
+
         return wrapper
 
     async def session_getter(self) -> AsyncGenerator[AsyncSession, None]:
@@ -71,7 +72,9 @@ class DatabaseAPI:
             yield session
             await session.commit()
 
-    async def session_getter_commit_and_rollback_if_err(self) -> AsyncGenerator[AsyncSession, None]:
+    async def session_getter_commit_and_rollback_if_err(
+        self,
+    ) -> AsyncGenerator[AsyncSession, None]:
         async with self.session_factory() as session:
             try:
                 yield session
@@ -95,14 +98,14 @@ def async_session_factory(commit: bool = True, rollback: bool = True):
         async def wrapped(*args, **kwargs) -> Any:
             async with db_api.session_factory() as session:
                 try:
-                    return await func(*args, session=session,**kwargs)
-                except Exception: # todo logging
+                    return await func(*args, session=session, **kwargs)
+                except Exception:  # todo logging
                     if rollback:
                         await session.rollback()
                 finally:
                     if commit:
                         await session.commit()
+
         return wrapped
+
     return wrapper
-
-

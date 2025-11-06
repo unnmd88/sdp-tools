@@ -4,14 +4,13 @@ from auth.utils import encode_jwt, decode_jwt
 
 
 class TestJWT:
-
     @pytest.fixture
     def jwt_payloads(self):
         return [
             {'iss': 'sdp'},
-            {'sub': "1"},
-            {'uname': "2"},
-            {'sub': "3", 'uname': "2", "blabla": "bla"},
+            {'sub': '1'},
+            {'uname': '2'},
+            {'sub': '3', 'uname': '2', 'blabla': 'bla'},
         ]
 
     def test_encode_jwt(self, jwt_payloads):
@@ -31,7 +30,3 @@ class TestJWT:
             # Все ключи и значения словаря payload присутствуют в decoded_payload
             for k, v in payload.items():
                 assert decoded_payload.get(k) == v
-
-
-
-

@@ -16,5 +16,7 @@ def async_timed():
                 end = time.perf_counter()
                 total = end - start
                 print(f'{func} завершилась за {total:.4f} с')
+
         return wrapped
+
     return wrapper
