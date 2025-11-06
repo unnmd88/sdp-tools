@@ -37,6 +37,6 @@ class TrafficLightObject(
     )
     description: Mapped[str] = mapped_column(
         String(255),
-        default=False,
-        server_default='false',
+        default='',
+        server_default='',
     )
