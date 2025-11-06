@@ -12,7 +12,6 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select
 from starlette import status
 
-from core.models.database_api import async_session_factory
 from users.schemas import CreateUser, UserFromDbFullSchema
 
 logger = logging.getLogger(USERS_LOGGER)
@@ -51,7 +50,10 @@ async def get_users(
     return [UserFromDbFullSchema.model_validate(res) for res in result.scalars().all()]
 
 
-async def create_user(user: CreateUser, sess):
+async def create_user(
+    user: CreateUser,
+    session: AsyncSession,
+) -> UserFromDbFullSchema:
     if user.username == 'root':
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -60,14 +62,15 @@ async def create_user(user: CreateUser, sess):
 
     user.password = auth_utils.hash_password(user.password)
     new_user = User(**user.model_dump())
-    sess.add(new_user)
+    session.add(new_user)
     try:
-        await sess.commit()
-        await sess.refresh(new_user)
+        await session.commit()
+        await session.refresh(new_user)
     except IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f'User with that username already exists: {user.username!r}',
         )
     logger.info('Created user: %r', user)
-    return new_user
+    return UserFromDbFullSchema.model_validate(new_user)
+    # return new_user
