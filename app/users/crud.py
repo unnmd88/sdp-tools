@@ -51,8 +51,8 @@ async def get_users(
     return [UserFromDbFullSchema.model_validate(res) for res in result.scalars().all()]
 
 
-async def create_user(user: CreateUser, sess, from_app=False):
-    if user.username == 'root' and from_app is False:
+async def create_user(user: CreateUser, sess):
+    if user.username == 'root':
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail='username "root" is not allowed',
