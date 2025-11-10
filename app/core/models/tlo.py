@@ -1,4 +1,4 @@
-from sqlalchemy import String
+from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from core.models import Base
@@ -13,7 +13,7 @@ class TrafficLightObject(
     UpdatedAtMixin,
     Base,
 ):
-    region: Mapped[int]
+    region: Mapped[int] = mapped_column(unique=True, nullable=False,)
     name: Mapped[str] = mapped_column(
         String(32),
         nullable=False,
@@ -24,7 +24,13 @@ class TrafficLightObject(
         server_default='',
     )
     street: Mapped[str] = mapped_column(
+        Text,
         nullable=False,
+    )
+    description: Mapped[str] = mapped_column(
+        Text,
+        default='',
+        server_default='',
     )
     ovim_in_use: Mapped[bool] = mapped_column(
         default=False,
@@ -34,8 +40,4 @@ class TrafficLightObject(
         default=False,
         server_default='false',
     )
-    description: Mapped[str] = mapped_column(
-        String(255),
-        default='',
-        server_default='',
-    )
+
