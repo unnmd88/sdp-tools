@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from api.api_v1.regions.crud import RegionsCrud
-from api.api_v1.regions.schemas import CreateRegionSchema, RegionSchema
+from api.api_v1.regions.schemas import RegionCreate, RegionSchema, RegionUpdate
 from core.database import db_api
 
 router = APIRouter(
@@ -43,7 +43,7 @@ async def get_regions(session: Annotated[AsyncSession, Depends(db_api.session_ge
     response_model=RegionSchema,
 )
 async def create_region(
-    region: CreateRegionSchema,
+    region: RegionCreate,
     session: Annotated[AsyncSession, Depends(db_api.session_getter)],
 ) -> RegionSchema:
     db_region = await RegionsCrud.add(session, region)
@@ -57,7 +57,7 @@ async def create_region(
 )
 async def update_region(
     region_id: int,
-    region: CreateRegionSchema,
+    region: RegionUpdate,
     session: Annotated[AsyncSession, Depends(db_api.session_getter)],
 ) -> RegionSchema:
     db_region = await RegionsCrud.get_one_by_id_or_404(session, region_id)

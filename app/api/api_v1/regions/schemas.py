@@ -4,15 +4,15 @@ from sqlalchemy.sql.annotation import Annotated
 from core.constants import RegionCodes, RegionNames
 
 
-class CreateRegionSchema(BaseModel):
+class RegionCreate(BaseModel):
     name: RegionNames
     code: RegionCodes
 
 
-class RegionSchema(CreateRegionSchema):
+class RegionSchema(RegionCreate):
     id: int
 
 
-class RegionUpdateSchema(CreateRegionSchema):
-    name: RegionNames = None
-    code: RegionCodes = None
+class RegionUpdate(RegionCreate):
+    name: RegionNames | None = None
+    code: RegionCodes | None = None
