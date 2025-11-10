@@ -1,4 +1,4 @@
-from sqlalchemy import String, Text
+from sqlalchemy import String, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 from core.models import Base
@@ -13,10 +13,12 @@ class TrafficLightObject(
     UpdatedAtMixin,
     Base,
 ):
-    region: Mapped[int] = mapped_column(unique=True, nullable=False,)
+    region_id: Mapped[int] = mapped_column(
+        ForeignKey("regions.id"),
+        unique=True,
+    )
     name: Mapped[str] = mapped_column(
         String(32),
-        nullable=False,
         unique=True,
     )
     district: Mapped[str] = mapped_column(
