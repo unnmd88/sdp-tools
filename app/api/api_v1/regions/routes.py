@@ -5,6 +5,7 @@ from fastapi import (
     Depends,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 from api.api_v1.regions.crud import RegionsCrud
 from api.api_v1.regions.schemas import CreateRegionSchema, RegionSchema
@@ -38,7 +39,7 @@ async def get_regions(session: Annotated[AsyncSession, Depends(db_api.session_ge
 
 @router.post(
     '/',
-    status_code=201,
+    status_code=status.HTTP_201_CREATED,
     response_model=RegionSchema,
 )
 async def create_region(
