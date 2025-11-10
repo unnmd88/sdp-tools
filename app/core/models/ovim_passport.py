@@ -13,15 +13,13 @@ class OvimPassport(
     Base,
 ):
     tlo_id: Mapped[int] = mapped_column(
-        ForeignKey("traffic_light_objects.id"),
+        ForeignKey('traffic_light_objects.id'),
     )
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"),
-
+        ForeignKey('users.id'),
     )
     data = mapped_column(
         JSONB,
         nullable=False,
     )
     commit_message: Mapped[str] = mapped_column(Text)
-

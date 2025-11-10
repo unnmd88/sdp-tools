@@ -5,9 +5,9 @@ from core.constants import RegionCodes, RegionNames
 
 
 class CreateRegionSchema(BaseModel):
-
     name: RegionNames
     code: RegionCodes
+
 
 class RegionSchema(CreateRegionSchema):
     id: int

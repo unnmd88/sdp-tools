@@ -14,7 +14,7 @@ class TrafficLightObject(
     Base,
 ):
     region_id: Mapped[int] = mapped_column(
-        ForeignKey("regions.id"),
+        ForeignKey('regions.id'),
         unique=True,
     )
     name: Mapped[str] = mapped_column(
@@ -42,4 +42,3 @@ class TrafficLightObject(
         default=False,
         server_default='false',
     )
-

@@ -7,5 +7,5 @@ class RegionCodes(IntEnum):
 
 
 class RegionNames(StrEnum):
-    MOSCOW = "Москва"
-    TMUTARAKAN = "Тмутаракань"
+    MOSCOW = 'Москва'
+    TMUTARAKAN = 'Тмутаракань'

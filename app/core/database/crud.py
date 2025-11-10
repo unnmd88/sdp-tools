@@ -12,7 +12,7 @@ from core.exceptions import NotFoundByIdException
 from core.models import Base
 
 
-T = TypeVar("T", bound=Base)
+T = TypeVar('T', bound=Base)
 
 
 class BaseCrud[T]:
@@ -21,7 +21,6 @@ class BaseCrud[T]:
     def __init__(
         self,
         a_session: AsyncSession,
-
     ) -> None:
         self.a_session = a_session
 
@@ -35,7 +34,9 @@ class BaseCrud[T]:
         return res
 
     @classmethod
-    async def get_all(cls, session: AsyncSession, filters: BaseModel = None) -> Sequence[T]:
+    async def get_all(
+        cls, session: AsyncSession, filters: BaseModel = None
+    ) -> Sequence[T]:
         if filters:
             filter_dict = filters.model_dump(exclude_unset=True)
         else:
@@ -54,7 +55,7 @@ class BaseCrud[T]:
             await session.rollback()
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"Already exists.",
+                detail=f'Already exists.',
             )
         except SQLAlchemyError as e:
             await session.rollback()

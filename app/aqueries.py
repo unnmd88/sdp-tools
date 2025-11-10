@@ -93,7 +93,7 @@ async def create_traffic_light_objects(
     region_id=1,
     name='laba_test',
     district='ЦАО',
-    street='BAZA BEREG'
+    street='BAZA BEREG',
 ):
     objects = [
         TrafficLightObject(
@@ -107,7 +107,7 @@ async def create_traffic_light_objects(
             name='laba_test2',
             district=district,
             street='BAZA BEREG2',
-        )
+        ),
     ]
     async for session in db_api.session_getter_commit():
         session.add_all(objects)
@@ -116,8 +116,7 @@ async def create_traffic_light_objects(
 async def create_region(
     db_api: DatabaseAPI,
     num: int = 77,
-    name = 'Москва',
-
+    name='Москва',
 ):
     objects = [
         Region(code=num, name=name),
@@ -137,7 +136,7 @@ async def create_ovim_passport(
     objects = [
         OvimPassport(
             tlo_id=tlo_id,
-            data=data or {"Test1": 1, "Test2": 2, 55: "abra"},
+            data=data or {'Test1': 1, 'Test2': 2, 55: 'abra'},
             user_id=user_id,
             commit_message=commit_message,
         )
@@ -153,7 +152,10 @@ async def main():
 
     # await create_region(db_api=db_api_main)
     # await create_traffic_light_objects(db_api=db_api_main)
-    await create_ovim_passport(db_api=db_api_main, tlo_id=2,)
+    await create_ovim_passport(
+        db_api=db_api_main,
+        tlo_id=2,
+    )
 
 
 if __name__ == '__main__':
