@@ -48,3 +48,18 @@ async def create_region(
 ) -> RegionSchema:
     db_region = await RegionsCrud.add(session, region)
     return RegionSchema.model_validate(db_region, extra='ignore', from_attributes=True)
+
+
+@router.patch(
+    '/{region_id}',
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=RegionSchema,
+)
+async def update_region(
+    region_id: int,
+    region: CreateRegionSchema,
+    session: Annotated[AsyncSession, Depends(db_api.session_getter)],
+) -> RegionSchema:
+    db_region = await RegionsCrud.get_one_by_id_or_404(session, region_id)
+    updated_region = await RegionsCrud.update(session, db_region, region)
+    return RegionSchema.model_validate(updated_region, extra='ignore', from_attributes=True)

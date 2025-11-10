@@ -11,3 +11,8 @@ class CreateRegionSchema(BaseModel):
 
 class RegionSchema(CreateRegionSchema):
     id: int
+
+
+class RegionUpdateSchema(CreateRegionSchema):
+    name: RegionNames = None
+    code: RegionCodes = None
