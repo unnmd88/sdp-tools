@@ -25,14 +25,22 @@ async def get_region_by_code_or_name(
     return await RegionsCrud.get_one_by_code_or_name_or_404(session, code_or_name)
 
 
-@router.get('/{id}')
+@router.get(
+'/{id}',
+    response_model=RegionSchema,
+    status_code=status.HTTP_200_OK,
+)
 async def get_region_by_id(
     num_id: int, session: Annotated[AsyncSession, Depends(db_api.session_getter)]
 ):
     return await RegionsCrud.get_one_by_id_or_404(session, num_id)
 
 
-@router.get('/')
+@router.get(
+    '/',
+    response_model=list[RegionSchema],
+    status_code=status.HTTP_200_OK,
+)
 async def get_regions(session: Annotated[AsyncSession, Depends(db_api.session_getter)]):
     return await RegionsCrud.get_all(session)
 
