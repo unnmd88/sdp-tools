@@ -31,9 +31,10 @@ async def get_region_by_code_or_name(
     status_code=status.HTTP_200_OK,
 )
 async def get_region_by_id(
-    num_id: int, session: Annotated[AsyncSession, Depends(db_api.session_getter)]
+    region_id: int,
+    session: Annotated[AsyncSession, Depends(db_api.session_getter)],
 ):
-    return await RegionsCrud.get_one_by_id_or_404(session, num_id)
+    return await RegionsCrud.get_one_by_id_or_404(session, region_id)
 
 
 @router.get(
@@ -59,7 +60,7 @@ async def create_region(
 
 
 @router.patch(
-    '/{region_id}',
+    '/{id}',
     status_code=status.HTTP_202_ACCEPTED,
     response_model=RegionSchema,
 )

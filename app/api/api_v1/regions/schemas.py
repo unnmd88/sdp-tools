@@ -14,5 +14,8 @@ class RegionSchema(RegionCreate):
 
 
 class RegionUpdate(RegionCreate):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
     name: RegionNames | None = None
     code: RegionCodes | None = None

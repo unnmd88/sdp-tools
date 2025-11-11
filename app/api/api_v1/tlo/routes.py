@@ -7,7 +7,7 @@ from fastapi import (
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.api_v1.tlo.crud import TloCrud
-from auth.token_validation import check_user_is_active
+
 
 from core.database import db_api
 
@@ -20,9 +20,9 @@ router = APIRouter(
 
 @router.get('/{id}')
 async def get_traffic_light_object_by_id(
-    pk_id: int, session: Annotated[AsyncSession, Depends(db_api.session_getter)]
+    traffic_light_object_id: int, session: Annotated[AsyncSession, Depends(db_api.session_getter)]
 ):
-    return await TloCrud.get_one_by_id_or_404(session, pk_id)
+    return await TloCrud.get_one_by_id_or_404(session, traffic_light_object_id)
 
 
 @router.get('/')
