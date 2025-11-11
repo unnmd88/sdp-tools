@@ -15,7 +15,6 @@ class TrafficLightObject(
 ):
     region_id: Mapped[int] = mapped_column(
         ForeignKey('regions.id'),
-        unique=True,
     )
     name: Mapped[str] = mapped_column(
         String(32),
