@@ -29,16 +29,21 @@ class TrafficLightObject(
         Text,
         nullable=False,
     )
+    service_organization: Mapped[str] = mapped_column(
+        String(32),
+        default='',
+        server_default='',
+    )
     description: Mapped[str] = mapped_column(
         Text,
         default='',
         server_default='',
     )
-    ovim_in_use: Mapped[bool] = mapped_column(
+    ovim_passport_editing: Mapped[bool] = mapped_column(
         default=False,
         server_default='false',
     )
-    construction_in_use: Mapped[bool] = mapped_column(
+    stroykontrol_passport_editing: Mapped[bool] = mapped_column(
         default=False,
         server_default='false',
     )
