@@ -12,7 +12,9 @@ class Region(
     UpdatedAtMixin,
     Base,
 ):
-    code: Mapped[int]
+    code: Mapped[int] = mapped_column(
+        unique=True,
+    )
     name: Mapped[str] = mapped_column(
         String(32),
         unique=True,
