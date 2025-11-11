@@ -15,7 +15,7 @@ from core.database import db_api
 
 router = APIRouter(
     prefix='/traffic-light-objects',
-    tags=['Traffic-light-objects'],
+    tags=['Traffic Light Objects'],
     # dependencies=[Depends(check_user_is_active)],
 )
 
@@ -64,4 +64,4 @@ async def update_traffic_light_object(
         db_model=tlo,
         update_model=traffic_light_object,
     )
-    return TrafficLightSchema.model_validate(updated_traffic_light_object, from_attributes=True)
+    return TrafficLightSchema.model_validate(updated_traffic_light_object, from_attributes=True,)

@@ -13,7 +13,7 @@ from core.database import db_api
 
 router = APIRouter(
     prefix='/regions',
-    tags=['Regions-of-traffic-light-objects'],
+    tags=['Regions of Traffic Light Objects'],
 )
 
 
