@@ -9,7 +9,7 @@ from starlette import status
 
 from api.api_v1.regions.crud import RegionsCrud
 from api.api_v1.tlo.crud import TloCrud
-from api.api_v1.tlo.schemas import TrafficLightCreate, TrafficLightSchema
+from api.api_v1.tlo.schemas import TrafficLightCreate, TrafficLightSchema, TrafficLightUpdate
 
 from core.database import db_api
 
@@ -46,3 +46,22 @@ async def create_traffic_light_object(
     await RegionsCrud.get_one_by_id_or_404(session, traffic_light_object.region_id)
     tlo = await TloCrud.add(session, traffic_light_object)
     return TrafficLightSchema.model_validate(tlo, from_attributes=True)
+
+
+@router.patch(
+    '/{id}',
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=TrafficLightSchema,
+)
+async def update_traffic_light_object(
+    traffic_light_object_id: int,
+    traffic_light_object: TrafficLightUpdate,
+    session: Annotated[AsyncSession, Depends(db_api.session_getter)],
+) -> TrafficLightSchema:
+    tlo = await TloCrud.get_one_by_id_or_404(session, traffic_light_object_id)
+    updated_traffic_light_object = await TloCrud.update(
+        session=session,
+        db_model=tlo,
+        update_model=traffic_light_object,
+    )
+    return TrafficLightSchema.model_validate(updated_traffic_light_object, from_attributes=True)
