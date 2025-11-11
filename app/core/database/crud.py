@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Sequence
 from typing import TypeVar
 
@@ -17,6 +18,7 @@ T = TypeVar('T', bound=Base)
 
 class BaseCrud[T]:
     model: type[T]
+    logger: logging.Logger = logging.getLogger(__name__)
 
     def __init__(
         self,
@@ -48,16 +50,23 @@ class BaseCrud[T]:
     @classmethod
     async def add(cls, session: AsyncSession, model: BaseModel):
         new_instance = cls.model(**model.model_dump(exclude_unset=True))
+        cls.logger.info(
+            'Попытка добавить строку в таблицу %r из данных %r',
+            cls.model.__name__, model
+        )
         session.add(new_instance)
         try:
             await session.commit()
+            cls.logger.info( 'Новая запись добавлена успешно: %r', new_instance)
         except IntegrityError:
+            cls.logger.warning('Новая запись не была добавлена: данные уже существуют')
             await session.rollback()
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f'Already exists.',
             )
         except SQLAlchemyError as e:
+            cls.logger.error('Ошибка добавления данных: %r', e)
             await session.rollback()
             raise e
         return new_instance
