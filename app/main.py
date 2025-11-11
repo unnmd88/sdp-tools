@@ -1,7 +1,7 @@
 import uvicorn
 from starlette.middleware.cors import CORSMiddleware
 
-# from users.demo import router as demo_auth_router
+
 from api import router as api_v1_router
 from fastapi import FastAPI
 
@@ -20,14 +20,6 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
-
-@app.get('/')
-def root():
-    # print(a_sess)
-    return {'Message': 'Hello sdp-tools api'}
-
-
-# app.include_router(routr)
 
 if __name__ == '__main__':
     uvicorn.run('main:app', **settings.run.model_dump())
