@@ -15,3 +15,14 @@ class RegionNames(StrEnum):
     SAKHALIN = 'Сахалин'
     RYBINSK = 'Рыбинск'
     TMUTARAKAN = 'Тмутаракань'
+
+
+class ServiceOrganizations(StrEnum):
+    CODD = 'ЦОДД'
+
+
+class Districts(StrEnum):
+    CENTRAL = 'ЦАО'
+    WEST = 'ЗАО'
+    EAST = 'ВАО'
+    SOUTH = 'ЮАО'
