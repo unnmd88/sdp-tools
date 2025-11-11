@@ -1,5 +1,5 @@
-from pydantic import BaseModel, ConfigDict, AfterValidator
-from sqlalchemy.sql.annotation import Annotated
+from pydantic import BaseModel, ConfigDict
+
 
 from core.constants import RegionCodes, RegionNames
 
