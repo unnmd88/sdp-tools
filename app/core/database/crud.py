@@ -73,9 +73,15 @@ class BaseCrud[T]:
 
 
     @classmethod
-    async def update(cls, session: AsyncSession, db_model: T, update_model: BaseModel) -> T:
+    async def update(
+            cls,
+            session: AsyncSession,
+            db_model: T,
+            update_model: BaseModel,
+            exclude_unset: bool = True,
+    ) -> T:
         try:
-            for k, v in update_model.model_dump(exclude_unset=True).items():
+            for k, v in update_model.model_dump(exclude_unset=exclude_unset).items():
                 setattr(db_model, k, v)
             await session.commit()
         except SQLAlchemyError as e:
