@@ -10,7 +10,7 @@ from api.api_v1.passports.dependencies import check_allow_to_save_or_raise_http_
 from api.api_v1.passports.schemas import CapturePassport, SavePassport
 from app_logging.dev.config import OVIM_PASSPORTS_LOGGER
 from core.database.crud import BaseCrud, T as T_Model
-from core.models import OvimPassport
+from core.models import Passport
 
 
 class ProxyPassportsCrud(BaseCrud):
@@ -92,6 +92,6 @@ class ProxyPassportsCrud(BaseCrud):
     #     )
 
 
-class OvimPassportsCrud(ProxyPassportsCrud):
-    model = OvimPassport
+class PassportsCrud(ProxyPassportsCrud):
+    model = Passport
     logger = logging.getLogger(OVIM_PASSPORTS_LOGGER)
