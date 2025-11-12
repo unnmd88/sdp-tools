@@ -1,6 +1,6 @@
 import asyncio
 
-from sqlalchemy import Result
+from sqlalchemy import Result, text
 from sqlalchemy.sql.expression import update, select
 
 from core.database import db_api as db_api_main
@@ -43,21 +43,21 @@ users = [
         'telegram': '',
         'description': 'Тестовый юзер 2',
     },
-    # {
-    #     'first_name': 'Test',
-    #     'last_name': 'Testov',
-    #     'username': 'test1',
-    #     'organization': 'Spetsdorproject',
-    #     'email': 'user@example.com',
-    #     'password': b'1234',
-    #     'is_active': True,
-    #     'is_admin': True,
-    #     'is_superuser': True,
-    #     'role': 'superuser',
-    #     'phone_number': '',
-    #     'telegram': '',
-    #     'description': 'Тестовый юзер 1',
-    # },
+    {
+        'first_name': 'Test',
+        'last_name': 'Testov',
+        'username': 'test1',
+        'organization': 'Spetsdorproject',
+        'email': 'user@example.com',
+        'password': b'1234',
+        'is_active': True,
+        'is_admin': True,
+        'is_superuser': True,
+        'role': 'superuser',
+        'phone_number': '',
+        'telegram': '',
+        'description': 'Тестовый юзер 1',
+    },
     # {
     #     'first_name': 'Test1',
     #     'last_name': 'Testov1',
@@ -83,8 +83,8 @@ async def search():
         print(result.scalars().all())
 
 
-async def create_users():
-    async for session in t_dp_api.session_getter_commit():
+async def create_users(db_api: DatabaseAPI):
+    async for session in db_api.session_getter_commit():
         session.add_all([User(**u) for u in users])
 
 
@@ -145,6 +145,16 @@ async def create_ovim_passport(
         session.add_all(objects)
 
 
+async def get_editing_passport(
+    db_api: DatabaseAPI,
+):
+    async with db_api.session_factory() as session:
+        stmt2 = select(OvimPassport).where(OvimPassport.tlo_id == 1).order_by(OvimPassport.started_editing_at.desc()).limit(1)
+        res: Result = await session.scalar(stmt2)
+        # res: Result = await session.scalars(stmt)
+        print(res)
+
+
 async def main():
     # await search()
     # await create_users()
@@ -152,10 +162,15 @@ async def main():
 
     # await create_region(db_api=db_api_main)
     # await create_traffic_light_objects(db_api=db_api_main)
-    await create_ovim_passport(
-        db_api=db_api_main,
-        tlo_id=2,
-    )
+    # await create_ovim_passport(
+    #     db_api=db_api_main,
+    #     tlo_id=2,
+    # )
+    # await get_editing_passport(db_api_main)
+
+    await create_users(db_api=db_api_main)
+
+
 
 
 if __name__ == '__main__':
