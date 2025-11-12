@@ -4,7 +4,7 @@ from sqlalchemy import Result, text
 from sqlalchemy.sql.expression import update, select
 
 from core.database import db_api as db_api_main
-from core.models import User, TrafficLightObject, Region, OvimPassport
+from core.models import User, TrafficLightObject, Region, Passport, PassportsOwner
 from core.database.api import DatabaseAPI
 
 
@@ -126,23 +126,40 @@ async def create_region(
         session.add_all(objects)
 
 
-async def create_ovim_passport(
+async def create_passport(
     db_api: DatabaseAPI,
     tlo_id=1,
+    owner_id=1,
     user_id=1,
     data: dict = None,
     commit_message='commit tets',
 ):
     objects = [
-        OvimPassport(
+        Passport(
             tlo_id=tlo_id,
             data=data or {'Test1': 1, 'Test2': 2, 55: 'abra'},
             user_id=user_id,
+            owner_id=owner_id,
             commit_message=commit_message,
         )
     ]
     async for session in db_api.session_getter_commit():
         session.add_all(objects)
+
+
+async def create_passports_owners(
+    db_api: DatabaseAPI,
+):
+    owners = (
+        PassportsOwner(
+            owner='ovim',
+        ),
+        PassportsOwner(
+            owner='stroycontrol'
+        ),
+    )
+    async for session in db_api.session_getter_commit():
+        session.add_all(owners)
 
 
 async def get_editing_passport(
@@ -168,8 +185,9 @@ async def main():
     # )
     # await get_editing_passport(db_api_main)
 
-    await create_users(db_api=db_api_main)
-
+    # await create_users(db_api=db_api_main)
+    await  create_passport(db_api=db_api_main)
+    # await create_passports_owners(db_api=db_api_main)
 
 
 
