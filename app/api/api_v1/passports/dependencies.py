@@ -1,11 +1,8 @@
 from fastapi import HTTPException
 from pydantic import BaseModel
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from core.database.crud import T
-from core.models import OvimPassport
 
 
 def check_allow_to_save_or_raise_http_exc(
