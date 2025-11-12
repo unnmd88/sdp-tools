@@ -27,11 +27,11 @@ class UpdatedAtMixin:
 
 
 class StartAtMixin:
-    start_at: Mapped[datetime] = mapped_column(
+    started_editing_at: Mapped[datetime] = mapped_column(
         default=datetime.now,
         server_default=func.now(),
     )
 
 
 class FinishedAtMixin:
-    finished_at: Mapped[datetime | None]
+    finished_editing_at: Mapped[datetime | None]
