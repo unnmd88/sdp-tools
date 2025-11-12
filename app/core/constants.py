@@ -26,3 +26,8 @@ class Districts(StrEnum):
     WEST = 'ЗАО'
     EAST = 'ВАО'
     SOUTH = 'ЮАО'
+
+
+class PassportsOwners(StrEnum):
+    OVIM = 'овим'
+    STROYKONTROL = 'стройконтроль'
