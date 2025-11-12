@@ -3,11 +3,13 @@ __all__ = (
     'User',
     'TrafficLightObject',
     'Region',
-    'OvimPassport',
+    'PassportsOwner',
+    # 'OvimPassport',
 )
 
 from .base import Base
 from .tlo import TrafficLightObject
-from .user import User
+from .users import User
 from .regions import Region
-from .ovim_passport import OvimPassport
+# from .ovim_passport import OvimPassport
+from .passport_owners import PassportsOwner
