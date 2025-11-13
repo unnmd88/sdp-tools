@@ -27,11 +27,7 @@ class BaseCrud[T]:
         self.a_session = a_session
 
     @classmethod
-    async def get_one_by_id_or_404(
-        cls,
-        session: AsyncSession,
-        pk_id: int
-    ) -> T:
+    async def get_one_by_id_or_404(cls, session: AsyncSession, pk_id: int) -> T:
         if (res := await session.get(cls.model, pk_id)) is None:
             raise NotFoundByIdException(
                 entity_name=cls.model.__name__,
@@ -56,12 +52,13 @@ class BaseCrud[T]:
         new_instance = cls.model(**model.model_dump(exclude_unset=True))
         cls.logger.info(
             'Попытка добавить строку в таблицу %r из данных %r',
-            cls.model.__name__, model
+            cls.model.__name__,
+            model,
         )
         session.add(new_instance)
         try:
             await session.commit()
-            cls.logger.info( 'Новая запись добавлена успешно: %r', new_instance)
+            cls.logger.info('Новая запись добавлена успешно: %r', new_instance)
         except IntegrityError:
             cls.logger.warning('Новая запись не была добавлена: данные уже существуют')
             await session.rollback()
@@ -75,14 +72,13 @@ class BaseCrud[T]:
             raise e
         return new_instance
 
-
     @classmethod
     async def update(
-            cls,
-            session: AsyncSession,
-            db_model: T,
-            update_model: BaseModel,
-            exclude_unset: bool = True,
+        cls,
+        session: AsyncSession,
+        db_model: T,
+        update_model: BaseModel,
+        exclude_unset: bool = True,
     ) -> T:
         try:
             for k, v in update_model.model_dump(exclude_unset=exclude_unset).items():

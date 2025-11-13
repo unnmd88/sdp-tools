@@ -107,4 +107,3 @@ def downgrade() -> None:
     """Downgrade schema."""
 
     op.drop_table('traffic_light_objects')
-

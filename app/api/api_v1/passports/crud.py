@@ -14,12 +14,11 @@ from core.models import Passport
 
 
 class ProxyPassportsCrud(BaseCrud):
-
     @classmethod
     async def get_last_passport_or_none(
-            cls,
-            session: AsyncSession,
-            tlo_id: int,
+        cls,
+        session: AsyncSession,
+        tlo_id: int,
     ) -> T_Model | None:
         stmt = (
             select(cls.model)
@@ -31,11 +30,13 @@ class ProxyPassportsCrud(BaseCrud):
 
     @classmethod
     async def capture_passport(
-            cls,
-            session: AsyncSession,
-            model: CapturePassport,
+        cls,
+        session: AsyncSession,
+        model: CapturePassport,
     ):
-        last_passport: T_Model = await cls.get_last_passport_or_none(session, model.tlo_id)
+        last_passport: T_Model = await cls.get_last_passport_or_none(
+            session, model.tlo_id
+        )
         if last_passport is not None and last_passport.editing_now:
             if last_passport.user_id == model.user_id:
                 return last_passport
@@ -46,14 +47,15 @@ class ProxyPassportsCrud(BaseCrud):
                 )
         return await cls.add(session, model)
 
-
     @classmethod
     async def save_passport(
-            cls,
-            session: AsyncSession,
-            model: SavePassport,
+        cls,
+        session: AsyncSession,
+        model: SavePassport,
     ):
-        editable_db_passport = await cls.get_last_passport_or_none(session, model.tlo_id)
+        editable_db_passport = await cls.get_last_passport_or_none(
+            session, model.tlo_id
+        )
         check_allow_to_save_or_raise_http_exc(
             editable_db_passport=editable_db_passport,
             model_to_save=model,

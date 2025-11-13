@@ -25,5 +25,3 @@ def check_allow_to_save_or_raise_http_exc(
             detail=f'Passport editing not found. Please capture passport for editing.',
         )
     return True
-
-

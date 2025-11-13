@@ -20,4 +20,3 @@ class PassportsOwner(
         default='',
         server_default='',
     )
-

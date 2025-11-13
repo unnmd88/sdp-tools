@@ -144,4 +144,3 @@ LOGGING_CONFIG = {
 }
 
 """
-

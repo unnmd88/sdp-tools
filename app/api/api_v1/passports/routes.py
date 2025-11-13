@@ -1,4 +1,3 @@
-
 from fastapi import (
     APIRouter,
 )
@@ -7,7 +6,11 @@ from starlette import status
 
 from api.api_v1.passports.crud import PassportsCrud
 from api.api_v1.passports.filters import OvimPassportsFilter
-from api.api_v1.passports.schemas import SavePassport, CapturePassport, SavedPassportSchema
+from api.api_v1.passports.schemas import (
+    SavePassport,
+    CapturePassport,
+    SavedPassportSchema,
+)
 
 from core.dependencies import db_session
 
@@ -23,7 +26,7 @@ router = APIRouter(
     status_code=status.HTTP_200_OK,
 )
 async def get_all_passports(
-    session:  db_session,
+    session: db_session,
     owner_id: int,
 ):
     return await PassportsCrud.get_all(
@@ -37,7 +40,7 @@ async def get_all_passports(
     status_code=status.HTTP_201_CREATED,
 )
 async def capture_editing_passport_ovim(
-    session:  db_session,
+    session: db_session,
     passport: CapturePassport,
 ):
     return await PassportsCrud.capture_passport(session, passport)
@@ -49,7 +52,7 @@ async def capture_editing_passport_ovim(
     response_model=SavedPassportSchema,
 )
 async def save_passport_ovim(
-    session:  db_session,
+    session: db_session,
     passport: SavePassport,
 ) -> SavedPassportSchema:
     res = await PassportsCrud.save_passport(session, passport)

@@ -8,4 +8,3 @@ from core.models import PassportsOwner
 class PassportsOwnersCrud(BaseCrud):
     model = PassportsOwner
     logger = logging.getLogger(PASSPORTS_OWNERS_LOGGER)
-

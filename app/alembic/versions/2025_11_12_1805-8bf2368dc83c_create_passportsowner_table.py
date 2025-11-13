@@ -42,4 +42,3 @@ def downgrade() -> None:
     """Downgrade schema."""
 
     op.drop_table('passports_owners')
-

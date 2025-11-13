@@ -26,7 +26,7 @@ async def get_region_by_code_or_name(
 
 
 @router.get(
-'/{id}',
+    '/{id}',
     response_model=RegionSchema,
     status_code=status.HTTP_200_OK,
 )
@@ -71,4 +71,6 @@ async def update_region(
 ) -> RegionSchema:
     db_region = await RegionsCrud.get_one_by_id_or_404(session, region_id)
     updated_region = await RegionsCrud.update(session, db_region, region)
-    return RegionSchema.model_validate(updated_region, extra='ignore', from_attributes=True)
+    return RegionSchema.model_validate(
+        updated_region, extra='ignore', from_attributes=True
+    )

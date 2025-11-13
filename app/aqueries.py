@@ -157,9 +157,7 @@ async def create_passports_owners(
         PassportsOwner(
             owner='ovim',
         ),
-        PassportsOwner(
-            owner='stroycontrol'
-        ),
+        PassportsOwner(owner='stroycontrol'),
     )
     async for session in db_api.session_getter_commit():
         session.add_all(owners)
@@ -169,7 +167,12 @@ async def get_editing_passport(
     db_api: DatabaseAPI,
 ):
     async with db_api.session_factory() as session:
-        stmt2 = select(OvimPassport).where(OvimPassport.tlo_id == 1).order_by(OvimPassport.started_editing_at.desc()).limit(1)
+        stmt2 = (
+            select(OvimPassport)
+            .where(OvimPassport.tlo_id == 1)
+            .order_by(OvimPassport.started_editing_at.desc())
+            .limit(1)
+        )
         res: Result = await session.scalar(stmt2)
         # res: Result = await session.scalars(stmt)
         print(res)
@@ -192,7 +195,6 @@ async def main():
     # await create_users(db_api=db_api_main)
     await create_passports_owners(db_api=db_api_main)
     # await  create_passport(db_api=db_api_main)
-
 
 
 if __name__ == '__main__':
