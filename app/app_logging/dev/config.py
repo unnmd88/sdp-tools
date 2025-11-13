@@ -20,7 +20,13 @@ LOGGING_CONFIG = {
         'file_ovim_passports': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': API_V1_PATH / 'passports/logs/ovim_passports.log',
+            'filename': API_V1_PATH / 'passports/logs/log.log',
+            'formatter': 'simple2',
+        },
+        'file_passports_owners': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': API_V1_PATH / 'passports_owners/logs/log.log',
             'formatter': 'simple2',
         },
     },
@@ -38,7 +44,11 @@ LOGGING_CONFIG = {
         'ovim_passports': {
             'level': 'INFO',
             'handlers': ['console', 'file_ovim_passports'],
-        }
+        },
+        'passports_owners': {
+            'level': 'INFO',
+            'handlers': ['console', 'file_passports_owners'],
+        },
     },
     'formatters': {
         # "verbose": {
@@ -59,6 +69,7 @@ logging.config.dictConfig(LOGGING_CONFIG)
 
 USERS_LOGGER = 'users'
 OVIM_PASSPORTS_LOGGER = 'ovim_passports'
+PASSPORTS_OWNERS_LOGGER = 'passports_owners'
 
 # def logging_configure(level=logging.DEBUG):
 #     console_handler = logging.StreamHandler()
