@@ -27,7 +27,11 @@ class BaseCrud[T]:
         self.a_session = a_session
 
     @classmethod
-    async def get_one_by_id_or_404(cls, session: AsyncSession, pk_id: int) -> T:
+    async def get_one_by_id_or_404(
+        cls,
+        session: AsyncSession,
+        pk_id: int
+    ) -> T:
         if (res := await session.get(cls.model, pk_id)) is None:
             raise NotFoundByIdException(
                 entity_name=cls.model.__name__,
