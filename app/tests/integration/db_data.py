@@ -58,7 +58,10 @@ def passports_owners_models():
     ]
 
 def passports_models():
-    datas = [ {} ] + [{f'Field{i}': i} for i in range(1, 4)]
+    datas = [ {} ] + [
+        {f'Field_{i}': i if i % 2 == 0 else str(i) for i in range(random.randint(1, 10))}
+        for _ in range(1, 4)
+    ]
     return [
         Passport(
             tlo_id=random.randint(1, 4),
