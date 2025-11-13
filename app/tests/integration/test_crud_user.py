@@ -1,6 +1,7 @@
 import pytest
 
 from sqlalchemy.engine.result import Result
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select
 
@@ -19,3 +20,6 @@ async def test_create_user(t_session: AsyncSession, user_models):
 
     _users: Result = await t_session.execute(stmt)
     assert _users.scalars().all() == user_models
+
+
+
