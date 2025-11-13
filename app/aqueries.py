@@ -3,10 +3,11 @@ import asyncio
 from sqlalchemy import Result, text
 from sqlalchemy.sql.expression import update, select
 
+from core.constants import ServiceOrganizations
 from core.database import db_api as db_api_main
 from core.models import User, TrafficLightObject, Region, Passport, PassportsOwner
 from core.database.api import DatabaseAPI
-
+from users.organizations import Organizations
 
 # def t_dp_api():
 #     return DatabaseAPI(
@@ -100,12 +101,14 @@ async def create_traffic_light_objects(
             region_id=region_id,
             name=name,
             district=district,
+            service_organization=ServiceOrganizations.CODD,
             street=street,
         ),
         TrafficLightObject(
             region_id=region_id,
             name='laba_test2',
             district=district,
+            service_organization=ServiceOrganizations.CODD,
             street='BAZA BEREG2',
         ),
     ]
@@ -175,9 +178,10 @@ async def get_editing_passport(
 async def main():
     # await search()
     # await create_users()
+    # await create_region(db_api=db_api_main)
+    #
     # await create_traffic_light_objects(db_api=db_api_main)
 
-    # await create_region(db_api=db_api_main)
     # await create_traffic_light_objects(db_api=db_api_main)
     # await create_ovim_passport(
     #     db_api=db_api_main,
@@ -186,8 +190,8 @@ async def main():
     # await get_editing_passport(db_api_main)
 
     # await create_users(db_api=db_api_main)
-    await  create_passport(db_api=db_api_main)
-    # await create_passports_owners(db_api=db_api_main)
+    await create_passports_owners(db_api=db_api_main)
+    # await  create_passport(db_api=db_api_main)
 
 
 
