@@ -31,3 +31,6 @@ class Districts(StrEnum):
 class PassportsOwners(StrEnum):
     OVIM = 'овим'
     STROYKONTROL = 'стройконтроль'
+    CODD = 'цодд'
+    _TEST1 = 'test1'
+    _TEST2 = 'test2'
