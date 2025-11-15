@@ -1,20 +1,24 @@
 services:
   test_app:
     build:
-      dockerfile: Dockerfile
+      dockerfile: docker-build/app/Dockerfile
       context: .
+    image: fastapi-sdp-tools
     container_name: test_app
     environment:
       APP_CONFIG__DB__URL: postgresql+asyncpg://test1:1111@192.168.200.3:5432/test
       APP_CONFIG__DB__ECHO: 1
     command: ["fastapi", "dev", "--host", "0.0.0.0", "main.py", "--port", "7000"]
+    volumes:
+      - ./app:/app/app
     ports:
       - "8002:7000"
     networks:
       app_net2:
         ipv4_address: 192.168.200.2
-    depends_on:
-      - test_pg
+#    depends_on:
+#      test_pg:
+#       condition: service_healthy
 
   test_pg:
     image: postgres:18
@@ -24,8 +28,8 @@ services:
       POSTGRES_PASSWORD: 1111
       POSTGRES_DB: test
       PGDATA: /var/lib/postgresql
-    ports:
-      - "5432:5432"
+#    ports:
+#      - "5432:5432"
     networks:
       app_net2:
         ipv4_address: 192.168.200.3

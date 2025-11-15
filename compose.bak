@@ -1,17 +1,16 @@
 services:
   app:
     build:
-      #dockerfile: docker-build/app/Dockerfile
       dockerfile: Dockerfile
       context: .
     image: fastapi-sdp-tools
-    command: ["/bin/bash"]
     container_name: fapiapp
     environment:
       APP_CONFIG__DB__URL: postgresql+asyncpg://admin1:1122@192.168.100.4:5432/tdb
       APP_CONFIG__DB__ECHO: 1
-#    volumes:
-#      - ./app:/app
+
+    volumes:
+      - ./app:/app/app
     networks:
       app_net:
         ipv4_address: 192.168.100.2
