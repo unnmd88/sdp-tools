@@ -1,0 +1,44 @@
+services:
+  test_app:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    container_name: test_app
+    environment:
+      APP_CONFIG__DB__URL: postgresql+asyncpg://test1:1111@192.168.200.3:5432/test
+      APP_CONFIG__DB__ECHO: 1
+    command: ["fastapi", "dev", "--host", "0.0.0.0", "main.py", "--port", "7000"]
+    ports:
+      - "8002:7000"
+    networks:
+      app_net2:
+        ipv4_address: 192.168.200.2
+    depends_on:
+      - test_pg
+
+  test_pg:
+    image: postgres:18
+    container_name: test_psgr
+    environment:
+      POSTGRES_USER: test1
+      POSTGRES_PASSWORD: 1111
+      POSTGRES_DB: test
+      PGDATA: /var/lib/postgresql
+    ports:
+      - "5432:5432"
+    networks:
+      app_net2:
+        ipv4_address: 192.168.200.3
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+networks:
+  app_net2:
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.200.0/24"
+          gateway: 192.168.200.1
