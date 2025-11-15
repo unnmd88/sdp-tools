@@ -7,7 +7,11 @@ from fastapi import (
 from starlette import status
 
 from api.api_v1.passports_owners.crud import PassportsOwnersCrud
-from api.api_v1.passports_owners.schemas import PassportOwnersSchema, PassportOwnersCreate, PassportOwnersPatch
+from api.api_v1.passports_owners.schemas import (
+    PassportOwnersSchema,
+    PassportOwnersCreate,
+    PassportOwnersPatch,
+)
 
 from core.dependencies import db_session
 
@@ -47,20 +51,23 @@ async def get_all_owners(
         session,
     )
 
+
 @router.post(
-    '/', status_code=status.HTTP_200_OK, response_model=PassportOwnersSchema,
+    '/',
+    status_code=status.HTTP_200_OK,
+    response_model=PassportOwnersSchema,
 )
 async def create_owner(
     session: db_session,
     owner: PassportOwnersCreate,
 ) -> PassportOwnersSchema:
-    return await PassportsOwnersCrud.add(
-        session=session,
-        model=owner
-    )
+    return await PassportsOwnersCrud.add(session=session, model=owner)
+
 
 @router.patch(
-    '/{id}', status_code=status.HTTP_200_OK, response_model=PassportOwnersSchema,
+    '/{id}',
+    status_code=status.HTTP_200_OK,
+    response_model=PassportOwnersSchema,
 )
 async def create_owner(
     owner_id: int,
@@ -75,5 +82,4 @@ async def create_owner(
         session=session,
         db_model=db_model_owner,
         to_update_model=owner,
-
     )

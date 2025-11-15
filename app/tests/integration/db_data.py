@@ -10,19 +10,19 @@ from users.roles import Roles
 def users_models():
     return [
         User(
-        first_name=f'ChoookNoGekk{i}',
-        last_name='Choookoffff',
-        username=f'Choook{i}',
-        organization=Organizations.SDP,
-        email='user@example.com',
-        password=b'1234',
-        is_active=True,
-        is_admin=True,
-        is_superuser=True,
-        role=Roles.superuser,
-        phone_number='',
-        telegram='',
-        description=f'Тестовый юзер {i}',
+            first_name=f'ChoookNoGekk{i}',
+            last_name='Choookoffff',
+            username=f'Choook{i}',
+            organization=Organizations.SDP,
+            email='user@example.com',
+            password=b'1234',
+            is_active=True,
+            is_admin=True,
+            is_superuser=True,
+            role=Roles.superuser,
+            phone_number='',
+            telegram='',
+            description=f'Тестовый юзер {i}',
         )
         for i in range(1, 5)
     ]
@@ -45,7 +45,7 @@ def traffic_light_objects() -> Sequence[TrafficLightObject]:
             district='ЦАО',
             street='Бережковская набережная',
             service_organization=ServiceOrganizations.CODD,
-            description=f'Тестовый_00{i}'
+            description=f'Тестовый_00{i}',
         )
         for i in range(1, 5)
     ]
@@ -57,9 +57,13 @@ def passports_owners_models():
         PassportsOwner(owner=PassportsOwners.STROYKONTROL),
     ]
 
+
 def passports_models():
-    datas = [ {} ] + [
-        {f'Field_{i}': i if i % 2 == 0 else str(i) for i in range(random.randint(1, 10))}
+    datas = [{}] + [
+        {
+            f'Field_{i}': i if i % 2 == 0 else str(i)
+            for i in range(random.randint(1, 10))
+        }
         for _ in range(1, 4)
     ]
     return [

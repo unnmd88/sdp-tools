@@ -10,8 +10,13 @@ from core.database.api import DatabaseAPI
 from main import app
 from starlette.testclient import TestClient
 
-from tests.integration.db_data import regions_models, passports_owners_models, traffic_light_objects, passports_models, \
-    users_models
+from tests.integration.db_data import (
+    regions_models,
+    passports_owners_models,
+    traffic_light_objects,
+    passports_models,
+    users_models,
+)
 from users.user_examples import users as user_examples
 
 BASE_URL = (
@@ -37,6 +42,7 @@ def t_dp_api():
         max_overflow=10,
     )
 
+
 # @pytest.fixture(scope='session')
 
 
@@ -48,7 +54,9 @@ async def t_session(t_dp_api):
 
 
 @pytest.fixture(scope='session', autouse=True)
-async def create_tables(t_dp_api, ):
+async def create_tables(
+    t_dp_api,
+):
     async with t_dp_api.engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
     async with t_dp_api.engine.begin() as conn:
@@ -107,4 +115,3 @@ def user_models():
 #             ]
 #         )
 #         await session.commit()
-

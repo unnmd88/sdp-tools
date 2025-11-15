@@ -67,7 +67,7 @@ async def update_traffic_light_object(
     updated_traffic_light_object = await TloCrud.update(
         session=session,
         db_model=tlo,
-        update_model=traffic_light_object,
+        to_update_model=traffic_light_object,
     )
     return TrafficLightSchema.model_validate(
         updated_traffic_light_object,
