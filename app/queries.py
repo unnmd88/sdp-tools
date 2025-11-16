@@ -117,3 +117,26 @@
 #     #
 #     # get_all('tlo')
 #     # get_all('regions')
+
+
+"""
+SELECT traffic_light_objects.name, traffic_light_objects.district,
+traffic_light_objects.street, traffic_light_objects.service_organization,
+regions.name as region_name, regions.code as region_code
+FROM traffic_light_objects
+JOIN regions ON traffic_light_objects.region_id = regions.id
+"""
+
+"""
+SELECT traffic_light_objects.name as tlo_name, users.username, passport_groups.group_name,
+passports.data, passports.commit_message,passports.editing_now, 
+passports.started_editing_at, passports.finished_editing_at
+FROM passports 
+JOIN users ON passports.user_id = users.id
+JOIN traffic_light_objects ON passports.tlo_id = traffic_light_objects.id
+JOIN passport_groups ON passports.group_id = passport_groups.id
+WHERE passport_groups.id = 1
+ORDER BY passports.finished_editing_at DESC
+LIMIT 1
+"""
+
