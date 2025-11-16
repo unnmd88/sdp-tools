@@ -3,7 +3,7 @@ __all__ = (
     'User',
     'TrafficLightObject',
     'Region',
-    'PassportsOwner',
+    'PassportGroup',
     'Passport',
 )
 
@@ -12,4 +12,4 @@ from .tlo import TrafficLightObject
 from .users import User
 from .regions import Region
 from .passports import Passport
-from .passport_owners import PassportsOwner
+from .passport_groups import PassportGroup

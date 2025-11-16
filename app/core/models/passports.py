@@ -25,8 +25,8 @@ class Passport(
     user_id: Mapped[int] = mapped_column(
         ForeignKey('users.id'),
     )
-    owner_id: Mapped[int] = mapped_column(
-        ForeignKey('passports_owners.id'),
+    group_id: Mapped[int] = mapped_column(
+        ForeignKey('passport_groups.id'),
     )
     data = mapped_column(
         JSONB,
