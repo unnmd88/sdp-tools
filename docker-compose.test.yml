@@ -28,8 +28,8 @@ services:
       POSTGRES_PASSWORD: 1111
       POSTGRES_DB: test
       PGDATA: /var/lib/postgresql
-#    ports:
-#      - "5432:5432"
+    ports:
+      - "5433:5432"
     networks:
       app_net2:
         ipv4_address: 192.168.200.3
