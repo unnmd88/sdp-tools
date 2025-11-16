@@ -35,7 +35,7 @@ client = TestClient(
 @pytest.fixture(scope='session')
 def t_dp_api():
     yield DatabaseAPI(
-        url='postgresql+asyncpg://admin2:1111@localhost:5433/db_test',
+        url='postgresql+asyncpg://test1:1111@192.168.200.3:5432/test',
         echo=True,
         echo_pool=True,
         pool_size=50,
@@ -53,30 +53,41 @@ async def t_session(t_dp_api):
     await t_dp_api.dispose()
 
 
-@pytest.fixture(scope='session', autouse=True)
-async def create_tables(
+# @pytest.fixture(scope='session', autouse=True)
+# async def create_tables(
+#     t_dp_api,
+# ):
+#     async with t_dp_api.engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.drop_all)
+#     async with t_dp_api.engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.create_all)
+#     if FILL_DATA_TO_TABLES_DB:
+#         async with t_dp_api.session_factory() as session:
+#             try:
+#                 session.add_all(users_models())
+#                 await session.commit()
+#                 session.add_all(regions_models())
+#                 await session.commit()
+#                 session.add_all(traffic_light_objects())
+#                 await session.commit()
+#                 session.add_all(passports_owners_models())
+#                 await session.commit()
+#                 session.add_all(passports_models())
+#                 await session.commit()
+#             except SQLAlchemyError:
+#                 await session.rollback()
+#                 raise
+#     yield
+
+
+@pytest.fixture
+async def preparing_clean_database(
     t_dp_api,
 ):
     async with t_dp_api.engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
     async with t_dp_api.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    if FILL_DATA_TO_TABLES_DB:
-        async with t_dp_api.session_factory() as session:
-            try:
-                session.add_all(users_models())
-                await session.commit()
-                session.add_all(regions_models())
-                await session.commit()
-                session.add_all(traffic_light_objects())
-                await session.commit()
-                session.add_all(passports_owners_models())
-                await session.commit()
-                session.add_all(passports_models())
-                await session.commit()
-            except SQLAlchemyError:
-                await session.rollback()
-                raise
     yield
 
 
