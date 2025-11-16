@@ -1,4 +1,23 @@
 services:
+  app:
+    build:
+      dockerfile: docker-build/app/Dockerfile
+      context: .
+    image: fastapi-sdp-tools
+    container_name: fapiapp
+    environment:
+      APP_CONFIG__DB__URL: postgresql+asyncpg://admin1:1122@192.168.100.4:5432/tdb
+      APP_CONFIG__DB__ECHO: 1
+    #volumes:
+    #  - ./app:/sdp-tools-app/app
+    networks:
+      app_net:
+        ipv4_address: 192.168.100.2
+    depends_on:
+      pg:
+       condition: service_healthy
+    ports:
+      - "8001:8080"
   pg:
     image: postgres:18
     container_name: psgr
@@ -20,24 +39,6 @@ services:
       timeout: 3s
       retries: 3
 
-  pg_test:
-    image: postgres:18
-    container_name: psgr_test
-    environment:
-      POSTGRES_USER: admin2
-      POSTGRES_PASSWORD: 1111
-      POSTGRES_DB: db_test
-    ports:
-      - "5433:5432"
-    networks:
-      app_net:
-        ipv4_address: 192.168.100.10
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready" ]
-      interval: 5s
-      timeout: 3s
-      retries: 3
-
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin1
@@ -51,7 +52,8 @@ services:
       app_net:
         ipv4_address: 192.168.100.5
     depends_on:
-      - pg
+      pg:
+       condition: service_healthy
 
   adminer:
     image: adminer
@@ -62,7 +64,8 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - pg
+      pg:
+       condition: service_healthy
 
 networks:
   app_net:

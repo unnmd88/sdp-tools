@@ -7,7 +7,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app_logging.dev.config import USERS_LOGGER
-from core.models import db_api, User
+from core.database import db_api
+from core.models import User
 
 from users.organizations import Organizations
 from users.roles import Roles
@@ -38,7 +39,6 @@ async def create_root(session: AsyncSession = None):
     )
     sess: AsyncSession = session or db_api.session_factory()
     try:
-
         sess.add(user_root)
         await sess.commit()
         await sess.refresh(user_root)

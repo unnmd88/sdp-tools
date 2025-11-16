@@ -5,10 +5,10 @@ from auth.token_validation import (
     check_user_is_active,
     extract_payload_from_jwt,
 )
-from core.models import db_api
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
+from core.database import db_api
 from users import crud as users_crud
 from users.schemas import CreateUser, UserFromDbFullSchema
 
@@ -39,7 +39,7 @@ def whoami(
     response_model=UserFromDbFullSchema,
     dependencies=[Depends(check_user_is_active)],
 )
-async def get_all_user(
+async def get_user(
     user_id: int,
     sess: db_session,
 ):
@@ -54,7 +54,7 @@ async def get_all_user(
 async def get_users(
     sess: db_session,
 ):
-    return await users_crud.get_users(sess)
+    return await users_crud.get_users(session=sess)
 
 
 @router.post(

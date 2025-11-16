@@ -7,12 +7,13 @@ from pydantic_settings import (
 )
 
 BASE_DIR = Path(__file__).parent.parent
+API_V1_PATH = BASE_DIR / 'api/api_v1/'
 
 
 class RunConfig(BaseModel):
-    # host: str = '0.0.0.0'
-    host: str = '192.168.45.248'
-    port: int = 8001
+    host: str = '0.0.0.0'
+    # host: str = '192.168.45.248'
+    port: int = 8010
     reload: bool = True
 
 
@@ -24,7 +25,6 @@ class ApiV1Prefix(BaseModel):
 class ApiPrefix(BaseModel):
     prefix: str = '/api'
     v1: ApiV1Prefix = ApiV1Prefix()
-
 
 
 class Password(BaseModel):

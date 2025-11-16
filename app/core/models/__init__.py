@@ -1,5 +1,15 @@
-__all__ = ('db_api', 'Base', 'User')
+__all__ = (
+    'Base',
+    'User',
+    'TrafficLightObject',
+    'Region',
+    'PassportGroup',
+    'Passport',
+)
 
 from .base import Base
-from .database_api import db_api
-from .user import User
+from .tlo import TrafficLightObject
+from .users import User
+from .regions import Region
+from .passports import Passport
+from .passport_groups import PassportGroup

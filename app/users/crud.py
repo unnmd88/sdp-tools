@@ -1,9 +1,11 @@
 import logging
+from collections.abc import Sequence
 
 import sqlalchemy
 from app_logging.dev.config import USERS_LOGGER
 from auth import utils as auth_utils
-from core.models import User, db_api
+from core.database import db_api
+from core.models import User
 from fastapi import HTTPException
 from sqlalchemy.engine.result import Result
 from sqlalchemy.exc import IntegrityError
@@ -32,7 +34,7 @@ async def get_user_by_username_or_none(
 async def get_user_by_id(
     user_id: int,
     session: AsyncSession,
-):
+) -> UserFromDbFullSchema:
     if (res := await session.get(User, user_id)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -43,14 +45,17 @@ async def get_user_by_id(
 
 async def get_users(
     session: AsyncSession,
-):
+) -> Sequence[UserFromDbFullSchema]:
     stmt = select(User).order_by(User.id)
     result: Result = await session.execute(stmt)
     return [UserFromDbFullSchema.model_validate(res) for res in result.scalars().all()]
 
 
-async def create_user(user: CreateUser, sess, from_app=False):
-    if user.username == 'root' and from_app is False:
+async def create_user(
+    user: CreateUser,
+    session: AsyncSession,
+) -> UserFromDbFullSchema:
+    if user.username == 'root':
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail='username "root" is not allowed',
@@ -58,15 +63,15 @@ async def create_user(user: CreateUser, sess, from_app=False):
 
     user.password = auth_utils.hash_password(user.password)
     new_user = User(**user.model_dump())
-    sess.add(new_user)
+    session.add(new_user)
     try:
-        await sess.commit()
-        await sess.refresh(new_user)
+        await session.commit()
+        await session.refresh(new_user)
     except IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f'User with that username already exists: {user.username!r}',
         )
-    # logger.debug('Created user: %r', user)
     logger.info('Created user: %r', user)
-    return user.model_dump(exclude={'password'})
+    return UserFromDbFullSchema.model_validate(new_user)
+    # return new_user
