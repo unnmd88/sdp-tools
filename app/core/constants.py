@@ -28,9 +28,19 @@ class Districts(StrEnum):
     SOUTH = 'ЮАО'
 
 
-class PassportsOwners(StrEnum):
-    OVIM = 'овим'
-    STROYKONTROL = 'стройконтроль'
-    CODD = 'цодд'
+class PassportGroups(StrEnum):
+    OVIM = 'ОВИМ'
+    STROYKONTROL = 'Стройконтроль'
+    CODD = 'ЦОДД'
+    PTO = 'ПТО'
+    _TEST1 = 'test1'
+    _TEST2 = 'test2'
+
+
+class PassportGroupsRoutes(StrEnum):
+    OVIM = 'ovim'
+    STROYKONTROL = 'stroykontrol'
+    CODD = 'codd'
+    PTO = 'pto'
     _TEST1 = 'test1'
     _TEST2 = 'test2'
