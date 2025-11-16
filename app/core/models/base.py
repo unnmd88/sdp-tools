@@ -16,3 +16,8 @@ class Base(AsyncAttrs, DeclarativeBase):
     @declared_attr.directive
     def __tablename__(cls) -> str:
         return f'{camel_case_to_snake_case(cls.__name__)}s'
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, type(self)):
+            return all(getattr(self, attr) == getattr(other, attr) for attr in self.__table__.columns.keys())
+        return NotImplemented
