@@ -5,7 +5,7 @@ from sqlalchemy.sql.expression import update, select
 
 from core.constants import ServiceOrganizations
 from core.database import db_api as db_api_main
-from core.models import User, TrafficLightObject, Region, Passport, PassportsOwner
+from core.models import User, TrafficLightObject, Region, Passport, PassportGroup
 from core.database.api import DatabaseAPI
 from users.organizations import Organizations
 
@@ -154,10 +154,10 @@ async def create_passports_owners(
     db_api: DatabaseAPI,
 ):
     owners = (
-        PassportsOwner(
+        PassportGroup(
             owner='ovim',
         ),
-        PassportsOwner(owner='stroycontrol'),
+        PassportGroup(owner='stroycontrol'),
     )
     async for session in db_api.session_getter_commit():
         session.add_all(owners)
@@ -195,6 +195,7 @@ async def main():
     # await create_users(db_api=db_api_main)
     await create_passports_owners(db_api=db_api_main)
     # await  create_passport(db_api=db_api_main)
+
 
 
 if __name__ == '__main__':

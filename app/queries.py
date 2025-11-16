@@ -96,7 +96,7 @@
 # FROM regions
 #
 # SELECT *
-# FROM passports_owners
+# FROM passport_groups
 #
 # SELECT *
 # FROM traffic_light_objects
