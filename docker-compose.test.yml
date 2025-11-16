@@ -9,16 +9,16 @@ services:
       APP_CONFIG__DB__URL: postgresql+asyncpg://test1:1111@192.168.200.3:5432/test
       APP_CONFIG__DB__ECHO: 1
     command: ["fastapi", "dev", "--host", "0.0.0.0", "main.py", "--port", "7000"]
-    volumes:
-      - ./app:/app/app
+#    volumes:
+#      - ./app:/app/app
     ports:
       - "8002:7000"
     networks:
       app_net2:
         ipv4_address: 192.168.200.2
-#    depends_on:
-#      test_pg:
-#       condition: service_healthy
+    depends_on:
+      test_pg:
+       condition: service_healthy
 
   test_pg:
     image: postgres:18
