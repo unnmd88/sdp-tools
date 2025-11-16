@@ -5,15 +5,24 @@ from annotated_types import MaxLen
 from pydantic import BaseModel, Field, computed_field
 
 
-class CapturePassport(BaseModel):
+class PassportGroupBase(BaseModel):
     tlo_id: Annotated[int, Field(ge=1)]
     user_id: Annotated[int, Field(ge=1)]
+    group_id: Annotated[int, Field(ge=1)]
 
 
-class SavePassport(BaseModel):
+class CapturePassport(PassportGroupBase):
+    pass
+
+
+class CapturedPassport(PassportGroupBase):
+    id: Annotated[int, Field(ge=1)]
+
+
+class SavePassport(PassportGroupBase):
     id: Annotated[int, Field(ge=1, exclude=True)]
-    tlo_id: Annotated[int, Field(ge=1, exclude=True)]
-    user_id: Annotated[int, Field(ge=1, exclude=True)]
+    # tlo_id: Annotated[int, Field(ge=1, exclude=True)]
+    # user_id: Annotated[int, Field(ge=1, exclude=True)]
     data: dict
     commit_message: Annotated[str, MaxLen(255)]
 
@@ -30,10 +39,19 @@ class SavePassport(BaseModel):
 
 class SavedPassportSchema(BaseModel):
     tlo_id: Annotated[int, Field(ge=1)]
+    group_id: Annotated[int, Field(ge=1)]
     # user_id: Annotated[int, Field(ge=1)]
     finished_editing_at: datetime
     editing_now: bool
 
 
-class PassportSchema(BaseModel):
+class CurrentPassportSchema(BaseModel):
+    id: Annotated[int, Field(ge=1)]
     tlo_id: Annotated[int, Field(ge=1)]
+    user_id: Annotated[int, Field(ge=1)]
+    group_id: Annotated[int, Field(ge=1)]
+    data: dict
+    commit_message: str
+    editing_now: bool
+    started_editing_at: datetime
+    finished_editing_at: datetime
