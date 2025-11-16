@@ -13,7 +13,7 @@ API_V1_PATH = BASE_DIR / 'api/api_v1/'
 class RunConfig(BaseModel):
     host: str = '0.0.0.0'
     # host: str = '192.168.45.248'
-    port: int = 8001
+    port: int = 8010
     reload: bool = True
 
 
