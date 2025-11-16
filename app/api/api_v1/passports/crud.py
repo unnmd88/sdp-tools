@@ -13,7 +13,11 @@ from core.database.crud import BaseCrud, T as T_Model
 from core.models import Passport
 
 
-class ProxyPassportsCrud(BaseCrud):
+class PassportsCrud(BaseCrud):
+
+    model = Passport
+    logger = logging.getLogger(OVIM_PASSPORTS_LOGGER)
+
     @classmethod
     async def get_last_passport_or_none(
         cls,
@@ -94,6 +98,6 @@ class ProxyPassportsCrud(BaseCrud):
     #     )
 
 
-class PassportsCrud(ProxyPassportsCrud):
-    model = Passport
-    logger = logging.getLogger(OVIM_PASSPORTS_LOGGER)
+# class PassportsCrud(ProxyPassportsCrud):
+#     model = Passport
+#     logger = logging.getLogger(OVIM_PASSPORTS_LOGGER)

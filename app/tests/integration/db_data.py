@@ -1,8 +1,8 @@
 import random
 from collections.abc import Sequence
 
-from core.constants import PassportsOwners, ServiceOrganizations
-from core.models import Region, PassportsOwner, Passport, TrafficLightObject, User
+from core.constants import PassportGroups, ServiceOrganizations
+from core.models import Region, PassportGroup, Passport, TrafficLightObject, User
 from users.organizations import Organizations
 from users.roles import Roles
 
@@ -53,8 +53,8 @@ def traffic_light_objects() -> Sequence[TrafficLightObject]:
 
 def passports_owners_models():
     return [
-        PassportsOwner(owner=PassportsOwners.OVIM),
-        PassportsOwner(owner=PassportsOwners.STROYKONTROL),
+        PassportGroup(owner=PassportGroups.OVIM),
+        PassportGroup(owner=PassportGroups.STROYKONTROL),
     ]
 
 
