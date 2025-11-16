@@ -43,6 +43,7 @@ async def create_root(session: AsyncSession = None):
         await sess.commit()
         await sess.refresh(user_root)
         logger.info('User %r was created with id=%s.', name, user_root.id)
+        return user_root
     except IntegrityError:
         logger.warning('User %r already exists.', name)
     finally:
