@@ -1,8 +1,6 @@
 from typing import Annotated
 
-from fastapi import (
-    APIRouter, HTTPException,
-)
+from fastapi import APIRouter
 from pydantic import Field
 
 from starlette import status
@@ -10,12 +8,16 @@ from starlette import status
 from api.api_v1.passport_groups.crud import PassportGroupsCrud
 from api.api_v1.passports.crud import PassportsCrud
 from api.api_v1.passports.dependencies import passport_group_found_or_404, current_passport_or_404
-from api.api_v1.passports.filters import PassportGroupNameFilter, PassportGroupIdFilter, PassportCurrentFilter
+from api.api_v1.passports.filters import (
+    PassportGroupNameFilter,
+    PassportCurrentFilter
+)
 from api.api_v1.passports.schemas import (
     SavePassport,
     CapturePassport,
     SavedPassportSchema,
-    CapturedPassport, CurrentPassportSchema,
+    CapturedPassport,
+    CurrentPassportSchema,
 )
 from core.constants import PassportGroupsRoutes
 
@@ -34,13 +36,13 @@ router = APIRouter(
     response_model=CurrentPassportSchema,
 )
 async def get_valid_passport(
-    group_name_route: PassportGroupsRoutes,
+    group_name: PassportGroupsRoutes,
     tlo_id: Annotated[int, Field(ge=1)],
     session: db_session,
 ) -> CurrentPassportSchema:
     sequence_group_id = await PassportGroupsCrud.get_all(
         session=session,
-        filters=PassportGroupNameFilter(group_name_route=group_name_route),
+        filters=PassportGroupNameFilter(group_name_route=group_name),
     )
     passport_group_found_or_404(sequence_group_id=sequence_group_id)
     current_passport = await PassportsCrud.get_all(
@@ -52,7 +54,7 @@ async def get_valid_passport(
     )
     current_passport_or_404(current_passport)
     return CurrentPassportSchema.model_validate(
-        current_passport[0],
+        current_passport[-1],
         from_attributes=True,
     )
 

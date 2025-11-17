@@ -1,10 +1,16 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import String, Text, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.models import Base
 
 from .mixins.integer_pk_id import IntegerIdPkMixin
 from .mixins.timestamp import CreatedAtMixin, UpdatedAtMixin
+
+
+if TYPE_CHECKING:
+    from . import Region
 
 
 class TrafficLightObject(
@@ -20,6 +26,7 @@ class TrafficLightObject(
         String(32),
         unique=True,
     )
+
     district: Mapped[str] = mapped_column(
         default='',
         server_default='',
@@ -46,3 +53,5 @@ class TrafficLightObject(
         default=False,
         server_default='false',
     )
+
+    region: Mapped["Region"] = relationship()

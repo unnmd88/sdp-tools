@@ -37,7 +37,9 @@ class BaseCrud[T]:
 
     @classmethod
     async def get_all(
-        cls, session: AsyncSession, filters: BaseModel = None
+        cls,
+        session: AsyncSession,
+        filters: BaseModel = None,
     ) -> Sequence[T]:
         if filters:
             filter_dict = filters.model_dump(exclude_unset=True)
@@ -48,7 +50,11 @@ class BaseCrud[T]:
         return result.scalars().all()
 
     @classmethod
-    async def add(cls, session: AsyncSession, model: BaseModel):
+    async def add(
+        cls,
+        session: AsyncSession,
+        model: BaseModel,
+    ):
         new_instance = cls.model(**model.model_dump(exclude_unset=True))
         cls.logger.info(
             'Попытка добавить строку в таблицу %r из данных %r',
