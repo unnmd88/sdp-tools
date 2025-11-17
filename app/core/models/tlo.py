@@ -45,13 +45,5 @@ class TrafficLightObject(
         default='',
         server_default='',
     )
-    ovim_passport_editing: Mapped[bool] = mapped_column(
-        default=False,
-        server_default='false',
-    )
-    stroykontrol_passport_editing: Mapped[bool] = mapped_column(
-        default=False,
-        server_default='false',
-    )
 
     region: Mapped["Region"] = relationship()
