@@ -26,6 +26,3 @@ class Region(
         unique=True,
     )
 
-    # user: Mapped["TrafficLightObject"] = relationship(
-    #     back_populates="region",
-    # )
