@@ -54,7 +54,7 @@ async def get_all_groups(
 
 @router.post(
     '/',
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_201_CREATED,
     response_model=PassportGroupsSchema,
 )
 async def create_group(
