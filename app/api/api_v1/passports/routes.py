@@ -91,7 +91,7 @@ async def get_valid_passport(
     status_code=status.HTTP_201_CREATED,
     response_model=CapturedPassport,
 )
-async def capture_passport_for_editing(
+async def capture_for_editing(
     session: db_session,
     passport: CapturePassport,
 ) -> CapturedPassport:
