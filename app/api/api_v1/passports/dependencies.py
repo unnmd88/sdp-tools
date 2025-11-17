@@ -58,8 +58,9 @@ def current_passport_or_404(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='No passport found',
         )
-    elif len(current_passport) > 1:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail='Founded more than one passport for this group',
-        )
+
+    # elif len(current_passport) > 1:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND,
+    #         detail='Founded more than one passport for this group',
+    #     )
