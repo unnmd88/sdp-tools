@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import Annotated
 
-from annotated_types import MaxLen
+from annotated_types import MaxLen, MinLen
 from pydantic import BaseModel, Field, computed_field
 
 
 class PassportGroupBase(BaseModel):
-    tlo_id: Annotated[int, Field(ge=1)]
+    tlo_name: Annotated[str, MinLen(2)]
     user_id: Annotated[int, Field(ge=1)]
     group_id: Annotated[int, Field(ge=1)]
 

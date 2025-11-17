@@ -39,7 +39,7 @@ class PassportsCrud(BaseCrud):
         model: CapturePassport,
     ):
         last_passport: T_Model = await cls.get_last_passport_or_none(
-            session, model.tlo_id
+            session, model.tlo_name
         )
         if last_passport is not None and last_passport.editing_now:
             if last_passport.user_id == model.user_id:
@@ -58,7 +58,7 @@ class PassportsCrud(BaseCrud):
         model: SavePassport,
     ):
         editable_db_passport = await cls.get_last_passport_or_none(
-            session, model.tlo_id
+            session, model.tlo_name
         )
         check_allow_to_save_or_raise_http_exc(
             editable_db_passport=editable_db_passport,
