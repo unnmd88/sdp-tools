@@ -36,7 +36,7 @@ class AuthJWT(BaseModel):
     private_key_path: Path = BASE_DIR / 'certs' / 'private.pem'
     public_key_path: Path = BASE_DIR / 'certs' / 'public.pem'
     algorithm: str = 'RS256'
-    access_expire_minutes: int = 3
+    access_expire_minutes: int = 60 * 12
     refresh_expire_days: int = 1
     passwd: Password = Password()
 

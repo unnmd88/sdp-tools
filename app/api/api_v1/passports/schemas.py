@@ -4,25 +4,42 @@ from typing import Annotated
 from annotated_types import MaxLen, MinLen
 from pydantic import BaseModel, Field, computed_field
 
+from core.constants import PassportGroups
 
-class PassportGroupBase(BaseModel):
+
+class PassportSchemaBase(BaseModel):
+    # user_id: Annotated[int, Field(ge=1)]
     tlo_name: Annotated[str, MinLen(2)]
-    user_id: Annotated[int, Field(ge=1)]
-    group_id: Annotated[int, Field(ge=1)]
+    group_name: PassportGroups
 
 
-class CapturePassport(PassportGroupBase):
+class CapturePassportSchema(PassportSchemaBase):
     pass
 
 
-class CapturedPassport(PassportGroupBase):
+class CapturePassportSchemaSaveToDatabase(BaseModel):
+    user_id: Annotated[int, Field(ge=1)]
+    tlo_id: Annotated[int, Field(ge=1)]
+    group_id: Annotated[int, Field(ge=1)]
+
+
+class CapturedPassport(PassportSchemaBase):
     id: Annotated[int, Field(ge=1)]
+    username: str
+    editing_now: bool
 
 
-class SavePassport(PassportGroupBase):
+class UpdatePassport(PassportSchemaBase):
     id: Annotated[int, Field(ge=1, exclude=True)]
-    # tlo_id: Annotated[int, Field(ge=1, exclude=True)]
-    # user_id: Annotated[int, Field(ge=1, exclude=True)]
+    data: dict
+    commit_message: Annotated[str, MaxLen(255)]
+
+
+class UpdatePassportSchemaSaveToDatabase(BaseModel):
+    id: Annotated[int, Field(ge=1, exclude=True)]
+    user_id: Annotated[int, Field(ge=1)]
+    tlo_id: Annotated[int, Field(ge=1)]
+    group_id: Annotated[int, Field(ge=1)]
     data: dict
     commit_message: Annotated[str, MaxLen(255)]
 
@@ -37,11 +54,11 @@ class SavePassport(PassportGroupBase):
         return False
 
 
-class SavedPassportSchema(BaseModel):
-    tlo_id: Annotated[int, Field(ge=1)]
-    group_id: Annotated[int, Field(ge=1)]
-    # user_id: Annotated[int, Field(ge=1)]
-    finished_editing_at: datetime
+class FinalSavedPassportSchema(BaseModel):
+    tlo_name: Annotated[str, MinLen(2)]
+    group_name: PassportGroups
+    id: Annotated[int, Field(ge=1)]
+    username: str
     editing_now: bool
 
 

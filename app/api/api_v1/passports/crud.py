@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from api.api_v1.passports.dependencies import check_allow_to_save_or_raise_http_exc
-from api.api_v1.passports.schemas import CapturePassport, SavePassport
+from api.api_v1.passports.schemas import CapturePassportSchema, UpdatePassport, CapturePassportSchemaSaveToDatabase, \
+    UpdatePassportSchemaSaveToDatabase
 from app_logging.dev.config import OVIM_PASSPORTS_LOGGER
 from core.database.crud import BaseCrud, T as T_Model
 from core.models import Passport
@@ -36,10 +37,11 @@ class PassportsCrud(BaseCrud):
     async def capture_passport(
         cls,
         session: AsyncSession,
-        model: CapturePassport,
+        model: CapturePassportSchemaSaveToDatabase,
     ):
         last_passport: T_Model = await cls.get_last_passport_or_none(
-            session, model.tlo_name
+            session,
+            model.tlo_id
         )
         if last_passport is not None and last_passport.editing_now:
             if last_passport.user_id == model.user_id:
@@ -55,10 +57,11 @@ class PassportsCrud(BaseCrud):
     async def save_passport(
         cls,
         session: AsyncSession,
-        model: SavePassport,
+        model: UpdatePassportSchemaSaveToDatabase,
     ):
         editable_db_passport = await cls.get_last_passport_or_none(
-            session, model.tlo_name
+            session,
+            model.tlo_id
         )
         check_allow_to_save_or_raise_http_exc(
             editable_db_passport=editable_db_passport,

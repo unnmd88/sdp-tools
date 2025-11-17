@@ -27,3 +27,21 @@ class UserSchema(BaseModel):
     organization: Annotated[
         Organizations, BeforeValidator(lambda val: Organizations(val))
     ]
+
+
+class PayloadJWTSchema(BaseModel):
+    model_config = ConfigDict(strict=True, extra='forbid')
+    user_id: int
+    sub: str
+    role: str | Roles
+    is_admin: bool
+    is_superuser: bool
+    organization: str | Organizations
+    email: EmailStr | str
+    typ: str
+    exp: int
+    iat: int
+
+
+
+

@@ -52,7 +52,7 @@ class Passport(
             f'{self.__class__.__name__}('
             f'id={self.id} '
             f'tlo_id={self.tlo_id} '
-            f'owner_id={self.group_id} '
+            f'group_id={self.group_id} '
             f'editing_now={self.editing_now} '
             f'data={"{...}" if self.data else self.data} '
             f'user_id={self.user_id} '

@@ -9,7 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from core.exceptions import NotFoundByIdException
+from core.exceptions import NotFoundException
 from core.models import Base
 
 
@@ -27,11 +27,39 @@ class BaseCrud[T]:
         self.a_session = a_session
 
     @classmethod
-    async def get_one_by_id_or_404(cls, session: AsyncSession, pk_id: int) -> T:
+    async def get_pk_id_from_model_or_404(
+            cls,
+            session: AsyncSession,
+            from_model: type[T],
+            **filters,
+    ) -> int:
+        res= await session.execute(
+            select(from_model.id)
+            .filter_by(**filters)
+        )
+        if (pk_id := res.scalar_one_or_none()) is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=(
+                    f'Instance of {from_model.__class__.__name__!r} '
+                    f'with filters {" ".join(f'{k!r}={v!r}' for k, v in filters.items())} '
+                    f'not found'
+                ),
+            )
+        return pk_id
+
+    @classmethod
+    async def get_one_by_id_or_404(
+            cls,
+            session: AsyncSession,
+            pk_id: int
+    ) -> T:
         if (res := await session.get(cls.model, pk_id)) is None:
-            raise NotFoundByIdException(
-                entity_name=cls.model.__name__,
-                num_id=pk_id,
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=(
+                    f'{cls.model.__name__!r} with pk_id {pk_id!r} not found '
+                ),
             )
         return res
 

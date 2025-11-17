@@ -169,7 +169,7 @@ async def get_editing_passport(
     async with db_api.session_factory() as session:
         stmt2 = (
             select(OvimPassport)
-            .where(OvimPassport.tlo_id == 1)
+            .where(OvimPassport.tlo_name == 1)
             .order_by(OvimPassport.started_editing_at.desc())
             .limit(1)
         )

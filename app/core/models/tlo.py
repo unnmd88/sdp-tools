@@ -26,7 +26,6 @@ class TrafficLightObject(
         String(32),
         unique=True,
     )
-
     district: Mapped[str] = mapped_column(
         default='',
         server_default='',
@@ -45,5 +44,4 @@ class TrafficLightObject(
         default='',
         server_default='',
     )
-
     region: Mapped["Region"] = relationship()
