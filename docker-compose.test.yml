@@ -3,7 +3,7 @@ services:
     build:
       dockerfile: docker-build/app/Dockerfile
       context: .
-    image: fastapi-sdp-tools
+    image: fastapi-sdp-tools:tests
     container_name: test_app
     environment:
       APP_CONFIG__DB__URL: postgresql+asyncpg://test1:1111@192.168.200.3:5432/test
