@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from annotated_types import MinLen
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import Field
@@ -8,17 +9,19 @@ from starlette import status
 
 from api.api_v1.passport_groups.crud import PassportGroupsCrud
 from api.api_v1.passports.crud import PassportsCrud
-from api.api_v1.passports.dependencies import passport_group_found_or_404, current_passport_or_404
+from api.api_v1.passports.dependencies import passport_group_found_or_404, valid_data_from_db_or_404
 from api.api_v1.passports.filters import (
-    PassportGroupNameRouteFilter,
-    PassportCurrentFilter, PassportGroupNameFilter
+
+    PassportCurrentFilter,
 )
 from api.api_v1.passports.schemas import (
     UpdatePassport,
     CapturePassportSchema,
     FinalSavedPassportSchema,
     CapturedPassport,
-    CurrentPassportSchema, CapturePassportSchemaSaveToDatabase, UpdatePassportSchemaSaveToDatabase,
+    CurrentPassportSchema,
+    CapturePassportSchemaSaveToDatabase,
+    UpdatePassportSchemaSaveToDatabase,
 )
 from api.dependencies import http_bearer, get_jwt_payload_jwt_bearer
 from auth.schemas import PayloadJWTSchema
@@ -36,32 +39,58 @@ router = APIRouter(
 
 
 @router.get(
-    '/{group_name}/{tlo_id}',
+    '/{group_name}/{tlo_name}',
     status_code=status.HTTP_200_OK,
-    response_model=CurrentPassportSchema,
+    # response_model=CurrentPassportSchema,
 )
 async def get_valid_passport(
     group_name: PassportGroupsRoutes,
-    tlo_id: Annotated[int, Field(ge=1)],
+    tlo_name: Annotated[str, MinLen(1)],
     session: db_session,
-) -> CurrentPassportSchema:
+    user_data: Annotated[PayloadJWTSchema, Depends(get_jwt_payload_jwt_bearer)],
+# ) -> CurrentPassportSchema:
+) :
+
+    return await PassportGroupsCrud.get_tlo_and_passport_group(
+        session=session,
+        group_name_route=group_name,
+        tlo_name=tlo_name,
+    )
+
+
+    tlo_id = await PassportGroupsCrud.get_pk_id_from_model_or_404(
+        session=session,
+        from_model=TrafficLightObject,
+        name=tlo_name,
+    )
+    group_id = await PassportGroupsCrud.get_pk_id_from_model_or_404(
+        session=session,
+        from_model=PassportGroupModel,
+        group_name=group_name,
+    )
+
     sequence_group_id = await PassportGroupsCrud.get_all(
         session=session,
-        filters=PassportGroupNameRouteFilter(group_name_route=group_name),
-    )
-    passport_group_found_or_404(sequence_group_id=sequence_group_id)
-    current_passport = await PassportsCrud.get_all(
-        session,
         filters=PassportCurrentFilter(
-            group_id=sequence_group_id[-1].id,
+            group_id=group_id,
             tlo_id=tlo_id,
         ),
     )
-    current_passport_or_404(current_passport)
-    return CurrentPassportSchema.model_validate(
-        current_passport[-1],
-        from_attributes=True,
+    passport_group_found_or_404(sequence_group_id=sequence_group_id)
+    all_passports_this_tlo_name = await PassportsCrud.get_all(
+        session,
+        filters=PassportCurrentFilter(
+            group_id=sequence_group_id[-1].id,
+            tlo_id=tlo_name,
+        ),
     )
+    valid_data_from_db_or_404(all_passports_this_tlo_name)
+    current_passport = all_passports_this_tlo_name[-1]
+    user = await PassportGroupsCrud.get_user_by_id_or_404(
+        session=session,
+        user_id=current_passport.user_id,
+    )
+
 
 
 @router.post(
@@ -122,14 +151,6 @@ async def save_passport(
         session=session,
         from_model=PassportGroupModel,
         group_name=passport.group_name,
-    )
-    passport_db = await PassportsCrud.capture_passport(
-        session,
-        CapturePassportSchemaSaveToDatabase(
-            tlo_id=tlo_id,
-            group_id=group_id,
-            user_id=user_data.user_id,
-        )
     )
     passport_db = await PassportsCrud.save_passport(
         session,

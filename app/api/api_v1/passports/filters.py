@@ -9,12 +9,9 @@ class PassportGroupIdFilter(BaseModel):
     group_id: Annotated[int, Field(ge=1)]
 
 
-class PassportGroupNameRouteFilter(BaseModel):
-    group_name_route: Annotated[str, PassportGroupsRoutes]
-
-
-class PassportGroupNameFilter(BaseModel):
-    group_name: Annotated[str, PassportGroups]
+class PassportGroupNameRouteAndTloNameFilter(BaseModel):
+    group_name: str
+    tlo_name: str
 
 
 class PassportCurrentFilter(BaseModel):

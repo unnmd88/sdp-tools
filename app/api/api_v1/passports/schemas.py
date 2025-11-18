@@ -63,12 +63,24 @@ class FinalSavedPassportSchema(BaseModel):
 
 
 class CurrentPassportSchema(BaseModel):
-    id: Annotated[int, Field(ge=1)]
-    tlo_id: Annotated[int, Field(ge=1)]
-    user_id: Annotated[int, Field(ge=1)]
-    group_id: Annotated[int, Field(ge=1)]
+    # id: Annotated[int, Field(ge=1)]
+    tlo_name: str
+    username: str
+    passport_group_name: str
     data: dict
     commit_message: str
-    editing_now: bool
+    editing_now: bool | dict
     started_editing_at: datetime
     finished_editing_at: datetime
+
+
+# class CurrentPassportSchema(BaseModel):
+#     id: Annotated[int, Field(ge=1)]
+#     tlo_id: Annotated[int, Field(ge=1)]
+#     user_id: Annotated[int, Field(ge=1)]
+#     group_id: Annotated[int, Field(ge=1)]
+#     data: dict
+#     commit_message: str
+#     editing_now: bool
+#     started_editing_at: datetime
+#     finished_editing_at: datetime

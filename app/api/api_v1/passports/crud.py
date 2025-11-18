@@ -1,6 +1,8 @@
 import logging
+from typing import Annotated
 
 from fastapi import HTTPException
+from pydantic import Field
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,6 +20,7 @@ class PassportsCrud(BaseCrud):
 
     model = Passport
     logger = logging.getLogger(OVIM_PASSPORTS_LOGGER)
+
 
     @classmethod
     async def get_last_passport_or_none(

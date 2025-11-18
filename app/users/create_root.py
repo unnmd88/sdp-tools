@@ -18,7 +18,7 @@ logger = logging.getLogger(USERS_LOGGER)
 
 
 async def create_root(session: AsyncSession = None):
-    name = 'root'
+    name = 'root2'
     password = bcrypt.hashpw(
         'sdp2025'.encode('utf-8'),
         bcrypt.gensalt(),

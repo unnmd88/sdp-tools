@@ -50,7 +50,7 @@ def passport_group_found_or_404(
         )
 
 
-def current_passport_or_404(
+def valid_data_from_db_or_404(
     current_passport: Sequence[T_Model],
 ):
     if len(current_passport) == 0:
