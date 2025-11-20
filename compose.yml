@@ -8,6 +8,8 @@ services:
     environment:
       APP_CONFIG__DB__URL: postgresql+asyncpg://admin1:1122@192.168.100.4:5432/tdb
       APP_CONFIG__DB__ECHO: 1
+      APP_CONFIG__default_superuser_creds__NAME: root
+      APP_CONFIG__default_superuser_creds__PASSWORD: sdp2025
     volumes:
       - ./app:/sdp-tools-app/app
     networks:
