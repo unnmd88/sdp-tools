@@ -16,6 +16,7 @@ dependencies = [
     "pytest-asyncio>=1.2.0",
     "python-multipart>=0.0.20",
     "sqlalchemy[asyncio]>=2.0.44",
+    "typer>=0.20.0",
     "uvicorn[standatd]>=0.38.0",
 ]
 
