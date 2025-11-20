@@ -40,3 +40,26 @@ AND passports.tlo_id = traffic_light_objects.id
 AND users.id = users.id
 ORDER BY passports.finished_editing_at DESC
 LIMIT $3::INTEGER ('413', <PassportGroupsRoutes.OVIM: 'ovim'>, 1)
+
+
+SELECT
+passports.user_id AS passport_user_id,
+traffic_light_objects.id AS tlo_id,
+traffic_light_objects.name AS tlo_name,
+traffic_light_objects.street,
+traffic_light_objects.service_organization,
+regions.code AS region_code,
+regions.name AS region_name,
+passport_groups.id AS passport_group_id,
+passport_groups.group_name AS passport_group_name,
+passports.id AS passport_id,
+passports.tlo_id AS tlo_id_1,
+passports.data,
+passports.commit_message,
+passports.editing_now,
+passports.started_editing_at,
+passports.finished_editing_at,
+users.username AS username
+FROM passports, traffic_light_objects, regions, passport_groups, users
+WHERE traffic_light_objects.name = $1::VARCHAR AND passport_groups.group_name_route = $2::VARCHAR AND passports.tlo_id = traffic_light_objects.id AND users.id = passports.user_id AND passports.group_id = passport_groups.id AND regions.id = traffic_light_objects.region_id ORDER BY passports.finished_editing_at DESC
+LIMIT $3::INTEGER
