@@ -54,16 +54,9 @@ async def get_users(
 async def create_user(
     user: CreateUser,
     session: AsyncSession,
-) -> UserFromDbFullSchema:
-    # if user.username == 'root':
-    #     raise HTTPException(
-    #         status_code=status.HTTP_409_CONFLICT,
-    #         detail='username "root" is not allowed',
-    #     )
+) -> User:
     hashed_passwd = auth_utils.hash_password(user.password)
     fields = user.model_dump() | {'password': hashed_passwd}
-    # user.password = auth_utils.hash_password(user.password)
-    # new_user = User(**user.model_dump(exclude={'password'}))
     new_user = User(**fields)
     session.add(new_user)
     try:
@@ -75,7 +68,4 @@ async def create_user(
             detail=f'User with that username already exists: {user.username!r}',
         )
     logger.info('Created user: %r', user)
-    return UserFromDbFullSchema.model_validate(new_user)
-    # return new_user
-
-
+    return new_user
