@@ -33,6 +33,11 @@ class Password(BaseModel):
     max_length: int = 30
 
 
+class DefaultSuperuserCreds(BaseModel):
+    name: str
+    password: str
+
+
 class AuthJWT(BaseModel):
     private_key_path: Path = BASE_DIR / 'certs' / 'private.pem'
     public_key_path: Path = BASE_DIR / 'certs' / 'public.pem'
@@ -69,6 +74,7 @@ class Settings(BaseSettings):
     api: ApiPrefix = ApiPrefix()
     db: DatabaseConfig
     auth_jwt: AuthJWT = AuthJWT()
+    default_superuser_creds: DefaultSuperuserCreds
 
 
 settings = Settings()
