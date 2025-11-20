@@ -65,12 +65,21 @@ class User(
         server_default='',
     )
 
+    def __str__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'id={self.id} '
+            f'first_name={self.first_name} '
+            f'last_name={self.last_name} '
+            f'username={self.username} '
+            f'role={self.role} '
+            f'organization={self.organization} '
+            f'email={self.email} '
+            f'is_active={self.is_active} '
+            f'is_admin={self.is_admin} '
+            f'is_superuser={self.is_superuser} '
+            f')'
+        )
+
     def __repr__(self):
         return f'{self.__class__.__name__}(id={self.id} username={self.username})'
-
-    # foo: Mapped[int]
-    # bar: Mapped[int]
-    #
-    # __table_args__ = (
-    #     UniqueConstraint('foo', 'bar'),
-    # )
