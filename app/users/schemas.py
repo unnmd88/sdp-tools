@@ -16,7 +16,7 @@ class CreateUser(BaseModel):
     username: Annotated[str, MinLen(3), MaxLen(20)]
     organization: Organizations
     email: Annotated[EmailStr, Field(default=None)]
-    password: Annotated[str | bytes, Field(repr=False)]
+    password: Annotated[str, MinLen(4), MaxLen(16), Field(repr=False)]
     is_active: bool
     is_admin: bool
     is_superuser: bool

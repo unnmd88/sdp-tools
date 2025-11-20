@@ -66,5 +66,10 @@ async def get_users(
 async def create_user(
     user: CreateUser,
     sess: db_session,
-):
-    return await users_crud.create_user(user, sess)
+) -> UserFromDbFullSchema:
+    return UserFromDbFullSchema.model_validate(
+        obj=await users_crud.create_user(user, sess),
+        from_attributes=True,
+    )
+
+
