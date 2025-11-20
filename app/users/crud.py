@@ -54,8 +54,9 @@ async def get_users(
 async def create_user(
     user: CreateUser,
     session: AsyncSession,
+    from_script: bool = False,
 ) -> UserFromDbFullSchema:
-    if user.username == 'root':
+    if user.username == 'root' and from_script is False:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail='username "root" is not allowed',

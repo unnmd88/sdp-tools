@@ -17,8 +17,12 @@ from users.roles import Roles
 logger = logging.getLogger(USERS_LOGGER)
 
 
+async def create_user():
+    pass
+
+
 async def create_root(session: AsyncSession = None):
-    name = 'root2'
+    name = 'root'
     password = bcrypt.hashpw(
         'sdp2025'.encode('utf-8'),
         bcrypt.gensalt(),

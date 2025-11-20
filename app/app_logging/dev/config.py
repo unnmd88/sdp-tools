@@ -23,7 +23,7 @@ LOGGING_CONFIG = {
             'filename': API_V1_PATH / 'passports/logs/log.log',
             'formatter': 'simple2',
         },
-        'file_passports_owners': {
+        'file_passport_groups': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': API_V1_PATH / 'passport_groups/logs/log.log',
@@ -47,7 +47,7 @@ LOGGING_CONFIG = {
         },
         'passport_groups': {
             'level': 'INFO',
-            'handlers': ['console', 'file_passports_owners'],
+            'handlers': ['console', 'file_passport_groups'],
         },
     },
     'formatters': {
