@@ -2,8 +2,6 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field
 
-from core.constants import PassportGroupsRoutes, PassportGroups
-
 
 class PassportGroupIdFilter(BaseModel):
     group_id: Annotated[int, Field(ge=1)]

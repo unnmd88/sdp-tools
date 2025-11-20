@@ -2,9 +2,13 @@ from datetime import datetime
 from typing import Annotated
 
 from annotated_types import MaxLen, MinLen
+from core.constants import (
+    PassportGroups,
+    RegionCodes,
+    RegionNames,
+    ServiceOrganizations,
+)
 from pydantic import BaseModel, Field, computed_field
-
-from core.constants import PassportGroups
 
 
 class PassportSchemaBase(BaseModel):
@@ -65,6 +69,10 @@ class FinalSavedPassportSchema(BaseModel):
 class CurrentPassportSchema(BaseModel):
     # id: Annotated[int, Field(ge=1)]
     tlo_name: str
+    region_code: RegionCodes
+    region_name: RegionNames
+    street: str
+    service_organization: ServiceOrganizations
     username: str
     passport_group_name: str
     data: dict
