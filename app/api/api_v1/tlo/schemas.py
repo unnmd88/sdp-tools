@@ -1,9 +1,8 @@
 from typing import Annotated
 
 from annotated_types import MaxLen
-from pydantic import BaseModel, Field, ConfigDict
-
-from core.constants import ServiceOrganizations, Districts
+from core.constants import Districts, ServiceOrganizations
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class TrafficLightCreate(BaseModel):

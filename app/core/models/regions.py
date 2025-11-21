@@ -1,15 +1,14 @@
 from typing import TYPE_CHECKING
 
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from core.models import Base
 from core.models.mixins.integer_pk_id import IntegerIdPkMixin
 from core.models.mixins.timestamp import CreatedAtMixin, UpdatedAtMixin
 
-
 if TYPE_CHECKING:
-    from . import TrafficLightObject
+    pass
 
 
 class Region(
@@ -25,4 +24,3 @@ class Region(
         String(32),
         unique=True,
     )
-

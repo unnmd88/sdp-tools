@@ -1,13 +1,11 @@
 import asyncio
 
-from sqlalchemy import Result, text
-from sqlalchemy.sql.expression import update, select
-
 from core.constants import ServiceOrganizations
 from core.database import db_api as db_api_main
-from core.models import User, TrafficLightObject, Region, Passport, PassportGroup
 from core.database.api import DatabaseAPI
-from users.organizations import Organizations
+from core.models import Passport, PassportGroup, Region, TrafficLightObject, User
+from sqlalchemy import Result
+from sqlalchemy.sql.expression import select
 
 # def t_dp_api():
 #     return DatabaseAPI(
@@ -195,7 +193,6 @@ async def main():
     # await create_users(db_api=db_api_main)
     await create_passports_owners(db_api=db_api_main)
     # await  create_passport(db_api=db_api_main)
-
 
 
 if __name__ == '__main__':

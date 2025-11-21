@@ -59,9 +59,9 @@ class UpdatePassportSchemaSaveToDatabase(BaseModel):
 
 
 class FinalSavedPassportSchema(BaseModel):
-    tlo_name: Annotated[str, MinLen(2)]
-    group_name: PassportGroups
     id: Annotated[int, Field(ge=1)]
+    tlo_name: Annotated[str, MinLen(1)]
+    group_name: PassportGroups
     username: str
     editing_now: bool
 

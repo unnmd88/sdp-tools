@@ -1,13 +1,12 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String, Text, ForeignKey
+from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.models import Base
 
 from .mixins.integer_pk_id import IntegerIdPkMixin
 from .mixins.timestamp import CreatedAtMixin, UpdatedAtMixin
-
 
 if TYPE_CHECKING:
     from . import Region
@@ -44,4 +43,4 @@ class TrafficLightObject(
         default='',
         server_default='',
     )
-    region: Mapped["Region"] = relationship()
+    region: Mapped['Region'] = relationship()

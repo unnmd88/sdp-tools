@@ -1,5 +1,4 @@
 from auth.create_tokens import create_access_jwt
-from tests.fixtures.fixtures_user import user_schemas
 
 
 def test_create_jwt(user_schemas):

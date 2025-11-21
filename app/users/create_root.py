@@ -2,17 +2,14 @@ import asyncio
 import logging
 
 import bcrypt
-
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app_logging.dev.config import USERS_LOGGER
 from core.database import db_api
 from core.models import User
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from users.organizations import Organizations
 from users.roles import Roles
-
 
 logger = logging.getLogger(USERS_LOGGER)
 
@@ -24,7 +21,7 @@ async def create_user():
 async def create_root(session: AsyncSession = None):
     name = 'root'
     password = bcrypt.hashpw(
-        'sdp2025'.encode('utf-8'),
+        b'sdp2025',
         bcrypt.gensalt(),
     )
     user_root = User(

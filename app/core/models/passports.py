@@ -1,16 +1,15 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, String, Text
+from sqlalchemy import ForeignKey, Text
 from sqlalchemy.dialects.postgresql.json import JSONB
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from core.models import Base
 from core.models.mixins.integer_pk_id import IntegerIdPkMixin
-from core.models.mixins.timestamp import StartAtMixin, FinishedAtMixin
+from core.models.mixins.timestamp import FinishedAtMixin, StartAtMixin
 
 if TYPE_CHECKING:
-    from . import User
-    from . import TrafficLightObject
+    pass
 
 
 class Passport(

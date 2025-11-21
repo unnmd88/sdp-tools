@@ -1,10 +1,9 @@
-from fastapi import HTTPException
-from sqlalchemy import or_, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
-
 from core.database.crud import BaseCrud, T
 from core.models import Region
+from fastapi import HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 
 class RegionsCrud(BaseCrud):

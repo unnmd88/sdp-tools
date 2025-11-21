@@ -1,7 +1,7 @@
 from typing import Annotated
-from pydantic import BaseModel, Field
 
 from core.constants import PassportGroups, PassportGroupsRoutes
+from pydantic import BaseModel, Field
 
 
 class PassportBase(BaseModel):

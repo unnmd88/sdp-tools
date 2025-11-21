@@ -1,10 +1,9 @@
-import pytest
 from contextlib import nullcontext
 
-from fastapi import HTTPException
-
+import pytest
 from auth.constants import TokenTypes
 from auth.token_validation import check_token_type
+from fastapi import HTTPException
 
 
 @pytest.mark.parametrize(

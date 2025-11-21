@@ -1,12 +1,11 @@
 from collections.abc import Sequence
 
+from core.database.crud import BaseCrud, T
+from core.models import TrafficLightObject
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload, contains_eager
-
-from core.database.crud import BaseCrud, T
-from core.models import TrafficLightObject, Region
+from sqlalchemy.orm import joinedload
 
 
 class TloCrud(BaseCrud):
@@ -32,14 +31,10 @@ class TloCrud(BaseCrud):
                 # TrafficLightObject.service_organization,
                 # TrafficLightObject.description,
             )
-            .options(
-                joinedload(TrafficLightObject.region)
-            )
+            .options(joinedload(TrafficLightObject.region))
             .order_by(TrafficLightObject.id)
             .filter_by(**filter_dict)
         )
-
-
 
         # stmt = (
         #     select(cls.model)
@@ -51,7 +46,6 @@ class TloCrud(BaseCrud):
         #     .order_by(TrafficLightObject.id)
         #     .filter_by(**filter_dict)
         # )
-
 
         result = await session.execute(stmt)
         s = result.scalars().all()

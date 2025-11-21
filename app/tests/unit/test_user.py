@@ -1,10 +1,8 @@
 import asyncio
 
 import pytest
-
-from fastapi import HTTPException
 from auth.token_validation import check_is_active_superuser
-from tests.fixtures.fixtures_user import user_schemas
+from fastapi import HTTPException
 
 
 async def test_check_is_active_superuser(user_schemas):

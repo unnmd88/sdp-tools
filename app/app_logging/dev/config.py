@@ -1,6 +1,6 @@
 import logging.config
 
-from core.config import BASE_DIR, API_V1_PATH
+from core.config import API_V1_PATH, BASE_DIR
 
 LOGGING_CONFIG = {
     'version': 1,

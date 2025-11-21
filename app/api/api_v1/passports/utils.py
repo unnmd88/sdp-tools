@@ -39,5 +39,4 @@ def create_current_passport_schema_or_404(
                 detail=f'Has not current passport, but '
                 f'editing now by user={db_rows_from_mappings[0]["username"]}',
             )
-    raise ValueError(f'Count rows should be no more than 2')
-
+    raise ValueError('Count rows should be no more than 2')

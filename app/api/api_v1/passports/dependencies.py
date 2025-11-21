@@ -10,7 +10,7 @@ def check_allow_to_save_or_raise_http_exc(
     editable_db_passport: T_Model,
     model_to_save: BaseModel,
 ):
-    #todo Проверка, что паспорт сохраняется с правильной группой
+    # todo Проверка, что паспорт сохраняется с правильной группой
     if editable_db_passport is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

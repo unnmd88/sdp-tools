@@ -1,10 +1,9 @@
 from typing import Annotated
 
+from core.database import db_api
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import ExpiredSignatureError, InvalidTokenError
-
-from core.database import db_api
 from users.crud import get_user_by_id
 from users.schemas import UserFromDbFullSchema
 

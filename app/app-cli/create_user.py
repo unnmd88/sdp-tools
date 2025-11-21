@@ -3,10 +3,9 @@ from typing import Annotated
 
 import typer
 from core.config import settings
+from core.models import User
 from fastapi.exceptions import HTTPException
 from rich import print
-
-from core.models import User
 from users.crud import create_user as crud_create_user
 from users.organizations import Organizations
 from users.roles import Roles
@@ -26,23 +25,14 @@ async def create_user_async_wrap(
             session=session,
         )
 
+
 @app.command('create-user')
 def create_user(
-    username: Annotated[
-        str, typer.Option(help='username for user')
-    ],
-    password: Annotated[
-        str, typer.Option(help='password for user')
-    ],
-    first_name: Annotated[
-        str, typer.Option(help='first_name for user')
-    ] = '',
-    last_name: Annotated[
-        str, typer.Option(help='last_name for user')
-    ] = '',
-    email: Annotated[
-        str, typer.Option(help='email for user')
-    ] = 'user@mail.com',
+    username: Annotated[str, typer.Option(help='username for user')],
+    password: Annotated[str, typer.Option(help='password for user')],
+    first_name: Annotated[str, typer.Option(help='first_name for user')] = '',
+    last_name: Annotated[str, typer.Option(help='last_name for user')] = '',
+    email: Annotated[str, typer.Option(help='email for user')] = 'user@mail.com',
     is_active: Annotated[
         bool, typer.Option(help='Bool flag "is_active" for user')
     ] = True,
@@ -52,23 +42,15 @@ def create_user(
     is_superuser: Annotated[
         bool, typer.Option(help='Bool flag "is_superuser" for user')
     ] = False,
-    role: Annotated[
-        Roles, typer.Option(help='role for user')
-    ] = Roles.worker,
+    role: Annotated[Roles, typer.Option(help='role for user')] = Roles.worker,
     organization: Annotated[
         Organizations, typer.Option(help='organization for user')
     ] = Organizations.SDP,
-    phone_number: Annotated[
-        str, typer.Option(help='phone_number for user')
-    ] = '',
-    telegram: Annotated[
-        str, typer.Option(help='telegram for user')
-    ] = '',
-    description: Annotated[
-        str, typer.Option(help='description for user')
-    ] = '',
+    phone_number: Annotated[str, typer.Option(help='phone_number for user')] = '',
+    telegram: Annotated[str, typer.Option(help='telegram for user')] = '',
+    description: Annotated[str, typer.Option(help='description for user')] = '',
 ) -> None:
-    """ Create user for fastapi application. """
+    """Create user for fastapi application."""
 
     user_schema = CreateUser(
         first_name=first_name,
@@ -103,15 +85,9 @@ def create_superuser(
     password: Annotated[
         str, typer.Option(help='password for user')
     ] = settings.default_superuser_creds.password,
-    first_name: Annotated[
-        str, typer.Option(help='first_name for user')
-    ] = '',
-    last_name: Annotated[
-        str, typer.Option(help='last_name for user')
-    ] = '',
-    email: Annotated[
-        str, typer.Option(help='email for user')
-    ] = 'superuser@mail.com',
+    first_name: Annotated[str, typer.Option(help='first_name for user')] = '',
+    last_name: Annotated[str, typer.Option(help='last_name for user')] = '',
+    email: Annotated[str, typer.Option(help='email for user')] = 'superuser@mail.com',
     is_active: Annotated[
         bool, typer.Option(help='Bool flag "is_active" for user')
     ] = True,
@@ -121,23 +97,15 @@ def create_superuser(
     is_superuser: Annotated[
         bool, typer.Option(help='Bool flag "is_superuser" for user')
     ] = True,
-    role: Annotated[
-        Roles, typer.Option(help='role for user')
-    ] = Roles.superuser,
+    role: Annotated[Roles, typer.Option(help='role for user')] = Roles.superuser,
     organization: Annotated[
         Organizations, typer.Option(help='organization for user')
     ] = Organizations.SDP,
-    phone_number: Annotated[
-        str, typer.Option(help='phone_number for user')
-    ] = '',
-    telegram: Annotated[
-        str, typer.Option(help='telegram for user')
-    ] = '',
-    description: Annotated[
-        str, typer.Option(help='description for user')
-    ] = '',
+    phone_number: Annotated[str, typer.Option(help='phone_number for user')] = '',
+    telegram: Annotated[str, typer.Option(help='telegram for user')] = '',
+    description: Annotated[str, typer.Option(help='description for user')] = '',
 ) -> None:
-    """ Create superuser for fastapi application. """
+    """Create superuser for fastapi application."""
     create_user(
         first_name=first_name,
         last_name=last_name,

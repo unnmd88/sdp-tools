@@ -19,5 +19,8 @@ class Base(AsyncAttrs, DeclarativeBase):
 
     def __eq__(self, other) -> bool:
         if isinstance(other, type(self)):
-            return all(getattr(self, attr) == getattr(other, attr) for attr in self.__table__.columns.keys())
+            return all(
+                getattr(self, attr) == getattr(other, attr)
+                for attr in self.__table__.columns.keys()
+            )
         return NotImplemented

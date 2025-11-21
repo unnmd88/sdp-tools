@@ -1,11 +1,9 @@
 import random
 import string
+from contextlib import nullcontext
 
 import pytest
-
-from auth.utils import hash_password, validate_password, gen_password
-
-from contextlib import nullcontext
+from auth.utils import gen_password, hash_password, validate_password
 
 
 class TestPasswordUtils:

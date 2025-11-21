@@ -139,4 +139,3 @@ WHERE passport_groups.id = 1
 ORDER BY passports.finished_editing_at DESC
 LIMIT 1
 """
-

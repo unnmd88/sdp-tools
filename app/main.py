@@ -1,9 +1,7 @@
 import uvicorn
-from starlette.middleware.cors import CORSMiddleware
-
-
 from api import router as api_v1_router
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 
@@ -22,7 +20,4 @@ app.add_middleware(
 
 
 if __name__ == '__main__':
-    uvicorn.run(
-        'main:app',
-        **settings.run.model_dump()
-    )
+    uvicorn.run('main:app', **settings.run.model_dump())

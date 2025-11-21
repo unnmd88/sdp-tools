@@ -1,12 +1,8 @@
 import pytest
-
+from core.models import User
 from sqlalchemy.engine.result import Result
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select
-
-from core.models import User
-from tests.integration.conftest import user_models
 
 
 @pytest.mark.asyncio(loop_scope='session')

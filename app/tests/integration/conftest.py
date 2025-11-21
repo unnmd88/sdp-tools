@@ -1,22 +1,9 @@
-import asyncio
-
 import pytest
-from sqlalchemy.exc import SQLAlchemyError
-
-from api.api_v1.regions.crud import RegionsCrud
 from core.config import settings
-from core.models import Base, User, Region
 from core.database.api import DatabaseAPI
+from core.models import Base, User
 from main import app
 from starlette.testclient import TestClient
-
-from tests.integration.db_data import (
-    regions_models,
-    passports_owners_models,
-    traffic_light_objects,
-    passports_models,
-    users_models,
-)
 from users.user_examples import users as user_examples
 
 BASE_URL = (

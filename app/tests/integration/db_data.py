@@ -2,7 +2,7 @@ import random
 from collections.abc import Sequence
 
 from core.constants import PassportGroups, ServiceOrganizations
-from core.models import Region, PassportGroup, Passport, TrafficLightObject, User
+from core.models import Passport, PassportGroup, Region, TrafficLightObject, User
 from users.organizations import Organizations
 from users.roles import Roles
 

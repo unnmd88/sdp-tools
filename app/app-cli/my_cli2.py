@@ -7,4 +7,4 @@ app = typer.Typer()
 def my2(
     arg1: str,
 ):
-    print(f'Hello from my2!')
+    print('Hello from my2!')

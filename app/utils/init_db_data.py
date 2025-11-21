@@ -1,12 +1,17 @@
 import asyncio
 
+from core.constants import (
+    PassportGroups,
+    PassportGroupsRoutes,
+    RegionCodes,
+    RegionNames,
+    ServiceOrganizations,
+)
+from core.database.api import db_api
+from core.models import PassportGroup, Region, TrafficLightObject
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select
-
-from core.constants import RegionCodes, RegionNames, PassportGroups, PassportGroupsRoutes, ServiceOrganizations
-from core.database.api import db_api
-from core.models import Region, PassportGroup, TrafficLightObject, Base
 
 REGIONS = [
     Region(code=RegionCodes.MOSCOW77, name=RegionNames.MOSCOW),
@@ -63,15 +68,13 @@ async def add_tlo(session: AsyncSession):
         await session.rollback()
 
 
-async def add_regions_and_passport_groups(
-    session: AsyncSession
-):
+async def add_regions_and_passport_groups(session: AsyncSession):
     try:
         session.add_all(REGIONS)
         session.add_all(PASSPORT_GROUPS)
         await session.commit()
-    except IntegrityError as e:
-        print(f'Failed: already exists.')
+    except IntegrityError:
+        print('Failed: already exists.')
         await session.rollback()
 
 

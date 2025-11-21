@@ -41,7 +41,3 @@ class PayloadJWTSchema(BaseModel):
     typ: str
     exp: int
     iat: int
-
-
-
-

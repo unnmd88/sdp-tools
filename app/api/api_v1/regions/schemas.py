@@ -1,7 +1,5 @@
-from pydantic import BaseModel, ConfigDict
-
-
 from core.constants import RegionCodes, RegionNames
+from pydantic import BaseModel, ConfigDict
 
 
 class RegionCreate(BaseModel):

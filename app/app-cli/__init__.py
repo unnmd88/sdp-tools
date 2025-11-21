@@ -1,11 +1,8 @@
-__all__ = (
-    'app',
-)
+__all__ = ('app',)
 
 import typer
 
 from . import create_user
-
 
 app = typer.Typer(no_args_is_help=True)
 app.add_typer(create_user.app)

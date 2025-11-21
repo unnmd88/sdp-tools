@@ -1,20 +1,17 @@
 from collections.abc import Sequence
 
+from core.dependencies import db_session
 from fastapi import (
     APIRouter,
 )
-
 from starlette import status
 
 from api.api_v1.passport_groups.crud import PassportGroupsCrud
 from api.api_v1.passport_groups.schemas import (
-    PassportGroupsSchema,
     PassportGroupsCreate,
+    PassportGroupsSchema,
     PassportGroupsUpdate,
 )
-
-from core.dependencies import db_session
-
 
 router = APIRouter(
     prefix='/passport-groups',

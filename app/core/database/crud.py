@@ -1,16 +1,16 @@
 import logging
 from collections.abc import Sequence
-from typing import TypeVar, Annotated
+from typing import Annotated, TypeVar
 
 from fastapi import HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import select
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
+from users.schemas import UserFromDbFullSchema
 
 from core.models import Base, User
-from users.schemas import UserFromDbFullSchema
 
 T = TypeVar('T', bound=Base)
 
@@ -101,7 +101,7 @@ class BaseCrud[T]:
             await session.rollback()
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f'Already exists.',
+                detail='Already exists.',
             )
         except SQLAlchemyError as e:
             cls.logger.error('Ошибка добавления данных: %r', e)

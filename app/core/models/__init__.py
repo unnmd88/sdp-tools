@@ -8,8 +8,8 @@ __all__ = (
 )
 
 from .base import Base
+from .passport_groups import PassportGroup
+from .passports import Passport
+from .regions import Region
 from .tlo import TrafficLightObject
 from .users import User
-from .regions import Region
-from .passports import Passport
-from .passport_groups import PassportGroup
