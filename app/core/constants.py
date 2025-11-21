@@ -3,9 +3,9 @@ from enum import IntEnum, StrEnum
 
 class RegionCodes(IntEnum):
     MOSCOW77 = 77
-    TVER = 69
-    SAKHALIN = 65
-    RYBINSK = 76
+    TVER69 = 69
+    SAKHALIN65 = 65
+    RYBINSK76 = 76
     TMUTARAKAN1111 = 1111
 
 
