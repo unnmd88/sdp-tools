@@ -5,10 +5,11 @@ from auth.token_validation import (
     check_user_is_active,
     extract_payload_from_jwt,
 )
-from core.database import db_api
+# from core.database import db_api
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
+from infra.database.api import db_api
 from users import crud as users_crud
 from users.schemas import CreateUser, UserFromDbFullSchema
 

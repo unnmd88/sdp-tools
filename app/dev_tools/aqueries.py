@@ -2,7 +2,7 @@ import asyncio
 
 from core.constants import ServiceOrganizations
 from core.database import db_api as db_api_main
-from core.database.api import DatabaseAPI
+from core.database import DatabaseAPI
 from core.models import Passport, PassportGroup, Region, TrafficLightObject, User
 from sqlalchemy import Result
 from sqlalchemy.sql.expression import select

@@ -7,7 +7,7 @@ from pydantic_settings import (
 )
 
 BASE_DIR = Path(__file__).parent.parent
-API_V1_PATH = BASE_DIR / 'api/api_v1/'
+API_V1_PATH = BASE_DIR / 'application/api/api_v1/'
 
 
 class RunConfig(BaseModel):

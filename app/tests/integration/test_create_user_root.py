@@ -1,6 +1,6 @@
 import bcrypt
 import pytest
-from core.database.api import DatabaseAPI
+from core.database import DatabaseAPI
 from core.models import User
 from sqlalchemy.engine.result import Result
 from sqlalchemy.sql.expression import select

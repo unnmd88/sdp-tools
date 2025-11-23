@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from core.database import db_api
+from infra.database.api import db_api
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from users.crud import get_user_by_id

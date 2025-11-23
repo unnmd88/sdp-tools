@@ -52,7 +52,7 @@ ENV PYTHONPATH="/sdp-tools-app:/sdp-tools-app/app"
 WORKDIR /sdp-tools-app/app
 
 RUN chmod +x prestart-app.sh
-ENTRYPOINT ["./prestart-app.sh"]
+#ENTRYPOINT ["./prestart-app.sh"]
 
 CMD ["fastapi", "dev", "--host", "0.0.0.0", "main.py", "--port", "8080"]
 #CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

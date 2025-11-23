@@ -7,7 +7,7 @@ from core.constants import (
     RegionNames,
     ServiceOrganizations,
 )
-from core.database.api import db_api
+from core.database import db_api
 from core.models import PassportGroup, Region, TrafficLightObject
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio.session import AsyncSession

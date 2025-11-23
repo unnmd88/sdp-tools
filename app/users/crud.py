@@ -4,8 +4,8 @@ from collections.abc import Sequence
 import sqlalchemy
 from app_logging.dev.config import USERS_LOGGER
 from auth import utils as auth_utils
-from core.database import db_api
-from core.models import User
+# from core.database import db_api
+# from core.models import User
 from fastapi import HTTPException
 from sqlalchemy.engine.result import Result
 from sqlalchemy.exc import IntegrityError
@@ -13,6 +13,8 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select
 from starlette import status
 
+from infra.database import User
+from infra.database.api import db_api
 from users.schemas import CreateUser, UserFromDbFullSchema
 
 logger = logging.getLogger(USERS_LOGGER)
