@@ -14,6 +14,10 @@ activate:
 
 .PHONY: up
 up:
+	docker compose up
+
+.PHONY: upd
+upd:
 	docker compose up -d
 
 .PHONY: up-build
