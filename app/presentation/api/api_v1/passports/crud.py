@@ -1,6 +1,6 @@
 import logging
 
-from app_logging.dev.config import OVIM_PASSPORTS_LOGGER
+from app_logging.dev.config import PASSPORTS_LOGGER
 from core.constants import PassportGroupsRoutes as PassportGroupsRoutesEnum
 from infra.database.models.crud import BaseCrud
 from infra.database.models.crud import T as T_Model
@@ -16,17 +16,17 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from application.api.api_v1.passports.dependencies import check_allow_to_save_or_raise_http_exc
-from application.api.api_v1.passports.schemas import (
+from presentation.api.api_v1.passports.dependencies import check_allow_to_save_or_raise_http_exc
+from presentation.api.api_v1.passports.schemas import (
     CapturePassportSchemaSaveToDatabase,
     UpdatePassportSchemaSaveToDatabase,
 )
-from application.api.api_v1.passports.utils import create_current_passport_schema_or_404
+from presentation.api.api_v1.passports.utils import create_current_passport_schema_or_404
 
 
 class PassportsCrud(BaseCrud):
     model = Passport
-    logger = logging.getLogger(OVIM_PASSPORTS_LOGGER)
+    logger = logging.getLogger(PASSPORTS_LOGGER)
 
     @classmethod
     async def get_current_passport(

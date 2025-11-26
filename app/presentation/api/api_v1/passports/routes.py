@@ -10,15 +10,15 @@ from infra.database import TrafficLightObject
 from fastapi import APIRouter, Depends
 from starlette import status
 
-from application.api.api_v1.passports.crud import PassportsCrud
-from application.api.api_v1.passports.dependencies import (
+from presentation.api.api_v1.passports.crud import PassportsCrud
+from presentation.api.api_v1.passports.dependencies import (
     passport_group_found_or_404,
     valid_data_from_db_or_404,
 )
-from application.api.api_v1.passports.filters import (
+from presentation.api.api_v1.passports.filters import (
     PassportCurrentFilter,
 )
-from application.api.api_v1.passports.schemas import (
+from presentation.api.api_v1.passports.schemas import (
     CapturedPassport,
     CapturePassportSchema,
     CapturePassportSchemaSaveToDatabase,
@@ -26,7 +26,7 @@ from application.api.api_v1.passports.schemas import (
     UpdatePassport,
     UpdatePassportSchemaSaveToDatabase,
 )
-from application.api.dependencies import get_jwt_payload_jwt_bearer, db_session
+from presentation.api.dependencies import get_jwt_payload_jwt_bearer, db_session
 
 router = APIRouter(
     prefix='/passports',

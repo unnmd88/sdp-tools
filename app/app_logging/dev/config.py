@@ -17,7 +17,7 @@ LOGGING_CONFIG = {
             'filename': BASE_DIR / 'users/logs/users.log',
             'formatter': 'simple',
         },
-        'file_ovim_passports': {
+        'file_passports': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': API_V1_PATH / 'passports/logs/log.log',
@@ -41,9 +41,9 @@ LOGGING_CONFIG = {
             'handlers': ['console', 'file_users'],
             'propagate': True,
         },
-        'ovim_passports': {
+        'passports': {
             'level': 'INFO',
-            'handlers': ['console', 'file_ovim_passports'],
+            'handlers': ['console', 'file_passports'],
         },
         'passport_groups': {
             'level': 'INFO',
@@ -68,7 +68,7 @@ logging.config.dictConfig(LOGGING_CONFIG)
 
 
 USERS_LOGGER = 'users'
-OVIM_PASSPORTS_LOGGER = 'ovim_passports'
+PASSPORTS_LOGGER = 'passports'
 PASSPORTS_OWNERS_LOGGER = 'passport_groups'
 
 # def logging_configure(level=logging.DEBUG):

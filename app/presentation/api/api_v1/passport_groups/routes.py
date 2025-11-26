@@ -6,13 +6,13 @@ from fastapi import (
 )
 from starlette import status
 
-from application.api.api_v1.passport_groups.crud import PassportGroupsCrud
-from application.api.api_v1.passport_groups.schemas import (
+from presentation.api.api_v1.passport_groups.crud import PassportGroupsCrud
+from presentation.api.api_v1.passport_groups.schemas import (
     PassportGroupsCreate,
     PassportGroupsSchema,
     PassportGroupsUpdate,
 )
-from application.api.dependencies import db_session
+from presentation.api.dependencies import db_session
 
 router = APIRouter(
     prefix='/passport-groups',

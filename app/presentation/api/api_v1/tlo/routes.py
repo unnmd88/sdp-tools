@@ -8,9 +8,10 @@ from fastapi import (
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from application.api.api_v1.regions.crud import RegionsCrud
-from application.api.api_v1.tlo.crud import TloCrud
-from application.api.api_v1.tlo.schemas import (
+from application.dependencies import CrudTloUseCase
+from presentation.api.api_v1.regions.crud import RegionsCrud
+from presentation.api.api_v1.tlo.crud import TloCrud
+from presentation.api.api_v1.tlo.schemas import (
     TrafficLightCreate,
     TrafficLightSchema,
     TrafficLightUpdate,
@@ -22,6 +23,15 @@ router = APIRouter(
     tags=['Traffic Light Objects'],
     # dependencies=[Depends(check_user_is_active)],
 )
+
+@router.get('/as-tets-ddd/{id}')
+async def get_traffic_light_object_by_id(
+    tlo_id: int,
+    use_case: CrudTloUseCase,
+    session: Annotated[AsyncSession, Depends(db_api.session_getter)],
+):
+    return await use_case.get_one_by_id(tlo_id)
+    # return await TloCrud.get_one_by_id_or_404(session, traffic_light_object_id)
 
 
 @router.get('/{id}')

@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy.engine.row import RowMapping
 from starlette import status
 
-from application.api.api_v1.passports.schemas import CurrentPassportSchema
+from presentation.api.api_v1.passports.schemas import CurrentPassportSchema
 
 
 def create_current_passport_schema_or_404(
