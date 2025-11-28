@@ -2,8 +2,8 @@ from typing import TypeVar, Annotated
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from infra.database import Base
-from infra.database.api import db_api
+from infrastructure.database.models import Base
+from infrastructure.database.api import db_api
 from fastapi.params import Depends
 
 

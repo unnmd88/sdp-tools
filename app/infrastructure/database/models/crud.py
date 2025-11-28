@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from infra.database import Base, User
+from infrastructure.database.models import Base, User
 from users.schemas import UserFromDbFullSchema
 
 # from core.models import Base, User

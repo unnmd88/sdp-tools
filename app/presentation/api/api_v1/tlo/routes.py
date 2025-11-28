@@ -16,7 +16,7 @@ from presentation.api.api_v1.tlo.schemas import (
     TrafficLightSchema,
     TrafficLightUpdate,
 )
-from infra.database.api import db_api
+from infrastructure.database.api import db_api
 
 router = APIRouter(
     prefix='/traffic-light-objects',

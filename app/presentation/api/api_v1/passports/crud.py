@@ -2,9 +2,9 @@ import logging
 
 from app_logging.dev.config import PASSPORTS_LOGGER
 from core.constants import PassportGroupsRoutes as PassportGroupsRoutesEnum
-from infra.database.models.crud import BaseCrud
-from infra.database.models.crud import T as T_Model
-from infra.database import (
+from infrastructure.database.models.crud import BaseCrud
+from infrastructure.database.models.crud import T as T_Model
+from infrastructure.database.models import (
     Passport,
     PassportGroup,
     Region,

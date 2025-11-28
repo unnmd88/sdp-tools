@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from infra.database import Base
+from infrastructure.database.models import Base
 
-from infra.database.models.mixins.integer_pk_id import IntegerIdPkMixin
+from infrastructure.database.models.mixins.integer_pk_id import IntegerIdPkMixin
 from .mixins import CreatedAtMixin, UpdatedAtMixin
 
 if TYPE_CHECKING:

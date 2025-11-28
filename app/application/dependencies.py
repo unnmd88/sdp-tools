@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from application.interfaces.use_cases.base_crud import BaseCrudUseCaseProtocol
 from application.use_cases.base_crud import BaseCrudUseCaseImpl
-from infra.database.api import db_api
-from infra.database.tlo_repository import TrafficLightObjectSqlAlchemy
+from infrastructure.database.api import db_api
+from infrastructure.database.tlo_repository import TrafficLightObjectSqlAlchemy
 
 
 # use-cases

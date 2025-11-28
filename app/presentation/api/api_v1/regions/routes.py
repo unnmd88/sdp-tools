@@ -10,7 +10,7 @@ from starlette import status
 
 from presentation.api.api_v1.regions.crud import RegionsCrud
 from presentation.api.api_v1.regions.schemas import RegionCreate, RegionSchema, RegionUpdate
-from infra.database.api import db_api
+from infrastructure.database.api import db_api
 
 router = APIRouter(
     prefix='/regions',

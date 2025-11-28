@@ -4,7 +4,7 @@ from sqlalchemy import ForeignKey, Text
 from sqlalchemy.dialects.postgresql.json import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
-from infra.database import Base
+from infrastructure.database.models import Base
 
 from .mixins.integer_pk_id import IntegerIdPkMixin
 from .mixins.timestamp import StartAtMixin, FinishedAtMixin

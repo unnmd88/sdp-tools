@@ -1,5 +1,5 @@
-from infra.database.models.crud import BaseCrud, T
-from infra.database import Region
+from infrastructure.database.models.crud import BaseCrud, T
+from infrastructure.database.models import Region
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession

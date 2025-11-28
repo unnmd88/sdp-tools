@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from infra.database import Base
+from infrastructure.database.models import Base
 
-from infra.database.models.mixins.integer_pk_id import IntegerIdPkMixin
-from infra.database.models.mixins.timestamp import CreatedAtMixin, UpdatedAtMixin
+from infrastructure.database.models.mixins.integer_pk_id import IntegerIdPkMixin
+from infrastructure.database.models.mixins.timestamp import CreatedAtMixin, UpdatedAtMixin
 
 if TYPE_CHECKING:
-    from core.models import Region
+    from infrastructure.database.models import Region
 
 
 class TrafficLightObject(

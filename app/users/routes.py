@@ -9,7 +9,7 @@ from auth.token_validation import (
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from infra.database.api import db_api
+from infrastructure.database.api import db_api
 from users import crud as users_crud
 from users.schemas import CreateUser, UserFromDbFullSchema
 

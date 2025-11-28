@@ -5,8 +5,8 @@ from auth.schemas import PayloadJWTSchema
 from auth.token_validation import check_user_is_active
 from core.constants import PassportGroupsRoutes
 # from core.dependencies import db_session
-from infra.database import PassportGroup as PassportGroupModel
-from infra.database import TrafficLightObject
+from infrastructure.database.models import PassportGroup as PassportGroupModel
+from infrastructure.database.models import TrafficLightObject
 from fastapi import APIRouter, Depends
 from starlette import status
 

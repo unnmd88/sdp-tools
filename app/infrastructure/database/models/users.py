@@ -2,7 +2,7 @@ import sqlalchemy as sa
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from infra.database import Base
+from infrastructure.database.models import Base
 from .mixins import (
     CreatedAtMixin,
     UpdatedAtMixin,

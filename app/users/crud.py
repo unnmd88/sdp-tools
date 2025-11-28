@@ -13,8 +13,8 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select
 from starlette import status
 
-from infra.database import User
-from infra.database.api import db_api
+from infrastructure.database.models import User
+from infrastructure.database.api import db_api
 from users.schemas import CreateUser, UserFromDbFullSchema
 
 logger = logging.getLogger(USERS_LOGGER)

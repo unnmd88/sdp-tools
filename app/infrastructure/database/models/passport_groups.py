@@ -1,7 +1,7 @@
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from infra.database import Base
+from infrastructure.database.models import Base
 
 from .mixins.integer_pk_id import IntegerIdPkMixin
 from .mixins.timestamp import CreatedAtMixin, UpdatedAtMixin

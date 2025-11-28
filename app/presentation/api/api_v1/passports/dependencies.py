@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from infra.database.models.crud import T as T_Model
+from infrastructure.database.models.crud import T as T_Model
 from fastapi import HTTPException
 from pydantic import BaseModel
 from starlette import status

@@ -10,4 +10,4 @@ class BaseCrudUseCaseImpl:
         return await self.repository.get_one_by_id(entity_id)
 
     async def get_all(self):
-        pass
+        ...

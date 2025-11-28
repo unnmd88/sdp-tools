@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 
-from infra.database.models.crud import BaseCrud, T
-from infra.database import TrafficLightObject
+from infrastructure.database.models.crud import BaseCrud, T
+from infrastructure.database.models import TrafficLightObject
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession

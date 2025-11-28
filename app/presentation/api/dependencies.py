@@ -7,7 +7,7 @@ from auth.utils import decode_jwt
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from infra.database.api import db_api
+from infrastructure.database.api import db_api
 
 http_bearer = HTTPBearer()
 
