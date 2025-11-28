@@ -5,11 +5,13 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import ExpiredSignatureError, InvalidTokenError
 
+from core.users.crud import get_user_by_id
+from core.users.schemas import UserFromDbFullSchema
 from infrastructure.database.api import db_api
-from users.crud import get_user_by_id
-from users.schemas import UserFromDbFullSchema
+# from core.users import get_user_by_id
+# from core.users import UserFromDbFullSchema
 
-from auth.constants import TokenFields, TokenTypes
+from core.enums.tokens import TokenFields, TokenTypes
 from auth.exceptions import (
     ExpiredSignatureJWT,
     ForbiddenSelfUser,

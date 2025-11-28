@@ -3,8 +3,8 @@ from typing import Annotated
 from annotated_types import MaxLen, MinLen
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-from users.organizations import Organizations
-from users.roles import Roles
+from core.enums.organizations import Organizations
+from core.enums.roles import Roles
 
 
 class CreateUser(BaseModel):
@@ -31,4 +31,5 @@ class UserFromDbFullSchema(CreateUser):
 
     id: int
     email: EmailStr | str
-    password: Annotated[str | bytes, Field(repr=False), Field(exclude=True)]
+    password: Annotated[str | bytes, Field(repr=False)]
+    # password: Annotated[str | bytes, Field(repr=False), Field(exclude=True)]

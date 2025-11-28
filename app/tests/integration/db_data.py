@@ -3,8 +3,8 @@ from collections.abc import Sequence
 
 from core.constants import PassportGroups, ServiceOrganizations
 from core.models import Passport, PassportGroup, Region, TrafficLightObject, User
-from users.organizations import Organizations
-from users.roles import Roles
+from core.users import Organizations
+from core.users import Roles
 
 
 def users_models():

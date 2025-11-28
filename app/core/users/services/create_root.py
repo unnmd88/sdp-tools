@@ -8,8 +8,8 @@ from core.models import User
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from users.organizations import Organizations
-from users.roles import Roles
+from core.enums.organizations import Organizations
+from core.enums.roles import Roles
 
 logger = logging.getLogger(USERS_LOGGER)
 

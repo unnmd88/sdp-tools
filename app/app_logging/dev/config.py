@@ -14,7 +14,7 @@ LOGGING_CONFIG = {
         'file_users': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'users/logs/users.log',
+            'filename': BASE_DIR / 'auth/logs/users.log',
             'formatter': 'simple',
         },
         'file_passports': {

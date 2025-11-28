@@ -1,8 +1,8 @@
 from contextlib import nullcontext
 
 import pytest
-from auth.constants import TokenTypes
-from auth.token_validation import check_token_type
+from core.enums.tokens import TokenTypes
+from auth import check_token_type
 from fastapi import HTTPException
 
 

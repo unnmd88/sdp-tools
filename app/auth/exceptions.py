@@ -1,31 +1,39 @@
+from dataclasses import dataclass
+from typing import final
+
 from fastapi import HTTPException
 from starlette import status
 
-from auth.constants import TokenTypes
-
-AuthenticationError = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED, detail='invalid username or password'
-)
-
-InactiveUserError = HTTPException(
-    status_code=status.HTTP_403_FORBIDDEN, detail='inactive user'
-)
+from core.enums.tokens import TokenTypes
 
 
-ForbiddenSelfUser = HTTPException(
-    status_code=status.HTTP_403_FORBIDDEN, detail='access denied'
-)
+class BaseAuthException(Exception):
+    pass
 
 
-InvalidErrorJWT = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail='Invalid token error',
-)
+@final
+@dataclass
+class InvalidUsernameOrPasswordException(BaseAuthException):
 
-ExpiredSignatureJWT = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail='Signature has expired',
-)
+    @property
+    def detail(self) -> str:
+        return 'invalid username or password'
+
+
+@final
+@dataclass
+class InactiveUserException(BaseAuthException):
+
+    user: str | int = ''
+
+    @property
+    def detail(self) -> str:
+        return f'User {self.user!r} is inactive'.replace("  ", ' ')
+
+
+
+
+
 
 
 def get_invalid_type_jwt_exception(

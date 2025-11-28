@@ -1,5 +1,5 @@
 import pytest
-from auth.utils import decode_jwt, encode_jwt
+from auth import decode_jwt, encode_jwt
 
 
 class TestJWT:

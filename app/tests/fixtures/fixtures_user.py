@@ -1,10 +1,10 @@
 from collections.abc import Sequence
 
 import pytest
-from auth.schemas import UserSchema
-from users.organizations import Organizations
-from users.roles import Roles
-from users.schemas import UserFromDbFullSchema
+from auth import UserSchema
+from core.users import Organizations
+from core.users import Roles
+from core.users import UserFromDbFullSchema
 
 
 @pytest.fixture

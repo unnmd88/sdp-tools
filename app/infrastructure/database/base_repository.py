@@ -14,13 +14,10 @@ class BaseSqlAlchemy:
     model = T
 
     # def __init__(self, session: AsyncSession):
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession = None):
         self.session: AsyncSession = session
 
-    async def get_one_by_id(self, _id: int):
-        print(f'Session: {self.session}')
-
-
+    async def get_one_by_id_or_none(self, _id: int):
         async with db_api.session_factory() as session:
             return await session.get(self.model, _id)
 

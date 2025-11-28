@@ -1,4 +1,4 @@
-from auth.create_tokens import create_access_jwt
+from auth import create_access_jwt
 
 
 def test_create_jwt(user_schemas):

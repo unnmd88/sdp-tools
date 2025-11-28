@@ -3,7 +3,7 @@ import string
 from contextlib import nullcontext
 
 import pytest
-from auth.utils import gen_password, hash_password, validate_password
+from auth import gen_password, hash_password, validate_password
 
 
 class TestPasswordUtils:

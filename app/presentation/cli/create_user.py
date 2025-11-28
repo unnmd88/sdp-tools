@@ -10,10 +10,10 @@ from fastapi.exceptions import HTTPException
 from rich import print
 
 from infra.database import User
-from users.crud import create_user as crud_create_user
-from users.organizations import Organizations
-from users.roles import Roles
-from users.schemas import CreateUser
+from core.users.services import create_user as crud_create_user
+from core.users import Organizations
+from core.users import Roles
+from core.users import CreateUser
 
 # from .dependencies import db_api_helper
 

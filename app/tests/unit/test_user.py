@@ -1,7 +1,7 @@
 import asyncio
 
 import pytest
-from auth.token_validation import check_is_active_superuser
+from auth import check_is_active_superuser
 from fastapi import HTTPException
 
 

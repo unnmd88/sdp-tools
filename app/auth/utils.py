@@ -71,3 +71,4 @@ def gen_password(
     return ''.join(
         secrets.choice(chars) for _ in range(random.randint(min_length, max_length))
     )
+

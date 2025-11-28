@@ -15,7 +15,7 @@ from starlette import status
 
 from infrastructure.database.models import User
 from infrastructure.database.api import db_api
-from users.schemas import CreateUser, UserFromDbFullSchema
+from core.users.schemas import CreateUser, UserFromDbFullSchema
 
 logger = logging.getLogger(USERS_LOGGER)
 

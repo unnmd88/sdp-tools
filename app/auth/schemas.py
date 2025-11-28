@@ -1,8 +1,8 @@
 from typing import Annotated
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, EmailStr
-from users.organizations import Organizations
-from users.roles import Roles
+from core.enums.organizations import Organizations
+from core.enums.roles import Roles
 
 ACCESS_TOKEN_TYPE = 'access'
 REFRESH_TOKEN_TYPE = 'refresh'
@@ -12,6 +12,18 @@ class TokenInfo(BaseModel):
     access_token: str
     refresh_token: str | None = None
     token_type: str = 'Bearer'
+
+
+class AuthSchema(BaseModel):
+    model_config = ConfigDict(strict=True, extra='ignore')
+
+    username: str
+    password_plain: str
+
+
+class AuthSchemaToValidate(AuthSchema):
+
+    password_hashed: bytes
 
 
 class UserSchema(BaseModel):

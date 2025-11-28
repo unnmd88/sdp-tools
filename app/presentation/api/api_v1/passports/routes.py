@@ -1,8 +1,8 @@
 from typing import Annotated
 
 from annotated_types import MinLen
-from auth.schemas import PayloadJWTSchema
-from auth.token_validation import check_user_is_active
+# from auth import PayloadJWTSchema
+# from auth import check_user_is_active
 from core.constants import PassportGroupsRoutes
 # from core.dependencies import db_session
 from infrastructure.database.models import PassportGroup as PassportGroupModel
@@ -31,7 +31,7 @@ from presentation.api.dependencies import get_jwt_payload_jwt_bearer, db_session
 router = APIRouter(
     prefix='/passports',
     tags=['Passports of Traffic Light Objects'],
-    dependencies=[Depends(check_user_is_active)],
+    # dependencies=[Depends(check_user_is_active)],
 )
 
 
@@ -44,7 +44,7 @@ async def get_valid_passport(
     group_name: PassportGroupsRoutes,
     tlo_name: Annotated[str, MinLen(1)],
     session: db_session,
-    user_data: Annotated[PayloadJWTSchema, Depends(get_jwt_payload_jwt_bearer)],
+    # user_data: Annotated[PayloadJWTSchema, Depends(get_jwt_payload_jwt_bearer)],
     # ) -> CurrentPassportSchema:
 ):
     return await PassportsCrud.get_current_passport(
@@ -95,7 +95,7 @@ async def get_valid_passport(
 async def capture_for_editing(
     session: db_session,
     passport: CapturePassportSchema,
-    user_data: Annotated[PayloadJWTSchema, Depends(get_jwt_payload_jwt_bearer)],
+    # user_data: Annotated[PayloadJWTSchema, Depends(get_jwt_payload_jwt_bearer)],
 ) -> CapturedPassport:
     # ) :
     tlo_id = await PassportsCrud.get_pk_id_from_model_or_404(
@@ -133,7 +133,7 @@ async def capture_for_editing(
 async def save_passport(
     session: db_session,
     passport: UpdatePassport,
-    user_data: Annotated[PayloadJWTSchema, Depends(get_jwt_payload_jwt_bearer)],
+    # user_data: Annotated[PayloadJWTSchema, Depends(get_jwt_payload_jwt_bearer)],
 ) -> FinalSavedPassportSchema:
     tlo_id = await PassportsCrud.get_pk_id_from_model_or_404(
         session=session,

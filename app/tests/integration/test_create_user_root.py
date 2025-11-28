@@ -4,7 +4,7 @@ from core.database import DatabaseAPI
 from core.models import User
 from sqlalchemy.engine.result import Result
 from sqlalchemy.sql.expression import select
-from users.create_root import create_root
+from core.users.services.create_root import create_root
 
 
 @pytest.mark.asyncio(loop_scope='session')

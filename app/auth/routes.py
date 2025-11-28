@@ -1,15 +1,16 @@
 from typing import Annotated
 
+from auth.services.validation import validate_auth_user
 from infrastructure.database.api import db_api
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from users.crud import get_user_by_id
+# from core.users import get_user_by_id
 
-from auth.constants import TokenFields, TokenTypes
+from core.enums.tokens import TokenFields, TokenTypes
 from auth.create_tokens import create_access_jwt, create_refresh_jwt
 from auth.exceptions import InactiveUserError
 from auth.schemas import TokenInfo, UserSchema
-from auth.services import validate_auth_user
+# from core.auth.services import validate_auth_user
 from auth.token_validation import check_token_type, extract_payload_from_jwt
 
 router = APIRouter(prefix='/auth', tags=['Authentication'])
