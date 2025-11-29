@@ -12,7 +12,7 @@ from core.users.exceptions import UserNotFoundException
 from infrastructure.database.api import db_api
 from core.users import crud as users_crud
 from core.users.schemas import CreateUser, UserFromDbFullSchema
-from presentation.api.dependencies import UsersCrudUseCase
+from presentation.api.dependencies import UsersCrudUseCase, PayloadJWTDependency
 from presentation.api.exceptions import UserNotFoundHttpException
 
 router = APIRouter(prefix='/users', tags=['Users'])
@@ -28,13 +28,13 @@ db_session = Annotated[
 @router.get(
     '/whoami/',
     status_code=status.HTTP_200_OK,
-    response_model=UserFromDbFullSchema,
+    # response_model=UserFromDbFullSchema,
 )
 def whoami(
     # user: Annotated[UserFromDbFullSchema, Depends(check_is_active_superuser)],
+    user: PayloadJWTDependency,
 ):
-    pass
-    # return user
+    return user
 
 
 @router.get(

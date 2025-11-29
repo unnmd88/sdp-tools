@@ -11,7 +11,7 @@ from core.enums.tokens import TokenFields, TokenTypes
 # from auth import TokenInfo, UserSchema
 # from core.auth import validate_auth_user
 # from auth import check_token_type, extract_payload_from_jwt
-from presentation.api.dependencies import auth_form, AuthUseCase, auth_user_and_issue_access_and_refresh_jwt, JWT
+from presentation.api.dependencies import auth_form, AuthUseCase, auth_user_and_issue_access_and_refresh_jwt, AccessAndRefreshJWT
 
 router = APIRouter(prefix='/auth', tags=['Authentication'])
 
@@ -20,8 +20,6 @@ db_session = Annotated[
     AsyncSession,
     Depends(db_api.session_getter),
 ]
-
-
 
 
 @router.post(
@@ -33,7 +31,7 @@ db_session = Annotated[
 async def auth_user_and_issue_jwt(
 
     # use_case: AuthUseCase,
-    jwt: JWT,
+    jwt: AccessAndRefreshJWT,
 
 ):
     return jwt

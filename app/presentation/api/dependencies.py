@@ -1,10 +1,10 @@
 from fastapi import Form
-from fastapi.security import HTTPBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from application.interfaces.services.authentication import AuthenticationUserServiceProtocol
 from application.use_cases.auth.auth import AuthUseCaseImpl
 from auth.exceptions import InvalidUsernameOrPasswordException, InactiveUserException
-from auth.schemas import AuthSchema, TokenInfo
+from auth.schemas import AuthSchema, TokenInfo, PayloadJWTSchema
 
 from typing import Annotated
 
@@ -12,10 +12,11 @@ from fastapi.params import Depends
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from application.interfaces.use_cases.base_crud import BaseCrudUseCaseProtocol
-from application.interfaces.use_cases.get_users_repo import UsersRepositoryUseCaseProtocol
+from application.interfaces.use_cases.users_crud_repo import UsersRepositoryUseCaseProtocol
 from application.use_cases.base_crud import BaseCrudUseCaseImpl
 from application.use_cases.users.get_users_from_repo import UsersRepositoryUseCaseImpl
 from auth.services.authentication import AuthenticationUserServiceImpl
+from auth.utils import decode_jwt
 from core.users.services.get_user import UserServiceImpl
 from infrastructure.database.api import db_api
 from infrastructure.database.tlo_repository import TrafficLightObjectSqlAlchemy
@@ -30,22 +31,19 @@ db_session = Annotated[
     Depends(db_api.session_getter),
 ]
 
-get_jwt_payload_jwt_bearer = ''
 
-# def get_jwt_payload_jwt_bearer(
-#     credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
-# ):
-#     return PayloadJWTSchema(**decode_jwt(credentials.credentials))
-
-
-
-
+def get_jwt_payload_jwt_bearer(
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
+):
+    return PayloadJWTSchema(**decode_jwt(credentials.credentials))
 
 # use-cases
 
 
 def get_tlo() -> BaseCrudUseCaseProtocol:
     return BaseCrudUseCaseImpl(repository=TrafficLightObjectSqlAlchemy(session=db_session))
+
+
 
 
 def users_crud() -> UsersRepositoryUseCaseProtocol:
@@ -88,11 +86,14 @@ async def auth_user_and_issue_access_and_refresh_jwt(
 
     # return AuthUseCaseImpl(user_service)
 
-
+async def get_user_from_jwt() -> UserServiceImpl:
+    pass
 
 
 
 CrudTloUseCase = Annotated[BaseCrudUseCaseProtocol, Depends(get_tlo)]
 UsersCrudUseCase = Annotated[UsersRepositoryUseCaseProtocol, Depends(users_crud)]
 AuthUseCase = Annotated[AuthenticationUserServiceProtocol, Depends(get_auth_user_use_case)]
-JWT = Annotated[TokenInfo, Depends(auth_user_and_issue_access_and_refresh_jwt)]
+AccessAndRefreshJWT = Annotated[TokenInfo, Depends(auth_user_and_issue_access_and_refresh_jwt)]
+#TO DO  AccessFromRefreshJWT = Annotated[TokenInfo, Depends(auth_user_and_issue_access_and_refresh_jwt)]
+PayloadJWTDependency = Annotated[PayloadJWTSchema, Depends(get_jwt_payload_jwt_bearer)]

@@ -1,7 +1,7 @@
 from core.config import settings
 from fastapi import APIRouter
 # from core.users import router as users_router
-from .auth.routes import router as auth_router
+from presentation.api.auth.routes import router as auth_router
 
 from .passport_groups.routes import router as passport_groups_router
 from .passports.routes import router as passports_router
