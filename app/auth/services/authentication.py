@@ -6,7 +6,6 @@ from app.auth.utils import validate_password
 
 
 class AuthenticationUserServiceImpl:
-
     def __init__(
         self,
         user_repository_factory: type[UsersRepositoryProtocol],
@@ -16,10 +15,12 @@ class AuthenticationUserServiceImpl:
         self.user_auth_schema = user_auth_schema
 
     async def auth_and_issue_jwt(
-            self,
-            refresh_token: bool,
+        self,
+        refresh_token: bool,
     ) -> TokenInfo:
-        user = await self.repository.get_user_by_username_or_none(self.user_auth_schema.username)
+        user = await self.repository.get_user_by_username_or_none(
+            self.user_auth_schema.username
+        )
         if user is None:
             raise InvalidUsernameOrPasswordException
         password_is_valid = validate_password(

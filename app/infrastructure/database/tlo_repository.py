@@ -3,5 +3,4 @@ from infrastructure.database.base_repository import BaseSqlAlchemy
 
 
 class TrafficLightObjectSqlAlchemy(BaseSqlAlchemy):
-
     model = TrafficLightObject

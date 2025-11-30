@@ -7,10 +7,11 @@ from infrastructure.database.base_repository import BaseSqlAlchemy
 
 
 class UsersRepositorySqlAlchemy(BaseSqlAlchemy):
-
     model = User
 
-    async def get_user_by_username_or_none(self, username: str) -> UserFromDbFullSchema | None:
+    async def get_user_by_username_or_none(
+        self, username: str
+    ) -> UserFromDbFullSchema | None:
         async with db_api.session_factory() as session:
             stmt = select(self.model).filter_by(username=username)
             res = await session.execute(stmt)
@@ -19,8 +20,6 @@ class UsersRepositorySqlAlchemy(BaseSqlAlchemy):
         if user is not None:
             return UserFromDbFullSchema.model_validate(user, from_attributes=True)
         return None
-
-
 
     # async def get_user_by_id_or_404(
     #     self,

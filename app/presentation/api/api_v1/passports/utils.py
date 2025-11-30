@@ -23,7 +23,7 @@ def create_current_passport_schema_or_404(
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f'Has not current passport, but '
-                       f'editing now by user={db_rows_from_mappings[0]["username"]}',
+                f'editing now by user={db_rows_from_mappings[0]["username"]}',
             )
         return CurrentPassportSchema(**db_rows_from_mappings[0])
 
@@ -37,6 +37,6 @@ def create_current_passport_schema_or_404(
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f'Has not current passport, but '
-                       f'editing now by user={db_rows_from_mappings[0]["username"]}',
+                f'editing now by user={db_rows_from_mappings[0]["username"]}',
             )
     raise ValueError('Count rows should be no more than 2')

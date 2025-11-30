@@ -4,14 +4,12 @@ from starlette import status
 
 class UserNotFoundHttpException(HTTPException):
     def __init__(
-            self,
-            status_code: int = status.HTTP_404_NOT_FOUND,
-            detail: str = None,
+        self,
+        status_code: int = status.HTTP_404_NOT_FOUND,
+        detail: str = None,
     ):
-        super().__init__(
-            status_code,
-            detail
-        )
+        super().__init__(status_code, detail)
+
 
 UnauthorizedErrorHttp401 = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED, detail='invalid username or password'

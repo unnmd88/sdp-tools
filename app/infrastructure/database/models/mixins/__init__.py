@@ -11,4 +11,4 @@ from .timestamp import (
     UpdatedAtMixin,
     StartAtMixin,
     FinishedAtMixin,
- )
+)

@@ -6,7 +6,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from infrastructure.database.models import Base
 
 from infrastructure.database.models.mixins.integer_pk_id import IntegerIdPkMixin
-from infrastructure.database.models.mixins.timestamp import CreatedAtMixin, UpdatedAtMixin
+from infrastructure.database.models.mixins.timestamp import (
+    CreatedAtMixin,
+    UpdatedAtMixin,
+)
 
 if TYPE_CHECKING:
     from infrastructure.database.models import Region

@@ -7,11 +7,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # from core.users import get_user_by_id
 
 from core.enums.tokens import TokenFields, TokenTypes
+
 # from auth import create_access_jwt, create_refresh_jwt
 # from auth import TokenInfo, UserSchema
 # from core.auth import validate_auth_user
 # from auth import check_token_type, extract_payload_from_jwt
-from presentation.api.dependencies import auth_form, AuthUseCase, auth_user_and_issue_access_and_refresh_jwt, AccessAndRefreshJWT
+from presentation.api.dependencies import (
+    auth_form,
+    AuthUseCase,
+    auth_user_and_issue_access_and_refresh_jwt,
+    AccessAndRefreshJWT,
+)
 
 router = APIRouter(prefix='/auth', tags=['Authentication'])
 
@@ -29,10 +35,8 @@ db_session = Annotated[
 # async def auth_user_issue_jwt(user: UserSchema = Depends(validate_auth_user)):
 # async def auth_user_and_issue_jwt(user: AuthSchema = Depends(auth_form)):
 async def auth_user_and_issue_jwt(
-
     # use_case: AuthUseCase,
     jwt: AccessAndRefreshJWT,
-
 ):
     return jwt
     return jwt

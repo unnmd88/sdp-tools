@@ -1,5 +1,6 @@
 from core.config import settings
 from fastapi import APIRouter
+
 # from core.users import router as users_router
 from presentation.api.auth.routes import router as auth_router
 

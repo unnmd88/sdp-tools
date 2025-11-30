@@ -45,10 +45,10 @@ def whoami(
     # dependencies=[Depends(check_user_is_active)],
 )
 async def get_user_by_username(
-        username: str,
-        sess: db_session,
-        # use_case: Annotated[UsersUseCaseProtocol, Depends(get_user)],
-        use_case: UsersCrudUseCase,
+    username: str,
+    sess: db_session,
+    # use_case: Annotated[UsersUseCaseProtocol, Depends(get_user)],
+    use_case: UsersCrudUseCase,
 ):
     try:
         return await use_case.get_user_by_username_or_none(username)
@@ -69,7 +69,6 @@ async def get_user(
     sess: db_session,
     use_case: UsersCrudUseCase,
 ):
-
     try:
         return await use_case.get_user_by_id(user_id)
     except UserNotFoundException as e:

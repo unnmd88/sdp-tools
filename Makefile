@@ -13,6 +13,12 @@ ACTIVATE_VENV = source .venv/bin/activate
 activate:
 	${ACTIVATE_VENV}	
 
+lint: ## Run linting with ruff
+	uv run ruff check app/
+
+format: ## Format code with ruff
+	uv run ruff format app/
+
 .PHONY: up
 up:
 	docker compose up
@@ -40,7 +46,14 @@ app-shell:
 
 .PHONY: tst
 tst:
+	uv run pytest tests/
+
+.PHONY: tst-v
+tst-v:
 	uv run pytest tests/ -vv -s
+
+test-cov: ## Run tests with coverage
+	uv run pytest tests/ -v --cov=app --cov-report=html --cov-report=term
 
 .PHONY: test
 test:

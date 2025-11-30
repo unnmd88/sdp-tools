@@ -1,9 +1,11 @@
 from typing import Annotated
 
 from annotated_types import MinLen
+
 # from auth import PayloadJWTSchema
 # from auth import check_user_is_active
 from core.constants import PassportGroupsRoutes
+
 # from core.dependencies import db_session
 from infrastructure.database.models import PassportGroup as PassportGroupModel
 from infrastructure.database.models import TrafficLightObject

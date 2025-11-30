@@ -5,7 +5,6 @@ from auth.schemas import AuthSchema, TokenInfo
 
 
 class AuthenticationUserServiceProtocol(Protocol):
-
     def __init__(
         self,
         user_repository_factory: type[UsersRepositoryProtocol],
@@ -17,10 +16,4 @@ class AuthenticationUserServiceProtocol(Protocol):
     async def auth_and_issue_jwt(
         self,
         refresh_token: bool,
-    ) -> TokenInfo:
-        ...
-
-
-
-
-
+    ) -> TokenInfo: ...

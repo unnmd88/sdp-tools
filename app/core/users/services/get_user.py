@@ -4,14 +4,15 @@ from infrastructure.database.user_reposirory import UsersRepositorySqlAlchemy
 
 
 class UserServiceImpl:
-
     repository_factory = UsersRepositorySqlAlchemy
 
     def __init__(self):
         self.repository = self.repository_factory('12321')
 
     async def get_user_by_username_or_none(self, username: str) -> UserFromDbFullSchema:
-        if (user := await self.repository.get_user_by_username_or_none(username)) is None:
+        if (
+            user := await self.repository.get_user_by_username_or_none(username)
+        ) is None:
             raise UserNotFoundException(username)
         print(user)
         return user
@@ -21,4 +22,3 @@ class UserServiceImpl:
             raise UserNotFoundException(user_id)
         print(user)
         return user
-

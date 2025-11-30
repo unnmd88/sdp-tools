@@ -24,6 +24,7 @@ router = APIRouter(
     # dependencies=[Depends(check_user_is_active)],
 )
 
+
 @router.get('/as-tets-ddd/{id}')
 async def get_traffic_light_object_by_id(
     tlo_id: int,

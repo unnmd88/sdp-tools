@@ -14,7 +14,6 @@ class BaseAuthException(Exception):
 @final
 @dataclass
 class InvalidUsernameOrPasswordException(BaseAuthException):
-
     @property
     def detail(self) -> str:
         return 'invalid username or password'
@@ -23,17 +22,11 @@ class InvalidUsernameOrPasswordException(BaseAuthException):
 @final
 @dataclass
 class InactiveUserException(BaseAuthException):
-
     user: str | int = ''
 
     @property
     def detail(self) -> str:
-        return f'User {self.user!r} is inactive'.replace("  ", ' ')
-
-
-
-
-
+        return f'User {self.user!r} is inactive'.replace('  ', ' ')
 
 
 def get_invalid_type_jwt_exception(

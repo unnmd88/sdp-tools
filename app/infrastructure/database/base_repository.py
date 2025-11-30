@@ -14,7 +14,6 @@ Record = TypeVar('Record', bound=Base)
 
 
 class BaseSqlAlchemy:
-
     model = T
 
     # def __init__(self, session: AsyncSession):

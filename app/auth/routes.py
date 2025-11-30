@@ -10,6 +10,7 @@ from core.enums.tokens import TokenFields, TokenTypes
 from auth.create_tokens import create_access_jwt, create_refresh_jwt
 from auth.exceptions import InactiveUserError
 from auth.schemas import TokenInfo, UserSchema
+
 # from core.auth.services import validate_auth_user
 from auth.token_validation import check_token_type, extract_payload_from_jwt
 

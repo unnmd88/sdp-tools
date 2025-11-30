@@ -2,6 +2,7 @@
 
 from auth import utils as auth_utils
 from auth.exceptions import AuthenticationError, InactiveUserError
+
 # from auth.exceptions import AuthenticationError, InactiveUserError
 from auth.schemas import UserSchema, AuthSchemaToValidate
 
@@ -17,8 +18,7 @@ def check_password_is_valid(
     hashed_password: bytes,
 ) -> bool:
     if not auth_utils.validate_password(
-        password=plain_password,
-        hashed_password=hashed_password
+        password=plain_password, hashed_password=hashed_password
     ):
         raise AuthenticationError
     return True
@@ -29,6 +29,7 @@ async def validate_auth_user(user: AuthSchemaToValidate):
     check_user_is_active(user.is_active)
     return True
     return UserSchema.model_validate(user, from_attributes=True)
+
 
 ###----- Archive-----
 

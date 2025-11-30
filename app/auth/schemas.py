@@ -22,7 +22,6 @@ class AuthSchema(BaseModel):
 
 
 class AuthSchemaToValidate(AuthSchema):
-
     password_hashed: bytes
 
 

@@ -9,3 +9,5 @@ Makefile*
 
 .idea/
 .vscode/
+*.bak
+*cache

@@ -1,12 +1,14 @@
-
-
-
 class ApplicationException(Exception):
     """
-    Base application exception.
+    Базовое исключение приложения.
     """
+
+    detail: str = 'Ошибка приложения'
 
 
 class NotFoundException(ApplicationException):
+    """
+    Исключение поиска любого объекта.
+    """
 
-    detail = "Not found"
+    detail: str = 'Объект не найден'

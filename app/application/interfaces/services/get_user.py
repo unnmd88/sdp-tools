@@ -5,7 +5,6 @@ from core.users.schemas import UserFromDbFullSchema
 
 
 class UsersRepositoryServiceProtocol(Protocol):
-
     repository_factory: type[UsersRepositoryProtocol]
 
     async def get_user_by_username_or_none(self, name: str) -> UserFromDbFullSchema: ...

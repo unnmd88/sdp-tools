@@ -3,7 +3,6 @@ from core.users.schemas import UserFromDbFullSchema
 
 
 class UsersRepositoryUseCaseImpl:
-
     def __init__(self, user_service: UsersRepositoryServiceProtocol):
         self.user_service = user_service
 
@@ -12,4 +11,3 @@ class UsersRepositoryUseCaseImpl:
 
     async def get_user_by_id(self, user_id: int) -> UserFromDbFullSchema:
         return await self.user_service.get_user_by_id_or_none(user_id)
-

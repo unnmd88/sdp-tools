@@ -5,6 +5,7 @@ import typer
 
 from application.cli.dependencies import db_api_helper
 from core.config import settings
+
 # from core.models import User
 from fastapi.exceptions import HTTPException
 from rich import print

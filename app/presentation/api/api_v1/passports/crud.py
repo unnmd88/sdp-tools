@@ -16,12 +16,16 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from presentation.api.api_v1.passports.dependencies import check_allow_to_save_or_raise_http_exc
+from presentation.api.api_v1.passports.dependencies import (
+    check_allow_to_save_or_raise_http_exc,
+)
 from presentation.api.api_v1.passports.schemas import (
     CapturePassportSchemaSaveToDatabase,
     UpdatePassportSchemaSaveToDatabase,
 )
-from presentation.api.api_v1.passports.utils import create_current_passport_schema_or_404
+from presentation.api.api_v1.passports.utils import (
+    create_current_passport_schema_or_404,
+)
 
 
 class PassportsCrud(BaseCrud):

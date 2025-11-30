@@ -3,11 +3,7 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from infrastructure.database.models import Base
-from .mixins import (
-    CreatedAtMixin,
-    UpdatedAtMixin,
-    IntegerIdPkMixin
-)
+from .mixins import CreatedAtMixin, UpdatedAtMixin, IntegerIdPkMixin
 
 
 class User(
