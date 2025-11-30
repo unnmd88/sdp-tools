@@ -12,6 +12,7 @@ from core.users.exceptions import UserNotFoundException
 from infrastructure.database.api import db_api
 from core.users import crud as users_crud
 from core.users.schemas import CreateUser, UserFromDbFullSchema
+from infrastructure.database.user_reposirory import UsersRepositorySqlAlchemy
 from presentation.api.dependencies import UsersCrudUseCase, PayloadJWTDependency
 from presentation.api.exceptions import UserNotFoundHttpException
 
@@ -80,13 +81,15 @@ async def get_user(
 
 @router.get(
     '/',
-    response_model=list[UserFromDbFullSchema],
+    # response_model=list[UserFromDbFullSchema],
     # dependencies=[Depends(check_is_active_superuser)],
 )
 async def get_users(
     sess: db_session,
 ):
-    return await users_crud.get_users(session=sess)
+    repo = UsersRepositorySqlAlchemy(sess)
+    return await repo.get_all()
+    # return await users_crud.get_users(session=sess)
 
 
 @router.post(

@@ -11,9 +11,8 @@ from typing import Annotated
 from fastapi.params import Depends
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from application.interfaces.use_cases.base_crud import BaseCrudUseCaseProtocol
-from application.interfaces.use_cases.users_crud_repo import UsersRepositoryUseCaseProtocol
-from application.use_cases.base_crud import BaseCrudUseCaseImpl
+
+from application.use_cases.crud import UsersCrudUseCase
 from application.use_cases.users.get_users_from_repo import UsersRepositoryUseCaseImpl
 from auth.services.authentication import AuthenticationUserServiceImpl
 from auth.utils import decode_jwt
@@ -40,13 +39,11 @@ def get_jwt_payload_jwt_bearer(
 # use-cases
 
 
-def get_tlo() -> BaseCrudUseCaseProtocol:
-    return BaseCrudUseCaseImpl(repository=TrafficLightObjectSqlAlchemy(session=db_session))
+def get_tlo() -> UsersCrudUseCase:
+    return UsersCrudUseCase(repository=TrafficLightObjectSqlAlchemy(session=db_session))
 
 
-
-
-def users_crud() -> UsersRepositoryUseCaseProtocol:
+def users_crud() -> UsersRepositoryUseCaseImpl:
     return UsersRepositoryUseCaseImpl(UserServiceImpl())
 
 
@@ -91,8 +88,8 @@ async def get_user_from_jwt() -> UserServiceImpl:
 
 
 
-CrudTloUseCase = Annotated[BaseCrudUseCaseProtocol, Depends(get_tlo)]
-UsersCrudUseCase = Annotated[UsersRepositoryUseCaseProtocol, Depends(users_crud)]
+CrudTloUseCase = Annotated[UsersCrudUseCase, Depends(get_tlo)]
+UsersCrudUseCase = Annotated[UsersRepositoryUseCaseImpl, Depends(users_crud)]
 AuthUseCase = Annotated[AuthenticationUserServiceProtocol, Depends(get_auth_user_use_case)]
 AccessAndRefreshJWT = Annotated[TokenInfo, Depends(auth_user_and_issue_access_and_refresh_jwt)]
 #TO DO  AccessFromRefreshJWT = Annotated[TokenInfo, Depends(auth_user_and_issue_access_and_refresh_jwt)]
