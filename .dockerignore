@@ -1,3 +1,11 @@
 # Exclude the project virtual environment from image builds
-.venv
+*venv/
+
 Dockerfile.bak
+docker-build/
+compose*
+docker*
+Makefile*
+
+.idea/
+.vscode/
