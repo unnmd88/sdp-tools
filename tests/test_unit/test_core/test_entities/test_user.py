@@ -2,9 +2,9 @@ import random
 
 import pytest
 
-from core.enums.entity import EntityIdRange
-from core.enums.organizations import Organizations
-from core.enums.roles import Roles
+from core.enums import EntityIdRange
+from core.enums import Organizations
+from core.enums import Roles
 from core.users.entities.user import UserEntity
 from core.users.exceptions import DomainValidationException
 from tests.utils.create_user_entity import create_user_entity
