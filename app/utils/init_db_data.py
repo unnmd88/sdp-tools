@@ -1,6 +1,6 @@
 import asyncio
 
-from core.constants import (
+from core.enums import (
     PassportGroups,
     PassportGroupsRoutes,
     RegionCodes,

@@ -1,7 +1,7 @@
 import random
 from collections.abc import Sequence
 
-from core.constants import PassportGroups, ServiceOrganizations
+from core.enums import PassportGroups, ServiceOrganizations
 from core.models import Passport, PassportGroup, Region, TrafficLightObject, User
 from core.users import Organizations
 from core.users import Roles

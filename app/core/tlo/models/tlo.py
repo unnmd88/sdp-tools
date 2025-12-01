@@ -1,7 +1,7 @@
 from datetime import datetime
 from dataclasses import dataclass
 
-from core.constants import ServiceOrganizations
+from core.enums import ServiceOrganizations
 
 
 @dataclass

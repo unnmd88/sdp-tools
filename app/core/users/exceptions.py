@@ -1,9 +1,12 @@
 from dataclasses import dataclass
 from typing import final
 
-from core.exceptions.base import ApplicationException, NotFoundException
+from core.exceptions.base import (
+    ApplicationException,
+    NotFoundException,
+)
 
-
+@final
 @dataclass
 class DomainValidationException(ApplicationException):
     """

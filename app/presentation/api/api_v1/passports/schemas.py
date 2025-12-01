@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 
 from annotated_types import MaxLen, MinLen
-from core.constants import (
+from core.enums import (
     PassportGroups,
     RegionCodes,
     RegionNames,

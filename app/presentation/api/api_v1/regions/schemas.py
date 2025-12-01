@@ -1,4 +1,4 @@
-from core.constants import RegionCodes, RegionNames
+from core.enums import RegionCodes, RegionNames
 from pydantic import BaseModel, ConfigDict
 
 

@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from core.constants import PassportGroups, PassportGroupsRoutes
+from core.enums import PassportGroups, PassportGroupsRoutes
 from pydantic import BaseModel, Field
 
 
