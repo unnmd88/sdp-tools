@@ -4,6 +4,7 @@ import datetime
 from core.enums import RegionNames, ServiceOrganizations, PassportGroups
 from core.tlo.entities.tlo import TrafficLightObjectEntity
 from core.tlo.value_objects.passport import Passport
+from tests.utils.create_user_entity import create_user_entity
 
 
 class TestTrafficLightObjectEntity:
@@ -11,9 +12,11 @@ class TestTrafficLightObjectEntity:
     def test_create_tlo_entity_success(self, pk_id):
         """ Тест на успешное создание сущности TrafficLightObjectEntity. """
 
+        user = create_user_entity(username='chook')
+
         passport = Passport(
             data={"data": {}},
-            created_by='root',
+            created_by=user,
             group=PassportGroups.OVIM,
             commit_message='test commit message'
         )
@@ -41,6 +44,7 @@ class TestTrafficLightObjectEntity:
         assert tlo.description == 'Тестовый объект'
         assert tlo.editing_now == False
         assert tlo.current_passport == passport
+        assert tlo.current_passport.created_by == user
         assert tlo.passport_history == []
         assert isinstance(tlo.created_at, datetime.datetime)
         assert isinstance(tlo.updated_at, datetime.datetime)
