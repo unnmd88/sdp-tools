@@ -1,7 +1,6 @@
 from enum import IntEnum, StrEnum
 
 
-
 class TokenFields(StrEnum):
     pk_id = 'id'
     user_id = 'user_id'

@@ -1,11 +1,11 @@
 from typing import Protocol
 
-from application.interfaces.repositories.users import UsersRepositoryProtocol
-from core.users.schemas import UserFromDbFullSchema
+from application.interfaces.repositories.users import UsersCrudRepositoryProtocol
+from core.users._schemas import UserFromDbFullSchema
 
 
-class UsersRepositoryServiceProtocol(Protocol):
-    repository_factory: type[UsersRepositoryProtocol]
+class UsersRepositoryProtocol(Protocol):
+    # repository_factory: type[UsersRepositoryProtocol]
 
     async def get_user_by_username_or_none(self, name: str) -> UserFromDbFullSchema: ...
 

@@ -1,4 +1,4 @@
-from application.interfaces.repositories.users import UsersRepositoryProtocol
+from application.interfaces.repositories.users import UsersCrudRepositoryProtocol
 from auth.create_tokens import create_token, create_access_jwt, create_refresh_jwt
 from auth.exceptions import InvalidUsernameOrPasswordException, InactiveUserException
 from auth.schemas import AuthSchema, TokenInfo
@@ -8,7 +8,7 @@ from app.auth.utils import validate_password
 class AuthenticationUserServiceImpl:
     def __init__(
         self,
-        user_repository_factory: type[UsersRepositoryProtocol],
+        user_repository_factory: type[UsersCrudRepositoryProtocol],
         user_auth_schema: AuthSchema,
     ):
         self.repository = user_repository_factory()

@@ -5,8 +5,8 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import ExpiredSignatureError, InvalidTokenError
 
-from core.users.crud import get_user_by_id
-from core.users.schemas import UserFromDbFullSchema
+from core.users._crud import get_user_by_id
+from core.users._schemas import UserFromDbFullSchema
 from infrastructure.database.api import db_api
 # from core.users import get_user_by_id
 # from core.users import UserFromDbFullSchema

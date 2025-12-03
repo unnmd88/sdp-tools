@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from core.users.schemas import UserFromDbFullSchema
+from core.users._schemas import UserFromDbFullSchema
 from infrastructure.database.api import db_api
 from infrastructure.database.models import User
 from infrastructure.database.base_repository import BaseSqlAlchemy

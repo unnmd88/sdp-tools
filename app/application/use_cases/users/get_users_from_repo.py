@@ -1,9 +1,9 @@
-from application.interfaces.services.get_user import UsersRepositoryServiceProtocol
-from core.users.schemas import UserFromDbFullSchema
+from application.interfaces.services.get_user import UsersCrudRepositoryProtocol
+from core.users._schemas import UserFromDbFullSchema
 
 
 class UsersRepositoryUseCaseImpl:
-    def __init__(self, user_service: UsersRepositoryServiceProtocol):
+    def __init__(self, user_service: UsersCrudRepositoryProtocol):
         self.user_service = user_service
 
     async def get_user_by_username(self, username: str) -> UserFromDbFullSchema:

@@ -1,23 +1,23 @@
-from dataclasses import dataclass, InitVar
+from dataclasses import InitVar, dataclass
 
 from core.enums import (
+    EntityIdRange,
     Organizations,
     Roles,
-    EntityIdRange,
 )
 from core.field_validators import (
-    check_field_id_is_valid,
+    check_description_is_valid,
     check_email_is_valid,
+    check_field_id_is_valid,
     check_firstname_is_valid,
-    check_lastname_is_valid,
-    check_username_is_valid,
-    check_password_is_valid,
     check_is_valid_enum,
+    check_lastname_is_valid,
+    check_password_is_valid,
     check_phone_number_is_valid,
-    check_description_is_valid
+    check_username_is_valid, check_telegram_is_valid,
 )
-
-from core.users.exceptions import DomainValidationException
+from core.mixins.id import IdMixin
+from core.users.exceptions import DomainValidationException, INVALID_DESCRIPTION_EXCEPTION_TEXT
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -43,71 +43,76 @@ class UserEntity:
             return
         if not check_field_id_is_valid(self.id):
             raise DomainValidationException(
-                detail=(
-                    f'Недопустимый id пользователя: {self.id!r}. '
-                    f'Должен быть в диапазоне {EntityIdRange.MIN_ID}...{EntityIdRange.MAX_ID}'
-                )
+                f'Недопустимый id пользователя: {self.id!r}. '
+                f'Должен быть в диапазоне {EntityIdRange.MIN_ID}...{EntityIdRange.MAX_ID}'
             )
         if not check_email_is_valid(self.email):
             raise DomainValidationException(
-                detail=f'Недопустимый email пользователя: {self.email!r}.'
+                f'Недопустимый email пользователя: {self.email!r}.'
             )
         if not check_firstname_is_valid(self.first_name):
             raise DomainValidationException(
-                detail=f'Недопустимый first_name пользователя: {self.first_name!r}.'
+                f'Недопустимый first_name пользователя: {self.first_name!r}.'
             )
         if not check_lastname_is_valid(self.last_name):
             raise DomainValidationException(
-                detail=f'Недопустимый last_name пользователя: {self.last_name!r}.'
+                f'Недопустимый last_name пользователя: {self.last_name!r}.'
             )
         if not check_username_is_valid(self.username):
             raise DomainValidationException(
-                detail=f'Недопустимый username пользователя: {self.username!r}.'
+                f'Недопустимый username пользователя: {self.username!r}.'
             )
         check_is_valid_enum(Organizations, self.organization)
         if not check_password_is_valid(self.password):
             raise DomainValidationException(
-                detail=f'Недопустимый password пользователя.'
+                f'Недопустимый password пользователя.'
             )
         if not isinstance(self.is_active, bool):
             raise DomainValidationException(
-                detail=f'Значение "is_active" должно быть типа bool.'
+                f'Значение "is_active" должно быть типа bool.'
             )
         if not isinstance(self.is_admin, bool):
             raise DomainValidationException(
-                detail=f'Значение "is_admin" должно быть типа bool.'
+                f'Значение "is_admin" должно быть типа bool.'
             )
         if not isinstance(self.is_superuser, bool):
             raise DomainValidationException(
-                detail=f'Значение "is_superuser" должно быть типа bool.'
+                f'Значение "is_superuser" должно быть типа bool.'
             )
         check_is_valid_enum(Roles, self.role)
         if not check_phone_number_is_valid(self.phone_number):
             raise DomainValidationException(
-                detail=f'Недопустимый phone_number пользователя: {self.phone_number!r}.'
+                f'Недопустимый phone_number пользователя: {self.phone_number!r}.'
             )
-        if not check_description_is_valid(self.telegram):
+        if not check_telegram_is_valid(self.telegram):
             raise DomainValidationException(
-                detail=f'Поле description не должно превышать 255 символов.'
+                f'Недопустимый telegram пользователя: {self.telegram!r}. Должен начинаться с @'
             )
+        if not check_description_is_valid(self.description):
+            raise DomainValidationException(INVALID_DESCRIPTION_EXCEPTION_TEXT)
+
 
 
 if __name__ == '__main__':
-    user = UserEntity(
-        id=321,
-        first_name='Chook',
-        last_name='Gekk',
-        username='chook',
-        organization=Organizations.SDP,
-        email='example@example.com',
-        password=b'mysecret',
-        is_active=True,
-        is_admin=True,
-        is_superuser=True,
-        role=Roles.superuser,
-        phone_number='',
-        telegram='',
-        description='',
-    )
+    try:
+        user = UserEntity(
+            id=321,
+            first_name='Chook',
+            last_name='Gekk',
+            username='chokk',
+            organization=Organizations.SDP,
+            email='example@example.com',
+            password=b'mysecret',
+            is_active=True,
+            is_admin=True,
+            is_superuser=True,
+            role=Roles.superuser,
+            phone_number='',
+            telegram='',
+            description='',
+        )
+    except DomainValidationException as e:
+        print(f'e: {e}')
 
-    print(user)
+
+    # print(user)

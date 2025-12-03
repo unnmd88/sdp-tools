@@ -10,8 +10,8 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from core.users.exceptions import UserNotFoundException
 from infrastructure.database.api import db_api
-from core.users import crud as users_crud
-from core.users.schemas import CreateUser, UserFromDbFullSchema
+from core.users import _crud as users_crud
+from core.users._schemas import CreateUser, UserFromDbFullSchema
 from infrastructure.database.user_reposirory import UsersRepositorySqlAlchemy
 from presentation.api.dependencies import UsersCrudUseCase, PayloadJWTDependency
 from presentation.api.exceptions import UserNotFoundHttpException

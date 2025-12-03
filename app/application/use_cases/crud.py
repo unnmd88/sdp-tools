@@ -1,9 +1,9 @@
-from application.interfaces.repositories.users import UsersRepositoryProtocol
-from core.users.schemas import UserFromDbFullSchema
+from application.interfaces.repositories.users import UsersCrudRepositoryProtocol
+from core.users._schemas import UserFromDbFullSchema
 
 
 class UsersCrudUseCase:
-    def __init__(self, repository: UsersRepositoryProtocol):
+    def __init__(self, repository: UsersCrudRepositoryProtocol):
         self.repository = repository
 
     async def get_one_by_id(self, entity_id) -> UserFromDbFullSchema | None:
