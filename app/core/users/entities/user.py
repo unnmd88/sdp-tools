@@ -16,7 +16,6 @@ from core.field_validators import (
     check_phone_number_is_valid,
     check_username_is_valid, check_telegram_is_valid,
 )
-from core.mixins.id import IdMixin
 from core.users.exceptions import DomainValidationException, INVALID_DESCRIPTION_EXCEPTION_TEXT
 
 

@@ -134,8 +134,6 @@ def check_is_valid_enum(enum_cls: type[Enum], value: Any) -> bool:
 
 
 
-
-
 # def validate_field_id(value: int, check_type: bool = True) -> bool:
 #     if check_type and not isinstance(value, int):
 #         raise TypeError(f'id must be an {int!r}')

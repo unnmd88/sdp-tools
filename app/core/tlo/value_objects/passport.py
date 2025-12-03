@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from typing import final
 
 from core.enums import PassportGroups
+from core.users.entities.user import UserEntity
+from core.users.exceptions import DomainValidationException
 
 
 @final
@@ -9,8 +11,14 @@ from core.enums import PassportGroups
 class Passport:
 
     data: dict
-    created_by: str
+    created_by: UserEntity
     group: PassportGroups
     commit_message: str
+
+    def __post_init__(self):
+        if not isinstance(self.created_by, UserEntity):
+            raise DomainValidationException(
+                f'Поле created_by должно экземпляр {UserEntity.__name__!r}'
+            )
 
     # TO DO: validate rules
