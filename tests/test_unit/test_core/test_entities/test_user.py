@@ -14,13 +14,11 @@ from contextlib import nullcontext
 
 class TestUserEntity:
 
-    def test_create_user_entity_success(self):
-        """ Тест на успешное создание сущности UserEntity"""
-
-        _id = random.randint(EntityIdRange.MIN_ID, EntityIdRange.MAX_ID)
+    def test_create_user_entity_success(self, pk_id):
+        """ Тест на успешное создание сущности UserEntity. """
 
         user = UserEntity(
-            id=_id,
+            id=pk_id,
             first_name='Chook',
             last_name='Gekk',
             username='chokky',
@@ -36,7 +34,7 @@ class TestUserEntity:
             description='',
         )
 
-        assert user.id == _id
+        assert user.id == pk_id
         assert user.first_name == "Chook"
         assert user.last_name == "Gekk"
         assert user.username == "chokky"
@@ -81,15 +79,3 @@ class TestUserEntity:
         """ Тест на вызов ошибки при создании сущности UserEntity с невалидными значениями email. """
         with expectation:
             create_user_entity(email=bad_email)
-
-        # for bad_id in ('1', 32001, 123456789, -random.randint(EntityIdRange.MIN_ID, EntityIdRange.MAX_ID)):
-        #     with pytest.raises(DomainValidationException):
-        #         create_user_entity(_id=bad_id)
-
-        # for bad_mail in ('@example.com', '@', '12e1e12', ):
-        #     with pytest.raises(DomainValidationException):
-        #         create_user_entity(email=bad_mail)
-        #
-        # for bad_id in (0, 32001, 123456789, -random.randint(EntityIdRange.MIN_ID, EntityIdRange.MAX_ID)):
-        #     with pytest.raises(DomainValidationException):
-        #         create_user_entity(_id=bad_id)
