@@ -22,7 +22,6 @@ class TokenTypes(StrEnum):
     refresh = 'refresh'
 
 
-
 class EntityIdRange(IntEnum):
     MIN_ID = 1
     MAX_ID = 32000

@@ -1,11 +1,11 @@
 from core.enums import PassportGroups
-from core.tlo.value_objects.passport import Passport
+from core.passports.entities.passport import Passport
 import pytest
 
 from tests.utils.create_user_entity import create_user_entity
 
 
-class TestPassportValueObject:
+class TestPassportEntity:
 
     @pytest.mark.parametrize(
         "data,user,group",
@@ -15,7 +15,7 @@ class TestPassportValueObject:
             (dict(data=dict(nested=dict())), create_user_entity(username='chookAndGekk'), PassportGroups.CODD),
         ],
     )
-    def test_create_passport_value_object_success(self, data, user, group):
+    def test_create_passport_entities_success(self, data, user, group):
         """ Тест на успешное создание value-object Passport. """
         Passport(
             data=data,

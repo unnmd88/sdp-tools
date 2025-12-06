@@ -8,7 +8,6 @@ class A:
     manes: list[str]
 
 
-
 def check_types_from_dataclass_instance(dataclass_instance):
     instance_types = dataclass_instance.__annotations__
     for field_name, field_type in instance_types.items():

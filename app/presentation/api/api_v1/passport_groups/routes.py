@@ -12,7 +12,7 @@ from presentation.api.api_v1.passport_groups.schemas import (
     PassportGroupsSchema,
     PassportGroupsUpdate,
 )
-from presentation.api.dependencies import db_session
+from presentation.api.dependencies.dependencies import db_session
 
 router = APIRouter(
     prefix='/passport-groups',

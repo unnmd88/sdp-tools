@@ -1,10 +1,10 @@
 from datetime import timedelta as td
 
 from core.config import settings
+from core.enums import TokenFields, TokenTypes
 
-from core.enums.tokens import TokenFields, TokenTypes
-from auth.schemas import UserSchema
 from auth.utils import encode_jwt
+from core.users.entities.user import UserEntity
 
 
 def create_token(
@@ -20,7 +20,7 @@ def create_token(
     )
 
 
-def create_access_jwt(user: UserSchema):
+def create_access_jwt(user: UserEntity):
     payload = {
         str(TokenFields.user_id): user.id,
         str(TokenFields.sub): user.username,
@@ -37,7 +37,7 @@ def create_access_jwt(user: UserSchema):
     )
 
 
-def create_refresh_jwt(user: UserSchema):
+def create_refresh_jwt(user: UserEntity):
     payload = {
         str(TokenFields.user_id): user.id,
         str(TokenFields.sub): user.username,

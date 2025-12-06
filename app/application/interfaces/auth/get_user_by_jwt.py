@@ -1,7 +1,7 @@
 from typing import Protocol
 
-from core.users.services.get_user import UserServiceImpl
+from core.users.services.crud import UsersServiceImpl
 
 
 class GetUserByJWT(Protocol):
-    def __init__(self, user: UserServiceImpl): ...
+    def __init__(self, user: UsersServiceImpl): ...

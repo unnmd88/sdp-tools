@@ -1,19 +1,20 @@
+from dataclasses import dataclass
 from typing import Protocol
 
-from application.interfaces.repositories.users import UsersCrudRepositoryProtocol
-from auth.schemas import AuthSchema, TokenInfo
+from application.interfaces.services.users_crud import UsersServiceProtocol
 
 
-class AuthenticationUserServiceProtocol(Protocol):
-    def __init__(
+@dataclass
+class AuthenticationSchemaProtocol(Protocol):
+    username: str
+    password: str
+
+
+class UserAuthenticationServiceProtocol(Protocol):
+    def __init__(self, user_service: UsersServiceProtocol):
+        self.user_service = user_service
+
+    async def authenticate(
         self,
-        user_repository_factory: type[UsersCrudRepositoryProtocol],
-        user_auth_schema: AuthSchema,
-    ):
-        self.repository: UsersCrudRepositoryProtocol
-        self.user_auth_schema: AuthSchema
-
-    async def auth_and_issue_jwt(
-        self,
-        refresh_token: bool,
-    ) -> TokenInfo: ...
+        auth_data: AuthenticationSchemaProtocol,
+    ): ...

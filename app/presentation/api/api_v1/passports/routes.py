@@ -28,7 +28,10 @@ from presentation.api.api_v1.passports.schemas import (
     UpdatePassport,
     UpdatePassportSchemaSaveToDatabase,
 )
-from presentation.api.dependencies import get_jwt_payload_jwt_bearer, db_session
+from presentation.api.dependencies.dependencies import (
+    get_jwt_payload_jwt_bearer,
+    db_session,
+)
 
 router = APIRouter(
     prefix='/passports',

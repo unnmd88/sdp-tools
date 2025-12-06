@@ -44,30 +44,30 @@ def decode_jwt(
     return decoded
 
 
-def hash_password(
-    password: str,
-) -> bytes:
-    return bcrypt.hashpw(
-        password.encode('utf-8'),
-        bcrypt.gensalt(),
-    )
-
-
-def validate_password(
-    password: str,
-    hashed_password: bytes,
-) -> bool:
-    return bcrypt.checkpw(
-        password=password.encode('utf-8'),
-        hashed_password=hashed_password,
-    )
-
-
-def gen_password(
-    min_length: int = settings.auth_jwt.passwd.min_length,
-    max_length: int = settings.auth_jwt.passwd.max_length,
-) -> str:
-    chars = string.ascii_letters + string.digits + string.punctuation
-    return ''.join(
-        secrets.choice(chars) for _ in range(random.randint(min_length, max_length))
-    )
+# def hash_password(
+#     password: str,
+# ) -> bytes:
+#     return bcrypt.hashpw(
+#         password.encode('utf-8'),
+#         bcrypt.gensalt(),
+#     )
+#
+#
+# def validate_password(
+#     password: str,
+#     hashed_password: bytes,
+# ) -> bool:
+#     return bcrypt.checkpw(
+#         password=password.encode('utf-8'),
+#         hashed_password=hashed_password,
+#     )
+#
+#
+# def gen_password(
+#     min_length: int = settings.auth_jwt.passwd.min_length,
+#     max_length: int = settings.auth_jwt.passwd.max_length,
+# ) -> str:
+#     chars = string.ascii_letters + string.digits + string.punctuation
+#     return ''.join(
+#         secrets.choice(chars) for _ in range(random.randint(min_length, max_length))
+#     )

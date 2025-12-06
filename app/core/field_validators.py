@@ -8,20 +8,25 @@ from core.reg_exps import (
     LAST_NAME_PATTERN,
     USERNAME_PATTERN,
     PHONE_NUMBER_PATTERN,
+    PASSWORD_PATTERN,
 )
 from core.users.constants import (
     MIN_LEN_PASSWORD,
     MAX_LEN_PASSWORD,
-    MIN_ID, MAX_ID,
+    MIN_ID,
+    MAX_ID,
 )
 from core.utils import checking_simple_types
 
 
-def validate_string_by_pattern(string: str, pattern: re.Pattern, allow_empty: bool = True,) -> bool:
+def validate_string_by_pattern(
+    string: str,
+    pattern: re.Pattern,
+    allow_empty: bool = True,
+) -> bool:
     if allow_empty and string == '':
         return True
     return re.match(pattern, string) is not None
-
 
 
 @checking_simple_types(type_to_check=int, field_name='id')
@@ -127,11 +132,18 @@ def check_is_valid_enum(enum_cls: type[Enum], value: Any) -> bool:
     try:
         enum_cls(value)
     except ValueError:
-        raise TypeError(
-            f'{value!r} must be an {enum_cls.__name__!r}'
-        )
+        raise TypeError(f'{value!r} must be an {enum_cls.__name__!r}')
     return True
 
+
+@checking_simple_types(type_to_check=str, field_name='password')
+def check_set_password(value: str) -> bool:
+    """
+    Проверяет валидность устанавливаемого password.
+    :param value: Строка password.
+    :return: True or False.
+    """
+    return validate_string_by_pattern(value, PASSWORD_PATTERN, allow_empty=False)
 
 
 # def validate_field_id(value: int, check_type: bool = True) -> bool:
@@ -148,7 +160,3 @@ def check_is_valid_enum(enum_cls: type[Enum], value: Any) -> bool:
 #     if not value != '' and validate_email(value) is False:
 #         return False
 #     return True
-
-
-
-

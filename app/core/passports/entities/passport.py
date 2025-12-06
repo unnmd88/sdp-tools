@@ -9,7 +9,6 @@ from core.users.exceptions import DomainValidationException
 @final
 @dataclass(frozen=True, slots=True, kw_only=True, order=True)
 class Passport:
-
     data: dict
     created_by: UserEntity
     group: PassportGroups

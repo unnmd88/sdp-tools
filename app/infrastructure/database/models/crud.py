@@ -10,7 +10,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from infrastructure.database.models import Base, User
-from core.users._schemas import UserFromDbFullSchema
 
 # from core.models import Base, User
 

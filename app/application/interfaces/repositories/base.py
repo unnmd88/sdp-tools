@@ -1,11 +1,7 @@
-from abc import abstractmethod
 from typing import Protocol
-
-from core.users._schemas import UserFromDbFullSchema
 
 
 class BaseCrudProtocol(Protocol):
-
     async def get_one_by_id_or_none(self, _id: int): ...
 
     async def get_all(self): ...
@@ -13,4 +9,3 @@ class BaseCrudProtocol(Protocol):
     async def add(self, entity): ...
 
     async def update(self, model): ...
-

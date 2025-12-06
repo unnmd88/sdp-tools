@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import final
 
 from core.enums import ServiceOrganizations, RegionNames
-from core.tlo.value_objects.passport import Passport
+from core.passports.entities.passport import Passport
 
 
 @final

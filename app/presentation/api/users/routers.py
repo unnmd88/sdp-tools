@@ -1,28 +1,27 @@
-from typing import Annotated
+from collections.abc import Sequence
 
-# from auth import (
-#     # check_is_active_superuser,
-#     # extract_payload_from_jwt,
-# )
-# from core.database import db_api
-from fastapi import APIRouter, Depends, status
-from sqlalchemy.ext.asyncio.session import AsyncSession
+from fastapi import APIRouter, status, HTTPException
 
-from core.users.exceptions import UserNotFoundException
-from infrastructure.database.api import db_api
-from core.users import _crud as users_crud
-from core.users._schemas import CreateUser, UserFromDbFullSchema
-from infrastructure.database.user_reposirory import UsersRepositorySqlAlchemy
-from presentation.api.dependencies import UsersCrudUseCase, PayloadJWTDependency
+
+from application.dtos.users import CreateUserDTO
+from application.interfaces.services import users_crud
+
+from core.users.exceptions import UserNotFoundException, UserAlreadyExistsException
+from presentation.api.dependencies.deps import UsersCrudUseCase
+from presentation.api.dependencies.dependencies import PayloadJWTDependency
+
+
 from presentation.api.exceptions import UserNotFoundHttpException
+from presentation.schemas.users import (
+    CreateUserSchema,
+    ResponseUserSchema,
+    UpdateUserSchema,
+    ChangeUserPasswordSchema,
+)
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
 
-db_session = Annotated[
-    AsyncSession,
-    Depends(db_api.session_getter),
-]
 # jwt_payload = Annotated[dict, Depends(extract_payload_from_jwt)]
 
 
@@ -46,8 +45,6 @@ def whoami(
 )
 async def get_user_by_username(
     username: str,
-    sess: db_session,
-    # use_case: Annotated[UsersUseCaseProtocol, Depends(get_user)],
     use_case: UsersCrudUseCase,
 ):
     try:
@@ -61,47 +58,83 @@ async def get_user_by_username(
 @router.get(
     '/{user_id}/',
     description='Get user by id',
-    # response_model=UserFromDbFullSchema,
+    response_model=ResponseUserSchema,
     # dependencies=[Depends(check_user_is_active)],
 )
 async def get_user(
     user_id: int,
-    sess: db_session,
     use_case: UsersCrudUseCase,
 ):
     try:
-        return await use_case.get_user_by_id(user_id)
+        user_entity = await use_case.get_user_by_id(user_id)
+        return ResponseUserSchema.model_validate(user_entity, from_attributes=True)
     except UserNotFoundException as e:
         raise UserNotFoundHttpException(detail=e.detail)
-    return await use_case.user_service.find_by_id(user_id)
-    return await users_crud.get_user_by_id(user_id, sess)
-    return await users_crud.get_user_by_id(user_id, sess)
 
 
 @router.get(
     '/',
-    # response_model=list[UserFromDbFullSchema],
+    # response_model=Sequence[ResponseUserSchema],
     # dependencies=[Depends(check_is_active_superuser)],
 )
 async def get_users(
-    sess: db_session,
+    jwt_payload: PayloadJWTDependency,
+    user_use_case: UsersCrudUseCase,
+    use_case: UsersCrudUseCase,
 ):
-    repo = UsersRepositorySqlAlchemy(sess)
-    return await repo.get_all()
-    # return await users_crud.get_users(session=sess)
+    return await user_use_case.get_user_by_id(jwt_payload.user_id)
+    return jwt_payload
+    return [
+        ResponseUserSchema.model_validate(user_entity, from_attributes=True)
+        for user_entity in await use_case.get_all_users()
+    ]
 
 
 @router.post(
     '/',
     status_code=status.HTTP_201_CREATED,
-    response_model=UserFromDbFullSchema,
+    response_model=ResponseUserSchema,
     # dependencies=[Depends(check_is_active_superuser)],
 )
 async def create_user(
-    user: CreateUser,
-    sess: db_session,
-) -> UserFromDbFullSchema:
-    return UserFromDbFullSchema.model_validate(
-        obj=await users_crud.create_user(user, sess),
-        from_attributes=True,
+    jwt_payload: PayloadJWTDependency,
+    user: CreateUserSchema,
+    use_case: UsersCrudUseCase,
+):
+    user_dto = CreateUserDTO(
+        **(user.model_dump() | {'requester_username': jwt_payload.sub})
     )
+    try:
+        new_user = await use_case.create_user(user_dto)
+    except UserAlreadyExistsException as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=e.detail,
+        )
+    return ResponseUserSchema.model_validate(new_user, from_attributes=True)
+
+
+@router.patch(
+    '/',
+    status_code=status.HTTP_200_OK,
+    # response_model=UserSchema,
+    # dependencies=[Depends(check_is_active_superuser)],
+)
+async def update_user(
+    to_update: UpdateUserSchema,
+    use_case: UsersCrudUseCase,
+): ...
+
+
+@router.patch(
+    '/change_password/',
+    status_code=status.HTTP_200_OK,
+    # response_model=UserSchema,
+    # dependencies=[Depends(check_is_active_superuser)],
+)
+async def change_user_password(
+    to_change_password: ChangeUserPasswordSchema,
+    use_case: UsersCrudUseCase,
+):
+    user_dto = CreateUserDTO(**user.model_dump())
+    return await use_case.create_user(user_dto)

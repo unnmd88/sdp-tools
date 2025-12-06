@@ -3,7 +3,7 @@ import datetime
 
 from core.enums import RegionNames, ServiceOrganizations, PassportGroups
 from core.tlo.entities.tlo import TrafficLightObjectEntity
-from core.tlo.value_objects.passport import Passport
+from core.passports.entities.passport import Passport
 from tests.utils.create_user_entity import create_user_entity
 
 
