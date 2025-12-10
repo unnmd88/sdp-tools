@@ -1,7 +1,11 @@
 from collections.abc import Callable
 from functools import wraps
+from typing import TYPE_CHECKING
 
 import bcrypt
+
+from core.enums import Permission
+from core.exceptions.base import PermissionsError
 
 
 def checking_simple_types(*, type_to_check: type, field_name: str = ''):
@@ -28,6 +32,19 @@ def checking_simple_types(*, type_to_check: type, field_name: str = ''):
 
         return wrapper
 
+    return decorator
+
+
+def check_permissions_async(*permissions_to_check: Permission):
+    permissions_to_check: frozenset[Permission] = frozenset(permissions_to_check)
+    def decorator(func: Callable):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            self = args[0]
+            if not permissions_to_check.issubset(self.user_entity.permissions.get_all()):
+                raise PermissionsError
+            return await func(*args, **kwargs)
+        return wrapper
     return decorator
 
 

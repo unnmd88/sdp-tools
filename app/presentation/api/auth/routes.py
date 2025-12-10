@@ -1,8 +1,7 @@
 from typing import Annotated
-from application.dtos.auth import UserAuthDTO
-from auth.exceptions import InvalidUsernameOrPasswordException, InactiveUserException
 from fastapi import APIRouter, Depends
 
+from core.dto.auth import UserAuthDTO
 from presentation.api.dependencies.deps import JWTAuthUseCase, AuthForm
 
 from presentation.api.exceptions import (

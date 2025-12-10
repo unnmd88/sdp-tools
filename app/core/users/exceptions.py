@@ -3,9 +3,9 @@
 """
 
 from core.exceptions.base import (
-    ApplicationException,
-    NotFoundException,
-    CreateException,
+    ApplicationError,
+    NotFoundError,
+    CreateError, UpdateError, PermissionsError,
 )
 
 INVALID_DESCRIPTION_EXCEPTION_TEXT = (
@@ -13,7 +13,7 @@ INVALID_DESCRIPTION_EXCEPTION_TEXT = (
 )
 
 
-class DomainValidationException(ApplicationException):
+class DomainValidationError(ApplicationError):
     """Ошибка валидации доменной сущности."""
 
     @property
@@ -21,7 +21,11 @@ class DomainValidationException(ApplicationException):
         return f'Ошибка валидации. {". ".join(self.args)}'
 
 
-class UserNotFoundException(NotFoundException):
+class UserInactiveError(ApplicationError):
+    """Неактивный пользователь пытается осуществлять какие-либо действия. """
+
+
+class UserNotFoundException(NotFoundError):
     """Ошибка поиска user."""
 
     @property
@@ -59,7 +63,7 @@ class UserNotFoundByUsernameException(UserNotFoundException):
         return f'Пользователь с username={self._id!r} не найден.'
 
 
-class UserAlreadyExistsException(CreateException):
+class UserAlreadyExistsException(CreateError):
     """Ошибка создания нового пользователя из-за наличия такового."""
 
     def __init__(
@@ -74,7 +78,7 @@ class UserAlreadyExistsException(CreateException):
         return f'Пользователь с username={self._id!r} уже существует.'
 
 
-class InvalidPasswordToSet(CreateException):
+class InvalidPasswordToSet(CreateError):
     """Ошибка установки пароля пользователя."""
 
     @property
@@ -82,8 +86,18 @@ class InvalidPasswordToSet(CreateException):
         return f'Ошибка установки пароля пользователя.'
 
 
-class ForbiddenCreate(CreateException):
+class ForbiddenCreate(CreateError):
     """Ошибка создания нового объекта из-за отсутствия прав."""
+
+
+class ForbiddenUpdate(UpdateError):
+    """Ошибка обновления объекта из-за отсутствия прав."""
+
+
+class UserPermissionsError(PermissionsError):
+    """Ошибка доступа к данным и сервисам в связи с отсутствием прав пользователя."""
+
+
 
     # def __init__(
     #     self,

@@ -1,20 +1,18 @@
-from typing import Annotated
+from fastapi import APIRouter
 
-# from core.database import db_api
-from fastapi import (
-    APIRouter,
-    Depends,
-)
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.exceptions import HTTPException
 from starlette import status
 
-from presentation.api.api_v1.regions.crud import RegionsCrud
-from presentation.api.api_v1.regions.schemas import (
+from core.dto.regions import CreateRegionsDTO, UpdateRegionsDTO
+from core.enums import RegionNames
+from core.exceptions.base import CreateError
+from core.users.exceptions import DomainValidationError
+from presentation.schemas.regions import (
     RegionCreate,
     RegionSchema,
     RegionUpdate,
 )
-from infrastructure.database.api import db_api
+from presentation.api.dependencies.deps import RegionsCrudUseCase, UserEntityDep
 
 router = APIRouter(
     prefix='/regions',
@@ -22,12 +20,18 @@ router = APIRouter(
 )
 
 
-@router.get('/code-or-name/{code_or_name}')
-async def get_region_by_code_or_name(
-    code_or_name: int | str,
-    session: Annotated[AsyncSession, Depends(db_api.session_getter)],
+@router.get('/code/{code}')
+async def get_region_by_code(
+    code: int,
 ):
-    return await RegionsCrud.get_one_by_code_or_name_or_404(session, code_or_name)
+    raise NotImplemented
+
+
+@router.get('/name/{name}')
+async def get_region_by_name(
+    name: str,
+):
+    raise NotImplemented
 
 
 @router.get(
@@ -37,9 +41,15 @@ async def get_region_by_code_or_name(
 )
 async def get_region_by_id(
     region_id: int,
-    session: Annotated[AsyncSession, Depends(db_api.session_getter)],
+    use_case: RegionsCrudUseCase,
 ):
-    return await RegionsCrud.get_one_by_id_or_404(session, region_id)
+
+    if (region := await use_case.get_region_by_id(region_id)) is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Регион с id={region_id} не найден.'
+        )
+    return  RegionSchema.model_validate(region, from_attributes=True)
 
 
 @router.get(
@@ -47,8 +57,12 @@ async def get_region_by_id(
     response_model=list[RegionSchema],
     status_code=status.HTTP_200_OK,
 )
-async def get_regions(session: Annotated[AsyncSession, Depends(db_api.session_getter)]):
-    return await RegionsCrud.get_all(session)
+async def get_regions(
+    use_case: RegionsCrudUseCase,
+):
+    return await use_case.get_all_regions()
+# async def get_regions(session: Annotated[AsyncSession, Depends(db_api.session_getter)]):
+#     return await RegionsCrud.get_all(session)
 
 
 @router.post(
@@ -58,22 +72,32 @@ async def get_regions(session: Annotated[AsyncSession, Depends(db_api.session_ge
 )
 async def create_region(
     region: RegionCreate,
-    session: Annotated[AsyncSession, Depends(db_api.session_getter)],
+    use_case: RegionsCrudUseCase,
 ) -> RegionSchema:
-    db_region = await RegionsCrud.add(session, region)
+    dto = CreateRegionsDTO(**region.model_dump())
+    try:
+        db_region = await use_case.create_region(dto)
+    except CreateError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='Регион уже существует',
+        )
     return RegionSchema.model_validate(db_region, extra='ignore', from_attributes=True)
 
 
 @router.patch(
-    '/{id}',
+    '/',
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=RegionSchema,
+    # response_model=RegionSchema,
 )
 async def update_region(
-    region_id: int,
-    region: RegionUpdate,
-    session: Annotated[AsyncSession, Depends(db_api.session_getter)],
-) -> RegionSchema:
+    update_data: RegionUpdate,
+    use_case: RegionsCrudUseCase,
+    # session: Annotated[AsyncSession, Depends(db_api.session_getter)],
+):
+    dto = UpdateRegionsDTO(**update_data.model_dump())
+    return await use_case.update_region(dto)
+
     db_region = await RegionsCrud.get_one_by_id_or_404(session, region_id)
     updated_region = await RegionsCrud.update(session, db_region, region)
     return RegionSchema.model_validate(

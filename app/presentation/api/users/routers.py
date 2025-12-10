@@ -3,13 +3,15 @@ from collections.abc import Sequence
 from fastapi import APIRouter, status, HTTPException
 
 
-from application.dtos.users import CreateUserDTO
 from application.interfaces.services import users_crud
+from core.dto.users import CreateUserDTO, UpdateUserDTO
 
 from core.users.exceptions import UserNotFoundException, UserAlreadyExistsException
-from presentation.api.dependencies.deps import UsersCrudUseCase
-from presentation.api.dependencies.dependencies import PayloadJWTDependency
-
+from presentation.api.dependencies.deps import (
+    UsersCrudUseCase,
+    PayloadJWT,
+    IsSuperuser
+)
 
 from presentation.api.exceptions import UserNotFoundHttpException
 from presentation.schemas.users import (
@@ -19,10 +21,11 @@ from presentation.schemas.users import (
     ChangeUserPasswordSchema,
 )
 
-router = APIRouter(prefix='/users', tags=['Users'])
-
-
-# jwt_payload = Annotated[dict, Depends(extract_payload_from_jwt)]
+router = APIRouter(
+    prefix='/users',
+    tags=['Users'],
+    # dependencies=[IsSuperuser],
+)
 
 
 @router.get(
@@ -32,7 +35,7 @@ router = APIRouter(prefix='/users', tags=['Users'])
 )
 def whoami(
     # user: Annotated[UserFromDbFullSchema, Depends(check_is_active_superuser)],
-    user: PayloadJWTDependency,
+    user: PayloadJWT,
 ):
     return user
 
@@ -59,7 +62,8 @@ async def get_user_by_username(
     '/{user_id}/',
     description='Get user by id',
     response_model=ResponseUserSchema,
-    # dependencies=[Depends(check_user_is_active)],
+    dependencies=[IsSuperuser],
+
 )
 async def get_user(
     user_id: int,
@@ -74,16 +78,12 @@ async def get_user(
 
 @router.get(
     '/',
-    # response_model=Sequence[ResponseUserSchema],
-    # dependencies=[Depends(check_is_active_superuser)],
+    response_model=Sequence[ResponseUserSchema],
+    dependencies=[IsSuperuser],
 )
 async def get_users(
-    jwt_payload: PayloadJWTDependency,
-    user_use_case: UsersCrudUseCase,
     use_case: UsersCrudUseCase,
 ):
-    return await user_use_case.get_user_by_id(jwt_payload.user_id)
-    return jwt_payload
     return [
         ResponseUserSchema.model_validate(user_entity, from_attributes=True)
         for user_entity in await use_case.get_all_users()
@@ -94,10 +94,10 @@ async def get_users(
     '/',
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseUserSchema,
-    # dependencies=[Depends(check_is_active_superuser)],
+    dependencies=[IsSuperuser],
 )
 async def create_user(
-    jwt_payload: PayloadJWTDependency,
+    jwt_payload: PayloadJWT,
     user: CreateUserSchema,
     use_case: UsersCrudUseCase,
 ):
@@ -118,12 +118,19 @@ async def create_user(
     '/',
     status_code=status.HTTP_200_OK,
     # response_model=UserSchema,
-    # dependencies=[Depends(check_is_active_superuser)],
+    # dependencies=[IsSuperuser],
+
 )
 async def update_user(
+    payload_jwt: PayloadJWT,
     to_update: UpdateUserSchema,
     use_case: UsersCrudUseCase,
-): ...
+):
+    upd_user_dto = UpdateUserDTO(
+        **to_update.model_dump()
+        | {'requester_username': payload_jwt.sub, 'is_active': True}
+    )
+    return await use_case.update_user(upd_user_dto)
 
 
 @router.patch(

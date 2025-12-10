@@ -1,9 +1,9 @@
 from collections.abc import Sequence
 
-from application.dtos.users import CreateUserDTO
 from application.interfaces.services.users_crud import (
     UsersServiceProtocol,
 )
+from core.dto.users import CreateUserDTO, UpdateUserDTO
 from core.users.entities.user import UserEntity
 
 
@@ -22,3 +22,6 @@ class UsersCrudUseCaseImpl:
 
     async def create_user(self, user: CreateUserDTO) -> UserEntity:
         return await self.user_service.create_user(user)
+
+    async def update_user(self, user: UpdateUserDTO) -> UserEntity:
+        return await self.user_service.update_user(user)

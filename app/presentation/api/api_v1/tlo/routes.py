@@ -8,7 +8,6 @@ from fastapi import (
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from presentation.api.api_v1.regions.crud import RegionsCrud
 from presentation.api.api_v1.tlo.crud import TloCrud
 from presentation.api.api_v1.tlo.schemas import (
     TrafficLightCreate,

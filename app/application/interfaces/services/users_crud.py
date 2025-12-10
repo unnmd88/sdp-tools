@@ -1,6 +1,6 @@
 from typing import Protocol, Sequence
 
-from application.dtos.users import CreateUserDTO, UpdateUserDTO
+from core.dto.users import CreateUserDTO, UpdateUserDTO
 from core.users.entities.user import UserEntity
 
 

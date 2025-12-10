@@ -3,7 +3,7 @@ from typing import final
 
 from core.enums import PassportGroups
 from core.users.entities.user import UserEntity
-from core.users.exceptions import DomainValidationException
+from core.users.exceptions import DomainValidationError
 
 
 @final
@@ -16,7 +16,7 @@ class Passport:
 
     def __post_init__(self):
         if not isinstance(self.created_by, UserEntity):
-            raise DomainValidationException(
+            raise DomainValidationError(
                 f'Поле created_by должно экземпляр {UserEntity.__name__!r}'
             )
 

@@ -19,6 +19,7 @@ class UsersRepositorySqlAlchemy(BaseSqlAlchemy):
             return self.mapper.to_entity(user)
         return None
 
+
     # async def get_user_by_username_or_none(
     #     self, username: str
     # ) -> UserFromDbFullSchema | None:

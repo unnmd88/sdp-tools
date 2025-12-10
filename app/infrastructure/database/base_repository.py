@@ -2,11 +2,13 @@ from collections.abc import Sequence
 from typing import TypeVar, TypeAlias
 
 from sqlalchemy import select
+from sqlalchemy.engine.result import Result
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from application.interfaces.mappers.db import BaseDBMapperProtocol
 from application.interfaces.repositories.base import BaseCrudProtocol
+from core.regions.entities.region import RegionEntity
 from core.tlo.entities.tlo import TrafficLightObjectEntity
 from core.users.entities.user import UserEntity
 from core.users.exceptions import UserAlreadyExistsException
@@ -16,11 +18,11 @@ from fastapi.params import Depends
 
 
 T = TypeVar('T', bound=type[Base])
-Entity: TypeAlias = UserEntity | TrafficLightObjectEntity
+Entity: TypeAlias = UserEntity | TrafficLightObjectEntity | RegionEntity
 Record = TypeVar('Record', bound=Base)
 
 
-class BaseSqlAlchemy(BaseCrudProtocol):
+class BaseSqlAlchemy:
     model = T
     mapper: BaseDBMapperProtocol
 
@@ -31,6 +33,14 @@ class BaseSqlAlchemy(BaseCrudProtocol):
         if (model := await self.session.get(self.model, _id)) is not None:
             return self.mapper.to_entity(model)
         return None
+
+    async def get_one_or_none_by_filters(self, **filters) -> Entity | None:
+        stmt = select(self.model).filter_by(**filters)
+        result = await self.session.execute(stmt)
+        if (model := result.scalars().one_or_none()) is not None:
+            return self.mapper.to_entity(model)
+        return None
+
 
     async def get_all(self, **filters) -> Sequence[Entity]:
         # if filters:
@@ -63,4 +73,21 @@ class BaseSqlAlchemy(BaseCrudProtocol):
             raise e
         return new_instance
 
-    async def update(self, model): ...
+    async def update(
+        self,
+        _id: int,
+        **fields,
+    ):
+        stmt = select(self.model).filter_by(id=_id)
+        result: Result = await self.session.execute(stmt)
+        model = result.scalars().one()
+        try:
+            for k, v in fields.items():
+                if v is not None:
+                    setattr(model, k, v)
+            await self.session.commit()
+        except SQLAlchemyError as e:
+            await self.session.rollback()
+            raise e
+        return model
+

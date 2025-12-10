@@ -34,10 +34,23 @@ class CreateUserSchema(BaseUserSchema):
     password: Annotated[str, MinLen(4), MaxLen(16)]
 
 
-class UpdateUserSchema(BaseUserSchema):
+class UpdateUserSchema(BaseModel):
     model_config = ConfigDict(use_enum_values=True, strict=True, extra='forbid')
 
     subject_username: str
+    first_name: Annotated[str | None, MaxLen(32), Field(default=None), Field(examples=['dsd', 'das'])]
+    last_name: Annotated[str | None, MaxLen(32), Field(default=None)]
+    username: Annotated[str | None, MinLen(3), MaxLen(32), Field(default=None)]
+    email: EmailStr | None | str = None
+    is_admin: bool | None = None
+    is_superuser: bool | None = None
+    role: Annotated[Roles | None, BeforeValidator(lambda val: Roles(val) if val else None), Field(default=None)]
+    organization: Annotated[
+        Organizations | None, BeforeValidator(lambda val: Organizations(val) if val else None), Field(default=None)
+    ]
+    phone_number: Annotated[str | None, MaxLen(10), Field(default=None)]
+    telegram: Annotated[str | None, MaxLen(32), Field(default=None),]
+    description: Annotated[str | None, Field(default=None)]
 
 
 class ChangeUserPasswordSchema(BaseModel):

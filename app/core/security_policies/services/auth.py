@@ -1,6 +1,6 @@
 from application.interfaces.services.authentication import AuthenticationSchemaProtocol
 from application.interfaces.services.users_crud import UsersServiceProtocol
-from auth.exceptions import InvalidUsernameOrPasswordException, InactiveUserException
+from core.security_policies.exceptions import InvalidUsernameOrPasswordError, InactiveUserError
 from core.users.entities.user import UserEntity
 from core.utils import validate_password
 
@@ -18,13 +18,13 @@ class UserAuthenticationServiceImpl:
                 auth_data.username
             )
         ) is None:
-            raise InvalidUsernameOrPasswordException
+            raise InvalidUsernameOrPasswordError
         password_is_valid = validate_password(
             password=auth_data.password,
             hashed_password=user_entity.password,
         )
         if not password_is_valid:
-            raise InvalidUsernameOrPasswordException
+            raise InvalidUsernameOrPasswordError
         if not user_entity.is_active:
-            raise InactiveUserException(user_entity.username)
+            raise InactiveUserError(user_entity.username)
         return user_entity

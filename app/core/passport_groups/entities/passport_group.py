@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from core.enums import RegionCodes, RegionNames, PassportGroups, PassportGroupsRoutes
 from core.field_validators import check_is_valid_enum, check_description_is_valid
 from core.users.exceptions import (
-    DomainValidationException,
+    DomainValidationError,
     INVALID_DESCRIPTION_EXCEPTION_TEXT,
 )
 
@@ -19,4 +19,4 @@ class PassportGroup:
         check_is_valid_enum(RegionCodes, self.group_name)
         check_is_valid_enum(RegionCodes, self.group_name_route)
         if not check_description_is_valid(self.description):
-            raise DomainValidationException(INVALID_DESCRIPTION_EXCEPTION_TEXT)
+            raise DomainValidationError(INVALID_DESCRIPTION_EXCEPTION_TEXT)

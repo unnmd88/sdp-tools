@@ -1,9 +1,10 @@
-from dataclasses import InitVar, dataclass
+from dataclasses import InitVar, dataclass, field
+from typing import NoReturn
 
 from core.enums import (
     EntityIdRange,
     Organizations,
-    Roles,
+    Roles, Permission,
 )
 from core.field_validators import (
     check_description_is_valid,
@@ -19,10 +20,11 @@ from core.field_validators import (
     check_set_password,
 )
 from core.users.exceptions import (
-    DomainValidationException,
+    DomainValidationError,
     INVALID_DESCRIPTION_EXCEPTION_TEXT,
-    ForbiddenCreate,
+    ForbiddenCreate, UserPermissionsError,
 )
+from core.users.value_objects.permissions import UserPermissions
 from core.utils import hash_password
 
 
@@ -48,60 +50,87 @@ class UserEntity:
     telegram: str = ''
     description: str = ''
     full_validate: InitVar[bool] = True
+    permissions: UserPermissions = field(default_factory=UserPermissions)
 
     def __post_init__(self, full_validate):
         if not full_validate:
             return
         if self.id is not None and not check_field_id_is_valid(self.id):
-            raise DomainValidationException(
+            raise DomainValidationError(
                 f'Недопустимый id пользователя: {self.id!r}. '
                 f'Должен быть в диапазоне {EntityIdRange.MIN_ID}...{EntityIdRange.MAX_ID}'
             )
         if not check_email_is_valid(self.email):
-            raise DomainValidationException(
+            raise DomainValidationError(
                 f'Недопустимый email пользователя: {self.email!r}.'
             )
         if not check_firstname_is_valid(self.first_name):
-            raise DomainValidationException(
+            raise DomainValidationError(
                 f'Недопустимый first_name пользователя: {self.first_name!r}.'
             )
         if not check_lastname_is_valid(self.last_name):
-            raise DomainValidationException(
+            raise DomainValidationError(
                 f'Недопустимый last_name пользователя: {self.last_name!r}.'
             )
         if not check_username_is_valid(self.username):
-            raise DomainValidationException(
+            raise DomainValidationError(
                 f'Недопустимый username пользователя: {self.username!r}.'
             )
         check_is_valid_enum(Organizations, self.organization)
         if not check_password_is_valid(self.password):
-            raise DomainValidationException(f'Недопустимый password пользователя.')
+            raise DomainValidationError(f'Недопустимый password пользователя.')
         if not isinstance(self.is_active, bool):
-            raise DomainValidationException(
+            raise DomainValidationError(
                 f'Значение "is_active" должно быть типа bool.'
             )
         if not isinstance(self.is_admin, bool):
-            raise DomainValidationException(
+            raise DomainValidationError(
                 f'Значение "is_admin" должно быть типа bool.'
             )
         if not isinstance(self.is_superuser, bool):
-            raise DomainValidationException(
+            raise DomainValidationError(
                 f'Значение "is_superuser" должно быть типа bool.'
             )
         check_is_valid_enum(Roles, self.role)
         if not check_phone_number_is_valid(self.phone_number):
-            raise DomainValidationException(
+            raise DomainValidationError(
                 f'Недопустимый phone_number пользователя: {self.phone_number!r}.'
             )
         if not check_telegram_is_valid(self.telegram):
-            raise DomainValidationException(
+            raise DomainValidationError(
                 f'Недопустимый telegram пользователя: {self.telegram!r}. Должен начинаться с @'
             )
         if not check_description_is_valid(self.description):
-            raise DomainValidationException(INVALID_DESCRIPTION_EXCEPTION_TEXT)
+            raise DomainValidationError(INVALID_DESCRIPTION_EXCEPTION_TEXT)
+        self._set_permissions()
+
+    def _set_permissions(self):
+        if not self.is_active:
+            self.permissions.revoke_all()
+            return
+
+        if self.is_superuser:
+            self.permissions.add_all_user_permissions()
+        elif self.is_admin:
+            self.permissions.add_all_user_permissions(
+                exclude={Permission.CREATE_USERS, Permission.UPDATE_USERS}
+            )
 
     def allow_to_crete_new_user(self) -> bool:
         return self.is_active and self.is_superuser
+
+    def check_permissions(self, *permissions: Permission):
+        if not permissions:
+            raise TypeError('permissions cant be empty')
+        all_permissions = self.permissions.get_all()
+        print(f'user permissions: {self.permissions}')
+        if not all(Permission(p) in all_permissions for p in permissions):
+            raise UserPermissionsError(f'Отсутствуют права: {",".join(p for p in permissions if p not in all_permissions)}')
+
+    def check_permission_read_region(self):
+        self.check_permissions(Permission.READ_REGIONS)
+
+
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -124,7 +153,7 @@ class CreateNewUserEntity:
         # Validate only password in this point.
         # Extra validation in UserEntity instance.
         if not check_set_password(self.password):
-            raise DomainValidationException(f'Недопустимый формат пароля.')
+            raise DomainValidationError(f'Недопустимый формат пароля.')
         return UserEntity(
             id=None,
             first_name=self.first_name,
@@ -161,7 +190,7 @@ if __name__ == '__main__':
             telegram='',
             description='',
         )
-    except DomainValidationException as e:
+    except DomainValidationError as e:
         print(f'e: {e}')
 
     user2 = CreateNewUserEntity(

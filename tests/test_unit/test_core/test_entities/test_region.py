@@ -2,7 +2,7 @@ import random
 import string
 
 from core.enums import RegionNames, RegionCodes
-from core.regions.entities.region import Region
+from core.regions.entities.region import RegionEntity
 import pytest
 
 
@@ -11,7 +11,7 @@ class TestRegionEntity:
     def test_create_region_entity_success(self, pk_id):
         """ Тест на успешное создание сущности RegionEntity. """
 
-        region = Region(
+        region = RegionEntity(
             id=pk_id,
             name=RegionNames.MOSCOW,
             code=RegionCodes.MOSCOW77
@@ -31,7 +31,7 @@ class TestRegionEntity:
     def test_create_user_entity_exception(self, region_name, region_code, expectation, pk_id):
         """ Тест на вызов ошибки при создании сущности UserEntity с невалидными значениями email. """
         with expectation:
-            Region(
+            RegionEntity(
                 id=pk_id,
                 name=random.choices(string.ascii_letters),
                 code=random.choices(string.ascii_letters),

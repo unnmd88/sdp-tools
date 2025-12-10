@@ -6,7 +6,7 @@ from core.enums import EntityIdRange
 from core.enums import Organizations
 from core.enums import Roles
 from core.users.entities.user import UserEntity
-from core.users.exceptions import DomainValidationException
+from core.users.exceptions import DomainValidationError
 from tests.utils.create_user_entity import create_user_entity
 
 from contextlib import nullcontext
@@ -54,10 +54,10 @@ class TestUserEntity:
         [
             ('3', pytest.raises(TypeError)),
             (random.uniform(1.0, 32_000.0), pytest.raises(TypeError)),
-            (0, pytest.raises(DomainValidationException)),
-            (-random.randint(EntityIdRange.MIN_ID, EntityIdRange.MAX_ID), pytest.raises(DomainValidationException)),
-            (32001, pytest.raises(DomainValidationException)),
-            (123456789, pytest.raises(DomainValidationException)),
+            (0, pytest.raises(DomainValidationError)),
+            (-random.randint(EntityIdRange.MIN_ID, EntityIdRange.MAX_ID), pytest.raises(DomainValidationError)),
+            (32001, pytest.raises(DomainValidationError)),
+            (123456789, pytest.raises(DomainValidationError)),
         ],
     )
     def test_create_user_entity_exception_bad_id(self, bad_id, expectation):
@@ -70,9 +70,9 @@ class TestUserEntity:
         [
             (list(('abra', 'cadabra', 1)), pytest.raises(TypeError)),
             (random.randint(1, 100000000), pytest.raises(TypeError)),
-            ('@example.com', pytest.raises(DomainValidationException)),
-            ('@', pytest.raises(DomainValidationException)),
-            ('12e1e12', pytest.raises(DomainValidationException)),
+            ('@example.com', pytest.raises(DomainValidationError)),
+            ('@', pytest.raises(DomainValidationError)),
+            ('12e1e12', pytest.raises(DomainValidationError)),
         ],
     )
     def test_create_user_entity_exception_bad_email(self, bad_email, expectation):

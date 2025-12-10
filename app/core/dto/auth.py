@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(kw_only=True)
 class UserAuthDTO:
     username: str
     password: str

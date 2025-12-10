@@ -1,15 +1,28 @@
 from dataclasses import dataclass
+from typing import ClassVar
 
+from core.constants import ALLOWED_REGIONS
 from core.enums import RegionCodes, RegionNames
-from core.field_validators import check_is_valid_enum
+from core.users.exceptions import DomainValidationError
+
+T_ALLOWED_REGIONS = frozenset[tuple[RegionNames, RegionCodes]]
 
 
-@dataclass
-class Region:
-    id: int
+@dataclass(frozen=True)
+class RegionEntity:
+
+    allowed_regions: ClassVar[T_ALLOWED_REGIONS] = ALLOWED_REGIONS
+
     code: RegionCodes
     name: RegionNames
+    id: int | None = None
+
+    def __eq__(self, other):
+         if not isinstance(other, RegionEntity):
+             return NotImplemented
+         return self.code == other.code and self.name == other.name
 
     def __post_init__(self):
-        check_is_valid_enum(RegionCodes, self.code)
-        check_is_valid_enum(RegionNames, self.name)
+        if (self.name, self.code) not in self.allowed_regions:
+            raise DomainValidationError('Недопустимая пара кода и названия для региона')
+

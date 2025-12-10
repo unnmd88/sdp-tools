@@ -28,8 +28,24 @@ class CreateUserDTO(UserDTO):
 
 
 @dataclass
-class UpdateUserDTO(UserDTO):
-    """DTO для создания обновления существующего пользователя системы."""
+class UpdateUserDTO:
+    """DTO для обновления существующего пользователя системы."""
+
+    requester_username: str
+    subject_username: str
+
+    first_name: str | None = None
+    last_name: str | None = None
+    username: str | None = None
+    email: str | None = None
+    organization: Organizations | None = None
+    is_active: bool | None = None
+    is_admin: bool | None = None
+    is_superuser: bool | None = None
+    role: Roles | None = None
+    phone_number: str | None = None
+    telegram: str | None = None
+    description: str | None = None
 
 
 @dataclass

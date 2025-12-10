@@ -1,17 +1,20 @@
 from collections.abc import Sequence
+from dataclasses import asdict
 
-from application.dtos.users import CreateUserDTO, UpdateUserDTO
 from application.interfaces.cache.users import UsersCacheProtocol
 from application.interfaces.repositories.users import UsersRepositoryProtocol
-from core.enums import Organizations, Roles
+from core.dto.users import CreateUserDTO, UpdateUserDTO
+from core.enums import Organizations, Roles, Permission
+from core.exceptions.base import CreateError, UpdateError
 from core.field_validators import check_set_password
+from core.security_policies.services.user_permissions import check_permission_to_update_entity
 from core.users.entities.user import UserEntity
 from core.users.exceptions import (
     UserNotFoundByIdException,
     UserNotFoundByUsernameException,
     InvalidPasswordToSet,
     UserAlreadyExistsException,
-    ForbiddenCreate,
+    ForbiddenCreate, ForbiddenUpdate,
 )
 from core.utils import hash_password
 
@@ -46,9 +49,9 @@ class UsersServiceImpl:
         requestor_entity: UserEntity = (
             await self.repository.get_user_by_username_or_none(data.requester_username)
         )
-        print(f'requestor_entity={requestor_entity}')
-        if requestor_entity is None or not requestor_entity.allow_to_crete_new_user():
+        if requestor_entity is None:
             raise ForbiddenCreate
+        requestor_entity.check_permissions(Permission.CREATE_USERS)
         if not check_set_password(data.password):
             raise InvalidPasswordToSet
         if requestor_entity.username == data.username:
@@ -76,4 +79,29 @@ class UsersServiceImpl:
         )
         return await self.repository.add(entity)
 
-    async def update_user(self, user: UpdateUserDTO) -> UserEntity: ...
+    async def update_user(self, data: UpdateUserDTO) -> UserEntity:
+        requestor_entity: UserEntity = (
+            await self.repository.get_user_by_username_or_none(data.requester_username)
+        )
+        if requestor_entity.username != data.subject_username:
+            to_update_entity = await self.repository.get_user_by_username_or_none(data.subject_username)
+            if to_update_entity is None:
+                raise CreateError('Пользователь не найден в базе')
+        else:
+            to_update_entity = requestor_entity
+        check_permission_to_update_entity(
+            requestor_entity=requestor_entity,
+            to_update_entity=to_update_entity,
+            data=data
+        )
+        if data.password:
+            raise ForbiddenUpdate('Изменение пароля запрещено.')
+        to_update_entity_as_dict = asdict(to_update_entity)
+        data_as_dict = asdict(data)
+        for k, v in data_as_dict.items():
+            if k not in to_update_entity_as_dict:
+                raise UpdateError(f'Некорректное поле для изменения: {k!r}')
+            if k is not None:
+                to_update_entity_as_dict[k] = v
+        UserEntity(**to_update_entity_as_dict) # Проверка, что данные для обновления валидны
+        return await self.repository.update(**data_as_dict)

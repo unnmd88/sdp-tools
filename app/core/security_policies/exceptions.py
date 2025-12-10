@@ -5,28 +5,16 @@ from fastapi import HTTPException
 from starlette import status
 
 from core.enums import TokenTypes
+from core.exceptions.base import ApplicationError
 
 
-class BaseAuthException(Exception):
-    pass
+class InvalidUsernameOrPasswordError(ApplicationError):
+    ...
 
 
-@final
-@dataclass
-class InvalidUsernameOrPasswordException(BaseAuthException):
-    @property
-    def detail(self) -> str:
-        return 'invalid username or password'
+class InactiveUserError(ApplicationError):
+    ...
 
-
-@final
-@dataclass
-class InactiveUserException(BaseAuthException):
-    user: str | int = ''
-
-    @property
-    def detail(self) -> str:
-        return f'User {self.user!r} is inactive'.replace('  ', ' ')
 
 
 def get_invalid_type_jwt_exception(

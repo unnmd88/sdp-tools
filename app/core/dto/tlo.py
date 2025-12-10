@@ -15,3 +15,4 @@ class TrafficLightObjectDTO:
     description: str
     created_at: datetime
     updated_at: datetime
+

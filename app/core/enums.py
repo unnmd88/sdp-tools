@@ -80,3 +80,22 @@ class PassportGroupsRoutes(StrEnum):
     PTO = 'pto'
     _TEST1 = 'test1'
     _TEST2 = 'test2'
+
+
+class Permission(StrEnum):
+    READ_USERS = 'READ_USERS'
+    CREATE_USERS = 'CREATE_USERS'
+    UPDATE_USERS = 'UPDATE_USERS'
+
+    READ_TLO = 'READ_TLO'
+    CREATE_TLO = 'CREATE_TLO'
+    UPDATE_TLO = 'UPDATE_TLO'
+
+    READ_REGIONS = 'READ_REGIONS'
+    CREATE_REGIONS = 'CREATE_REGIONS'
+    UPDATE_REGIONS = 'UPDATE_REGIONS'
+
+
+if __name__ == '__main__':
+    for m in Permission:
+        print(m)
