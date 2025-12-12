@@ -3,7 +3,6 @@ from collections.abc import MutableSet, Iterable
 from core.enums import Permission
 
 
-
 class UserPermissions:
     def __init__(self, *permissions: Permission):
         self._permissions: MutableSet = set(permissions)
