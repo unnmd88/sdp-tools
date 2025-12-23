@@ -45,7 +45,6 @@ class RegionsServiceImpl(BaseService):
         return await self.repository.add(region_entity)
 
     async def update_region(self, region: UpdateRegionsDTO) -> RegionEntity:
-        print('SERCIVE: 111111')
         self.user_entity.check_permissions(Permission.UPDATE_REGIONS)
         current_region = await self.repository.get_region_by_name_or_none(region.region_name_to_update)
         if current_region is None:
@@ -60,7 +59,6 @@ class RegionsServiceImpl(BaseService):
         update_data_as_dict = {
             k: v for k, v in asdict(region).items() if v is not None
         }
-        print('SERCIVE: {}')
         return await self.repository.update(
             _id=current_region.id,
             **update_data_as_dict,

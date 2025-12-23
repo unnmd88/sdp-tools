@@ -13,6 +13,7 @@ from presentation.api.api_v1.passport_groups.schemas import (
     PassportGroupsUpdate,
 )
 from presentation.api.dependencies.dependencies import db_session
+from presentation.api.dependencies.deps import PassportGroupsUseCase
 
 router = APIRouter(
     prefix='/passport-groups',
@@ -43,11 +44,10 @@ async def get_group(
     '/', status_code=status.HTTP_200_OK, response_model=Sequence[PassportGroupsSchema]
 )
 async def get_all_groups(
-    session: db_session,
+    use_case: PassportGroupsUseCase,
 ) -> Sequence[PassportGroupsSchema]:
-    return await PassportGroupsCrud.get_all(
-        session,
-    )
+    r = await use_case.get_all_passport_groups()
+    return await use_case.get_all_passport_groups()
 
 
 @router.post(

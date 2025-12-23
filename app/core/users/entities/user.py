@@ -130,6 +130,8 @@ class UserEntity:
     def check_permission_read_region(self):
         self.check_permissions(Permission.READ_REGIONS)
 
+    def check_permission_read_passport_groups(self):
+        self.check_permissions(Permission.READ_PASSPORT_GROUPS)
 
 
 

@@ -1,0 +1,31 @@
+from typing import Annotated
+
+from pydantic import BaseModel, Field, ConfigDict
+
+from core.enums import PassportGroups, PassportGroupsRoutes
+
+
+class PassportGroupsBase(BaseModel):
+    group_name: PassportGroups
+    group_name_route: PassportGroupsRoutes
+    description: Annotated[str, Field(default='')]
+
+
+class PassportGroupsSchema(PassportGroupsBase):
+    id: Annotated[int, Field(ge=1)]
+
+
+class PassportGroupsCreate(PassportGroupsBase):
+    pass
+
+
+class PassportGroupsUpdate(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+
+    group_name_to_update: PassportGroups
+
+    group_name: PassportGroups | None = None
+    group_name_route: PassportGroupsRoutes | None = None
+    description: Annotated[str | None, Field(default=None)]
