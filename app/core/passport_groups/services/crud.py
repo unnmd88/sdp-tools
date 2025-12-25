@@ -29,12 +29,10 @@ class PassportGroupsServiceImpl(BaseService):
         self.user_entity.check_permissions(Permission.CREATE_PASSPORT_GROUPS)
         region_entity = PassportGroupEntity(
             group_name=passport_group_dto.group_name,
-            group_name_route=passport_group_dto.group_name_route,
             description=passport_group_dto.description,
         )
         passport_group_exists = await self.repository.get_one_or_none_by_filters(
             group_name=passport_group_dto.group_name,
-            group_name_route=passport_group_dto.group_name_route,
         )
         if passport_group_exists is not None:
             raise CreateError('Паспортная группа уже существует.')
@@ -48,7 +46,6 @@ class PassportGroupsServiceImpl(BaseService):
         updated_passport_group = PassportGroupEntity(
             id=current_passport_group.id,
             group_name=passport_group_dto.group_name,
-            group_name_route=passport_group_dto.group_name_route,
             description=passport_group_dto.description,
         )
         if current_passport_group == updated_passport_group:

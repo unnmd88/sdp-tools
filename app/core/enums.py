@@ -73,15 +73,6 @@ class PassportGroups(StrEnum):
     _TEST2 = 'test2'
 
 
-class PassportGroupsRoutes(StrEnum):
-    OVIM = 'ovim'
-    STROYKONTROL = 'stroykontrol'
-    CODD = 'codd'
-    PTO = 'pto'
-    _TEST1 = 'test1'
-    _TEST2 = 'test2'
-
-
 class Permission(StrEnum):
     READ_USERS = 'READ_USERS'
     CREATE_USERS = 'CREATE_USERS'

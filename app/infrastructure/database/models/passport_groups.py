@@ -16,10 +16,6 @@ class PassportGroup(
     group_name: Mapped[str] = mapped_column(
         unique=True,
     )
-    # group_name_route: Mapped[str] = mapped_column(
-    #     String(length=32),
-    #     unique=True,
-    # )
     description: Mapped[str] = mapped_column(
         Text,
         default='',

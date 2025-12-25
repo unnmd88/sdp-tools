@@ -2,12 +2,11 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field, ConfigDict
 
-from core.enums import PassportGroups, PassportGroupsRoutes
+from core.enums import PassportGroups
 
 
 class PassportGroupsBase(BaseModel):
     group_name: PassportGroups
-    group_name_route: PassportGroupsRoutes
     description: Annotated[str, Field(default='')]
 
 
@@ -27,5 +26,4 @@ class PassportGroupsUpdate(BaseModel):
     group_name_to_update: PassportGroups
 
     group_name: PassportGroups | None = None
-    group_name_route: PassportGroupsRoutes | None = None
     description: Annotated[str | None, Field(default=None)]

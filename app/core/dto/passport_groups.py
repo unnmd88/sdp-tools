@@ -1,15 +1,11 @@
 from dataclasses import dataclass
 
-from core.enums import (
-    PassportGroups,
-    PassportGroupsRoutes
-)
+from core.enums import PassportGroups
 
 
 @dataclass(kw_only=True)
 class PassportGroupDTO:
     group_name: PassportGroups
-    group_name_route: PassportGroupsRoutes
     description: str
 
 
@@ -19,7 +15,6 @@ class UpdatePassportGroupDTO:
     group_name_to_update: PassportGroups
 
     group_name: PassportGroups | None = None
-    group_name_route: PassportGroupsRoutes | None = None
     description: str | None = None
 
 
@@ -27,5 +22,4 @@ class UpdatePassportGroupDTO:
 class CreatePassportGroupDTO:
 
     group_name: PassportGroups
-    group_name_route: PassportGroupsRoutes
     description: str | None = ''
