@@ -4,8 +4,13 @@ from typing import TYPE_CHECKING
 
 import bcrypt
 
+from dataclasses import asdict
 from core.enums import Permission
 from core.exceptions.base import PermissionsError
+
+
+if TYPE_CHECKING:
+    from _typeshed import DataclassInstance
 
 
 def checking_simple_types(*, type_to_check: type, field_name: str = ''):
@@ -37,14 +42,19 @@ def checking_simple_types(*, type_to_check: type, field_name: str = ''):
 
 def check_permissions_async(*permissions_to_check: Permission):
     permissions_to_check: frozenset[Permission] = frozenset(permissions_to_check)
+
     def decorator(func: Callable):
         @wraps(func)
         async def wrapper(*args, **kwargs):
             self = args[0]
-            if not permissions_to_check.issubset(self.user_entity.permissions.get_all()):
+            if not permissions_to_check.issubset(
+                self.user_entity.permissions.get_all()
+            ):
                 raise PermissionsError
             return await func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
@@ -67,6 +77,15 @@ def validate_password(
     )
 
 
+def create_fields_for_update(dataclass_instance) -> dict:
+    return {k: v for k, v in asdict(dataclass_instance).items() if v is not None}
+
+
+
+
+#    return {
+#    asdict(dataclass_instance)
+# }
 # def gen_password(
 #     min_length: int = 3,
 #     max_length: int = 20,
@@ -75,3 +94,4 @@ def validate_password(
 #     return ''.join(
 #         secrets.choice(chars) for _ in range(random.randint(min_length, max_length))
 #     )
+

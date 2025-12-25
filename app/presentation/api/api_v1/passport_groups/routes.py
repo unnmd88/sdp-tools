@@ -1,15 +1,22 @@
 from collections.abc import Sequence
 
-from fastapi import (
-    APIRouter,
-)
+from fastapi import APIRouter
+
 from fastapi.exceptions import HTTPException
 from starlette import status
 
-# from presentation.api.api_v1.passport_groups.crud import PassportGroupsCrud
-from presentation.api.dependencies.dependencies import db_session
+from core.dto.passport_groups import (
+    CreatePassportGroupDTO,
+    UpdatePassportGroupDTO,
+)
+from core.passport_groups.entities.passport_group import PassportGroupEntity
 from presentation.api.dependencies.deps import PassportGroupsCrudUseCase
-from presentation.schemas.passport_groups import PassportGroupsSchema, PassportGroupsCreate, PassportGroupsUpdate
+from presentation.schemas.passport_groups import (
+    PassportGroupsSchema,
+    PassportGroupsCreate,
+    PassportGroupsUpdate
+)
+
 
 router = APIRouter(
     prefix='/passport-groups',
@@ -73,28 +80,23 @@ async def get_all_groups(
     response_model=PassportGroupsSchema,
 )
 async def create_group(
-    session: db_session,
-    group: PassportGroupsCreate,
+    use_case: PassportGroupsCrudUseCase,
+    group_data: PassportGroupsCreate,
 ) -> PassportGroupsSchema:
-    return await PassportGroupsCrud.add(session=session, model=group)
+    dto = CreatePassportGroupDTO(**group_data.model_dump())
+    new_passport_group: PassportGroupEntity= await use_case.create_passport_group(dto)
+    return PassportGroupsSchema.model_validate(new_passport_group, from_attributes=True)
 
 
 @router.patch(
-    '/{id}',
+    '/',
     status_code=status.HTTP_200_OK,
     response_model=PassportGroupsSchema,
 )
 async def update_group(
-    group_id: int,
-    group_data: PassportGroupsUpdate,
-    session: db_session,
+    use_case: PassportGroupsCrudUseCase,
+    group_data_to_update: PassportGroupsUpdate,
 ) -> PassportGroupsSchema:
-    db_model_owner = await PassportGroupsCrud.get_one_by_id_or_404(
-        session=session,
-        pk_id=group_id,
-    )
-    return await PassportGroupsCrud.update(
-        session=session,
-        db_model=db_model_owner,
-        to_update_model=group_data,
-    )
+    dto = UpdatePassportGroupDTO(**group_data_to_update.model_dump())
+    updated_passport_group: PassportGroupEntity = await use_case.update_passport_group(dto)
+    return PassportGroupsSchema.model_validate(updated_passport_group, from_attributes=True)

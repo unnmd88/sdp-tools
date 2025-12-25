@@ -6,6 +6,9 @@ from core.enums import PassportGroups
 
 
 class PassportGroupsBase(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
     group_name: PassportGroups
     description: Annotated[str, Field(default='')]
 
@@ -15,7 +18,9 @@ class PassportGroupsSchema(PassportGroupsBase):
 
 
 class PassportGroupsCreate(PassportGroupsBase):
-    pass
+    model_config = ConfigDict(
+        extra='forbid',
+    )
 
 
 class PassportGroupsUpdate(BaseModel):

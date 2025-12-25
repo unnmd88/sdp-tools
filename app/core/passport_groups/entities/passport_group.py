@@ -10,7 +10,8 @@ from core.users.exceptions import (
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class PassportGroupEntity:
-    id: int
+
+    id: int | None = None
     group_name: PassportGroups
     description: str = ''
 
