@@ -1,19 +1,15 @@
 from collections.abc import Sequence
 
-# from core.dependencies import db_session
 from fastapi import (
     APIRouter,
 )
+from fastapi.exceptions import HTTPException
 from starlette import status
 
-from presentation.api.api_v1.passport_groups.crud import PassportGroupsCrud
-from presentation.api.api_v1.passport_groups.schemas import (
-    PassportGroupsCreate,
-    PassportGroupsSchema,
-    PassportGroupsUpdate,
-)
+# from presentation.api.api_v1.passport_groups.crud import PassportGroupsCrud
 from presentation.api.dependencies.dependencies import db_session
-from presentation.api.dependencies.deps import PassportGroupsUseCase
+from presentation.api.dependencies.deps import PassportGroupsCrudUseCase
+from presentation.schemas.passport_groups import PassportGroupsSchema, PassportGroupsCreate, PassportGroupsUpdate
 
 router = APIRouter(
     prefix='/passport-groups',
@@ -23,31 +19,52 @@ router = APIRouter(
 
 
 @router.get(
+    '/name/{name}',
+    status_code=status.HTTP_200_OK,
+    response_model=PassportGroupsSchema,
+)
+async def get_group_by_name(
+    group_name: str,
+    use_case: PassportGroupsCrudUseCase,
+) -> PassportGroupsSchema:
+    if (region := await use_case.get_passport_group_by_name(group_name)) is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Регион с именем={group_name} не найден.'
+        )
+    return PassportGroupsSchema.model_validate(region, from_attributes=True)
+
+
+
+@router.get(
     '/{id}',
     status_code=status.HTTP_200_OK,
     response_model=PassportGroupsSchema,
 )
 async def get_group(
     group_id: int,
-    session: db_session,
+    use_case: PassportGroupsCrudUseCase,
 ) -> PassportGroupsSchema:
-    owner = await PassportGroupsCrud.get_one_by_id_or_404(
-        session=session, pk_id=group_id
-    )
-    return PassportGroupsSchema.model_validate(
-        obj=owner,
-        from_attributes=True,
-    )
+    if (region := await use_case.get_passport_group_by_id(group_id)) is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Регион с id={group_id} не найден.'
+        )
+    return PassportGroupsSchema.model_validate(region, from_attributes=True)
 
 
 @router.get(
-    '/', status_code=status.HTTP_200_OK, response_model=Sequence[PassportGroupsSchema]
+    '/',
+    status_code=status.HTTP_200_OK,
+    response_model=Sequence[PassportGroupsSchema],
 )
 async def get_all_groups(
-    use_case: PassportGroupsUseCase,
+    use_case: PassportGroupsCrudUseCase,
 ) -> Sequence[PassportGroupsSchema]:
-    r = await use_case.get_all_passport_groups()
-    return await use_case.get_all_passport_groups()
+    return [
+        PassportGroupsSchema.model_validate(m, from_attributes=True)
+        for m in await use_case.get_all_passport_groups()
+    ]
 
 
 @router.post(

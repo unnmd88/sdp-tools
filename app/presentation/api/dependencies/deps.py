@@ -42,5 +42,5 @@ UserEntityDep = Annotated[UserEntity, Depends(get_user_entity_by_id)]
 ## Regions
 RegionsCrudUseCase = Annotated[RegionsCrudUseCaseImpl, Depends(get_regions_crud_use_case)]
 
-## PasportGroups
-PassportGroupsUseCase = Annotated[PassportGroupsCrudUseCaseImpl, Depends(get_passport_groups_use_case)]
+## PassportGroups
+PassportGroupsCrudUseCase = Annotated[PassportGroupsCrudUseCaseImpl, Depends(get_passport_groups_use_case)]

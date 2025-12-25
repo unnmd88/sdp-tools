@@ -12,6 +12,8 @@ class BaseService:
     ):
 
         self.user_entity = user_entity
-        self.repository = repository
+        if not isinstance(self.user_entity, UserEntity):
+            raise AttributeError
         if not user_entity.is_active:
             raise UserInactiveError
+        self.repository = repository

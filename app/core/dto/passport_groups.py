@@ -7,14 +7,14 @@ from core.enums import (
 
 
 @dataclass(kw_only=True)
-class PassportGroupsDTO:
+class PassportGroupDTO:
     group_name: PassportGroups
     group_name_route: PassportGroupsRoutes
     description: str
 
 
 @dataclass(kw_only=True)
-class UpdatePassportGroupsDTO:
+class UpdatePassportGroupDTO:
 
     group_name_to_update: PassportGroups
 
@@ -24,7 +24,7 @@ class UpdatePassportGroupsDTO:
 
 
 @dataclass(kw_only=True)
-class CreatePassportGroupsDTO:
+class CreatePassportGroupDTO:
 
     group_name: PassportGroups
     group_name_route: PassportGroupsRoutes

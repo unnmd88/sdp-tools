@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 
 from application.interfaces.repositories.base import BaseCrudProtocol
-from core.dto.passport_groups import CreatePassportGroupsDTO, UpdatePassportGroupsDTO
+from core.dto.passport_groups import CreatePassportGroupDTO, UpdatePassportGroupDTO
 from core.passport_groups.entities.passport_group import PassportGroupEntity
 
 
@@ -13,6 +13,6 @@ class PassportGroupRepositoryProtocol(BaseCrudProtocol):
 
     async def get_all_passport_groups(self) -> Sequence[PassportGroupEntity]: ...
 
-    async def create_region(self, region: CreatePassportGroupsDTO) -> PassportGroupEntity: ...
+    async def create_region(self, region: CreatePassportGroupDTO) -> PassportGroupEntity: ...
 
-    async def update_region(self, user: UpdatePassportGroupsDTO) -> PassportGroupEntity: ...
+    async def update_region(self, user: UpdatePassportGroupDTO) -> PassportGroupEntity: ...
