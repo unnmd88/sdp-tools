@@ -8,7 +8,7 @@ from core.reg_exps import (
     LAST_NAME_PATTERN,
     USERNAME_PATTERN,
     PHONE_NUMBER_PATTERN,
-    PASSWORD_PATTERN,
+    PASSWORD_PATTERN, NAME_TLO_PATTERN, DISTRICT_TLO_PATTERN, STREET_TLO_PATTERN,
 )
 from core.users.constants import (
     MIN_LEN_PASSWORD,
@@ -146,6 +146,46 @@ def check_set_password(value: str) -> bool:
     return validate_string_by_pattern(value, PASSWORD_PATTERN, allow_empty=False)
 
 
+# Блок проверки для Светофорного объекта(TrafficLightObjectEntity)
+
+@checking_simple_types(type_to_check=str, field_name='name')
+def check_tlo_name_is_valid(value: str) -> bool:
+    """
+    Проверяет валидность name светофорного объекта.
+    :param value: Строка name.
+    :return: True or False.
+    """
+    return validate_string_by_pattern(value, NAME_TLO_PATTERN, allow_empty=False)
+
+
+@checking_simple_types(type_to_check=str, field_name='district')
+def check_tlo_district_is_valid(value: str) -> bool:
+    """
+    Проверяет валидность district светофорного объекта.
+    :param value: Строка district.
+    :return: True or False.
+    """
+    return validate_string_by_pattern(value, DISTRICT_TLO_PATTERN, allow_empty=True)
+
+
+@checking_simple_types(type_to_check=str, field_name='street')
+def check_tlo_street_is_valid(value: str) -> bool:
+    """
+    Проверяет валидность street светофорного объекта.
+    :param value: Строка street.
+    :return: True or False.
+    """
+    return validate_string_by_pattern(value, STREET_TLO_PATTERN, allow_empty=True)
+
+
+@checking_simple_types(type_to_check=float, field_name='latitude_or_longitude')
+def check_tlo_latitude_or_longitude_is_valid(value: float) -> bool:
+    """
+    Проверяет валидность latitude_or_longitude светофорного объекта.
+    :param value: Строка latitude_or_longitude.
+    :return: True or False.
+    """
+    return True
 # def validate_field_id(value: int, check_type: bool = True) -> bool:
 #     if check_type and not isinstance(value, int):
 #         raise TypeError(f'id must be an {int!r}')

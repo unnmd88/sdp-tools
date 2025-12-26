@@ -48,7 +48,7 @@ async def get_group_by_name(
     status_code=status.HTTP_200_OK,
     response_model=PassportGroupsSchema,
 )
-async def get_group(
+async def get_group_by_id(
     group_id: int,
     use_case: PassportGroupsCrudUseCase,
 ) -> PassportGroupsSchema:

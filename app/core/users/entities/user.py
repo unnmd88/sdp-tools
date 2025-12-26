@@ -1,5 +1,5 @@
 from dataclasses import InitVar, dataclass, field
-from typing import NoReturn
+
 
 from core.enums import (
     EntityIdRange,
@@ -22,7 +22,7 @@ from core.field_validators import (
 from core.users.exceptions import (
     DomainValidationError,
     INVALID_DESCRIPTION_EXCEPTION_TEXT,
-    ForbiddenCreate, UserPermissionsError,
+    UserPermissionsError,
 )
 from core.users.value_objects.permissions import UserPermissions
 from core.utils import hash_password
@@ -132,7 +132,6 @@ class UserEntity:
 
     def check_permission_read_passport_groups(self):
         self.check_permissions(Permission.READ_PASSPORT_GROUPS)
-
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
