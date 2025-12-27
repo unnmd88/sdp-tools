@@ -4,7 +4,7 @@ from dataclasses import InitVar, dataclass, field
 from core.enums import (
     EntityIdRange,
     Organizations,
-    Roles, Permission,
+    Roles, Permissions,
 )
 from core.field_validators import (
     check_description_is_valid,
@@ -113,25 +113,27 @@ class UserEntity:
             self.permissions.add_all_user_permissions()
         elif self.is_admin:
             self.permissions.add_all_user_permissions(
-                exclude={Permission.CREATE_USERS, Permission.UPDATE_USERS}
+                exclude={Permissions.CREATE_USERS, Permissions.UPDATE_USERS}
             )
 
     def allow_to_crete_new_user(self) -> bool:
         return self.is_active and self.is_superuser
 
-    def check_permissions(self, *permissions: Permission):
+    def check_permissions(self, *permissions: Permissions):
         if not permissions:
             raise TypeError('permissions cant be empty')
         all_permissions = self.permissions.get_all()
-        print(f'user permissions: {self.permissions}')
-        if not all(Permission(p) in all_permissions for p in permissions):
+        if not all(Permissions(p) in all_permissions for p in permissions):
             raise UserPermissionsError(f'Отсутствуют права: {",".join(p for p in permissions if p not in all_permissions)}')
 
     def check_permission_read_region(self):
-        self.check_permissions(Permission.READ_REGIONS)
+        self.check_permissions(Permissions.READ_REGIONS)
 
     def check_permission_read_passport_groups(self):
-        self.check_permissions(Permission.READ_PASSPORT_GROUPS)
+        self.check_permissions(Permissions.READ_PASSPORT_GROUPS)
+
+    def check_permission_read_tlo(self):
+        self.check_permissions(Permissions.READ_TLO)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

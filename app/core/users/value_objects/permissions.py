@@ -1,10 +1,10 @@
 from collections.abc import MutableSet, Iterable
 
-from core.enums import Permission
+from core.enums import Permissions
 
 
 class UserPermissions:
-    def __init__(self, *permissions: Permission):
+    def __init__(self, *permissions: Permissions):
         self._permissions: MutableSet = set(permissions)
 
     def __repr__(self):
@@ -35,19 +35,19 @@ class UserPermissions:
     # def read_regions(self):
     #     return self.check_has_permissions(Permission.READ_REGIONS)
 
-    def get_all(self) -> MutableSet[Permission]:
+    def get_all(self) -> MutableSet[Permissions]:
         return self._permissions
 
-    def add(self, *permissions: Permission):
+    def add(self, *permissions: Permissions):
         self._permissions |= {p for p in permissions}
 
-    def add_all_user_permissions(self, exclude: set[Permission] = None):
+    def add_all_user_permissions(self, exclude: set[Permissions] = None):
         exclude = exclude or set()
-        self._permissions |= {p for p in Permission if p not in exclude}
+        self._permissions |= {p for p in Permissions if p not in exclude}
 
-    def revoke(self, *permissions: Permission):
+    def revoke(self, *permissions: Permissions):
         for permission in permissions:
-            self._permissions.remove(Permission(permission))
+            self._permissions.remove(Permissions(permission))
 
     def revoke_all(self) -> int:
         cnt = 0
@@ -61,6 +61,6 @@ if __name__ == '__main__':
 
     up = UserPermissions()
     print(up.read_users)
-    up.add(Permission.READ_USERS)
+    up.add(Permissions.READ_USERS)
     print(up.read_users)
     print(up)

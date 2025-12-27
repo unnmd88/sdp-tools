@@ -3,7 +3,7 @@ from dataclasses import asdict
 
 from application.interfaces.repositories.regions import RegionsRepositoryProtocol
 from core.dto.regions import RegionsDTO, UpdateRegionsDTO
-from core.enums import Permission
+from core.enums import Permissions
 from core.exceptions.base import CreateError, UpdateError
 from core.regions.entities.region import RegionEntity
 from core.services import BaseService
@@ -31,7 +31,7 @@ class RegionsServiceImpl(BaseService):
         return await self.repository.get_all()
 
     async def create_region(self, region: RegionsDTO) -> RegionEntity:
-        self.user_entity.check_permissions(Permission.CREATE_REGIONS)
+        self.user_entity.check_permissions(Permissions.CREATE_REGIONS)
         region_entity = RegionEntity(
             name=region.name,
             code=region.code,
@@ -45,7 +45,7 @@ class RegionsServiceImpl(BaseService):
         return await self.repository.add(region_entity)
 
     async def update_region(self, region: UpdateRegionsDTO) -> RegionEntity:
-        self.user_entity.check_permissions(Permission.UPDATE_REGIONS)
+        self.user_entity.check_permissions(Permissions.UPDATE_REGIONS)
         current_region = await self.repository.get_region_by_name_or_none(region.region_name_to_update)
         if current_region is None:
             raise UpdateError('Регион с данным названием не найден.')

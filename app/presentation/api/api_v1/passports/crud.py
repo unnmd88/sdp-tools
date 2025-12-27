@@ -35,7 +35,7 @@ from presentation.api.api_v1.passports.utils import (
 #     async def get_current_passport(
 #         cls,
 #         session: AsyncSession,
-#         tlo_name: str,
+#         tlo_name: str, 
 #         group_name_route: PassportGroupsRoutesEnum,
 #     ):
 #         stmt = (

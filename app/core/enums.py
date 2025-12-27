@@ -73,7 +73,7 @@ class PassportGroups(StrEnum):
     _TEST2 = 'test2'
 
 
-class Permission(StrEnum):
+class Permissions(StrEnum):
     READ_USERS = 'READ_USERS'
     CREATE_USERS = 'CREATE_USERS'
     UPDATE_USERS = 'UPDATE_USERS'
@@ -91,6 +91,7 @@ class Permission(StrEnum):
     UPDATE_PASSPORT_GROUPS = 'UPDATE_PASSPORT_GROUPS'
 
 
+
 if __name__ == '__main__':
-    for m in Permission:
+    for m in Permissions:
         print(m)

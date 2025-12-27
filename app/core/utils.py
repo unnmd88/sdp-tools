@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import bcrypt
 
 from dataclasses import asdict
-from core.enums import Permission
+from core.enums import Permissions
 from core.exceptions.base import PermissionsError
 
 
@@ -40,8 +40,8 @@ def checking_simple_types(*, type_to_check: type, field_name: str = ''):
     return decorator
 
 
-def check_permissions_async(*permissions_to_check: Permission):
-    permissions_to_check: frozenset[Permission] = frozenset(permissions_to_check)
+def check_permissions_async(*permissions_to_check: Permissions):
+    permissions_to_check: frozenset[Permissions] = frozenset(permissions_to_check)
 
     def decorator(func: Callable):
         @wraps(func)

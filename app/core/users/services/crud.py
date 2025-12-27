@@ -4,7 +4,7 @@ from dataclasses import asdict
 from application.interfaces.cache.users import UsersCacheProtocol
 from application.interfaces.repositories.users import UsersRepositoryProtocol
 from core.dto.users import CreateUserDTO, UpdateUserDTO
-from core.enums import Organizations, Roles, Permission
+from core.enums import Organizations, Roles, Permissions
 from core.exceptions.base import CreateError, UpdateError
 from core.field_validators import check_set_password
 from core.security_policies.services.user_permissions import check_permission_to_update_entity
@@ -51,7 +51,7 @@ class UsersServiceImpl:
         )
         if requestor_entity is None:
             raise ForbiddenCreate
-        requestor_entity.check_permissions(Permission.CREATE_USERS)
+        requestor_entity.check_permissions(Permissions.CREATE_USERS)
         if not check_set_password(data.password):
             raise InvalidPasswordToSet
         if requestor_entity.username == data.username:

@@ -3,9 +3,14 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import final
 
-from core.enums import ServiceOrganizations, RegionNames, EntityIdRange
-from core.field_validators import check_is_valid_enum, check_field_id_is_valid, check_tlo_name_is_valid, \
-    check_tlo_district_is_valid, check_tlo_street_is_valid, check_tlo_latitude_or_longitude_is_valid
+from core.enums import ServiceOrganizations, RegionNames
+from core.field_validators import (
+    check_is_valid_enum,
+    check_tlo_name_is_valid,
+    check_tlo_district_is_valid,
+    check_tlo_street_is_valid,
+    check_tlo_latitude_or_longitude_is_valid
+)
 from core.passports.entities.passport import Passport
 from core.users.exceptions import DomainValidationError
 
@@ -22,6 +27,7 @@ class TrafficLightObjectEntity:
     longitude: float
     service_organization: ServiceOrganizations
     description: str
+    editing_now: bool = False
     current_passport: Passport | None
     passport_history: Sequence[Passport] = field(default_factory=list)
     created_at: datetime
@@ -45,4 +51,10 @@ class TrafficLightObjectEntity:
         for coordinate in (self.latitude, self.longitude):
             if not check_tlo_latitude_or_longitude_is_valid(coordinate):
                 raise DomainValidationError('Некорректные координаты широты/долготы.')
-
+        if not isinstance(self.editing_now, bool):
+            raise TypeError('attr editing_now must be a bool.')
+        if not isinstance(self.current_passport, (Passport, None)):
+            raise TypeError('attr current_passport must be a "Passport" instance or None.')
+        if self.passport_history:
+            if any(not isinstance(instance, Passport) for instance in self.passport_history):
+                raise TypeError('all elements of attr passport_history must be a "Passport" instance.')
