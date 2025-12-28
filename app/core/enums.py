@@ -92,6 +92,21 @@ class Permissions(StrEnum):
 
 
 
+class ControllerTypes(StrEnum):
+    POTOK = 'Поток'
+    POTOK_D = 'Поток-Д'
+    PEEK = 'Peek'
+    SWARCO = 'Swarco'
+    SIGNAL = 'Сигнал'
+
+
+class PeripheralEquipmentsTypes(StrEnum):
+    MOXA = 'Moxa'
+    IP_RELAY = 'IP-relay'
+    IRZ = 'Irz'
+    TELTONICA = 'Teltonica'
+
+
 if __name__ == '__main__':
     for m in Permissions:
         print(m)

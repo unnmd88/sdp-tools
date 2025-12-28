@@ -37,7 +37,9 @@ class BaseSqlAlchemy:
     async def get_one_or_none_by_filters(self, **filters) -> Entity | None:
         stmt = select(self.model).filter_by(**filters)
         result = await self.session.execute(stmt)
+        print(f'result={result}')
         if (model := result.scalars().one_or_none()) is not None:
+            print(f'model={model}')
             return self.mapper.to_entity(model)
         return None
 

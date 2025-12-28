@@ -1,8 +1,11 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import final
 
 from application.interfaces.mappers.db import BaseDBMapperProtocol
 from core.dto.tlo import TrafficLightObjectDTO
+from core.enums import ServiceOrganizations, RegionNames
+from core.tlo.entities.tlo import TrafficLightObjectEntity
 from infrastructure.database.models import TrafficLightObject as TrafficLightObjectModel
 
 
@@ -10,45 +13,35 @@ from infrastructure.database.models import TrafficLightObject as TrafficLightObj
 @dataclass(frozen=True, slots=True)
 class TrafficLightObjectDBMapper(BaseDBMapperProtocol):
     @classmethod
-    def to_tlo_dto(cls, model: TrafficLightObjectModel) -> TrafficLightObjectDTO:
+    def to_entity(cls, model: TrafficLightObjectModel) -> TrafficLightObjectEntity:
         """ """
 
-        id: int
-        region_id: int
-        name: str
-        district: str
-        street: str
-        service_organization: ServiceOrganizations
-        description: str
-        created_at: datetime
-        updated_at: datetime
-
-        return TrafficLightObjectDTO(
-            id=
-            region_id=
-            name=
-            district=
-            street=
-            service_organization: ServiceOrganizations
-            description=
-            created_at: datetime
-            updated_at: datetime
-
+        return TrafficLightObjectEntity(
             id=model.id,
-            code=RegionCodes(model.code),
-            name=RegionNames(model.name),
+            name=model.name,
+            region=RegionNames.MOSCOW,
+            latitude=.0,
+            longitude=.0,
+            district=model.district,
+            street=model.street,
+            service_organization=ServiceOrganizations(model.service_organization),
+            traffic_controller=None,
+            current_passport=None,
+            description=model.description,
+            created_at=model.created_at,
+            updated_at=model.updated_at,
         )
 
-    @classmethod
-    def to_model(cls, entity: RegionEntity) -> RegionModel:
-        """ """
-        if entity.id is None:
-            return RegionModel(
-                code=entity.code,
-                name=entity.name,
-            )
-        return RegionModel(
-            id=entity.id,
-            code=entity.code,
-            name=entity.name,
-            )
+    # @classmethod
+    # def to_model(cls, entity: RegionEntity) -> RegionModel:
+    #     """ """
+    #     if entity.id is None:
+    #         return RegionModel(
+    #             code=entity.code,
+    #             name=entity.name,
+    #         )
+    #     return RegionModel(
+    #         id=entity.id,
+    #         code=entity.code,
+    #         name=entity.name,
+    #         )

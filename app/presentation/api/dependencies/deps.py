@@ -7,12 +7,13 @@ from application.use_cases.auth.auth_and_issue_jwt import AuthJWTUseCaseImpl
 from application.use_cases.passport_groups.crud import PassportGroupsCrudUseCaseImpl
 from application.use_cases.regions.crud import RegionsCrudUseCaseImpl
 from application.use_cases.users.crud import UsersCrudUseCaseImpl
+from core.tlo.services.main_tlo_service import TrafficLightObjectServiceImpl
 from core.users.entities.user import UserEntity
 from presentation.api.dependencies.dependencies import (
     auth_use_case,
     users_crud_use_case,
     get_jwt_payload_jwt_bearer, get_regions_crud_use_case, is_superuser, is_admin, get_user_entity_by_id,
-    get_passport_groups_use_case,
+    get_passport_groups_use_case, get_tlo_use_case,
 )
 from presentation.schemas.auth import AuthSchema
 from presentation.schemas.jwt import PayloadJWTSchema, TokenInfo
@@ -44,3 +45,6 @@ RegionsCrudUseCase = Annotated[RegionsCrudUseCaseImpl, Depends(get_regions_crud_
 
 ## PassportGroups
 PassportGroupsCrudUseCase = Annotated[PassportGroupsCrudUseCaseImpl, Depends(get_passport_groups_use_case)]
+
+## TrafficLightObjects
+TrafficLightObjectUseCase = Annotated[TrafficLightObjectServiceImpl, Depends(get_tlo_use_case)]

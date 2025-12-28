@@ -15,6 +15,8 @@ from presentation.api.api_v1.tlo.schemas import (
     TrafficLightUpdate,
 )
 from infrastructure.database.api import db_api
+from presentation.api.dependencies.deps import TrafficLightObjectUseCase
+
 # from presentation.api.dependencies.dependencies import CrudTloUseCase
 
 router = APIRouter(
@@ -32,6 +34,17 @@ async def get_traffic_light_object_by_id(
 ):
     return await use_case.get_one_by_id_or_none(tlo_id)
     # return await TloCrud.get_one_by_id_or_404(session, traffic_light_object_id)
+
+
+@router.get('/name/{name}')
+async def get_traffic_light_object_by_name(
+    tlo_name: str,
+    use_case: TrafficLightObjectUseCase,
+):
+    res = await use_case.get_tlo_by_name(tlo_name)
+    print(f'RESSSS: {res}')
+    return res
+    return await TloCrud.get_one_by_id_or_404(session, traffic_light_object_id)
 
 
 @router.get('/{id}')

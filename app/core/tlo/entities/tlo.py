@@ -12,6 +12,8 @@ from core.field_validators import (
     check_tlo_latitude_or_longitude_is_valid
 )
 from core.passports.entities.passport import Passport
+from core.tlo.entities.traffic_controller import TrafficController
+from core.tlo.value_objects.peripheral_equipments import PeripheralEquipment
 from core.users.exceptions import DomainValidationError
 
 
@@ -19,13 +21,15 @@ from core.users.exceptions import DomainValidationError
 @dataclass(frozen=True, slots=True, kw_only=True, order=True)
 class TrafficLightObjectEntity:
     id: int
-    region: RegionNames
     name: str
-    district: str
-    street: str
+    region: RegionNames
     latitude: float
     longitude: float
+    district: str
+    street: str
     service_organization: ServiceOrganizations
+    traffic_controller: TrafficController | None
+    peripheral_equipments: Sequence[PeripheralEquipment] = field(default_factory=list)
     description: str
     editing_now: bool = False
     current_passport: Passport | None
@@ -44,16 +48,16 @@ class TrafficLightObjectEntity:
             raise DomainValidationError(
                 'Недопустимый округ для светофорного объекта. Примеры допустимых округов: ЦАО, ВАО, ЮЗАО и т.д.'
             )
-        if not check_tlo_street_is_valid(self.street):
-            raise DomainValidationError(
-                'Недопустимое имя улицы. Используйте от 3 до 255 символов для названия.'
-            )
+        # if not check_tlo_street_is_valid(self.street):
+        #     raise DomainValidationError(
+        #         'Недопустимое имя улицы. Используйте от 3 до 255 символов для названия.'
+        #     )
         for coordinate in (self.latitude, self.longitude):
             if not check_tlo_latitude_or_longitude_is_valid(coordinate):
                 raise DomainValidationError('Некорректные координаты широты/долготы.')
         if not isinstance(self.editing_now, bool):
             raise TypeError('attr editing_now must be a bool.')
-        if not isinstance(self.current_passport, (Passport, None)):
+        if not isinstance(self.current_passport, (Passport | None)):
             raise TypeError('attr current_passport must be a "Passport" instance or None.')
         if self.passport_history:
             if any(not isinstance(instance, Passport) for instance in self.passport_history):
