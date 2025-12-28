@@ -13,6 +13,10 @@ class TrafficLightObjectServiceImpl(BaseService):
         self.user_entity.check_permission_read_tlo()
         return await self.repository.get_tlo_by_name_or_none(name)
 
+    async def get_base_tlo_by_name_or_none(self, name: str) -> TrafficLightObjectEntity:
+        self.user_entity.check_permission_read_tlo()
+        return await self.repository.get_base_tlo_by_name_or_none(name)
+
     async def get_all_tlo(self) -> Sequence[TrafficLightObjectEntity]:
         self.user_entity.check_permission_read_tlo()
         return await self.repository.get_all()

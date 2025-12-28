@@ -11,7 +11,7 @@ from core.field_validators import (
     check_tlo_street_is_valid,
     check_tlo_latitude_or_longitude_is_valid
 )
-from core.passports.entities.passport import Passport
+from core.passports.entities.passport import PassportEntity
 from core.tlo.entities.traffic_controller import TrafficController
 from core.tlo.value_objects.peripheral_equipments import PeripheralEquipment
 from core.users.exceptions import DomainValidationError
@@ -32,8 +32,8 @@ class TrafficLightObjectEntity:
     peripheral_equipments: Sequence[PeripheralEquipment] = field(default_factory=list)
     description: str
     editing_now: bool = False
-    current_passport: Passport | None
-    passport_history: Sequence[Passport] = field(default_factory=list)
+    current_passport: PassportEntity | None
+    passport_history: Sequence[PassportEntity] = field(default_factory=list)
     created_at: datetime
     updated_at: datetime
 
@@ -57,8 +57,8 @@ class TrafficLightObjectEntity:
                 raise DomainValidationError('Некорректные координаты широты/долготы.')
         if not isinstance(self.editing_now, bool):
             raise TypeError('attr editing_now must be a bool.')
-        if not isinstance(self.current_passport, (Passport | None)):
+        if not isinstance(self.current_passport, (PassportEntity | None)):
             raise TypeError('attr current_passport must be a "Passport" instance or None.')
         if self.passport_history:
-            if any(not isinstance(instance, Passport) for instance in self.passport_history):
+            if any(not isinstance(instance, PassportEntity) for instance in self.passport_history):
                 raise TypeError('all elements of attr passport_history must be a "Passport" instance.')

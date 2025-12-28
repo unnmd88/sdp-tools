@@ -1,5 +1,5 @@
 from core.enums import PassportGroups
-from core.passports.entities.passport import Passport
+from core.passports.entities.passport import PassportEntity
 import pytest
 
 from tests.utils.create_user_entity import create_user_entity
@@ -17,9 +17,9 @@ class TestPassportEntity:
     )
     def test_create_passport_entities_success(self, data, user, group):
         """ Тест на успешное создание value-object Passport. """
-        Passport(
+        PassportEntity(
             data=data,
-            created_by=user,
+            username=user,
             group=group,
             commit_message='test commit message'
         )

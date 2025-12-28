@@ -12,11 +12,15 @@ class TrafficLightObjectUseCaseImpl:
     async def get_tlo_by_id(self, tlo_id: int) -> TrafficLightObjectEntity | None:
         return await self.tlo_service.get_tlo_by_id_or_none(tlo_id)
 
+
     async def get_tlo_by_name(self, name: str) -> TrafficLightObjectEntity | None:
         return await self.tlo_service.get_tlo_by_name_or_none(name)
 
     async def get_all_tlo(self) -> Sequence[TrafficLightObjectEntity]:
         return await self.tlo_service.get_all_tlo()
+
+    async def get_base_tlo_by_name(self, name: str) -> TrafficLightObjectEntity | None:
+        return await self.tlo_service.get_base_tlo_by_name_or_none(name)
 
     # async def create_tlo(self, region: CreateRegionsDTO) -> TrafficLightObjectEntity:
     #    return await self.regions_service.create_region(region)

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import final
 
 from core.enums import PassportGroups
@@ -8,16 +9,20 @@ from core.users.exceptions import DomainValidationError
 
 @final
 @dataclass(frozen=True, slots=True, kw_only=True, order=True)
-class Passport:
+class PassportEntity:
     data: dict
-    created_by: UserEntity
-    group: PassportGroups
+    username: str
+    group_name: PassportGroups
+    editing_now: bool
     commit_message: str
+    started_editing_at: datetime
+    finished_editing_at: datetime | None
 
-    def __post_init__(self):
-        if not isinstance(self.created_by, UserEntity):
-            raise DomainValidationError(
-                f'Поле created_by должно экземпляр {UserEntity.__name__!r}'
-            )
+
+    # def __post_init__(self):
+    #     if not isinstance(self.username, UserEntity):
+    #         raise DomainValidationError(
+    #             f'Поле created_by должно экземпляр {UserEntity.__name__!r}'
+    #         )
 
     # TO DO: validate rules

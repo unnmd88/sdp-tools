@@ -41,8 +41,8 @@ async def get_traffic_light_object_by_name(
     tlo_name: str,
     use_case: TrafficLightObjectUseCase,
 ):
-    res = await use_case.get_tlo_by_name(tlo_name)
-    print(f'RESSSS: {res}')
+    # res = await use_case.get_tlo_by_name(tlo_name)
+    res = await use_case.get_base_tlo_by_name(tlo_name)
     return res
     return await TloCrud.get_one_by_id_or_404(session, traffic_light_object_id)
 
