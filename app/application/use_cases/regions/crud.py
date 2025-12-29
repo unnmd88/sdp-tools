@@ -2,7 +2,7 @@ from collections.abc import Sequence
 
 from application.interfaces.services.regions_crud import RegionsServiceProtocol
 from core.dto.filters import FiltersForSearchDTO
-from core.dto.regions import CreateRegionDTO, UpdateRegionDTO, RegionFiltersForSearchDTO
+from core.dto.regions import CreateRegionDTO, UpdateRegionDTO
 from core.dto.update_entity import UpdatedEntityDTO
 from core.regions.entities.region import RegionEntity
 

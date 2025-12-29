@@ -79,8 +79,8 @@ def validate_password(
 
 def not_none_dataclass_instance_attrs_to_dict(
     dataclass_instance,
-    default_exclude_fields: frozenset | set | None = frozenset(('id', '_id', 'filters_for_search')),
     *exclude_fields,
+    default_exclude_fields: frozenset | set | None = frozenset(('id', '_id', 'filters_for_search')),
 ) -> dict:
     exclude = default_exclude_fields or frozenset()
     if exclude_fields:

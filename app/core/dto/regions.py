@@ -30,6 +30,7 @@ class UpdateRegionDTO:
     """ DTO для обновления существующего региона. """
     # region_name_to_update: RegionNames
     filters_for_search: dict
+    code_or_name: str
 
     code: int | None = None
     name: str | None = None
@@ -40,6 +41,3 @@ class CreateRegionDTO(RegionDTO):
     """ DTO для создания нового региона. """
 
 
-def get_region_filters_for_search_dto_instance(code_or_name: str | int) -> RegionFiltersForSearchDTO:
-    code = int(code_or_name) if code_or_name.isdigit() else None
-    name = None if code else code_or_name

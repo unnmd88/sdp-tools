@@ -5,7 +5,7 @@ from dataclasses import asdict
 from app_logging.dev.config import COMMON_LOGGER
 from application.interfaces.repositories.regions import RegionsRepositoryProtocol
 from core.dto.filters import FiltersForSearchDTO
-from core.dto.regions import UpdateRegionDTO, CreateRegionDTO, RegionFiltersForSearchDTO
+from core.dto.regions import UpdateRegionDTO, CreateRegionDTO
 from core.dto.update_entity import UpdatedEntityDTO
 from core.enums import Permissions
 from core.exceptions.base import CreateError, UpdateError
@@ -53,13 +53,13 @@ class RegionsServiceImpl(BaseService):
     async def update_region(self, region: UpdateRegionDTO) -> UpdatedEntityDTO:
         self.user_entity.check_permissions(Permissions.UPDATE_REGIONS)
         logger.info(
-            'Юзер %r: запрос на обновление региона =%r\nДанные для обновления: %r',
-            self.user_entity.username, region.id, region
+            'Юзер %r: запрос на обновление региона %r\nДанные для обновления: %r',
+            self.user_entity.username, region.code_or_name, region
         )
         try:
             update_dto = await self.repository.update_one(
                 region.filters_for_search,
-                **not_none_dataclass_instance_attrs_to_dict(region),
+                **not_none_dataclass_instance_attrs_to_dict(region, 'code_or_name'),
             )
         except UpdateError as e:
             logger.error('Ошибка обновления данных: %r', e)

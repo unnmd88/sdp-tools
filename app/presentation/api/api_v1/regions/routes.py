@@ -104,6 +104,7 @@ async def update_region(
 ):
     dto = UpdateRegionDTO(
         filters_for_search=get_filters_for_region_or_name_search(update_data.code_or_name).filters_for_search,
+        code_or_name=update_data.code_or_name,
         code=update_data.code,
         name=update_data.name,
     )

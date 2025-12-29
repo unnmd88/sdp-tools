@@ -4,7 +4,7 @@ from typing import Protocol
 from application.interfaces.repositories.regions import RegionsRepositoryProtocol
 from application.interfaces.services.users_crud import UsersServiceProtocol
 from core.dto.filters import FiltersForSearchDTO
-from core.dto.regions import RegionDTO, UpdateRegionDTO, CreateRegionDTO, RegionFiltersForSearchDTO
+from core.dto.regions import RegionDTO, UpdateRegionDTO, CreateRegionDTO
 from core.dto.update_entity import UpdatedEntityDTO
 from core.regions.entities.region import RegionEntity
 from core.users.entities.user import UserEntity
