@@ -29,11 +29,22 @@ LOGGING_CONFIG = {
             'filename': API_V1_PATH / 'passport_groups/logs/log.log',
             'formatter': 'simple2',
         },
+        'RUD': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'app_logging/RUD.log',
+            'formatter': 'simple2',
+        },
     },
     'loggers': {
         '': {
             'level': 'DEBUG',
             'handlers': ['console'],
+            'propagate': True,
+        },
+        'common': {
+            'level': 'INFO',
+            'handlers': ['RUD'],
             'propagate': True,
         },
         'users': {
@@ -66,7 +77,7 @@ LOGGING_CONFIG = {
 
 logging.config.dictConfig(LOGGING_CONFIG)
 
-
+COMMON_LOGGER = 'common'
 USERS_LOGGER = 'users'
 PASSPORTS_LOGGER = 'passports'
 PASSPORTS_OWNERS_LOGGER = 'passport_groups'

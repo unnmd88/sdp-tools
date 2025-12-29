@@ -3,7 +3,7 @@ from collections.abc import Sequence
 from application.interfaces.services.passport_groups_crud import PassportGroupsServiceProtocol
 from application.interfaces.services.regions_crud import RegionsServiceProtocol
 from core.dto.passport_groups import CreatePassportGroupDTO, UpdatePassportGroupDTO
-from core.dto.regions import CreateRegionsDTO, UpdateRegionsDTO
+from core.dto.regions import CreateRegionDTO, UpdateRegionDTO
 from core.passport_groups.entities.passport_group import PassportGroupEntity
 from core.regions.entities.region import RegionEntity
 

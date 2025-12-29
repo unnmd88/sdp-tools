@@ -120,8 +120,15 @@ class UserEntity:
         return self.is_active and self.is_superuser
 
     def check_permissions(self, *permissions: Permissions):
+        """
+        Проверка наличия permissions для пользователя. В случае, если один хотя бы одно из permissions
+        отсутствует - будет выброшено исключение.
+        :param permissions: Разрешения пользователя, подлежащие проверки на наличие.
+        :raises UserPermissionsError: Исключение, если хотя бы одно из permissions отсутствует.
+        :return: None.
+        """
         if not permissions:
-            raise TypeError('permissions cant be empty')
+            raise TypeError('permissions cant be empty.')
         all_permissions = self.permissions.get_all()
         if not all(Permissions(p) in all_permissions for p in permissions):
             raise UserPermissionsError(f'Отсутствуют права: {",".join(p for p in permissions if p not in all_permissions)}')

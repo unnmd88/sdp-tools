@@ -1,25 +1,45 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from core.enums import RegionCodes, RegionNames
 
 
-@dataclass(kw_only=True)
-class RegionsDTO:
-    code: RegionCodes
-    name: RegionNames
+@dataclass(slots=True, frozen=True, kw_only=True)
+class RegionDTO:
+    """ DTO для экземпляра существующего региона. """
+    code: int
+    name: str
 
 
-@dataclass(kw_only=True)
-class UpdateRegionsDTO:
+# @dataclass(slots=True, frozen=True, kw_only=True)
+# class RegionFiltersForSearchDTO:
+#     """ DTO для экземпляра существующего региона. """
+#     # code: int | None = None
+#     # name: str | None = None
+#     filters_for_search: dict = field(default_factory=dict)
+#
+#
+#     @classmethod
+#     def get_dto_instance(cls, code_or_name: str | int):
+#         code = int(code_or_name) if code_or_name.isdigit() else None
+#         name = None if code else code_or_name
+#         return RegionFiltersForSearchDTO(code=code, name=name,)
 
-    region_name_to_update: RegionNames
 
-    code: RegionCodes | None = None
-    name: RegionNames | None = None
+@dataclass(slots=True, frozen=True, kw_only=True)
+class UpdateRegionDTO:
+    """ DTO для обновления существующего региона. """
+    # region_name_to_update: RegionNames
+    filters_for_search: dict
+
+    code: int | None = None
+    name: str | None = None
 
 
-@dataclass(kw_only=True)
-class CreateRegionsDTO:
+@dataclass(slots=True, frozen=True, kw_only=True)
+class CreateRegionDTO(RegionDTO):
+    """ DTO для создания нового региона. """
 
-    code: RegionCodes
-    name: RegionNames
+
+def get_region_filters_for_search_dto_instance(code_or_name: str | int) -> RegionFiltersForSearchDTO:
+    code = int(code_or_name) if code_or_name.isdigit() else None
+    name = None if code else code_or_name

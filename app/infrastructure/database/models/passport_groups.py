@@ -1,4 +1,4 @@
-from sqlalchemy import String, Text
+from sqlalchemy import String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from infrastructure.database.models import Base
@@ -13,8 +13,10 @@ class PassportGroup(
     UpdatedAtMixin,
     Base,
 ):
-    group_name: Mapped[str] = mapped_column(
+    name: Mapped[str] = mapped_column(
+        String(length=32),
         unique=True,
+
     )
     description: Mapped[str] = mapped_column(
         Text,

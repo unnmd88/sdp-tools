@@ -38,7 +38,7 @@ class TrafficLightObjectSqlAlchemy(BaseSqlAlchemy):
                 PassportModel.started_editing_at,
                 PassportModel.finished_editing_at,
                 UserModel.username,
-                PassportGroupModel.group_name,
+                PassportGroupModel.name,
             )
             .where(PassportModel.tlo_id == tlo_model.id)
             .join(UserModel, PassportModel.user_id == UserModel.id)

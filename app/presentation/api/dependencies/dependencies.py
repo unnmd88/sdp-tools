@@ -1,6 +1,7 @@
 from textwrap import dedent
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from jwt import ExpiredSignatureError
 
 from application.interfaces.repositories.passport_groups import PassportGroupRepositoryProtocol
 from application.interfaces.repositories.regions import RegionsRepositoryProtocol
@@ -57,8 +58,10 @@ db_session = Annotated[
 def get_jwt_payload_jwt_bearer(
     credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
 ) -> PayloadJWTSchema:
-    return PayloadJWTSchema(**decode_jwt(credentials.credentials))
-
+    try:
+        return PayloadJWTSchema(**decode_jwt(credentials.credentials))
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 def is_admin(
     payload: Annotated[PayloadJWTSchema, Depends(get_jwt_payload_jwt_bearer)]

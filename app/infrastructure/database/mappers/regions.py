@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import final
 
 from application.interfaces.mappers.db import BaseDBMapperProtocol
-from core.enums import RegionCodes, RegionNames
 from core.regions.entities.region import RegionEntity
 from infrastructure.database.models import Region as RegionModel
 
@@ -15,8 +14,8 @@ class RegionDBMapper(BaseDBMapperProtocol):
         """ """
         return RegionEntity(
             id=model.id,
-            code=RegionCodes(model.code),
-            name=RegionNames(model.name),
+            code=model.code,
+            name=model.name,
         )
 
     @classmethod

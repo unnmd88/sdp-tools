@@ -8,13 +8,13 @@ from core.users.exceptions import DomainValidationError
 T_ALLOWED_REGIONS = frozenset[tuple[RegionNames, RegionCodes]]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True, kw_only=True)
 class RegionEntity:
 
     allowed_regions: ClassVar[T_ALLOWED_REGIONS] = ALLOWED_REGIONS
 
-    code: RegionCodes
-    name: RegionNames
+    code: int
+    name: str
     id: int | None = None
 
     def __eq__(self, other):
@@ -22,7 +22,7 @@ class RegionEntity:
              return NotImplemented
          return self.code == other.code and self.name == other.name
 
-    def __post_init__(self):
-        if (self.name, self.code) not in self.allowed_regions:
-            raise DomainValidationError('Недопустимая пара кода и названия для региона')
+    # def __post_init__(self):
+    #     if (self.name, self.code) not in self.allowed_regions:
+    #         raise DomainValidationError('Недопустимая пара кода и названия для региона')
 

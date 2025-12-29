@@ -6,7 +6,7 @@ from core.enums import Permissions
 from core.exceptions.base import CreateError, UpdateError
 from core.passport_groups.entities.passport_group import PassportGroupEntity
 from core.services import BaseService
-from core.utils import create_fields_for_update
+from core.utils import not_none_dataclass_instance_attrs_to_dict
 
 
 class PassportGroupsServiceImpl(BaseService):
@@ -55,5 +55,5 @@ class PassportGroupsServiceImpl(BaseService):
 
         return await self.repository.update(
             _id=current_passport_group.id,
-            **create_fields_for_update(passport_group_dto),
+            **not_none_dataclass_instance_attrs_to_dict(passport_group_dto),
         )

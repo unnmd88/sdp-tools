@@ -16,7 +16,7 @@ class PassportGroupsDBMapper(BaseDBMapperProtocol):
         """ """
         return PassportGroupEntity(
             id=model.id,
-            group_name=PassportGroups(model.group_name),
+            group_name=PassportGroups(model.name),
             description=model.description,
         )
 

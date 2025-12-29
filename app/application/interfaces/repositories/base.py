@@ -1,5 +1,7 @@
 from typing import Protocol
 
+from core.dto.update_entity import UpdatedEntityDTO
+
 
 class BaseCrudProtocol(Protocol):
 
@@ -11,9 +13,10 @@ class BaseCrudProtocol(Protocol):
 
     async def add(self, entity): ...
 
-    # async def update(self, model): ...
-    async def update(self, _id: int, **fields,): ...
+    async def update(self, _id: int, **fields,) -> UpdatedEntityDTO: ...
 
+    async def update_one(self, filters: dict, **fields,) -> UpdatedEntityDTO: ...
 
+    async def delete_one(self, _id: int): ...
 
 
