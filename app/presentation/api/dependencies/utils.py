@@ -1,4 +1,5 @@
-from core.dto.filters import FiltersForSearchDTO
+# from core.dto.filters import FiltersForSearchDTO
+from core.dto.common import FiltersForSearchDTO
 
 
 def get_filters_for_region_or_name_search(code_or_name: str | int) -> FiltersForSearchDTO:

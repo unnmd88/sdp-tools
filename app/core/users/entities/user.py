@@ -119,7 +119,7 @@ class UserEntity:
     def allow_to_crete_new_user(self) -> bool:
         return self.is_active and self.is_superuser
 
-    def check_permissions(self, *permissions: Permissions):
+    def has_all_permissions(self, *permissions: Permissions):
         """
         Проверка наличия permissions для пользователя. В случае, если один хотя бы одно из permissions
         отсутствует - будет выброшено исключение.
@@ -134,13 +134,13 @@ class UserEntity:
             raise UserPermissionsError(f'Отсутствуют права: {",".join(p for p in permissions if p not in all_permissions)}')
 
     def check_permission_read_region(self):
-        self.check_permissions(Permissions.READ_REGIONS)
+        self.has_all_permissions(Permissions.READ_REGIONS)
 
     def check_permission_read_passport_groups(self):
-        self.check_permissions(Permissions.READ_PASSPORT_GROUPS)
+        self.has_all_permissions(Permissions.READ_PASSPORT_GROUPS)
 
     def check_permission_read_tlo(self):
-        self.check_permissions(Permissions.READ_TLO)
+        self.has_all_permissions(Permissions.READ_TLO)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

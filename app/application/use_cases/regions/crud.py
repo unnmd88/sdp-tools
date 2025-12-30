@@ -1,10 +1,9 @@
 from collections.abc import Sequence
 
 from application.interfaces.services.regions_crud import RegionsServiceProtocol
-from core.dto.common import CreateRecordDTO
-from core.dto.filters import FiltersForSearchDTO
+from core.dto.common import CreateRecordDTO, FiltersForSearchDTO, ToUpdateRecordDTO, UpdatedRecordDTO
+# from core.dto.filters import FiltersForSearchDTO
 from core.dto.regions import CreateRegionDTO, UpdateRegionDTO
-from core.dto.update_entity import UpdatedEntityDTO
 from core.regions.entities.region import RegionEntity
 
 
@@ -21,11 +20,11 @@ class RegionsCrudUseCaseImpl:
     async def get_all_regions(self) -> Sequence[RegionEntity]:
         return await self.regions_service.get_all_regions()
 
-    async def create_region(self, region: CreateRecordDTO) -> RegionEntity:
-       return await self.regions_service.create_region(region)
+    async def create_region(self, create_dto: CreateRecordDTO) -> RegionEntity:
+       return await self.regions_service.create_region(create_dto)
 
-    async def update_region(self, region: UpdateRegionDTO) -> UpdatedEntityDTO:
-        return await self.regions_service.update_region(region)
+    async def update_region(self, update_dto: ToUpdateRecordDTO) -> UpdatedRecordDTO:
+        return await self.regions_service.update_region(update_dto)
 
-    async def delete_region(self, _id: int) -> RegionEntity:
-        return await self.regions_service.delete_region(_id)
+    async def delete_region(self, delete_dto: FiltersForSearchDTO) -> RegionEntity | None:
+        return await self.regions_service.delete_region(delete_dto)

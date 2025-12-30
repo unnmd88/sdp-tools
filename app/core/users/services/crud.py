@@ -51,7 +51,7 @@ class UsersServiceImpl:
         )
         if requestor_entity is None:
             raise ForbiddenCreate
-        requestor_entity.check_permissions(Permissions.CREATE_USERS)
+        requestor_entity.has_all_permissions(Permissions.CREATE_USERS)
         if not check_set_password(data.password):
             raise InvalidPasswordToSet
         if requestor_entity.username == data.username:
