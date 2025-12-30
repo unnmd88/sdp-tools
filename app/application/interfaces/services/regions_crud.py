@@ -3,6 +3,7 @@ from typing import Protocol
 
 from application.interfaces.repositories.regions import RegionsRepositoryProtocol
 from application.interfaces.services.users_crud import UsersServiceProtocol
+from core.dto.common import CreateRecordDTO
 from core.dto.filters import FiltersForSearchDTO
 from core.dto.regions import RegionDTO, UpdateRegionDTO, CreateRegionDTO
 from core.dto.update_entity import UpdatedEntityDTO
@@ -30,7 +31,7 @@ class RegionsServiceProtocol(Protocol):
 
     async def get_all_regions(self) -> Sequence[RegionEntity]: ...
 
-    async def create_region(self, region: CreateRegionDTO) -> RegionEntity: ...
+    async def create_region(self, region: CreateRecordDTO) -> RegionEntity: ...
 
     async def update_region(self, region: UpdateRegionDTO) -> UpdatedEntityDTO: ...
 

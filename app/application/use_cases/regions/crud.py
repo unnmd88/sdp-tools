@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 
 from application.interfaces.services.regions_crud import RegionsServiceProtocol
+from core.dto.common import CreateRecordDTO
 from core.dto.filters import FiltersForSearchDTO
 from core.dto.regions import CreateRegionDTO, UpdateRegionDTO
 from core.dto.update_entity import UpdatedEntityDTO
@@ -20,7 +21,7 @@ class RegionsCrudUseCaseImpl:
     async def get_all_regions(self) -> Sequence[RegionEntity]:
         return await self.regions_service.get_all_regions()
 
-    async def create_region(self, region: CreateRegionDTO) -> RegionEntity:
+    async def create_region(self, region: CreateRecordDTO) -> RegionEntity:
        return await self.regions_service.create_region(region)
 
     async def update_region(self, region: UpdateRegionDTO) -> UpdatedEntityDTO:

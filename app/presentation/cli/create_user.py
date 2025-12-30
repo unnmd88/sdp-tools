@@ -86,7 +86,7 @@ def create_user(
 def create_superuser(
     username: Annotated[
         str, typer.Option(help='username for user')
-    ] = settings.default_superuser_creds.name,
+    ] = settings.default_superuser_creds.entity_name,
     password: Annotated[
         str, typer.Option(help='password for user')
     ] = settings.default_superuser_creds.password,

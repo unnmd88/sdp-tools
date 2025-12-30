@@ -2,9 +2,9 @@ from typing import Any
 from pydantic import BaseModel
 
 
-class UpdatedEntitySchemaResponse(BaseModel):
+class UpdateRecordSchemaResponse(BaseModel):
 
-    name: str | None
+    entity_name: str | None
 
     old: Any
     new: Any

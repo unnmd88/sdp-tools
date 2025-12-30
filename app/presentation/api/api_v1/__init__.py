@@ -8,6 +8,7 @@ from .passport_groups.routes import router as passport_groups_router
 from .passports.routes import router as passports_router
 from .regions.routes import router as regions_router
 from .tlo.routes import router as tlo_router
+from .dir.routes import router as dir_router
 
 router = APIRouter(prefix=settings.api.v1.prefix)
 router.include_router(auth_router)
@@ -17,3 +18,4 @@ router.include_router(tlo_router)
 router.include_router(regions_router)
 router.include_router(passport_groups_router)
 router.include_router(passports_router)
+router.include_router(dir_router)

@@ -5,20 +5,22 @@ from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from starlette import status
 
+from core.dto.common import FiltersForSearchDTO, UpdateRecordDTO, CreateRecordDTO
 from core.dto.regions import CreateRegionDTO, UpdateRegionDTO
 from core.exceptions.base import (
     CreateError,
     CreateErrorAlreadyExists,
     NotFoundError,
 )
+from presentation.api.api_v1.regions.utils import FiltersFactory
 from presentation.api.dependencies.utils import get_filters_for_region_or_name_search
 from presentation.schemas.regions import (
-    RegionCreate,
-    RegionSchema,
+    RegionCreateSchema,
+    RegionSchemaResponse,
     RegionUpdate,
 )
 from presentation.api.dependencies.deps import RegionsCrudUseCase, regions_filters_for_search
-from presentation.schemas.update import UpdatedEntitySchemaResponse
+from presentation.schemas.update import UpdateRecordSchemaResponse
 
 router = APIRouter(
     prefix='/regions',
@@ -26,27 +28,47 @@ router = APIRouter(
 )
 
 
+# @router.get(
+#     '/{code-or-name}',
+#     response_model=RegionSchema,
+#     status_code=status.HTTP_200_OK,
+# )
+# async def get_region_by_code_or_name(
+#     code_or_name: str,
+#     use_case: RegionsCrudUseCase,
+# ):
+#     filters_for_search_dto = get_filters_for_region_or_name_search(code_or_name)
+#     if (region := await use_case.get_region_by_filters(filters_for_search_dto)) is None:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail=f'Регион {code_or_name!r} не найден.'
+#         )
+#     return RegionSchema.model_validate(region, from_attributes=True)
+
+
 @router.get(
-    '/{code-or-name}',
-    response_model=RegionSchema,
+    '/{code}',
+    response_model=RegionSchemaResponse,
     status_code=status.HTTP_200_OK,
 )
-async def get_region_by_code_or_name(
-    code_or_name: str,
+async def get_region_by_code(
+    region_code: int,
     use_case: RegionsCrudUseCase,
 ):
-    filters_for_search_dto = get_filters_for_region_or_name_search(code_or_name)
+    filters_for_search_dto = FiltersForSearchDTO(search_filters=FiltersFactory.get_filters_dict(code=region_code))
     if (region := await use_case.get_region_by_filters(filters_for_search_dto)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Регион {code_or_name!r} не найден.'
+            detail=f'Регион {region_code!r} не найден.'
         )
-    return RegionSchema.model_validate(region, from_attributes=True)
+    return region
+
+    return RegionSchemaResponse.model_validate(region, from_attributes=True)
 
 
 @router.get(
     '/id/{id}',
-    response_model=RegionSchema,
+    response_model=RegionSchemaResponse,
     status_code=status.HTTP_200_OK,
 )
 async def get_region_by_id(
@@ -58,15 +80,15 @@ async def get_region_by_id(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f'Регион с id={region_id} не найден.'
         )
-    return  RegionSchema.model_validate(region, from_attributes=True)
+    return  RegionSchemaResponse.model_validate(region, from_attributes=True)
 
 
 @router.get(
     '/',
-    response_model=list[RegionSchema],
+    response_model=list[RegionSchemaResponse],
     status_code=status.HTTP_200_OK,
 )
-async def get_list_regions(
+async def get_regions(
     use_case: RegionsCrudUseCase,
 ):
     return await use_case.get_all_regions()
@@ -76,12 +98,23 @@ async def get_list_regions(
 @router.post(
     '/',
     status_code=status.HTTP_201_CREATED,
-    response_model=RegionSchema,
+    response_model=RegionSchemaResponse,
 )
 async def create_region(
-    region: RegionCreate,
+    region: RegionCreateSchema,
     use_case: RegionsCrudUseCase,
-) -> RegionSchema:
+) -> RegionSchemaResponse:
+
+    dto = CreateRecordDTO(**region.model_dump())
+    try:
+        db_region = await use_case.create_region(dto)
+    except (CreateError, CreateErrorAlreadyExists):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='Регион с таким названием/кодом уже существует',
+        )
+    return RegionSchemaResponse.model_validate(db_region, extra='ignore', from_attributes=True)
+
     dto = CreateRegionDTO(**region.model_dump())
     try:
         db_region = await use_case.create_region(dto)
@@ -90,40 +123,39 @@ async def create_region(
             status_code=status.HTTP_409_CONFLICT,
             detail='Регион с таким названием/кодом уже существует',
         )
-    return RegionSchema.model_validate(db_region, extra='ignore', from_attributes=True)
+    return RegionSchemaResponse.model_validate(db_region, extra='ignore', from_attributes=True)
 
 
 @router.patch(
-    '/',
+    '/{code}',
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=UpdatedEntitySchemaResponse,
+    # response_model=UpdateRecordSchemaResponse,
 )
 async def update_region(
+    region_code: int,
     update_data: RegionUpdate,
     use_case: RegionsCrudUseCase,
 ):
-    dto = UpdateRegionDTO(
-        filters_for_search=get_filters_for_region_or_name_search(update_data.code_or_name).filters_for_search,
-        code_or_name=update_data.code_or_name,
-        code=update_data.code,
-        name=update_data.name,
+    dto = UpdateRecordDTO(
+        search_filters=FiltersFactory.get_filters_dict(code=region_code),
+        fields=update_data.model_dump(exclude_unset=True, exclude_none=True)
     )
     try:
         result = await use_case.update_region(dto)
-        return UpdatedEntitySchemaResponse.model_validate(
+        return UpdateRecordSchemaResponse.model_validate(
             result,
             from_attributes=True,
         )
     except NotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Регион с id={dto.id} не найден.'
+            detail=f'Регион {region_code!r} не найден.'
         )
 
 @router.delete(
     '/{id}',
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=RegionSchema,
+    response_model=RegionSchemaResponse,
 )
 async def delete_region(
     region_id: int,
@@ -131,7 +163,7 @@ async def delete_region(
 ):
     try:
         result = await use_case.delete_region(region_id)
-        return RegionSchema.model_validate(
+        return RegionSchemaResponse.model_validate(
             result,
             from_attributes=True,
         )

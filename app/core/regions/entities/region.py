@@ -1,21 +1,23 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import ClassVar
 
 from core.constants import ALLOWED_REGIONS
 from core.enums import RegionCodes, RegionNames
+from core.mixins import BaseEntityMixin
 from core.users.exceptions import DomainValidationError
 
 T_ALLOWED_REGIONS = frozenset[tuple[RegionNames, RegionCodes]]
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class RegionEntity:
+class RegionEntity(BaseEntityMixin):
 
+    entity_name: ClassVar = 'Region'
     allowed_regions: ClassVar[T_ALLOWED_REGIONS] = ALLOWED_REGIONS
 
     code: int
     name: str
-    id: int | None = None
 
     def __eq__(self, other):
          if not isinstance(other, RegionEntity):

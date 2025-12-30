@@ -4,7 +4,8 @@ from dataclasses import asdict
 
 from app_logging.dev.config import COMMON_LOGGER
 from application.interfaces.repositories.regions import RegionsRepositoryProtocol
-from core.dto.filters import FiltersForSearchDTO
+from core.dto.common import FiltersForSearchDTO, CreateRecordDTO
+# from core.dto.filters import FiltersForSearchDTO
 from core.dto.regions import UpdateRegionDTO, CreateRegionDTO
 from core.dto.update_entity import UpdatedEntityDTO
 from core.enums import Permissions
@@ -26,20 +27,15 @@ class RegionsServiceImpl(BaseService):
 
     async def get_region_by_filters_or_none(self, filters_dto: FiltersForSearchDTO) -> RegionEntity | None:
         self.user_entity.check_permission_read_region()
-        return await self.repository.get_one_or_none_by_filters(
-            **filters_dto.filters_for_search
-        )
+        return await self.repository.get_one_or_none_by_filters(filters_dto.search_filters)
 
     async def get_all_regions(self) -> Sequence[RegionEntity]:
         self.user_entity.check_permission_read_region()
-        return await self.repository.get_all()
+        return await self.repository.get_many()
 
-    async def create_region(self, region: CreateRegionDTO) -> RegionEntity:
+    async def create_region(self, region: CreateRecordDTO) -> RegionEntity:
         self.user_entity.check_permissions(Permissions.CREATE_REGIONS)
-        region_entity = RegionEntity(
-            name=region.name,
-            code=region.code,
-        )
+        region_entity = RegionEntity(**region.fields)
         region_exists = await self.repository.get_one_or_none_by_filters(
             name=region_entity.name,
             code=region_entity.code

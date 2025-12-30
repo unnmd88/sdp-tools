@@ -62,7 +62,7 @@ class TrafficLightObjectDBMapper(BaseDBMapperProtocol):
         )
         return TrafficLightObjectEntity(
             id=tlo_model.id,
-            name=tlo_model.name,
+            name=tlo_model.entity_name,
             region=RegionNames.MOSCOW,
             latitude=tlo_model.latitude,
             longitude=tlo_model.longitude,

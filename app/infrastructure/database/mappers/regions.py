@@ -9,6 +9,9 @@ from infrastructure.database.models import Region as RegionModel
 @final
 @dataclass(frozen=True, slots=True)
 class RegionDBMapper(BaseDBMapperProtocol):
+
+    entity = RegionEntity
+
     @classmethod
     def to_entity(cls, model: RegionModel) -> RegionEntity:
         """ """
@@ -16,6 +19,8 @@ class RegionDBMapper(BaseDBMapperProtocol):
             id=model.id,
             code=model.code,
             name=model.name,
+            created_at=model.created_at,
+            updated_at=model.updated_at,
         )
 
     @classmethod
@@ -31,4 +36,5 @@ class RegionDBMapper(BaseDBMapperProtocol):
             code=entity.code,
             name=entity.name,
             )
+
 
