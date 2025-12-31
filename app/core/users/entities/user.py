@@ -19,6 +19,7 @@ from core.field_validators import (
     check_telegram_is_valid,
     check_set_password,
 )
+from core.mixins import BaseEntityMixin
 from core.users.exceptions import (
     DomainValidationError,
     INVALID_DESCRIPTION_EXCEPTION_TEXT,
@@ -29,13 +30,8 @@ from core.utils import hash_password
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class UserEntity:
-    def __eq__(self, other):
-        if not isinstance(other, UserEntity):
-            return NotImplemented
-        return self.username == other.username
+class UserEntity(BaseEntityMixin):
 
-    id: int | None
     first_name: str
     last_name: str
     username: str
@@ -46,13 +42,16 @@ class UserEntity:
     is_admin: bool
     is_superuser: bool
     role: Roles
-    phone_number: str = ''
-    telegram: str = ''
-    description: str = ''
-    full_validate: InitVar[bool] = True
+    phone_number: str
+    telegram: str
+    description: str
     permissions: UserPermissions = field(default_factory=UserPermissions)
+    raise_if_not_active: InitVar[bool] = True
+    full_validate: InitVar[bool] = True
 
-    def __post_init__(self, full_validate):
+    def __post_init__(self, raise_if_not_active, full_validate,):
+        if raise_if_not_active and not self.is_active:
+            raise DomainValidationError(f'Пользователь с id={self.id} username={self.username!r} не активен.')
         if not full_validate:
             return
         if self.id is not None and not check_field_id_is_valid(self.id):
@@ -104,6 +103,11 @@ class UserEntity:
             raise DomainValidationError(INVALID_DESCRIPTION_EXCEPTION_TEXT)
         self._set_permissions()
 
+    def __eq__(self, other):
+        if not isinstance(other, UserEntity):
+            return NotImplemented
+        return self.username == other.username
+
     def _set_permissions(self):
         if not self.is_active:
             self.permissions.revoke_all()
@@ -116,7 +120,7 @@ class UserEntity:
                 exclude={Permissions.CREATE_USERS, Permissions.UPDATE_USERS}
             )
 
-    def allow_to_crete_new_user(self) -> bool:
+    def check_has_permission_to_crete_new_user(self) -> bool:
         return self.is_active and self.is_superuser
 
     def has_all_permissions(self, *permissions: Permissions):
@@ -183,6 +187,27 @@ class CreateNewUserEntity:
 
 
 if __name__ == '__main__':
+    user = UserEntity(
+        id=321,
+        first_name='Chook',
+        last_name='Gekk',
+        username='chokk',
+        organization=Organizations.SDP,
+        email='example@example.com',
+        password=b'mysecret',
+        is_active=False,
+        is_admin=True,
+        is_superuser=True,
+        role=Roles.superuser,
+        phone_number='',
+        telegram='',
+        description='',
+        raise_if_not_active=False,
+        # full_validate=False,
+    )
+
+
+
     try:
         user = UserEntity(
             id=321,

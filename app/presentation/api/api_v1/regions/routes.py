@@ -3,6 +3,12 @@ from fastapi import APIRouter
 from fastapi.exceptions import HTTPException
 from starlette import status
 
+from presentation.api.api_v1.documentation.regions.endpoints import (
+    PATCH_region_by_code_description,
+    GET_region_by_code_description, DELETE_region_by_code_description, POST_region_description,
+    GET_region_by_id_description, GET_all_regions_description,
+)
+
 from presentation.api.api_v1.regions.utils import FiltersFactory
 from presentation.api.dependencies.deps import RegionsCrudUseCase
 from presentation.schemas.update import UpdatedRecordSchemaResponse
@@ -14,7 +20,7 @@ from presentation.schemas.regions import (
 from core.dto.common import (
     FiltersForSearchDTO,
     ToUpdateRecordDTO,
-    CreateRecordDTO, DeleteRecordDTO
+    CreateRecordDTO
 )
 from core.exceptions.base import (
     CreateError,
@@ -52,6 +58,8 @@ router = APIRouter(
     '/{code}',
     response_model=RegionSchemaResponse,
     status_code=status.HTTP_200_OK,
+    summary="Получить данные существующего региона по его коду.",
+    description=GET_region_by_code_description,
 )
 async def get_region_by_code(
     region_code: int,
@@ -70,6 +78,8 @@ async def get_region_by_code(
     '/id/{id}',
     response_model=RegionSchemaResponse,
     status_code=status.HTTP_200_OK,
+    summary="Получить данные региона светофорного объекта по id",
+    description=GET_region_by_id_description,
 )
 async def get_region_by_id(
     region_id: int,
@@ -87,8 +97,10 @@ async def get_region_by_id(
     '/',
     response_model=list[RegionSchemaResponse],
     status_code=status.HTTP_200_OK,
+    summary="Список всех имеющихся регионов светофорного объекта",
+    description=GET_all_regions_description,
 )
-async def get_regions(use_case: RegionsCrudUseCase):
+async def get_all_regions(use_case: RegionsCrudUseCase):
     return await use_case.get_all_regions()
 
 
@@ -96,6 +108,8 @@ async def get_regions(use_case: RegionsCrudUseCase):
     '/',
     status_code=status.HTTP_201_CREATED,
     response_model=RegionSchemaResponse,
+    summary="Создать новый регион светофорного объекта",
+    description=POST_region_description,
 )
 async def create_region(
     region: RegionCreateSchema,
@@ -116,7 +130,9 @@ async def create_region(
 @router.patch(
     '/{code}',
     status_code=status.HTTP_202_ACCEPTED,
-    # response_model=UpdateRecordSchemaResponse,
+    response_model=UpdatedRecordSchemaResponse,
+    summary="Обновить данные существующего региона.",
+    description=PATCH_region_by_code_description
 )
 async def update_region(
     region_code: int,
@@ -129,20 +145,20 @@ async def update_region(
     )
     try:
         result = await use_case.update_region(dto)
-        return UpdatedRecordSchemaResponse.model_validate(
-            result,
-            from_attributes=True,
-        )
     except NotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f'Регион {region_code!r} не найден.'
         )
+    return result
+
 
 @router.delete(
     '/{code}',
     status_code=status.HTTP_202_ACCEPTED,
     response_model=RegionSchemaResponse,
+    summary="Удалить существующий регион.",
+    description=DELETE_region_by_code_description,
 )
 async def delete_region(
     region_code: int,

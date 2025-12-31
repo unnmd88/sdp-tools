@@ -1,23 +1,30 @@
 from collections.abc import Sequence
 from dataclasses import asdict
-from typing import TypeVar, TypeAlias, Any
+from typing import TypeVar, TypeAlias
 
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, delete
 from sqlalchemy.engine.result import Result
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
+from infrastructure.database.models import Base
+
 from application.interfaces.mappers.db import BaseDBMapperProtocol
-from application.interfaces.repositories.base import BaseCrudProtocol, FiltersForSearchProtocol
-from core.dto.common import CreateRecordDTO, UpdatedRecordDTO, ToUpdateRecordDTO, DeleteRecordDTO
-from core.exceptions.base import CreateError, CreateErrorAlreadyExists, NotFoundError, UpdateError, DeleteError
+from core.dto.common import (
+    CreateRecordDTO,
+    UpdatedRecordDTO,
+    ToUpdateRecordDTO,
+    DeleteRecordDTO
+)
+from core.exceptions.base import (
+    CreateErrorAlreadyExists,
+    NotFoundError,
+    DeleteError
+)
 from core.regions.entities.region import RegionEntity
 from core.tlo.entities.tlo import TrafficLightObjectEntity
 from core.users.entities.user import UserEntity
-from core.users.exceptions import UserAlreadyExistsException
-from infrastructure.database.models import Base
-from infrastructure.database.api import db_api
-from fastapi.params import Depends
+
 
 
 T = TypeVar('T', bound=type[Base])
@@ -84,64 +91,53 @@ class BaseSqlAlchemy:
         if (current_model := result.scalars().one_or_none()) is None:
             raise NotFoundError
         old_entity = self.mapper.to_entity(current_model)
-
+        # Создать инстанс сущности для проверки валидности обновляемых полей
         updated_fields = asdict(old_entity) | update_record_dto.fields
-        updated_entity = self.mapper.entity_validate(**updated_fields) # Возможно исключение DomainValidationError
+        self.mapper.entity_validate(**updated_fields) # Возможно исключение DomainValidationError
+
+        # stmt = (
+        #     update(self.model)
+        #     .where(self.model.id == current_model.id)
+        #     .values(update_record_dto.fields)
+        #     .returning("*")
 
         try:
             for k, v in update_record_dto.fields.items():
                 setattr(current_model, k, v)
             await self.session.commit()
-            # updated_entity = self.mapper.to_entity(current_model)
+            updated_entity = await self.get_one_or_none_by_filters({'id': old_entity.id})
             return UpdatedRecordDTO(old_entity, updated_entity, name=self.model.__name__)
         except SQLAlchemyError as e:
-            raise UpdateError(e)
+            raise
 
-        # stmt = (
-        #     update(self.model)
-        #     .filter_by(**filters)
-        #     .values(**fields)
-        #     .returning("*")
-        # )
-
-        try:
-            for k, v in fields.items():
-                if v is not None:
-                    setattr(model, k, v)
-            await self.session.commit()
-        except SQLAlchemyError as e:
-            await self.session.rollback()
-            raise e
-        return model
-
-    async def update(
-        self,
-        _id: int,
-        **fields,
-    ) -> UpdatedRecordDTO:
-        if (current_model := await self.session.get(self.model, _id)) is None:
-            raise NotFoundError
-        old_entity = self.mapper.to_entity(current_model)
-        try:
-            for k, v in fields.items():
-                setattr(current_model, k, v)
-            await self.session.commit()
-            updated_entity = self.mapper.to_entity(current_model)
-            return UpdatedRecordDTO(old_entity, updated_entity, name=self.model.__name__)
-        except SQLAlchemyError as e:
-            raise UpdateError(e)
+    # async def update(
+    #     self,
+    #     _id: int,
+    #     **fields,
+    # ) -> UpdatedRecordDTO:
+    #     if (current_model := await self.session.get(self.model, _id)) is None:
+    #         raise NotFoundError
+    #     old_entity = self.mapper.to_entity(current_model)
+    #     try:
+    #         for k, v in fields.items():
+    #             setattr(current_model, k, v)
+    #         await self.session.commit()
+    #         updated_entity = self.mapper.to_entity(current_model)
+    #         return UpdatedRecordDTO(old_entity, updated_entity, name=self.model.__name__)
+    #     except SQLAlchemyError as e:
+    #         raise UpdateError(e)
 
     async def delete_one(self, delete_record_dto: DeleteRecordDTO) -> Entity | None:
 
-        stmt = select(self.model).filter_by(**delete_record_dto.search_filters)
-        result: Result = await self.session.execute(stmt)
-        if (current_model := result.scalars().one_or_none()) is None:
+        entity = await self.get_one_or_none_by_filters(delete_record_dto.search_filters)
+        if entity is None:
             raise NotFoundError
-        stmt = delete(self.model).filter_by(id=current_model.id)
-        entity = self.mapper.to_entity(current_model)
+        stmt = delete(self.model).filter_by(id=entity.id)
         try:
             await self.session.execute(stmt)
             await self.session.commit()
+            if (await self.get_one_or_none_by_filters({'id': entity.id})) is not None:
+                raise DeleteError
         except SQLAlchemyError as e:
             raise DeleteError(e)
         return entity

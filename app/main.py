@@ -5,7 +5,9 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 
-app = FastAPI()
+app = FastAPI(
+    title='Api для работы с паспортами светофорного объекта.',
+)
 app.include_router(router=api_v1_router)
 
 
