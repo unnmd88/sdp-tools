@@ -6,7 +6,7 @@ from core.dto.users import UpdateUserDTO
 from core.enums import Roles, Organizations
 from core.exceptions.base import UpdateError
 from core.users.entities.user import UserEntity
-from core.users.exceptions import ForbiddenUpdate
+from core.users.exceptions import ForbiddenUpdateError
 from infrastructure.database.models import User as UserModel
 
 
@@ -31,6 +31,8 @@ class UserDBMapper(BaseDBMapperProtocol):
             phone_number=model.phone_number,
             telegram=model.telegram,
             description=model.description,
+            created_at=model.created_at,
+            updated_at=model.created_at,
         )
 
     @classmethod

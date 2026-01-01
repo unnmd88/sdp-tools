@@ -34,7 +34,7 @@ class RegionsServiceImpl(BaseService):
         return await self.repository.get_many()
 
     async def create_region(self, create_dto: CreateRecordDTO) -> RegionEntity:
-        self.user_entity.has_all_permissions(Permissions.CREATE_REGIONS)
+        self.user_entity.has_permissions(Permissions.CREATE_REGIONS)
         logger.info(
             'Юзер %r: запрос на создание нового региона: %r',
             self.user_entity.username, create_dto.fields
@@ -54,7 +54,7 @@ class RegionsServiceImpl(BaseService):
         return new_region_entity
 
     async def update_region(self, update_dto: ToUpdateRecordDTO) -> UpdatedRecordDTO:
-        self.user_entity.has_all_permissions(Permissions.UPDATE_REGIONS)
+        self.user_entity.has_permissions(Permissions.UPDATE_REGIONS)
         logger.info(
             'Юзер %r: запрос на обновление региона %r\nДанные для обновления: %r',
             self.user_entity.username, update_dto.search_filters, update_dto.fields
@@ -71,7 +71,7 @@ class RegionsServiceImpl(BaseService):
         return update_dto
 
     async def delete_region(self, filters_dto: FiltersForSearchDTO) -> RegionEntity:
-        self.user_entity.has_all_permissions(Permissions.DELETE_REGIONS)
+        self.user_entity.has_permissions(Permissions.DELETE_REGIONS)
         logger.info(
             'Юзер %r: запрос на удаление региона: %r',
             self.user_entity.username, filters_dto.search_filters,

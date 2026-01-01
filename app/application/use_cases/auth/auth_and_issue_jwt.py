@@ -3,6 +3,9 @@ from application.interfaces.services.authentication import (
 )
 from application.jwt_utils import create_access_jwt, create_refresh_jwt
 from core.dto.auth import UserAuthDTO
+from core.security_policies.exceptions import InactiveUserError
+from core.users.entities.user import UserEntity
+from core.users.exceptions import UserNotFoundByUsernameError
 
 from presentation.schemas.jwt import TokenInfo
 
@@ -16,7 +19,7 @@ class AuthJWTUseCaseImpl:
         user_auth_data: UserAuthDTO,
         refresh_token=None,
     ) -> TokenInfo:
-        user_entity = await self.auth_service.authenticate(user_auth_data)
+        user_entity: UserEntity = await self.auth_service.authenticate(user_auth_data)
         return TokenInfo(
             access_token=create_access_jwt(user_entity),
             refresh_token=create_refresh_jwt(user_entity) if refresh_token else None,

@@ -20,6 +20,7 @@ from core.field_validators import (
     check_set_password,
 )
 from core.mixins import BaseEntityMixin
+from core.security_policies.exceptions import InactiveUserError
 from core.users.exceptions import (
     DomainValidationError,
     INVALID_DESCRIPTION_EXCEPTION_TEXT,
@@ -119,11 +120,12 @@ class UserEntity(BaseEntityMixin):
             self.permissions.add_all_user_permissions(
                 exclude={Permissions.CREATE_USERS, Permissions.UPDATE_USERS}
             )
+    def check_has_permission_to_crete_new_user(self) -> None:
+        if self.role == Roles.superuser:
+            return None
+        raise UserPermissionsError(self.username)
 
-    def check_has_permission_to_crete_new_user(self) -> bool:
-        return self.is_active and self.is_superuser
-
-    def has_all_permissions(self, *permissions: Permissions):
+    def has_permissions(self, *permissions: Permissions):
         """
         Проверка наличия permissions для пользователя. В случае, если один хотя бы одно из permissions
         отсутствует - будет выброшено исключение.
@@ -138,13 +140,19 @@ class UserEntity(BaseEntityMixin):
             raise UserPermissionsError(f'Отсутствуют права: {",".join(p for p in permissions if p not in all_permissions)}')
 
     def check_permission_read_region(self):
-        self.has_all_permissions(Permissions.READ_REGIONS)
+        self.has_permissions(Permissions.READ_REGIONS)
 
     def check_permission_read_passport_groups(self):
-        self.has_all_permissions(Permissions.READ_PASSPORT_GROUPS)
+        self.has_permissions(Permissions.READ_PASSPORT_GROUPS)
 
     def check_permission_read_tlo(self):
-        self.has_all_permissions(Permissions.READ_TLO)
+        self.has_permissions(Permissions.READ_TLO)
+
+    def check_permission_to_search_any_user(self) -> None:
+        if self.role in (Roles.admin, Roles.superuser):
+            return None
+        raise UserPermissionsError(self.username)
+
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

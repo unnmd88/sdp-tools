@@ -1,15 +1,23 @@
 from typing import Protocol, Sequence
 
-from core.dto.users import CreateUserDTO, UpdateUserDTO
+from core.dto.common import FiltersForSearchDTO
+from core.dto.users import CreateUserDTO, UpdateUserDTO, SearchUserByIdDTO, SearchUsersDTO
 from core.users.entities.user import UserEntity
 
 
 class UsersServiceProtocol(Protocol):
+
+    customer_username: str
+
+    async def get_user_by_username_for_auth(self, username: str) -> UserEntity | None: ...
+
+    async def get_user_by_filters(self, filters: FiltersForSearchDTO) -> UserEntity: ...
+
     async def get_user_by_username_or_none(self, name: str) -> UserEntity: ...
 
-    async def get_user_by_id_or_none(self, user_id: int) -> UserEntity: ...
+    async def get_user_by_id_or_none(self, user_dto: SearchUserByIdDTO) -> UserEntity: ...
 
-    async def get_all_users(self) -> Sequence[UserEntity]: ...
+    async def get_all_users(self, users_dto: SearchUsersDTO) -> Sequence[UserEntity]: ...
 
     async def create_user(self, user: CreateUserDTO) -> UserEntity: ...
 

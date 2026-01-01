@@ -35,6 +35,12 @@ LOGGING_CONFIG = {
             'filename': BASE_DIR / 'app_logging/RUD.log',
             'formatter': 'simple2',
         },
+        'USERS_RUD': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'app_logging/USERS_RUD.log',
+            'formatter': 'simple2',
+        },
     },
     'loggers': {
         '': {
@@ -49,7 +55,7 @@ LOGGING_CONFIG = {
         },
         'users': {
             'level': 'INFO',
-            'handlers': ['console', 'file_users'],
+            'handlers': ['USERS_RUD'],
             'propagate': True,
         },
         'passports': {

@@ -3,6 +3,32 @@ from dataclasses import dataclass
 from core.enums import Roles, Organizations
 
 
+@dataclass(slots=True, frozen=True, kw_only=True)
+class SearchUsersDTO:
+    """ DTO для поиска сущности в хранилище. """
+
+    customer_id: int
+
+
+
+@dataclass(slots=True, frozen=True, kw_only=True)
+class SearchUserByIdDTO(SearchUsersDTO):
+    """ DTO для поиска сущности в хранилище. """
+
+    search_user_id: int
+
+
+@dataclass(slots=True, frozen=True, kw_only=True)
+class SearchManyUserByIdDTO:
+    """ DTO для поиска сущности в хранилище. """
+
+    customer_id: int
+    customer_username: str
+    customer_email: str
+
+    search_user_id: int
+
+
 @dataclass(kw_only=True)
 class UserDTO:
     first_name: str
@@ -24,7 +50,7 @@ class UserDTO:
 class CreateUserDTO(UserDTO):
     """DTO для создания нового пользователя системы."""
 
-    requester_username: str
+    customer_id: int
 
 
 @dataclass

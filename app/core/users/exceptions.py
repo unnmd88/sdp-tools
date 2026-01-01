@@ -25,7 +25,7 @@ class UserInactiveError(ApplicationError):
     """Неактивный пользователь пытается осуществлять какие-либо действия. """
 
 
-class UserNotFoundException(NotFoundError):
+class UserNotFoundError(NotFoundError):
     """Ошибка поиска user."""
 
     @property
@@ -33,7 +33,7 @@ class UserNotFoundException(NotFoundError):
         return f'Пользователь не найден.'
 
 
-class UserNotFoundByIdException(UserNotFoundException):
+class UserNotFoundByIdError(UserNotFoundError):
     """Ошибка поиска user по id."""
 
     def __init__(
@@ -48,7 +48,7 @@ class UserNotFoundByIdException(UserNotFoundException):
         return f'Пользователь с id={self._id!r} не найден.'
 
 
-class UserNotFoundByUsernameException(UserNotFoundException):
+class UserNotFoundByUsernameError(UserNotFoundError):
     """Ошибка поиска user по username."""
 
     def __init__(
@@ -63,7 +63,7 @@ class UserNotFoundByUsernameException(UserNotFoundException):
         return f'Пользователь с username={self._id!r} не найден.'
 
 
-class UserAlreadyExistsException(CreateError):
+class UserAlreadyExistsError(CreateError):
     """Ошибка создания нового пользователя из-за наличия такового."""
 
     def __init__(
@@ -78,7 +78,7 @@ class UserAlreadyExistsException(CreateError):
         return f'Пользователь с username={self._id!r} уже существует.'
 
 
-class InvalidPasswordToSet(CreateError):
+class InvalidUserPasswordToSetError(CreateError):
     """Ошибка установки пароля пользователя."""
 
     @property
@@ -86,11 +86,11 @@ class InvalidPasswordToSet(CreateError):
         return f'Ошибка установки пароля пользователя.'
 
 
-class ForbiddenCreate(CreateError):
+class ForbiddenCreateError(CreateError):
     """Ошибка создания нового объекта из-за отсутствия прав."""
 
 
-class ForbiddenUpdate(UpdateError):
+class ForbiddenUpdateError(UpdateError):
     """Ошибка обновления объекта из-за отсутствия прав."""
 
 

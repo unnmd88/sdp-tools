@@ -6,7 +6,7 @@ from presentation.api.dependencies.deps import JWTAuthUseCase, AuthForm
 
 from presentation.api.exceptions import (
     UnauthorizedErrorHttp401,
-    InactiveUserErrorHttp403,
+    InactiveUserErrorHttp403, InvalidUsernameOrPasswordException, InactiveUserException,
 )
 from presentation.schemas.auth import AuthSchema
 from presentation.schemas.jwt import TokenInfo

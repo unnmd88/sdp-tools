@@ -14,27 +14,6 @@ class UserPermissions:
             f')'
         )
 
-    # def check_has_permissions(self, *permissions: Permission):
-    #     if not permissions:
-    #         raise TypeError('permissions cant be empty')
-    #     return all(Permission(p) in self._permissions for p in permissions)
-    #
-    # @property
-    # def read_users(self) -> bool:
-    #     return Permission.READ_USERS in self._permissions
-    #
-    # @property
-    # def create_users(self) -> bool:
-    #     return Permission.CREATE_USERS in self._permissions
-    #
-    # @property
-    # def update_users(self) -> bool:
-    #     return Permission.UPDATE_USERS in self._permissions
-    #
-    # @property
-    # def read_regions(self):
-    #     return self.check_has_permissions(Permission.READ_REGIONS)
-
     def get_all(self) -> MutableSet[Permissions]:
         return self._permissions
 

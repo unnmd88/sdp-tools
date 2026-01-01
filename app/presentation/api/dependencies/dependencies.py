@@ -63,6 +63,7 @@ def get_jwt_payload_jwt_bearer(
     except ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
+
 def is_admin(
     payload: Annotated[PayloadJWTSchema, Depends(get_jwt_payload_jwt_bearer)]
 ):
@@ -112,7 +113,9 @@ def get_crud_users_service(
         UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
     ],
 ) -> UsersServiceProtocol:
-    return UsersServiceImpl(repository=sqlalchemy_repository)
+    return UsersServiceImpl(
+        repository=sqlalchemy_repository,
+    )
 
 
 def get_auth_service(

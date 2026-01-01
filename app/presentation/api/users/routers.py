@@ -1,19 +1,20 @@
-from collections.abc import Sequence
-
 from fastapi import APIRouter, status, HTTPException
 
+from core.dto.users import (
+    CreateUserDTO,
+    UpdateUserDTO,
+    SearchUserByIdDTO,
+    SearchUsersDTO
+)
 
-from application.interfaces.services import users_crud
-from core.dto.users import CreateUserDTO, UpdateUserDTO
-
-from core.users.exceptions import UserNotFoundException, UserAlreadyExistsException
+from core.users.exceptions import UserAlreadyExistsError, DomainValidationError, InvalidUserPasswordToSetError, \
+    UserPermissionsError
 from presentation.api.dependencies.deps import (
     UsersCrudUseCase,
     PayloadJWT,
     IsSuperuser
 )
 
-from presentation.api.exceptions import UserNotFoundHttpException
 from presentation.schemas.users import (
     CreateUserSchema,
     ResponseUserSchema,
@@ -31,87 +32,70 @@ router = APIRouter(
 @router.get(
     '/whoami/',
     status_code=status.HTTP_200_OK,
-    # response_model=UserFromDbFullSchema,
-)
-def whoami(
-    # user: Annotated[UserFromDbFullSchema, Depends(check_is_active_superuser)],
-    user: PayloadJWT,
-):
-    return user
-
-
-@router.get(
-    '/username/{username}/',
-    description='Get user by username',
-    # response_model=UserFromDbFullSchema,
-    # dependencies=[Depends(check_user_is_active)],
-)
-async def get_user_by_username(
-    username: str,
-    use_case: UsersCrudUseCase,
-):
-    try:
-        return await use_case.get_user_by_username_or_none(username)
-    except UserNotFoundException as e:
-        raise UserNotFoundHttpException(detail=e.detail)
-    return await users_crud.get_user_by_id(user_id, sess)
-    return await users_crud.get_user_by_id(user_id, sess)
-
-
-@router.get(
-    '/{user_id}/',
-    description='Get user by id',
     response_model=ResponseUserSchema,
-    dependencies=[IsSuperuser],
-
 )
-async def get_user(
-    user_id: int,
+async def whoami(
+    payload_jwt: PayloadJWT,
     use_case: UsersCrudUseCase,
 ):
-    try:
-        user_entity = await use_case.get_user_by_id(user_id)
-        return ResponseUserSchema.model_validate(user_entity, from_attributes=True)
-    except UserNotFoundException as e:
-        raise UserNotFoundHttpException(detail=e.detail)
+    user_search_dto = SearchUserByIdDTO(
+        customer_id=payload_jwt.user_id,
+        search_user_id=payload_jwt.user_id,
+    )
+    user = await use_case.get_user_by_id(user_search_dto)
+    return ResponseUserSchema.model_validate(user, from_attributes=True)
 
 
 @router.get(
     '/',
-    response_model=Sequence[ResponseUserSchema],
+    status_code=status.HTTP_200_OK,
+    response_model=list[ResponseUserSchema],
     dependencies=[IsSuperuser],
 )
 async def get_users(
+    payload_jwt: PayloadJWT,
     use_case: UsersCrudUseCase,
 ):
+    user_search_dto = SearchUsersDTO(customer_id=payload_jwt.user_id)
+    users = await use_case.get_all_users(user_search_dto)
     return [
-        ResponseUserSchema.model_validate(user_entity, from_attributes=True)
-        for user_entity in await use_case.get_all_users()
+        ResponseUserSchema.model_validate(user, from_attributes=True)
+        for user in users
     ]
 
 
 @router.post(
     '/',
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseUserSchema,
+    # response_model=ResponseUserSchema,
     dependencies=[IsSuperuser],
 )
 async def create_user(
     jwt_payload: PayloadJWT,
-    user: CreateUserSchema,
+    new_user: CreateUserSchema,
     use_case: UsersCrudUseCase,
 ):
-    user_dto = CreateUserDTO(
-        **(user.model_dump() | {'requester_username': jwt_payload.sub})
-    )
+    create_model_fields = new_user.model_dump(exclude_unset=True)
+    create_model_fields.update(customer_id=jwt_payload.user_id)
+    user_dto = CreateUserDTO(**create_model_fields)
+    new_user_entity = err = _status_code = None
     try:
-        new_user = await use_case.create_user(user_dto)
-    except UserAlreadyExistsException as e:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=e.detail,
-        )
-    return ResponseUserSchema.model_validate(new_user, from_attributes=True)
+        new_user_entity = await use_case.create_user(user_dto)
+    except DomainValidationError as e:
+        err = f'Некорректные данные для создания нового пользователя: {e}.'
+        _status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
+    except InvalidUserPasswordToSetError:
+        err = 'Недопустимый пароль.'
+        _status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
+    except UserAlreadyExistsError:
+        err = 'Пользователь с данным username уже существует.'
+        _status_code = status.HTTP_409_CONFLICT
+    except UserPermissionsError:
+        err = 'Нет прав для создания нового пользователя.'
+        _status_code = status.HTTP_403_FORBIDDEN
+    if err is not None:
+        raise HTTPException(status_code=_status_code, detail=err)
+    return new_user_entity
 
 
 @router.patch(
