@@ -25,8 +25,6 @@ class UserDBMapper(BaseDBMapperProtocol):
             email=model.email,
             password=model.password,
             is_active=model.is_active,
-            is_admin=model.is_admin,
-            is_superuser=model.is_superuser,
             role=Roles(model.role),
             phone_number=model.phone_number,
             telegram=model.telegram,

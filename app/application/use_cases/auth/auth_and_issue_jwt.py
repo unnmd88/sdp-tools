@@ -3,9 +3,7 @@ from application.interfaces.services.authentication import (
 )
 from application.jwt_utils import create_access_jwt, create_refresh_jwt
 from core.dto.auth import UserAuthDTO
-from core.security_policies.exceptions import InactiveUserError
 from core.users.entities.user import UserEntity
-from core.users.exceptions import UserNotFoundByUsernameError
 
 from presentation.schemas.jwt import TokenInfo
 

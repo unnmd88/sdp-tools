@@ -38,8 +38,6 @@ class UserDTO:
     email: str
     organization: Organizations
     is_active: bool
-    is_admin: bool
-    is_superuser: bool
     role: Roles
     phone_number: str
     telegram: str

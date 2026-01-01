@@ -40,8 +40,6 @@ class UserEntity(BaseEntityMixin):
     email: str
     password: bytes
     is_active: bool
-    is_admin: bool
-    is_superuser: bool
     role: Roles
     phone_number: str
     telegram: str
@@ -83,14 +81,6 @@ class UserEntity(BaseEntityMixin):
             raise DomainValidationError(
                 f'Значение "is_active" должно быть типа bool.'
             )
-        if not isinstance(self.is_admin, bool):
-            raise DomainValidationError(
-                f'Значение "is_admin" должно быть типа bool.'
-            )
-        if not isinstance(self.is_superuser, bool):
-            raise DomainValidationError(
-                f'Значение "is_superuser" должно быть типа bool.'
-            )
         check_is_valid_enum(Roles, self.role)
         if not check_phone_number_is_valid(self.phone_number):
             raise DomainValidationError(
@@ -114,9 +104,9 @@ class UserEntity(BaseEntityMixin):
             self.permissions.revoke_all()
             return
 
-        if self.is_superuser:
+        if self.role == Roles.superuser:
             self.permissions.add_all_user_permissions()
-        elif self.is_admin:
+        elif self.role == Roles.admin:
             self.permissions.add_all_user_permissions(
                 exclude={Permissions.CREATE_USERS, Permissions.UPDATE_USERS}
             )

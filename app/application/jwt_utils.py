@@ -60,8 +60,6 @@ def create_access_jwt(user: UserEntity):
         str(TokenFields.user_id): user.id,
         str(TokenFields.sub): user.username,
         str(TokenFields.role): user.role,
-        str(TokenFields.is_admin): user.is_admin,
-        str(TokenFields.is_superuser): user.is_superuser,
         str(TokenFields.organization): user.organization,
         str(TokenFields.email): user.email,
     }

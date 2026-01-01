@@ -18,8 +18,6 @@ class PayloadJWTSchema(BaseModel):
     user_id: int
     sub: str
     role: str | Roles
-    is_admin: bool
-    is_superuser: bool
     organization: str | Organizations
     email: EmailStr | str
     typ: str

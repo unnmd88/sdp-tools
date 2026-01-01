@@ -27,8 +27,6 @@ class BaseUserSchema(BaseModel):
     username: str
     email: EmailStr | None | str
     is_active: bool
-    is_admin: bool
-    is_superuser: bool
     role: Roles
     organization: Organizations
     phone_number: str | None
