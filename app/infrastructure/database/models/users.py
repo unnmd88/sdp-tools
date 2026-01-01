@@ -41,16 +41,16 @@ class User(
         default=True,
         server_default=sa.sql.expression.true(),
     )
-    is_admin: Mapped[bool] = mapped_column(
-        nullable=False,
-        default=True,
-        server_default=sa.sql.expression.false(),
-    )
-    is_superuser: Mapped[bool] = mapped_column(
-        nullable=False,
-        default=True,
-        server_default=sa.sql.expression.false(),
-    )
+    # is_admin: Mapped[bool] = mapped_column(
+    #     nullable=False,
+    #     default=True,
+    #     server_default=sa.sql.expression.false(),
+    # )
+    # is_superuser: Mapped[bool] = mapped_column(
+    #     nullable=False,
+    #     default=True,
+    #     server_default=sa.sql.expression.false(),
+    # )
     role: Mapped[str] = mapped_column(String(32), nullable=False)
     phone_number: Mapped[str] = mapped_column(
         String(32), nullable=False, default='', server_default=''
