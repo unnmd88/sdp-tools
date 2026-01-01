@@ -11,7 +11,7 @@ from core.users.exceptions import UserAlreadyExistsError, DomainValidationError,
     UserPermissionsError
 from presentation.api.dependencies.deps import (
     UsersCrudUseCase,
-    PayloadJWT,
+    PayloadAccessJWT,
     IsSuperuser
 )
 
@@ -35,7 +35,7 @@ router = APIRouter(
     response_model=ResponseUserSchema,
 )
 async def whoami(
-    payload_jwt: PayloadJWT,
+    payload_jwt: PayloadAccessJWT,
     use_case: UsersCrudUseCase,
 ):
     user_search_dto = SearchUserByIdDTO(
@@ -50,10 +50,9 @@ async def whoami(
     '/',
     status_code=status.HTTP_200_OK,
     response_model=list[ResponseUserSchema],
-    dependencies=[IsSuperuser],
 )
 async def get_users(
-    payload_jwt: PayloadJWT,
+    payload_jwt: PayloadAccessJWT,
     use_case: UsersCrudUseCase,
 ):
     user_search_dto = SearchUsersDTO(customer_id=payload_jwt.user_id)
@@ -71,7 +70,7 @@ async def get_users(
     # dependencies=[IsSuperuser],
 )
 async def create_user(
-    jwt_payload: PayloadJWT,
+    jwt_payload: PayloadAccessJWT,
     new_user: CreateUserSchema,
     use_case: UsersCrudUseCase,
 ):
@@ -106,7 +105,7 @@ async def create_user(
 
 )
 async def update_user(
-    payload_jwt: PayloadJWT,
+    payload_jwt: PayloadAccessJWT,
     to_update: UpdateUserSchema,
     use_case: UsersCrudUseCase,
 ):

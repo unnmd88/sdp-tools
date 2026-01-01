@@ -12,12 +12,12 @@ from core.users.entities.user import UserEntity
 from presentation.api.dependencies.dependencies import (
     auth_use_case,
     users_crud_use_case,
-    get_jwt_payload_jwt_bearer, get_regions_crud_use_case, is_superuser, is_admin, get_user_entity_by_id,
-    get_passport_groups_use_case, get_tlo_use_case,
+    get_access_jwt_payload_schema, get_regions_crud_use_case, is_superuser, is_admin, get_user_entity_by_id,
+    get_passport_groups_use_case, get_tlo_use_case, get_refresh_jwt_payload_schema,
 )
 from presentation.api.dependencies.utils import get_filters_for_region_or_name_search
 from presentation.schemas.auth import AuthSchema
-from presentation.schemas.jwt import PayloadJWTSchema, TokenInfo
+from presentation.schemas.jwt import PayloadAccessJWTSchema, TokenInfo, PayloadRefreshJWTSchema
 
 
 def auth_form(
@@ -30,8 +30,9 @@ def auth_form(
 AuthForm = Annotated[AuthSchema, Depends(auth_form)]
 JWTAuthUseCase = Annotated[AuthJWTUseCaseImpl, Depends(auth_use_case)]
 AccessAndRefreshJWT = Annotated[TokenInfo, Depends()]
-PayloadJWTDependency = Annotated[PayloadJWTSchema, Depends(get_jwt_payload_jwt_bearer)]
-PayloadJWT = Annotated[PayloadJWTSchema, Depends(get_jwt_payload_jwt_bearer)]
+# PayloadJWTDependency = Annotated[PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)]
+PayloadAccessJWT = Annotated[PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)]
+PayloadRefreshJWT = Annotated[PayloadRefreshJWTSchema, Depends(get_refresh_jwt_payload_schema)]
 IsSuperuser = Depends(is_superuser)
 IsAdmin = Depends(is_admin)
 # TO DO  AccessFromRefreshJWT = Annotated[TokenInfo, Depends(auth_user_and_issue_access_and_refresh_jwt)]

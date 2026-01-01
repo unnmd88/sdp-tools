@@ -13,13 +13,23 @@ class TokenInfo(BaseModel):
     token_type: str = 'Bearer'
 
 
-class PayloadJWTSchema(BaseModel):
+
+class BasePayloadJWTSchema(BaseModel):
     model_config = ConfigDict(strict=True, extra='forbid')
+
     user_id: int
     sub: str
-    role: str | Roles
-    organization: str | Organizations
-    email: EmailStr | str
     typ: str
     exp: int
     iat: int
+
+class PayloadAccessJWTSchema(BasePayloadJWTSchema):
+    model_config = ConfigDict(strict=True, extra='forbid')
+
+    role: str | Roles
+    organization: str | Organizations
+    email: EmailStr | str
+
+
+class PayloadRefreshJWTSchema(BasePayloadJWTSchema):
+    pass

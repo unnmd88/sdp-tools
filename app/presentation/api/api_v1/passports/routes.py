@@ -27,7 +27,7 @@ from presentation.api.api_v1.passports.schemas import (
     UpdatePassportSchemaSaveToDatabase,
 )
 from presentation.api.dependencies.dependencies import (
-    get_jwt_payload_jwt_bearer,
+    get_access_jwt_payload_schema,
     db_session,
 )
 

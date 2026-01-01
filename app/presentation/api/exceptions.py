@@ -39,10 +39,6 @@ def get_invalid_type_jwt_exception(
     )
 
 
-
-
-
-
 class UserNotFoundHttpException(HTTPException):
     def __init__(
         self,

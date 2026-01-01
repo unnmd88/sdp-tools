@@ -10,9 +10,7 @@ class TokenFields(StrEnum):
     email = 'email'
     role = 'role'
     iat = 'iat'
-    is_admin = 'is_admin'
     is_active = 'is_active'
-    is_superuser = 'is_superuser'
     organization = 'organization'
     typ = 'typ'
 
