@@ -68,7 +68,7 @@ async def get_users(
     '/',
     status_code=status.HTTP_201_CREATED,
     # response_model=ResponseUserSchema,
-    dependencies=[IsSuperuser],
+    # dependencies=[IsSuperuser],
 )
 async def create_user(
     jwt_payload: PayloadJWT,

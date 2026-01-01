@@ -96,6 +96,7 @@ class UsersServiceImpl:
                 'Ошибка: у инициатора %r нет прав на создание нового пользователя.',
                 customer_user_entity.username,
             )
+            raise
         if not check_set_password(create_user_dto.password):
             logger.info('Ошибка: Недопустимый пароль.')
             raise InvalidUserPasswordToSetError
