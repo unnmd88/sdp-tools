@@ -10,7 +10,7 @@ from core.dto.users import (
 from core.users.exceptions import UserAlreadyExistsError, DomainValidationError, InvalidUserPasswordToSetError, \
     UserPermissionsError
 from presentation.api.dependencies.deps import (
-    UsersCrudUseCase,
+    UsersUseCase,
     PayloadAccessJWT,
     IsSuperuser
 )
@@ -36,7 +36,7 @@ router = APIRouter(
 )
 async def whoami(
     payload_jwt: PayloadAccessJWT,
-    use_case: UsersCrudUseCase,
+    use_case: UsersUseCase,
 ):
     user_search_dto = SearchUserByIdDTO(
         customer_id=payload_jwt.user_id,
@@ -53,7 +53,7 @@ async def whoami(
 )
 async def get_users(
     payload_jwt: PayloadAccessJWT,
-    use_case: UsersCrudUseCase,
+    use_case: UsersUseCase,
 ):
     user_search_dto = SearchUsersDTO(customer_id=payload_jwt.user_id)
     users = await use_case.get_all_users(user_search_dto)
@@ -72,7 +72,7 @@ async def get_users(
 async def create_user(
     jwt_payload: PayloadAccessJWT,
     new_user: CreateUserSchema,
-    use_case: UsersCrudUseCase,
+    use_case: UsersUseCase,
 ):
     create_model_fields = new_user.model_dump(exclude_unset=True)
     create_model_fields.update(customer_id=jwt_payload.user_id)
@@ -107,7 +107,7 @@ async def create_user(
 async def update_user(
     payload_jwt: PayloadAccessJWT,
     to_update: UpdateUserSchema,
-    use_case: UsersCrudUseCase,
+    use_case: UsersUseCase,
 ):
     upd_user_dto = UpdateUserDTO(
         **to_update.model_dump()
@@ -124,7 +124,7 @@ async def update_user(
 )
 async def change_user_password(
     to_change_password: ChangeUserPasswordSchema,
-    use_case: UsersCrudUseCase,
+    use_case: UsersUseCase,
 ):
     user_dto = CreateUserDTO(**user.model_dump())
     return await use_case.create_user(user_dto)

@@ -20,14 +20,14 @@ from core.field_validators import (
     check_set_password,
 )
 from core.mixins import BaseEntityMixin
-from core.security_policies.exceptions import InactiveUserError
+from core.security_policies.exceptions import InactiveUserError, InvalidUsernameOrPasswordError
 from core.users.exceptions import (
     DomainValidationError,
     INVALID_DESCRIPTION_EXCEPTION_TEXT,
     UserPermissionsError,
 )
 from core.users.value_objects.permissions import UserPermissions
-from core.utils import hash_password
+from core.utils import hash_password, validate_password
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -96,20 +96,27 @@ class UserEntity(BaseEntityMixin):
 
     def __eq__(self, other):
         if not isinstance(other, UserEntity):
-            return NotImplemented
+            return NotImplementedError
         return self.username == other.username
+
+    def validate_password(self, password: str):
+        if not validate_password(
+            password=password,
+            hashed_password=self.password,
+        ):
+            raise InvalidUsernameOrPasswordError
 
     def _set_permissions(self):
         if not self.is_active:
             self.permissions.revoke_all()
             return
-
         if self.role == Roles.superuser:
             self.permissions.add_all_user_permissions()
         elif self.role == Roles.admin:
             self.permissions.add_all_user_permissions(
                 exclude={Permissions.CREATE_USERS, Permissions.UPDATE_USERS}
             )
+
     def check_has_permission_to_crete_new_user(self) -> None:
         if self.role == Roles.superuser:
             return None

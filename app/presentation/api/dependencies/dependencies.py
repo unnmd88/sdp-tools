@@ -7,19 +7,17 @@ from application.interfaces.repositories.passport_groups import PassportGroupRep
 from application.interfaces.repositories.regions import RegionsRepositoryProtocol
 from application.interfaces.repositories.tlo import TrafficLightObjectRepositoryProtocol
 from application.interfaces.repositories.users import UsersRepositoryProtocol
-from application.interfaces.services.authentication import (
-    UserAuthenticationServiceProtocol,
-)
+
 from application.interfaces.services.passport_groups_crud import PassportGroupsServiceProtocol
 from application.interfaces.services.regions_crud import RegionsServiceProtocol
 from application.interfaces.services.tlo import TrafficLightObjectServiceProtocol
 from application.interfaces.services.users_crud import UsersServiceProtocol
-from application.jwt_utils import decode_jwt
-from application.use_cases.auth.auth_and_issue_jwt import AuthJWTUseCaseImpl
+from application.jwt_utils import ManagerJWT
+from application.use_cases.auth_jwt_use_case import AuthAndJWTUseCaseImpl
 from application.use_cases.passport_groups.crud import PassportGroupsCrudUseCaseImpl
 from application.use_cases.regions.crud import RegionsCrudUseCaseImpl
 from application.use_cases.tlo.tlo_use_case import TrafficLightObjectUseCaseImpl
-from application.use_cases.users.crud import UsersCrudUseCaseImpl
+from application.use_cases.users.main_users_use_case import UsersCrudUseCaseImpl
 
 from typing import Annotated
 
@@ -33,10 +31,9 @@ from core.dto.users import SearchUserByIdDTO
 from core.enums import Roles, TokenTypes
 from core.passport_groups.services.crud import PassportGroupsServiceImpl
 from core.regions.services.crud import RegionsServiceImpl
-from core.security_policies.services.auth import UserAuthenticationServiceImpl
 from core.tlo.services.main_tlo_service import TrafficLightObjectServiceImpl
 from core.users.entities.user import UserEntity
-from core.users.services.crud import UsersServiceImpl
+from core.users.services.main_service import UsersServiceImpl
 from infrastructure.database.api import db_api
 from infrastructure.database.passport_groups_repository import PassportGroupsRepositorySqlAlchemy
 from infrastructure.database.regions_repository import RegionsRepositorySqlAlchemy
@@ -51,6 +48,7 @@ from presentation.schemas.jwt import PayloadAccessJWTSchema, TokenInfo, ACCESS_T
 
 http_bearer = HTTPBearer()
 
+jwt_manager = ManagerJWT()
 
 db_session = Annotated[
     AsyncSession,
@@ -59,19 +57,20 @@ db_session = Annotated[
 
 # -- JWT, credentials and access-levels --
 
+
 def get_jwt_payload_schema(
     credentials: str,
     expected_token_type: TokenTypes,
 ) -> PayloadAccessJWTSchema | PayloadRefreshJWTSchema:
     try:
-        payload = decode_jwt(credentials)
+        payload = jwt_manager.decode_jwt(credentials)
         if payload['typ'] == expected_token_type and expected_token_type == TokenTypes.access:
             return PayloadAccessJWTSchema(**payload)
         elif payload['typ'] == expected_token_type and expected_token_type == TokenTypes.refresh:
             return PayloadRefreshJWTSchema(**payload)
         else:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail=f'Некорректный тип токена. Ожидаемый тип: {str(expected_token_type)}.',
             )
     except ExpiredSignatureError:
@@ -153,33 +152,26 @@ def get_crud_users_service(
     )
 
 
-def get_auth_service(
-    user_service: Annotated[UsersServiceProtocol, Depends(get_crud_users_service)],
-):
-    return UserAuthenticationServiceImpl(user_service=user_service)
-
-
-
 # -- use-cases --
 
 
-def auth_use_case(
-    auth_service: Annotated[
-        UserAuthenticationServiceProtocol, Depends(get_auth_service)
-    ],
-) -> AuthJWTUseCaseImpl:
-    return AuthJWTUseCaseImpl(auth_service=auth_service)
-
-
-def users_crud_use_case(
+def users_use_case(
     service: Annotated[UsersServiceProtocol, Depends(get_crud_users_service)],
 ) -> UsersCrudUseCaseImpl:
     return UsersCrudUseCaseImpl(user_service=service)
 
 
+def get_auth_and_jwt_use_case(
+    user_service: Annotated[UsersCrudUseCaseImpl, Depends(get_crud_users_service)]
+)-> AuthAndJWTUseCaseImpl:
+    return AuthAndJWTUseCaseImpl(
+        user_service=user_service,
+    )
+
+
 async def get_user_entity_by_id(
     payload_jwt: Annotated[PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)],
-    users_crud: Annotated[UsersCrudUseCaseImpl, Depends(users_crud_use_case)]
+    users_crud: Annotated[UsersCrudUseCaseImpl, Depends(users_use_case)]
 ):
     dto = SearchUserByIdDTO(customer_id=payload_jwt.user_id, search_user_id=payload_jwt.user_id)
     if (user_entity := await users_crud.get_user_by_id(dto)) is None:

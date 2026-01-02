@@ -1,5 +1,7 @@
 from typing import Protocol, Sequence
 
+from application.interfaces.repositories.users import UsersRepositoryProtocol
+from application.interfaces.services.authentication import AuthenticationSchemaProtocol
 from core.dto.common import FiltersForSearchDTO
 from core.dto.users import CreateUserDTO, UpdateUserDTO, SearchUserByIdDTO, SearchUsersDTO
 from core.users.entities.user import UserEntity
@@ -7,7 +9,13 @@ from core.users.entities.user import UserEntity
 
 class UsersServiceProtocol(Protocol):
 
-    customer_username: str
+    def __init__(
+        self,
+        repository: UsersRepositoryProtocol,
+    ):
+        self.repository = repository
+
+    async def authenticate(self, auth_data: AuthenticationSchemaProtocol) -> UserEntity: ...
 
     async def get_user_by_username_for_auth(self, username: str) -> UserEntity | None: ...
 

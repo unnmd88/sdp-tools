@@ -1,4 +1,4 @@
-from collections.abc import Callable, Container
+from collections.abc import Callable
 from functools import wraps
 from typing import TYPE_CHECKING
 
@@ -52,9 +52,7 @@ def check_permissions_async(*permissions_to_check: Permissions):
             ):
                 raise PermissionsError
             return await func(*args, **kwargs)
-
         return wrapper
-
     return decorator
 
 

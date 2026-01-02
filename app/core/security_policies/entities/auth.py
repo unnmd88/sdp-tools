@@ -1,7 +1,0 @@
-from dataclasses import dataclass
-
-
-@dataclass(frozen=True, kw_only=True)
-class UserAuthentication:
-    username: str
-    password: str

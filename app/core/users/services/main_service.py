@@ -5,12 +5,15 @@ from dataclasses import asdict
 from app_logging.dev.config import USERS_LOGGER
 from application.interfaces.cache.users import UsersCacheProtocol
 from application.interfaces.repositories.users import UsersRepositoryProtocol
+from application.interfaces.services.authentication import AuthenticationSchemaProtocol
+
 from core.dto.common import FiltersForSearchDTO
+from core.dto.tokens import TokenDataDTO
 from core.dto.users import CreateUserDTO, UpdateUserDTO, SearchUserByIdDTO, SearchUsersDTO
 from core.enums import Organizations, Roles
 from core.exceptions.base import CreateError, UpdateError
 from core.field_validators import check_set_password
-from core.security_policies.exceptions import InactiveUserError
+from core.security_policies.exceptions import InactiveUserError, InvalidUsernameOrPasswordError
 from core.security_policies.services.user_permissions import check_permission_to_update_entity
 from core.users.entities.user import UserEntity
 from core.users.exceptions import (
@@ -35,8 +38,16 @@ class UsersServiceImpl:
         self.repository = repository
         self.cache = cache
 
-    async def get_user_by_username_for_auth(self, username: str) -> UserEntity | None:
-        return await self.repository.get_one_or_none_by_filters({'username': username})
+    async def authenticate(self, auth_data: AuthenticationSchemaProtocol) -> UserEntity:
+        user_entity = await self.repository.get_one_or_none_by_filters({'username': auth_data.username})
+        if user_entity is None:
+            raise InvalidUsernameOrPasswordError
+        try:
+            user_entity.validate_password(auth_data.password)
+        except InvalidUsernameOrPasswordError:
+            # TODO logging
+            raise
+        return user_entity
 
     async def get_user_by_filters(self, filters: FiltersForSearchDTO):
         customer_entity: UserEntity = await self.repository.get_user_by_username_or_none(self.customer_username)
