@@ -8,20 +8,25 @@ from application.interfaces.repositories.users import UsersRepositoryProtocol
 from application.interfaces.services.authentication import AuthenticationSchemaProtocol
 
 from core.dto.common import FiltersForSearchDTO
-from core.dto.tokens import TokenDataDTO
-from core.dto.users import CreateUserDTO, UpdateUserDTO, SearchUserByIdDTO, SearchUsersDTO
+from core.dto.users import (
+    CreateUserDTO,
+    UpdateUserDTO,
+    SearchUserByIdDTO,
+    SearchUsersDTO
+)
 from core.enums import Organizations, Roles
 from core.exceptions.base import CreateError, UpdateError
 from core.field_validators import check_set_password
-from core.security_policies.exceptions import InactiveUserError, InvalidUsernameOrPasswordError
-from core.security_policies.services.user_permissions import check_permission_to_update_entity
 from core.users.entities.user import UserEntity
 from core.users.exceptions import (
     UserNotFoundByIdError,
     UserNotFoundByUsernameError,
     InvalidUserPasswordToSetError,
     UserAlreadyExistsError,
-    ForbiddenUpdateError, UserPermissionsError,
+    ForbiddenUpdateError,
+    UserPermissionsError,
+    InvalidUsernameOrPasswordError,
+    InactiveUserError,
 )
 from core.utils import hash_password
 
@@ -39,14 +44,17 @@ class UsersServiceImpl:
         self.cache = cache
 
     async def authenticate(self, auth_data: AuthenticationSchemaProtocol) -> UserEntity:
-        user_entity = await self.repository.get_one_or_none_by_filters({'username': auth_data.username})
+        logger.info('Аутентификация пользователя %r', auth_data.username)
+        user_entity: UserEntity = await self.repository.get_one_or_none_by_filters({'username': auth_data.username})
         if user_entity is None:
+            logger.info('Пользователь %r не найден.', auth_data.username)
             raise InvalidUsernameOrPasswordError
         try:
             user_entity.validate_password(auth_data.password)
         except InvalidUsernameOrPasswordError:
-            # TODO logging
+            logger.info('Неверный пароль.')
             raise
+        logger.info('Успешная аутентификация %r', user_entity.username)
         return user_entity
 
     async def get_user_by_filters(self, filters: FiltersForSearchDTO):
@@ -125,15 +133,18 @@ class UsersServiceImpl:
             email=create_user_dto.email,
             organization=Organizations(create_user_dto.organization),
             is_active=create_user_dto.is_active,
-            is_admin=create_user_dto.is_admin,
-            is_superuser=create_user_dto.is_superuser,
             role=Roles(create_user_dto.role),
             phone_number=create_user_dto.phone_number,
             telegram=create_user_dto.telegram,
             description=create_user_dto.description,
         )
-        logger.info('Успешно создан новый пользователь: %r', entity)
-        return await self.repository.add_user(entity)
+        try:
+            new_user_entity = await self.repository.add_user(entity)
+        except Exception as e:
+            logger.critical(f'Ошибка логики приложения: {e}')
+            raise
+        logger.info('Успешно создан новый пользователь: %r', new_user_entity)
+        return new_user_entity
 
     # async def create_user(self, data: CreateUserDTO) -> UserEntity:
     #     requestor_entity: UserEntity = (

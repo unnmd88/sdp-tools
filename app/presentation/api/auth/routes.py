@@ -2,8 +2,8 @@ from fastapi import APIRouter, HTTPException
 from starlette import status
 
 from core.dto.auth import UserAuthDTO
-from core.security_policies.exceptions import InvalidUsernameOrPasswordError
-from core.users.exceptions import UserNotFoundByIdError
+from core.users.exceptions import UserNotFoundByIdError, InvalidUsernameOrPasswordError
+from presentation.api.api_v1.documentation.auth_and_jwt.endpoints import POST_LOGIN_user, POST_REFRESH
 from presentation.api.dependencies.deps import (
     AuthForm,
     PayloadRefreshJWT,
@@ -19,6 +19,9 @@ router = APIRouter(prefix='/auth', tags=['Authentication'])
 @router.post(
     '/login/',
     response_model=TokenInfo,
+    response_model_exclude_none=True,
+    summary='Аутентификация пользователя и выпуск jwt',
+    description=POST_LOGIN_user,
 )
 async def issue_jwt(
     auth_schema: AuthForm,
@@ -40,6 +43,8 @@ async def issue_jwt(
     '/refresh/',
     response_model=TokenInfo,
     response_model_exclude_none=True,
+    summary='Выпуск access jwt по refresh jwt',
+    description=POST_REFRESH,
 )
 async def issue_jwt_by_refresh_jwt(
     payload: PayloadRefreshJWT,

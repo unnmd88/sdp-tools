@@ -109,3 +109,11 @@ class UserPermissionsError(PermissionsError):
     # @property
     # def detail(self):
     #     return f'Отсутствуют права у {self.requestor!r}.'
+
+
+class InvalidUsernameOrPasswordError(ApplicationError):
+    ...
+
+
+class InactiveUserError(ApplicationError):
+    ...

@@ -20,11 +20,10 @@ from core.field_validators import (
     check_set_password,
 )
 from core.mixins import BaseEntityMixin
-from core.security_policies.exceptions import InactiveUserError, InvalidUsernameOrPasswordError
 from core.users.exceptions import (
     DomainValidationError,
     INVALID_DESCRIPTION_EXCEPTION_TEXT,
-    UserPermissionsError,
+    UserPermissionsError, InvalidUsernameOrPasswordError, InactiveUserError,
 )
 from core.users.value_objects.permissions import UserPermissions
 from core.utils import hash_password, validate_password
@@ -38,7 +37,7 @@ class UserEntity(BaseEntityMixin):
     username: str
     organization: Organizations
     email: str
-    password: bytes
+    password: bytes = field(repr=False)
     is_active: bool
     role: Roles
     phone_number: str

@@ -44,8 +44,6 @@ class UserDBMapper(BaseDBMapperProtocol):
             email=entity.email,
             password=entity.password,
             is_active=entity.is_active,
-            is_admin=entity.is_admin,
-            is_superuser=entity.is_superuser,
             role=Roles(entity.role),
             phone_number=entity.phone_number,
             telegram=entity.telegram,
