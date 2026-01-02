@@ -9,6 +9,7 @@ from core.dto.users import (
 
 from core.users.exceptions import UserAlreadyExistsError, DomainValidationError, InvalidUserPasswordToSetError, \
     UserPermissionsError
+from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
 from presentation.api.dependencies.deps import (
     UsersUseCase,
     PayloadAccessJWT,
@@ -33,6 +34,8 @@ router = APIRouter(
     '/whoami/',
     status_code=status.HTTP_200_OK,
     response_model=ResponseUserSchema,
+    summary='Данные о пользователе из access jwt',
+    description=GET_whoami,
 )
 async def whoami(
     payload_jwt: PayloadAccessJWT,
@@ -50,6 +53,9 @@ async def whoami(
     '/',
     status_code=status.HTTP_200_OK,
     response_model=list[ResponseUserSchema],
+    dependencies=[IsSuperuser],
+    summary='Получить список пользователей системы',
+
 )
 async def get_users(
     payload_jwt: PayloadAccessJWT,
@@ -67,7 +73,8 @@ async def get_users(
     '/',
     status_code=status.HTTP_201_CREATED,
     # response_model=ResponseUserSchema,
-    # dependencies=[IsSuperuser],
+    dependencies=[IsSuperuser],
+    summary='Создать нового пользователя системы',
 )
 async def create_user(
     jwt_payload: PayloadAccessJWT,
