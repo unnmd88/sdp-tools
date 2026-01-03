@@ -13,6 +13,9 @@ from infrastructure.database.models import User as UserModel
 @final
 @dataclass(frozen=True, slots=True)
 class UserDBMapper(BaseDBMapperProtocol):
+
+    entity = UserEntity
+
     @classmethod
     def to_entity(cls, model: UserModel) -> UserEntity:
         """ """

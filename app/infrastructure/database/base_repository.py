@@ -86,7 +86,7 @@ class BaseSqlAlchemy:
         self,
         update_record_dto: ToUpdateRecordDTO,
     ):
-        stmt = select(self.model).filter_by(**update_record_dto.search_filters)
+        stmt = select(self.model).filter_by(**update_record_dto.search_criteria)
         result: Result = await self.session.execute(stmt)
         if (current_model := result.scalars().one_or_none()) is None:
             raise NotFoundError

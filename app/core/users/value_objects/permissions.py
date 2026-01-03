@@ -1,11 +1,14 @@
 from collections.abc import MutableSet, Iterable
+from typing import TypeAlias
 
 from core.enums import Permissions
+
+T_Permissions: TypeAlias = set[Permissions] | frozenset[Permissions]
 
 
 class UserPermissions:
     def __init__(self, *permissions: Permissions):
-        self._permissions: MutableSet = set(permissions)
+        self._permissions: T_Permissions = set(permissions)
 
     def __repr__(self):
         return (
@@ -14,11 +17,11 @@ class UserPermissions:
             f')'
         )
 
-    def get_all(self) -> MutableSet[Permissions]:
+    def get_all(self) -> T_Permissions:
         return self._permissions
 
     def add(self, *permissions: Permissions):
-        self._permissions |= {p for p in permissions}
+        self._permissions |= set(permissions)
 
     def add_all_user_permissions(self, exclude: set[Permissions] = None):
         exclude = exclude or set()
@@ -34,6 +37,9 @@ class UserPermissions:
             self._permissions.pop()
             cnt += 1
         return cnt
+
+    def frozen_permissions(self):
+        self._permissions = frozenset(self._permissions)
 
 
 if __name__ == '__main__':

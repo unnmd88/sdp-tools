@@ -140,7 +140,7 @@ async def update_region(
     use_case: RegionsCrudUseCase,
 ):
     dto = ToUpdateRecordDTO(
-        search_filters=FiltersFactory.get_filters_dict(code=region_code),
+        search_criteria=FiltersFactory.get_filters_dict(code=region_code),
         fields=update_data.model_dump(exclude_unset=True, exclude_none=True)
     )
     try:

@@ -1,4 +1,3 @@
-import re
 from enum import Enum
 from typing import Any
 
@@ -8,25 +7,13 @@ from core.reg_exps import (
     LAST_NAME_PATTERN,
     USERNAME_PATTERN,
     PHONE_NUMBER_PATTERN,
-    PASSWORD_PATTERN, NAME_TLO_PATTERN, DISTRICT_TLO_PATTERN, STREET_TLO_PATTERN,
+    NAME_TLO_PATTERN, DISTRICT_TLO_PATTERN, STREET_TLO_PATTERN,
 )
 from core.users.constants import (
-    MIN_LEN_PASSWORD,
-    MAX_LEN_PASSWORD,
     MIN_ID,
     MAX_ID,
 )
-from core.utils import checking_simple_types
-
-
-def validate_string_by_pattern(
-    string: str,
-    pattern: re.Pattern,
-    allow_empty: bool = True,
-) -> bool:
-    if allow_empty and string == '':
-        return True
-    return re.match(pattern, string) is not None
+from core.utils import checking_simple_types, validate_string_by_pattern
 
 
 @checking_simple_types(type_to_check=int, field_name='id')
@@ -66,6 +53,7 @@ def check_username_is_valid(value: str) -> bool:
     :param value: Строка username.
     :return: True or False.
     """
+    return len(value) > 2 and value.isalnum()
     return validate_string_by_pattern(value, USERNAME_PATTERN, allow_empty=False)
 
 
@@ -134,16 +122,6 @@ def check_is_valid_enum(enum_cls: type[Enum], value: Any) -> bool:
     except ValueError:
         raise TypeError(f'{value!r} must be an {enum_cls.__name__!r}')
     return True
-
-
-@checking_simple_types(type_to_check=str, field_name='password')
-def check_set_password(value: str) -> bool:
-    """
-    Проверяет валидность устанавливаемого password.
-    :param value: Строка password.
-    :return: True or False.
-    """
-    return validate_string_by_pattern(value, PASSWORD_PATTERN, allow_empty=False)
 
 
 # Блок проверки для Светофорного объекта(TrafficLightObjectEntity)

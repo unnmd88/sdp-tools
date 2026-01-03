@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from typing import Protocol
 
 from application.interfaces.repositories.regions import RegionsRepositoryProtocol
-from application.interfaces.services.users_crud import UsersServiceProtocol
+from application.interfaces.services.users import UsersServiceProtocol
 from core.dto.common import CreateRecordDTO, FiltersForSearchDTO, ToUpdateRecordDTO, UpdatedRecordDTO
 # from core.dto.filters import FiltersForSearchDTO
 from core.dto.regions import RegionDTO, UpdateRegionDTO, CreateRegionDTO

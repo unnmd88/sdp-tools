@@ -1,5 +1,5 @@
 from application.interfaces.repositories.users import UsersRepositoryProtocol
-from application.interfaces.services.users_crud import UsersServiceProtocol
+from application.interfaces.services.users import UsersServiceProtocol
 from application.jwt_utils import ManagerJWT
 from core.dto.auth import UserAuthDTO
 from core.users.exceptions import UserNotFoundByIdError

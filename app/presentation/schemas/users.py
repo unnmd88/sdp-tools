@@ -1,8 +1,16 @@
 from typing import Annotated
 from annotated_types import MaxLen, MinLen
-
-from pydantic import BaseModel, BeforeValidator, ConfigDict, EmailStr, Field
+from pydantic_core.core_schema import FieldValidationInfo
+from pydantic import(
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    EmailStr,
+    Field,
+    field_validator,
+)
 from core.enums import Organizations, Roles
+from core.security_policies.user import check_password_to_set_is_valid
 
 
 # class BaseUserSchema(BaseModel):
@@ -43,13 +51,26 @@ class ResponseUserSchema(BaseUserSchema):
 class CreateUserSchema(BaseUserSchema):
     model_config = ConfigDict(use_enum_values=True, strict=True, extra='forbid')
 
-    password: Annotated[str, MinLen(4), MaxLen(16)]
+    password: Annotated[str, MinLen(4), MaxLen(32)]
     email: EmailStr | None | str
     username: Annotated[str, MinLen(4), MaxLen(16)]
     role: Annotated[Roles, BeforeValidator(lambda val: Roles(val))]
     organization: Annotated[
         Organizations, BeforeValidator(lambda val: Organizations(val))
     ]
+
+    @field_validator('username')
+    def username_alphanumeric(cls, v):
+        assert v.isalnum(), 'username должен содержать буквы и цифры'
+        return v
+
+    @field_validator('password')
+    def check_password(cls, v, info: FieldValidationInfo):
+        assert v != info.data['username'], 'username и пароль не должны совпадать'
+        if not check_password_to_set_is_valid:
+            raise ValueError('Недопустимый пароль')
+        return v
+
 
 class UpdateUserSchema(BaseModel):
     model_config = ConfigDict(use_enum_values=True, strict=True, extra='forbid')
@@ -73,6 +94,13 @@ class UpdateUserSchema(BaseModel):
 class ChangeUserPasswordSchema(BaseModel):
     model_config = ConfigDict(strict=True, extra='forbid')
 
-    subject_username: str
-    current_password: str
+    old_password: str
     new_password: str
+
+    @field_validator('new_password')
+    def check_password(cls, v, info: FieldValidationInfo):
+        if v == info.data['old_password']:
+            raise ValueError('Пароли не должны совпадать')
+        if not check_password_to_set_is_valid:
+            raise ValueError('Недопустимый пароль')
+        return v

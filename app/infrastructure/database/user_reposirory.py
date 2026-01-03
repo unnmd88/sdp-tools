@@ -1,3 +1,5 @@
+from typing import Any
+
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
@@ -26,35 +28,11 @@ class UsersRepositorySqlAlchemy(BaseSqlAlchemy):
             raise e
         return self.mapper.to_entity(new_instance)
 
-    # async def get_user_by_username_or_none(self, username: str) -> UserEntity | None:
-    #     stmt = select(self.model).filter_by(username=username)
-    #     res = await self.session.execute(stmt)
-    #     user = res.scalars().one_or_none()
-    #     if user is not None:
-    #         return self.mapper.to_entity(user)
-    #     return None
-
-
-    # async def get_user_by_username_or_none(
-    #     self, username: str
-    # ) -> UserFromDbFullSchema | None:
-    #     async with db_api.session_factory() as session:
-    #         stmt = select(self.model).filter_by(username=username)
-    #         res = await session.execute(stmt)
-    #         user = res.scalars().one_or_none()
-    #     print(f'User: {user}')
-    #     if user is not None:
-    #         return UserFromDbFullSchema.model_validate(user, from_attributes=True)
-    #     return None
-
-    # async def get_user_by_id_or_404(
-    #     self,
-    #     # session: AsyncSession,
-    #     user_id: Annotated[int, Field(ge=1)],
-    # ):
-    #     if (res := await session.get(User, user_id)) is None:
-    #         raise HTTPException(
-    #             status_code=status.HTTP_404_NOT_FOUND,
-    #             detail=f'User with id={user_id} not found',
-    #         )
-    #     return UserFromDbFullSchema.model_validate(res)
+    async def get_user_by_id_or_username_or_none(self, username_or_id: int | str) -> UserEntity | None:
+        if isinstance(username_or_id, int):
+            return await self.get_one_by_id_or_none(username_or_id)
+        stmt = select(self.model).filter_by(username=username_or_id)
+        res = await self.session.execute(stmt)
+        if (user := res.scalars().one_or_none()) is not None:
+            return self.mapper.to_entity(user)
+        return None

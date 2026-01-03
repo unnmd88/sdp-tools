@@ -21,7 +21,7 @@ class CreateRecordDTO:
 class ToUpdateRecordDTO:
     """ DTO для обновления существующей записи в хранилище. """
 
-    search_filters: dict
+    search_criteria: dict
     fields: dict
 
 
@@ -42,3 +42,4 @@ class UpdatedRecordDTO:
     # TODO
     # count_updated_fields: int
     # updated_fields: list = field(default_factory=list)
+

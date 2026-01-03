@@ -3,8 +3,8 @@ from fastapi import APIRouter, status, HTTPException
 from core.dto.users import (
     CreateUserDTO,
     UpdateUserDTO,
-    SearchUserByIdDTO,
-    SearchUsersDTO
+    SearchUserDTO,
+    SearchUsersDTO, ChangeUserPasswordDTO
 )
 
 from core.users.exceptions import UserAlreadyExistsError, DomainValidationError, InvalidUserPasswordToSetError, \
@@ -41,11 +41,11 @@ async def whoami(
     payload_jwt: PayloadAccessJWT,
     use_case: UsersUseCase,
 ):
-    user_search_dto = SearchUserByIdDTO(
-        customer_id=payload_jwt.user_id,
-        search_user_id=payload_jwt.user_id,
+    user_search_dto = SearchUserDTO(
+        customer=payload_jwt.user_id,
+        subject=payload_jwt.user_id,
     )
-    user = await use_case.get_user_by_id(user_search_dto)
+    user = await use_case.get_user_by_username_or_id(user_search_dto)
     return ResponseUserSchema.model_validate(user, from_attributes=True)
 
 
@@ -61,8 +61,12 @@ async def get_users(
     payload_jwt: PayloadAccessJWT,
     use_case: UsersUseCase,
 ):
-    user_search_dto = SearchUsersDTO(customer_id=payload_jwt.user_id)
-    users = await use_case.get_all_users(user_search_dto)
+    user_search_dto = SearchUsersDTO(customer=payload_jwt.user_id)
+    try:
+
+        users = await use_case.get_all_users(user_search_dto)
+    except UserPermissionsError:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return [
         ResponseUserSchema.model_validate(user, from_attributes=True)
         for user in users
@@ -125,13 +129,19 @@ async def update_user(
 
 @router.patch(
     '/change_password/',
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_202_ACCEPTED,
     # response_model=UserSchema,
     # dependencies=[Depends(check_is_active_superuser)],
 )
 async def change_user_password(
-    to_change_password: ChangeUserPasswordSchema,
+    payload_jwt: PayloadAccessJWT,
+    change_password: ChangeUserPasswordSchema,
     use_case: UsersUseCase,
 ):
-    user_dto = CreateUserDTO(**user.model_dump())
-    return await use_case.create_user(user_dto)
+    change_password_dto = ChangeUserPasswordDTO(
+        customer=payload_jwt.user_id,
+        subject=payload_jwt.user_id,
+        old_password=change_password.old_password,
+        new_password=change_password.new_password,
+    )
+    return await use_case.change_password(change_password_dto)

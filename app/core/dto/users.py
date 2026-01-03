@@ -7,26 +7,15 @@ from core.enums import Roles, Organizations
 class SearchUsersDTO:
     """ DTO для поиска сущности в хранилище. """
 
-    customer_id: int
-
-
-
-@dataclass(slots=True, frozen=True, kw_only=True)
-class SearchUserByIdDTO(SearchUsersDTO):
-    """ DTO для поиска сущности в хранилище. """
-
-    search_user_id: int
+    customer: int | str
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)
-class SearchManyUserByIdDTO:
+class SearchUserDTO(SearchUsersDTO):
     """ DTO для поиска сущности в хранилище. """
 
-    customer_id: int
-    customer_username: str
-    customer_email: str
+    subject: int | str
 
-    search_user_id: int
 
 
 @dataclass(kw_only=True)
@@ -51,6 +40,19 @@ class CreateUserDTO(UserDTO):
     customer_id: int
 
 
+@dataclass(slots=True, frozen=True, kw_only=True)
+class ChangeUserPasswordDTO(SearchUserDTO):
+    """DTO для изменения пароля существующего пользователя системы."""
+
+    old_password: str
+    new_password: str
+
+@dataclass
+class UpdatedPasswordDTO:
+
+    new_password: str
+
+
 @dataclass
 class UpdateUserDTO:
     """DTO для обновления существующего пользователя системы."""
@@ -72,9 +74,4 @@ class UpdateUserDTO:
     description: str | None = None
 
 
-@dataclass
-class ChangeUserPasswordDTO:
-    """DTO для изменения пароля существующего пользователя системы."""
 
-    old_password: str
-    new_password: str

@@ -1,12 +1,8 @@
 from collections.abc import Sequence
 
-from application.interfaces.services.authentication import AuthenticationSchemaProtocol
-from application.interfaces.services.users_crud import (
-    UsersServiceProtocol,
-)
+from application.interfaces.services.users import UsersServiceProtocol
 
-from core.dto.tokens import TokenDataDTO
-from core.dto.users import CreateUserDTO, UpdateUserDTO, SearchUserByIdDTO, SearchUsersDTO
+from core.dto.users import CreateUserDTO, UpdateUserDTO, SearchUserDTO, SearchUsersDTO, ChangeUserPasswordDTO
 
 from core.users.entities.user import UserEntity
 
@@ -18,8 +14,8 @@ class UsersCrudUseCaseImpl:
     ):
         self.user_service = user_service
 
-    async def get_user_by_id(self, user_dto: SearchUserByIdDTO) -> UserEntity:
-        return await self.user_service.get_user_by_id_or_none(user_dto)
+    async def get_user_by_username_or_id(self, user_dto: SearchUserDTO) -> UserEntity:
+        return await self.user_service.get_user_by_username_or_id(user_dto)
 
     async def get_all_users(self, users_dto: SearchUsersDTO) -> Sequence[UserEntity]:
         return await self.user_service.get_all_users(users_dto)
@@ -29,3 +25,6 @@ class UsersCrudUseCaseImpl:
 
     async def update_user(self, user: UpdateUserDTO) -> UserEntity:
         return await self.user_service.update_user(user)
+
+    async def change_password(self, dto: ChangeUserPasswordDTO):
+        return await self.user_service.change_password(dto)

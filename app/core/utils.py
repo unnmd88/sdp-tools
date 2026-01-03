@@ -1,8 +1,7 @@
+import re
 from collections.abc import Callable
 from functools import wraps
 from typing import TYPE_CHECKING
-
-import bcrypt
 
 from dataclasses import asdict
 from core.enums import Permissions
@@ -10,7 +9,7 @@ from core.exceptions.base import PermissionsError
 
 
 if TYPE_CHECKING:
-    from _typeshed import DataclassInstance
+    pass
 
 
 def checking_simple_types(*, type_to_check: type, field_name: str = ''):
@@ -40,39 +39,14 @@ def checking_simple_types(*, type_to_check: type, field_name: str = ''):
     return decorator
 
 
-def check_permissions_async(*permissions_to_check: Permissions):
-    permissions_to_check: frozenset[Permissions] = frozenset(permissions_to_check)
-
-    def decorator(func: Callable):
-        @wraps(func)
-        async def wrapper(*args, **kwargs):
-            self = args[0]
-            if not permissions_to_check.issubset(
-                self.user_entity.permissions.get_all()
-            ):
-                raise PermissionsError
-            return await func(*args, **kwargs)
-        return wrapper
-    return decorator
-
-
-def hash_password(
-    password: str,
-) -> bytes:
-    return bcrypt.hashpw(
-        password.encode('utf-8'),
-        bcrypt.gensalt(),
-    )
-
-
-def validate_password(
-    password: str,
-    hashed_password: bytes,
+def validate_string_by_pattern(
+    string: str,
+    pattern: re.Pattern,
+    allow_empty: bool = True,
 ) -> bool:
-    return bcrypt.checkpw(
-        password=password.encode('utf-8'),
-        hashed_password=hashed_password,
-    )
+    if allow_empty and string == '':
+        return True
+    return re.match(pattern, string) is not None
 
 
 def not_none_dataclass_instance_attrs_to_dict(
@@ -89,18 +63,4 @@ def not_none_dataclass_instance_attrs_to_dict(
     }
 
 
-
-
-
-#    return {
-#    asdict(dataclass_instance)
-# }
-# def gen_password(
-#     min_length: int = 3,
-#     max_length: int = 20,
-# ) -> str:
-#     chars = string.ascii_letters + string.digits + string.punctuation
-#     return ''.join(
-#         secrets.choice(chars) for _ in range(random.randint(min_length, max_length))
-#     )
 

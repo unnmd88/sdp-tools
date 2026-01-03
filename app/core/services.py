@@ -8,12 +8,13 @@ class BaseService:
     def __init__(
         self,
         user_entity: UserEntity,
-        repository: Any
+        repository: Any,
+        raise_if_user_inactive: bool = True,
     ):
 
         self.user_entity = user_entity
         if not isinstance(self.user_entity, UserEntity):
             raise AttributeError
-        if not user_entity.is_active:
+        if raise_if_user_inactive and not user_entity.is_active:
             raise UserInactiveError
         self.repository = repository

@@ -11,7 +11,7 @@ from application.interfaces.repositories.users import UsersRepositoryProtocol
 from application.interfaces.services.passport_groups_crud import PassportGroupsServiceProtocol
 from application.interfaces.services.regions_crud import RegionsServiceProtocol
 from application.interfaces.services.tlo import TrafficLightObjectServiceProtocol
-from application.interfaces.services.users_crud import UsersServiceProtocol
+from application.interfaces.services.users import UsersServiceProtocol
 from application.jwt_utils import ManagerJWT
 from application.use_cases.auth_jwt_use_case import AuthAndJWTUseCaseImpl
 from application.use_cases.passport_groups.crud import PassportGroupsCrudUseCaseImpl
@@ -27,7 +27,7 @@ from starlette import status
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from core.dto.users import SearchUserByIdDTO
+from core.dto.users import SearchUserDTO
 from core.enums import Roles, TokenTypes
 from core.passport_groups.services.crud import PassportGroupsServiceImpl
 from core.regions.services.crud import RegionsServiceImpl
@@ -173,8 +173,8 @@ async def get_user_entity_by_id(
     payload_jwt: Annotated[PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)],
     users_crud: Annotated[UsersCrudUseCaseImpl, Depends(users_use_case)]
 ):
-    dto = SearchUserByIdDTO(customer_id=payload_jwt.user_id, search_user_id=payload_jwt.user_id)
-    if (user_entity := await users_crud.get_user_by_id(dto)) is None:
+    dto = SearchUserDTO(customer=payload_jwt.user_id, subject=payload_jwt.user_id)
+    if (user_entity := await users_crud.get_user_by_username_or_id(dto)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f'Пользователь с id={payload_jwt.user_id!r} не найден.'

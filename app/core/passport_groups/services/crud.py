@@ -14,19 +14,19 @@ class PassportGroupsServiceImpl(BaseService):
     repository: PassportGroupRepositoryProtocol
 
     async def get_passport_group_by_name_or_none(self, name: str) -> PassportGroupEntity:
-        self.user_entity.check_permission_read_passport_groups()
+        self.user_entity.access_control_read_passport_groups()
         return await self.repository.get_passport_group_by_name_or_none(name)
 
     async def get_passport_group_by_id_or_none(self, _id: int) -> PassportGroupEntity:
-        self.user_entity.check_permission_read_passport_groups()
+        self.user_entity.access_control_read_passport_groups()
         return await self.repository.get_one_by_id_or_none(_id)
 
     async def get_all_passport_groups(self) -> Sequence[PassportGroupEntity]:
-        self.user_entity.check_permission_read_passport_groups()
+        self.user_entity.access_control_read_passport_groups()
         return await self.repository.get_all()
 
     async def create_passport_group(self, passport_group_dto: CreatePassportGroupDTO) -> PassportGroupEntity:
-        self.user_entity.has_permissions(Permissions.CREATE_PASSPORT_GROUPS)
+        self.user_entity.access_control(Permissions.CREATE_PASSPORT_GROUPS)
         passport_group_entity = PassportGroupEntity(
             group_name=passport_group_dto.group_name,
             description=passport_group_dto.description,
@@ -39,7 +39,7 @@ class PassportGroupsServiceImpl(BaseService):
         return await self.repository.add(passport_group_entity)
 
     async def update_passport_group(self, passport_group_dto: UpdatePassportGroupDTO) -> PassportGroupEntity:
-        self.user_entity.has_permissions(Permissions.UPDATE_PASSPORT_GROUPS)
+        self.user_entity.access_control(Permissions.UPDATE_PASSPORT_GROUPS)
         current_passport_group = await self.repository.get_passport_group_by_name_or_none(
             passport_group_dto.group_name_to_update
         )

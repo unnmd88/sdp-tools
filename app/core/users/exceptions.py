@@ -78,12 +78,15 @@ class UserAlreadyExistsError(CreateError):
         return f'Пользователь с username={self._id!r} уже существует.'
 
 
-class InvalidUserPasswordToSetError(CreateError):
+class InvalidUserPasswordToSetError(ApplicationError):
     """Ошибка установки пароля пользователя."""
 
     @property
     def detail(self):
         return f'Ошибка установки пароля пользователя.'
+
+class SameUsernameAndPasswordError(ApplicationError):
+    """Ошибка совпадения username и пароля пользователя."""
 
 
 class ForbiddenCreateError(CreateError):
@@ -96,19 +99,6 @@ class ForbiddenUpdateError(UpdateError):
 
 class UserPermissionsError(PermissionsError):
     """Ошибка доступа к данным и сервисам в связи с отсутствием прав пользователя."""
-
-
-
-    # def __init__(
-    #     self,
-    #     requestor: str = '',
-    # ):
-    #     self.requestor = requestor
-    #     super().__init__(self.detail)
-    #
-    # @property
-    # def detail(self):
-    #     return f'Отсутствуют права у {self.requestor!r}.'
 
 
 class InvalidUsernameOrPasswordError(ApplicationError):

@@ -1,4 +1,4 @@
-from application.interfaces.services.users_crud import UsersServiceProtocol
+from application.interfaces.services.users import UsersServiceProtocol
 
 
 class TloUseCase:

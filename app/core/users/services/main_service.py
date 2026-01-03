@@ -1,22 +1,22 @@
 import logging
 from collections.abc import Sequence
 from dataclasses import asdict
+from multiprocessing.util import sub_warning
 
 from app_logging.dev.config import USERS_LOGGER
 from application.interfaces.cache.users import UsersCacheProtocol
 from application.interfaces.repositories.users import UsersRepositoryProtocol
 from application.interfaces.services.authentication import AuthenticationSchemaProtocol
+from core.dto.common import ToUpdateRecordDTO
 
-from core.dto.common import FiltersForSearchDTO
 from core.dto.users import (
     CreateUserDTO,
     UpdateUserDTO,
-    SearchUserByIdDTO,
-    SearchUsersDTO
+    SearchUserDTO,
+    SearchUsersDTO, ChangeUserPasswordDTO
 )
 from core.enums import Organizations, Roles
 from core.exceptions.base import CreateError, UpdateError
-from core.field_validators import check_set_password
 from core.users.entities.user import UserEntity
 from core.users.exceptions import (
     UserNotFoundByIdError,
@@ -27,9 +27,9 @@ from core.users.exceptions import (
     UserPermissionsError,
     InvalidUsernameOrPasswordError,
     InactiveUserError,
+    UserNotFoundError, SameUsernameAndPasswordError
 )
-from core.utils import hash_password
-
+from core.security_policies.user import hash_password, check_password_to_set_is_valid
 
 logger = logging.getLogger(USERS_LOGGER)
 
@@ -57,46 +57,28 @@ class UsersServiceImpl:
         logger.info('Успешная аутентификация %r', user_entity.username)
         return user_entity
 
-    async def get_user_by_filters(self, filters: FiltersForSearchDTO):
-        customer_entity: UserEntity = await self.repository.get_user_by_username_or_none(self.customer_username)
-        search_user_username = filters.search_filters.get('username')
-        search_user_id = filters.search_filters.get('id')
-        # Если customer_entity не активен - raise InactiveUserError
-        # Если customer_entity != username или не superuser/admin - raise UserPermissionsError
-        customer_entity.check_permission_to_search_any_user(
-            username_to_search=search_user_username,
-            id_to_search=search_user_id,
-        )
-        if customer_entity.username == search_user_username or customer_entity.id == search_user_id:
-            return customer_entity
-        search_user_entity = await self.repository.get_one_or_none_by_filters(filters.search_filters)
-        if search_user_entity is None:
-            raise UserNotFoundByUsernameError
-        return search_user_entity
+    async def get_user_by_username_or_id(self, search_dto: SearchUserDTO) -> UserEntity:
 
-    async def get_user_by_id_or_none(self, search_dto: SearchUserByIdDTO) -> UserEntity:
-        if self.cache:
-            user_entity: UserEntity = await self.cache.get_by_id(search_dto.search_user_id)
-        else:
-            user_entity: UserEntity = await self.repository.get_one_by_id_or_none(search_dto.search_user_id)
-        if user_entity is None:
-            raise UserNotFoundByIdError
-        if not user_entity.is_active:
+        customer_entity: UserEntity = await self.repository.get_user_by_id_or_username_or_none(search_dto.customer)
+        if customer_entity is None:
+            raise UserNotFoundError
+        if not customer_entity.is_active:
             raise InactiveUserError
-        if user_entity.id != search_dto.search_user_id:
-            user_entity.check_permission_to_search_any_user()
-            user_entity: UserEntity = await self.repository.get_one_by_id_or_none(search_dto.search_user_id)
-            if user_entity is None:
-                raise UserNotFoundByIdError
-        return user_entity
+        if search_dto.customer == search_dto.subject:
+            return customer_entity
+        customer_entity.access_control_read_any_user() #Если не superuser/admin - raise UserPermissionsError
+        readable_user_entity = await self.repository.get_user_by_id_or_username_or_none(search_dto.subject)
+        if readable_user_entity is None:
+            raise UserNotFoundByUsernameError
+        return readable_user_entity
 
     async def get_all_users(self, users_dto: SearchUsersDTO) -> Sequence[UserEntity]:
-        customer_user_entity: UserEntity = await self.repository.get_one_by_id_or_none(users_dto.customer_id)
+        customer_user_entity: UserEntity = await self.repository.get_user_by_id_or_username_or_none(users_dto.customer)
         if customer_user_entity is None:
-            raise UserNotFoundByIdError
+            raise UserNotFoundError
         if not customer_user_entity.is_active:
             raise InactiveUserError
-        customer_user_entity.check_permission_to_search_any_user()
+        customer_user_entity.access_control_read_any_user()
         return await self.repository.get_many()
 
     async def create_user(self, create_user_dto: CreateUserDTO) -> UserEntity:
@@ -109,16 +91,19 @@ class UsersServiceImpl:
             raise UserNotFoundByIdError
         logger.info('Инициатор найден: %r', customer_user_entity.username)
         try:
-            customer_user_entity.check_has_permission_to_crete_new_user()
+            customer_user_entity.access_control_create_user()
         except UserPermissionsError:
             logger.info(
                 'Ошибка: у инициатора %r нет прав на создание нового пользователя.',
                 customer_user_entity.username,
             )
             raise
-        if not check_set_password(create_user_dto.password):
+        if create_user_dto.password == create_user_dto.username:
+            raise SameUsernameAndPasswordError
+        if not check_password_to_set_is_valid(create_user_dto.password):
             logger.info('Ошибка: Недопустимый пароль.')
             raise InvalidUserPasswordToSetError
+
         user_already_exists: UserEntity = await self.repository.get_one_or_none_by_filters(
             filters={'username': create_user_dto.username}
         )
@@ -146,40 +131,6 @@ class UsersServiceImpl:
         logger.info('Успешно создан новый пользователь: %r', new_user_entity)
         return new_user_entity
 
-    # async def create_user(self, data: CreateUserDTO) -> UserEntity:
-    #     requestor_entity: UserEntity = (
-    #         await self.repository.get_user_by_username_or_none(data.customer_id)
-    #     )
-    #     if requestor_entity is None:
-    #         raise ForbiddenCreateError
-    #     requestor_entity.has_permissions(Permissions.CREATE_USERS)
-    #     if not check_set_password(data.password):
-    #         raise InvalidPasswordToSetError
-    #     if requestor_entity.username == data.username:
-    #         raise UserAlreadyExistsError(data.username)
-    #     user_already_exists = await self.repository.get_user_by_username_or_none(
-    #         data.username
-    #     )
-    #     if user_already_exists:
-    #         raise UserAlreadyExistsError(data.username)
-    #     entity = UserEntity(
-    #         id=None,
-    #         first_name=data.first_name,
-    #         last_name=data.last_name,
-    #         username=data.username,
-    #         password=hash_password(data.password),
-    #         email=data.email,
-    #         organization=Organizations(data.organization),
-    #         is_active=data.is_active,
-    #         is_admin=data.is_admin,
-    #         is_superuser=data.is_superuser,
-    #         role=Roles(data.role),
-    #         phone_number=data.phone_number,
-    #         telegram=data.telegram,
-    #         description=data.description,
-    #     )
-    #     return await self.repository.add(entity)
-
     async def update_user(self, data: UpdateUserDTO) -> UserEntity:
         requestor_entity: UserEntity = (
             await self.repository.get_user_by_username_or_none(data.requester_username)
@@ -206,3 +157,28 @@ class UsersServiceImpl:
                 to_update_entity_as_dict[k] = v
         UserEntity(**to_update_entity_as_dict) # Проверка, что данные для обновления валидны
         return await self.repository.update(**data_as_dict)
+
+    async def change_password(self, dto: ChangeUserPasswordDTO) -> ChangeUserPasswordDTO:
+        if not check_password_to_set_is_valid(dto.new_password):
+            raise InvalidUserPasswordToSetError
+        customer_entity: UserEntity = await self.repository.get_user_by_id_or_username_or_none(dto.customer)
+        if customer_entity is None:
+            raise UserNotFoundError
+        if not customer_entity.is_active:
+            raise InactiveUserError
+        if dto.customer != dto.subject:
+            customer_entity.access_control_change_password_any_user()
+            subject_user_entity: UserEntity = await self.repository.get_user_by_id_or_username_or_none(dto.subject)
+        else:
+            subject_user_entity = customer_entity
+        subject_user_entity.validate_password(dto.old_password) # InvalidUsernameOrPasswordError если не совпал
+        if subject_user_entity.password == subject_user_entity.username:
+            raise SameUsernameAndPasswordError
+        update_dto = ToUpdateRecordDTO(
+            search_criteria={'id': subject_user_entity.id},
+            fields={'password': hash_password(dto.new_password)}
+        )
+        updated_dto = await self.repository.update_one(update_record_dto=update_dto)
+        updated_entity: UserEntity = updated_dto.new
+        updated_entity.validate_password(dto.new_password)
+        return dto
