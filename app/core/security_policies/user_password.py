@@ -1,7 +1,3 @@
-import random
-import secrets
-import string
-
 import bcrypt
 
 from core.reg_exps import PASSWORD_PATTERN
@@ -27,16 +23,6 @@ def validate_password(
     )
 
 
-def gen_password(
-    min_length: int = 3,
-    max_length: int = 20,
-) -> str:
-    chars = string.ascii_letters + string.digits + string.punctuation
-    return ''.join(
-        secrets.choice(chars) for _ in range(random.randint(min_length, max_length))
-    )
-
-
 @checking_simple_types(type_to_check=str, field_name='password')
 def check_password_to_set_is_valid(value: str) -> bool:
     """
@@ -44,4 +30,7 @@ def check_password_to_set_is_valid(value: str) -> bool:
     :param value: Строка password.
     :return: True or False.
     """
+    if len(value) > 3 and value.isalnum():
+        return True
+    return False
     return validate_string_by_pattern(value, PASSWORD_PATTERN, allow_empty=False)

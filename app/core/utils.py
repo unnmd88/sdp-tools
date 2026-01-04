@@ -1,11 +1,13 @@
+import random
 import re
-from collections.abc import Callable
+import secrets
+import string
+from collections.abc import Callable, Iterable
 from functools import wraps
 from typing import TYPE_CHECKING
 
 from dataclasses import asdict
 from core.enums import Permissions
-from core.exceptions.base import PermissionsError
 
 
 if TYPE_CHECKING:
@@ -63,4 +65,11 @@ def not_none_dataclass_instance_attrs_to_dict(
     }
 
 
-
+def gen_password(
+    min_length: int = 3,
+    max_length: int = 20,
+) -> str:
+    chars = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(
+        secrets.choice(chars) for _ in range(random.randint(min_length, max_length))
+    )

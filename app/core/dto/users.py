@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from core.enums import Roles, Organizations
 
@@ -7,14 +7,14 @@ from core.enums import Roles, Organizations
 class SearchUsersDTO:
     """ DTO для поиска сущности в хранилище. """
 
-    customer: int | str
+    customer: str
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class SearchUserDTO(SearchUsersDTO):
     """ DTO для поиска сущности в хранилище. """
 
-    subject: int | str
+    subject: str
 
 
 
@@ -37,20 +37,15 @@ class UserDTO:
 class CreateUserDTO(UserDTO):
     """DTO для создания нового пользователя системы."""
 
-    customer_id: int
+    customer: str
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class ChangeUserPasswordDTO(SearchUserDTO):
     """DTO для изменения пароля существующего пользователя системы."""
 
-    old_password: str
-    new_password: str
-
-@dataclass
-class UpdatedPasswordDTO:
-
-    new_password: str
+    old_password: str = field(repr=False)
+    new_password: str = field(repr=False)
 
 
 @dataclass

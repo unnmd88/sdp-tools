@@ -27,5 +27,9 @@ class DeleteError(ApplicationError):
     """Ошибка удаления существующего объекта."""
 
 
-class PermissionsError(ApplicationError):
-    """Ошибка доступа к данным и сервисам в связи с отсутствием прав."""
+class UserPermissionsError(ApplicationError):
+    """Ошибка доступа к данным и сервисам в связи с отсутствием прав пользователя."""
+
+    def __init__(self, type_permission: str = ''):
+        self.detail = f'Доступ {type_permission} запрещён'.replace("  ", "")
+        super().__init__(self.detail)

@@ -5,8 +5,7 @@
 from core.exceptions.base import (
     ApplicationError,
     NotFoundError,
-    CreateError, UpdateError, PermissionsError,
-)
+    CreateError, UpdateError, )
 
 INVALID_DESCRIPTION_EXCEPTION_TEXT = (
     'Поле description не должно превышать 255 символов.'
@@ -97,12 +96,10 @@ class ForbiddenUpdateError(UpdateError):
     """Ошибка обновления объекта из-за отсутствия прав."""
 
 
-class UserPermissionsError(PermissionsError):
-    """Ошибка доступа к данным и сервисам в связи с отсутствием прав пользователя."""
-
-
 class InvalidUsernameOrPasswordError(ApplicationError):
-    ...
+    def __init__(self, user: str | int = ""):
+        self.detail = f'Неверный логин или пароль пользователя {user}.'.replace("  ", "")
+        super().__init__(self.detail)
 
 
 class InactiveUserError(ApplicationError):

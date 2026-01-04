@@ -26,5 +26,5 @@ class UsersCrudUseCaseImpl:
     async def update_user(self, user: UpdateUserDTO) -> UserEntity:
         return await self.user_service.update_user(user)
 
-    async def change_password(self, dto: ChangeUserPasswordDTO):
+    async def change_password(self, dto: ChangeUserPasswordDTO) -> ChangeUserPasswordDTO:
         return await self.user_service.change_password(dto)

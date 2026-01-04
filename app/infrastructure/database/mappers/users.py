@@ -6,7 +6,6 @@ from core.dto.users import UpdateUserDTO
 from core.enums import Roles, Organizations
 from core.exceptions.base import UpdateError
 from core.users.entities.user import UserEntity
-from core.users.exceptions import ForbiddenUpdateError
 from infrastructure.database.models import User as UserModel
 
 

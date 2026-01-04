@@ -14,4 +14,5 @@ class SearchUserDTO:
     search_user_id: int
 
 if __name__ == '__main__':
-    print(SearchUserDTO(customer_username='dasd'))
+
+    print('dasd  ds       . dvcv4re '.replace("  ", ""))

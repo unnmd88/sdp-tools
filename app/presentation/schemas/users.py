@@ -10,24 +10,8 @@ from pydantic import(
     field_validator,
 )
 from core.enums import Organizations, Roles
-from core.security_policies.user import check_password_to_set_is_valid
+from core.security_policies.user_password import check_password_to_set_is_valid
 
-
-# class BaseUserSchema(BaseModel):
-#     first_name: Annotated[str, MaxLen(32), Field(default='')]
-#     last_name: Annotated[str, MaxLen(32), Field(default='')]
-#     username: str
-#     email: EmailStr | None | str = None
-#     is_active: bool
-#     is_admin: bool
-#     is_superuser: bool
-#     role: Annotated[Roles, BeforeValidator(lambda val: Roles(val))]
-#     organization: Annotated[
-#         Organizations, BeforeValidator(lambda val: Organizations(val))
-#     ]
-#     phone_number: Annotated[str, MaxLen(10), Field(default='')]
-#     telegram: Annotated[str, MaxLen(32), Field(default='')]
-#     description: Annotated[str, Field(default='')]
 
 class BaseUserSchema(BaseModel):
     first_name: str
@@ -37,9 +21,9 @@ class BaseUserSchema(BaseModel):
     is_active: bool
     role: Roles
     organization: Organizations
-    phone_number: str | None
-    telegram: str | None
-    description: str | None
+    phone_number: str
+    telegram: str
+    description: str
 
 
 class ResponseUserSchema(BaseUserSchema):
@@ -91,16 +75,29 @@ class UpdateUserSchema(BaseModel):
     description: Annotated[str | None, Field(default=None)]
 
 
-class ChangeUserPasswordSchema(BaseModel):
+class ChangeUserPasswordBaseSchema(BaseModel):
     model_config = ConfigDict(strict=True, extra='forbid')
 
-    old_password: str
     new_password: str
 
     @field_validator('new_password')
     def check_password(cls, v, info: FieldValidationInfo):
-        if v == info.data['old_password']:
+        has_old_password_attr = info.data.get('old_password')
+        if has_old_password_attr is not None and v == has_old_password_attr:
             raise ValueError('Пароли не должны совпадать')
         if not check_password_to_set_is_valid:
             raise ValueError('Недопустимый пароль')
         return v
+
+
+class ChangePasswordMyselfSchema(ChangeUserPasswordBaseSchema):
+
+    old_password: str
+
+class ChangeAnyUserPasswordSchema(ChangeUserPasswordBaseSchema):
+    pass
+
+
+class ChangeUserPasswordResponse(ChangeUserPasswordBaseSchema):
+
+    subject: str

@@ -1,7 +1,7 @@
 from textwrap import dedent
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jwt import ExpiredSignatureError
+from jwt import ExpiredSignatureError, DecodeError
 
 from application.interfaces.repositories.passport_groups import PassportGroupRepositoryProtocol
 from application.interfaces.repositories.regions import RegionsRepositoryProtocol
@@ -78,6 +78,9 @@ def get_jwt_payload_schema(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f'Срок действия токена истёк.',
         )
+    except DecodeError:
+        #TODO Залоггировать!
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 def get_access_jwt_payload_schema(

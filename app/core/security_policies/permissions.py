@@ -41,6 +41,23 @@ class UserPermissions:
     def frozen_permissions(self):
         self._permissions = frozenset(self._permissions)
 
+    def has_difference(self, permissions: set[Permissions]) -> set[Permissions]:
+        if not permissions:
+            raise ValueError('permissions cant be empty.')
+        if not permissions.issubset(self._permissions):
+            raise ValueError('Bad members in permissions.')
+        return self._permissions - permissions # Разность множеств
+
+    def has(self, permission: Permissions):
+        return permission in self._permissions
+
+    def has_to_update_users(self) -> bool:
+        return Permissions.UPDATE_USERS in self._permissions
+
+    def update_any_user(self) -> bool:
+        return Permissions.UPDATE_USERS in self._permissions
+
+
 
 if __name__ == '__main__':
 

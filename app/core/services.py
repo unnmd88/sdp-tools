@@ -18,3 +18,4 @@ class BaseService:
         if raise_if_user_inactive and not user_entity.is_active:
             raise UserInactiveError
         self.repository = repository
+

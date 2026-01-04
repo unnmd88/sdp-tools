@@ -1,12 +1,11 @@
-from collections.abc import MutableSet
 from dataclasses import InitVar, dataclass, field
-
 
 from core.enums import (
     EntityIdRange,
     Organizations,
     Roles, Permissions,
 )
+from core.exceptions.base import UserPermissionsError
 from core.field_validators import (
     check_description_is_valid,
     check_email_is_valid,
@@ -23,10 +22,10 @@ from core.mixins import BaseEntityMixin
 from core.users.exceptions import (
     DomainValidationError,
     INVALID_DESCRIPTION_EXCEPTION_TEXT,
-    UserPermissionsError, InvalidUsernameOrPasswordError, InactiveUserError,
+    InvalidUsernameOrPasswordError,
 )
-from core.users.value_objects.permissions import UserPermissions
-from core.security_policies.user import hash_password, validate_password, check_password_to_set_is_valid
+from core.security_policies.permissions import UserPermissions
+from core.security_policies.user_password import validate_password
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -91,17 +90,11 @@ class UserEntity(BaseEntityMixin):
             raise DomainValidationError(INVALID_DESCRIPTION_EXCEPTION_TEXT)
         self._set_permissions()
 
+
     def __eq__(self, other):
         if not isinstance(other, UserEntity):
             raise NotImplementedError
         return self.username == other.username
-
-    def validate_password(self, password: str):
-        if not validate_password(
-            password=password,
-            hashed_password=self.password,
-        ):
-            raise InvalidUsernameOrPasswordError
 
     def _set_permissions(self):
         if not self.is_active:
@@ -114,97 +107,86 @@ class UserEntity(BaseEntityMixin):
                 exclude={Permissions.CREATE_USERS, Permissions.UPDATE_USERS}
             )
 
-    def access_control(self, *permissions: Permissions):
-        """
-        Проверка наличия permissions для пользователя. В случае, если один хотя бы одно из permissions
-        отсутствует - будет выброшено исключение.
-        :param permissions: Разрешения пользователя, подлежащие проверки на наличие.
-        :raises UserPermissionsError: Исключение, если хотя бы одно из permissions отсутствует.
-        :return: None.
-        """
-        if not (permissions := set(permissions)):
-            raise ValueError('permissions cant be empty.')
-        all_permissions: MutableSet = self.permissions.get_all()
-        if not permissions.issubset(all_permissions):
-            raise ValueError('Bad members in permissions.')
-        difference = all_permissions - permissions
-        if difference:
-            raise UserPermissionsError(f'Отсутствуют права: {",".join(difference)}')
-
-    def access_control_read_region(self):
-        self.access_control(Permissions.READ_REGIONS)
-
-    def access_control_read_passport_groups(self):
-        self.access_control(Permissions.READ_PASSPORT_GROUPS)
-
-    def access_control_read_tlo(self):
-        self.access_control(Permissions.READ_TLO)
-
-    def access_control_read_user(self, readable_username_or_id: str | int) -> None:
-        if (
-            self.username == readable_username_or_id
-            or self.id == readable_username_or_id
-            or self.role in (Roles.admin, Roles.superuser)
-        ):
-            return None
-        raise UserPermissionsError(self.username)
-
-    def access_control_read_any_user(self) -> None:
-        if  self.role not in (Roles.admin, Roles.superuser):
-            raise UserPermissionsError
-        return None
-
-    def access_control_create_user(self):
-        if not self.role == Roles.superuser:
-            raise UserPermissionsError(self.username)
-
-    def access_control_change_password_any_user(self) -> None:
-        if  self.role != Roles.superuser:
-            raise UserPermissionsError
-        return None
+    def validate_password(self, password: str) -> bool:
+        return validate_password(
+            password=password,
+            hashed_password=self.password,
+        )
 
     @property
     def is_superuser(self) -> bool:
         return self.role == Roles.superuser
 
 
-@dataclass(frozen=True, slots=True, kw_only=True)
-class CreateNewUserEntity:
-    first_name: str
-    last_name: str
-    username: str
-    organization: Organizations
-    email: str
-    password: str
-    is_active: bool
-    is_admin: bool
-    is_superuser: bool
-    role: Roles
-    phone_number: str = ''
-    telegram: str = ''
-    description: str = ''
+class UserAccessControl:
 
-    def __post_init__(self):
-        # Validate only password in this point.
-        # Extra validation in UserEntity instance.
-        if not check_password_to_set_is_valid(self.password):
-            raise DomainValidationError(f'Недопустимый формат пароля.')
-        return UserEntity(
-            id=None,
-            first_name=self.first_name,
-            last_name=self.last_name,
-            username=self.username,
-            organization=self.organization,
-            email=self.email,
-            password=hash_password(self.password),
-            is_active=self.is_active,
-            is_admin=self.is_admin,
-            is_superuser=self.is_superuser,
-            role=Roles(self.role),
-            phone_number=self.phone_number,
-            telegram=self.telegram,
-            description=self.description,
-        )
+    def __init__(self, user_entity: UserEntity = None):
+        self._user_entity = user_entity
+
+    def load_user_entity(self, user_entity: UserEntity) -> None:
+        self._user_entity = user_entity
+
+    def updating_another_user(
+        self,
+        subject_username: str
+    ) -> None:
+        if self._user_entity.username == subject_username:
+            return None
+        if not self._user_entity.permissions.has(Permissions.UPDATE_USERS):
+            raise UserPermissionsError('обновления другого пользователя')
+        return None
+
+    def read_user(self, readable_username_or_id: str | int) -> None:
+        if (
+            self._user_entity.username == readable_username_or_id
+            or self._user_entity.id == readable_username_or_id
+            or self._user_entity.permissions.has(Permissions.READ_USERS)
+        ):
+            return None
+        raise UserPermissionsError('чтения другого пользователя')
+
+    def read_any_user(self) -> None:
+        if not self._user_entity.permissions.has(Permissions.READ_USERS):
+            raise UserPermissionsError('чтения другого пользователя')
+
+    def create_user(self) -> None:
+        if not self._user_entity.permissions.has(Permissions.CREATE_USERS):
+            raise UserPermissionsError('создания нового пользователя')
+
+    def change_password_for_any_user(self) -> None:
+        if not self._user_entity.permissions.has(Permissions.UPDATE_USERS):
+            raise UserPermissionsError('изменения другого пользователя')
+
+    def validate_password(self, password: str):
+        if not validate_password(
+            password=password,
+            hashed_password=self._user_entity.password,
+        ):
+            raise InvalidUsernameOrPasswordError
+
+    # def access_control(self, *permissions: Permissions):
+    #     """
+    #     Проверка наличия permissions для пользователя. В случае, если один хотя бы одно из permissions
+    #     отсутствует - будет выброшено исключение.
+    #     :param permissions: Разрешения пользователя, подлежащие проверки на наличие.
+    #     :raises UserPermissionsError: Исключение, если хотя бы одно из permissions отсутствует.
+    #     :return: None.
+    #     """
+    #     if not (permissions := set(permissions)):
+    #         raise ValueError('permissions cant be empty.')
+    #     if not permissions.issubset(self._user_entity.permissions.get_all()):
+    #         raise ValueError('Bad members in permissions.')
+    #     difference = self._user_entity.permissions.has_difference(permissions)
+    #     if difference:
+    #         raise UserPermissionsError(f'Отсутствуют права: {",".join(difference)}')
+
+    def read_regions(self):
+        if not self._user_entity.permissions.has(Permissions.READ_REGIONS):
+            raise UserPermissionsError(Permissions.READ_REGIONS)
+
+    def read_passport_group(self):
+        if not self._user_entity.permissions.has(Permissions.READ_PASSPORT_GROUPS):
+            raise UserPermissionsError(Permissions.READ_PASSPORT_GROUPS)
 
 
 if __name__ == '__main__':
@@ -217,52 +199,12 @@ if __name__ == '__main__':
         email='example@example.com',
         password=b'mysecret',
         is_active=False,
-        is_admin=True,
-        is_superuser=True,
-        role=Roles.superuser,
-        phone_number='',
-        telegram='',
-        description='',
-        raise_if_not_active=False,
-        # full_validate=False,
-    )
-
-
-
-    try:
-        user = UserEntity(
-            id=321,
-            first_name='Chook',
-            last_name='Gekk',
-            username='chokk',
-            organization=Organizations.SDP,
-            email='example@example.com',
-            password=b'mysecret',
-            is_active=True,
-            is_admin=True,
-            is_superuser=True,
-            role=Roles.superuser,
-            phone_number='',
-            telegram='',
-            description='',
-        )
-    except DomainValidationError as e:
-        print(f'e: {e}')
-
-    user2 = CreateNewUserEntity(
-        first_name='Chookaaa',
-        last_name='Gekk',
-        username='chokk',
-        organization=Organizations.SDP,
-        email='example@example.com',
-        password='sadf',
-        is_active=True,
-        is_admin=True,
-        is_superuser=True,
         role=Roles.superuser,
         phone_number='',
         telegram='',
         description='',
     )
 
-    print(user2)
+
+
+

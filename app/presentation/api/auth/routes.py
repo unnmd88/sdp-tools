@@ -34,7 +34,10 @@ async def issue_jwt(
     try:
         return await use_case.authenticate_and_issue_jwt(auth_dto, refresh_token=True)
     except InvalidUsernameOrPasswordError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Неверный логин или пароль.'
+        )
     except InactiveUserException:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
