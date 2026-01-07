@@ -21,11 +21,11 @@ format: ## Format code with ruff
 
 .PHONY: up
 up:
-	docker compose up
+	docker compose --env-file .env.docker up
 
 .PHONY: upd
 upd:
-	docker compose up -d
+	docker compose --env-file .env.docker up -d
 
 .PHONY: up-build
 up-build:

@@ -126,7 +126,8 @@ def create_root(
     Returns:
 
     """
-    res = asyncio.run(create_user_root(password))
+
+    print(asyncio.run(create_user_root(source='CLI', password=password)))
 
 
 if __name__ == '__main__':

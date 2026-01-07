@@ -1,4 +1,8 @@
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import (
+    HTTPBearer,
+    HTTPAuthorizationCredentials,
+    OAuth2PasswordBearer
+)
 from jwt import ExpiredSignatureError, DecodeError
 
 from application.interfaces.repositories.passport_groups import PassportGroupRepositoryProtocol
@@ -13,6 +17,7 @@ from application.interfaces.services.users import UsersServiceProtocol
 from application.interfaces.use_cases.create_user_use_case_interface import CreateUserUseCaseProtocol
 from application.interfaces.use_cases.user_login_use_case_interface import UserLoginUseCaseProtocol
 from application.use_cases.users.create_user_use_case import CreateUserUseCaseImpl
+from core.config import settings
 from presentation.api.auth.use_cases.login_and_issue_jwt_use_case import LoginAndIssueJWTUseCaseIml
 from presentation.api.auth.jwt_helper import JWTHelper
 from application.use_cases.auth.user_login_use_case import UserLoginUseCaseImpl
@@ -48,23 +53,23 @@ from presentation.schemas.jwt import PayloadAccessJWTSchema, PayloadRefreshJWTSc
 #  -- extras --
 
 http_bearer = HTTPBearer()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='')
+jwt_helper = JWTHelper()
+db_session = Annotated[AsyncSession,Depends(db_api.session_getter)]
 
-jwt_manager = JWTHelper()
-
-db_session = Annotated[
-    AsyncSession,
-    Depends(db_api.session_getter),
-]
 
 # -- JWT, credentials and access-levels --
 
 
 def get_jwt_payload_schema(
-    credentials: str,
+    # credentials: str,
+    token: Annotated[str, Depends(oauth2_scheme)],
     expected_token_type: TokenTypes,
 ) -> PayloadAccessJWTSchema | PayloadRefreshJWTSchema:
     try:
-        payload = jwt_manager.decode_jwt(credentials)
+        print(f'TOKEN: {token}')
+        # payload = jwt_helper.decode_jwt(credentials)
+        payload = jwt_helper.decode_jwt(token)
         if payload['typ'] == expected_token_type and expected_token_type == TokenTypes.access:
             return PayloadAccessJWTSchema(**payload)
         elif payload['typ'] == expected_token_type and expected_token_type == TokenTypes.refresh:
@@ -85,10 +90,12 @@ def get_jwt_payload_schema(
 
 
 def get_access_jwt_payload_schema(
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
+    # credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
+    token: Annotated[str, Depends(oauth2_scheme)],
 ) -> PayloadAccessJWTSchema:
     return get_jwt_payload_schema(
-        credentials=credentials.credentials,
+        # credentials=credentials.credentials,
+        token=token,
         expected_token_type=TokenTypes.access,
     )
 

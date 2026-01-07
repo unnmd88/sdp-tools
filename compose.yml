@@ -4,12 +4,14 @@ services:
       dockerfile: docker-build/app/Dockerfile
       context: .
     image: fastapi-sdp-tools
+    env_file: .env.docker
     container_name: fapiapp
-    environment:
-      APP_CONFIG__DB__URL: postgresql+asyncpg://admin1:1122@192.168.100.4:5432/tdb
-      APP_CONFIG__DB__ECHO: 1
-      APP_CONFIG__default_superuser_creds__NAME: root
-      APP_CONFIG__default_superuser_creds__PASSWORD: sdp2025
+
+#    environment:
+#      APP_CONFIG__DB__URL: postgresql+asyncpg://admin1:1122@192.168.100.4:5432/tdb
+#      APP_CONFIG__DB__ECHO: 1
+#      APP_CONFIG__default_superuser_creds__NAME: root
+#      APP_CONFIG__default_superuser_creds__PASSWORD: sdp2025
     volumes:
       - ./app:/sdp-tools-app/app
     networks:
@@ -19,7 +21,10 @@ services:
       pg:
        condition: service_healthy
     ports:
-      - "8001:8080"
+      - "${APP_CONFIG__RUN__PORT}:8080"
+#      - "8001:8080"
+#    command: uv run app/main.py
+    command: "fastapi dev --host 0.0.0.0  app/main.py --port ${APP_CONFIG__RUN__PORT}"
   pg:
     image: postgres:18
     container_name: psgr

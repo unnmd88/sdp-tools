@@ -22,4 +22,9 @@ app.add_middleware(
 
 
 if __name__ == '__main__':
-    uvicorn.run('main:app', **settings.run.model_dump())
+    uvicorn.run(
+        'main:app',
+        host=settings.run.host,
+        port=settings.run.port,
+        reload=settings.run.reload,
+    )

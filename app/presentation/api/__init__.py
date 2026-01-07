@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from .api_v1 import router as router_api_v1
 from .users.routers import router as router_users
 from .auth.routes import router as router_auth
-from .auth.admin.routes import router as administration_router
+from presentation.api.admin.routes import router as administration_router
 
 router = APIRouter(prefix=settings.api.prefix)
 
