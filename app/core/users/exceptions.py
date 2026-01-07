@@ -81,12 +81,19 @@ class UserAlreadyExistsError(CreateError):
         return f'Пользователь с username={self._id!r} уже существует.'
 
 
-class InvalidUserPasswordToSetError(ApplicationError):
+class InvalidValueToSetError(CreateError):
+    """Ошибка создания нового пользователя из-за невалидного username."""
+
+
+class InvalidUsernameOrPasswordToSetError(ApplicationError):
     """Ошибка установки пароля пользователя."""
 
     @property
     def detail(self):
-        return f'Ошибка установки пароля пользователя.'
+        return f'Ошибка установки username/пароля пользователя.'
+
+
+
 
 class SameUsernameAndPasswordError(ApplicationError):
     """Ошибка совпадения username и пароля пользователя."""
