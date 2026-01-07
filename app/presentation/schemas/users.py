@@ -18,9 +18,7 @@ class BaseUserSchema(BaseModel):
 
     first_name: Annotated[str | None, Field(examples=[None, 'Иван'])]
     last_name: Annotated[str | None, Field(examples=[None, 'Иванов'])]
-    username: Annotated[
-        str | None, MinLen(4), MaxLen(16), Field(examples=['user', 'edward'])
-    ]
+    username: Annotated[str, Field(examples=['user', 'edward'])]
     email: EmailStr | None
     is_active: bool
     role: Roles
@@ -43,23 +41,23 @@ class ResponseUserSchema(BaseUserSchema):
 
 class CreateUserSchema(BaseUserSchema):
 
-    password: Annotated[str, MinLen(4), MaxLen(32)]
+    password: str
     role: Annotated[Roles, BeforeValidator(lambda val: Roles(val))]
     organization: Annotated[
         Organizations, BeforeValidator(lambda val: Organizations(val))
     ]
 
-    @field_validator('username')
-    def username_alphanumeric(cls, v):
-        assert v.isalnum(), 'username должен содержать буквы и цифры'
-        return v
-
-    @field_validator('password')
-    def check_password(cls, v, info: FieldValidationInfo):
-        assert v != info.data['username'], 'username и пароль не должны совпадать'
-        if not check_password_to_set_constraints(v):
-            raise ValueError('Недопустимый пароль')
-        return v
+    # @field_validator('username')
+    # def username_alphanumeric(cls, v):
+    #     assert v.isalnum(), 'username должен содержать буквы и цифры'
+    #     return v
+    #
+    # @field_validator('password')
+    # def check_password(cls, v, info: FieldValidationInfo):
+    #     assert v != info.data['username'], 'username и пароль не должны совпадать'
+    #     if not check_password_to_set_constraints(v):
+    #         raise ValueError('Недопустимый пароль')
+    #     return v
 
 
 class UpdateUserSchema(BaseModel):

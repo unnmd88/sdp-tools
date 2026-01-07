@@ -13,7 +13,7 @@ def check_password_to_set_constraints(value: str):
     :return: True or False.
     """
 
-    if len(value) > 3 and value.isalnum():
+    if len(value) > 3 and (value.isalnum() or value.isalpha() or value.isnumeric()):
         return None
     raise InvalidValueToSetError('Недопустимый пароль.')
     return validate_string_by_pattern(value, PASSWORD_PATTERN, allow_empty=False)
