@@ -22,7 +22,7 @@ class CreateUserRootResultDTO:
 
 
 async def create_user_root(password: str = None):
-    username_root = 'root'
+    username_root = settings.default_superuser_creds.name
     result = CreateUserRootResultDTO(username=username_root,)
 
     try:

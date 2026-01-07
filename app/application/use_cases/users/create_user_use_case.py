@@ -1,6 +1,5 @@
-
 import logging
-from collections.abc import Sequence
+
 from dataclasses import dataclass
 
 from app_logging.dev.config import USERS_LOGGER
@@ -10,15 +9,16 @@ from application.interfaces.use_cases.get_user_use_case_interface import GetUser
 from core.dto.users import CreateUserDTO
 from core.enums import Permissions, Organizations, Roles
 from core.exceptions.base import UserPermissionsError, ApplicationError
-
 from core.users.entities.user import UserEntity
 from core.users.exceptions import (
     UserNotFoundError,
     InactiveUserError,
     UserAlreadyExistsError,
-    InvalidUserPasswordToSetError
+    InvalidValueToSetError
 )
-from core.users.services.user_password import check_password_to_set_is_valid, hash_password
+from core.users.services.user_password import hash_password
+from core.users.services.field_values_constraints import UserEntityConstraints
+
 
 logger = logging.getLogger(USERS_LOGGER)
 
@@ -49,6 +49,14 @@ class CreateUserUseCaseImpl:
             msg = f'У {customer_entity.username!r} нет прав для создания пользователей.'
             logger.warning(msg)
             raise UserPermissionsError(msg)
+        try:
+            UserEntityConstraints.check_username_and_password(
+                username=create_user_dto.username,
+                password=create_user_dto.password,
+            )
+        except InvalidValueToSetError as e:
+            logger.info('%s: %r', e, create_user_dto.password)
+            raise
         user_already_exists: UserEntity = await self.get_user_use_case.get_user_by_username_or_none(
             create_user_dto.username
         )
@@ -56,14 +64,6 @@ class CreateUserUseCaseImpl:
             msg = f'Пользователь с username={user_already_exists.username}(id={user_already_exists.id}) существует.'
             logger.warning(msg)
             raise UserAlreadyExistsError(msg)
-        if create_user_dto.password == create_user_dto.username:
-            msg = 'Ошибка: username и пароль должны отличаться'
-            logger.info(msg)
-            raise InvalidUserPasswordToSetError(msg)
-        if not check_password_to_set_is_valid(create_user_dto.password):
-            msg = 'Ошибка: username и пароль должны отличаться'
-            logger.info(msg)
-            raise InvalidUserPasswordToSetError('%s: %s', msg, create_user_dto.password)
         entity = UserEntity(
             first_name=create_user_dto.first_name,
             last_name=create_user_dto.last_name,

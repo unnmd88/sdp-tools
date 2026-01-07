@@ -10,7 +10,7 @@ from pydantic import(
     field_validator,
 )
 from core.enums import Organizations, Roles
-from core.users.services.user_password import check_password_to_set_is_valid
+from core.users.services.field_values_constraints import check_password_to_set_constraints
 
 
 class BaseUserSchema(BaseModel):
@@ -57,7 +57,7 @@ class CreateUserSchema(BaseUserSchema):
     @field_validator('password')
     def check_password(cls, v, info: FieldValidationInfo):
         assert v != info.data['username'], 'username и пароль не должны совпадать'
-        if not check_password_to_set_is_valid:
+        if not check_password_to_set_constraints(v):
             raise ValueError('Недопустимый пароль')
         return v
 
@@ -91,7 +91,7 @@ class ChangeUserPasswordBaseSchema(BaseModel):
         has_old_password_attr = info.data.get('old_password')
         if has_old_password_attr is not None and v == has_old_password_attr:
             raise ValueError('Пароли не должны совпадать')
-        if not check_password_to_set_is_valid:
+        if not check_password_to_set_constraints:
             raise ValueError('Недопустимый пароль')
         return v
 

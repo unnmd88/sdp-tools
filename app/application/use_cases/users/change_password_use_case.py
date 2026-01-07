@@ -9,8 +9,9 @@ from core.dto.users import ChangeUserPasswordDTO
 from core.exceptions.base import ApplicationError
 from core.users.entities.user import UserEntity
 from core.users.exceptions import UserNotFoundError, InactiveUserError, UserAdministratorNotFoundError, \
-    InvalidUsernameOrPasswordError, InvalidUserPasswordToSetError, SameUsernameAndPasswordError
-from core.users.services.user_password import check_password_to_set_is_valid, hash_password
+    InvalidUsernameOrPasswordError, InvalidUsernameOrPasswordToSetError, SameUsernameAndPasswordError
+from core.users.services.user_password import hash_password
+from core.users.services.field_values_constraints import check_password_to_set_constraints
 
 logger = logging.getLogger(USERS_LOGGER)
 
@@ -36,14 +37,14 @@ class ChangeUserPasswordUseCaseImpl:
         if not subject.validate_password(dto.old_password):
             logger.warning('Ошибка: неверный пароль пользователя %r.', subject.username)
             raise InvalidUsernameOrPasswordError
-        if not check_password_to_set_is_valid(dto.new_password):
+        if not check_password_to_set_constraints(dto.new_password):
             msg = 'Ошибка: Недопустимый пароль'
             logger.info('%s: %r', msg, dto.new_password)
-            raise InvalidUserPasswordToSetError(f'{msg}.')
+            raise InvalidUsernameOrPasswordToSetError(f'{msg}.')
         if subject.password == subject.username:
             msg = 'Ошибка: username и пароль должны отличаться'
             logger.info('%s: username=%r, пароль=%r', msg, subject.username, subject.password)
-            raise InvalidUserPasswordToSetError(msg)
+            raise InvalidUsernameOrPasswordToSetError(msg)
         update_dto = ToUpdateRecordDTO(
             search_criteria={'id': subject.id},
             fields={'password': hash_password(dto.new_password)}

@@ -21,7 +21,7 @@ from core.users.entities.user import UserEntity
 from core.users.exceptions import (
     UserNotFoundByIdError,
     UserNotFoundByUsernameError,
-    InvalidUserPasswordToSetError,
+    InvalidUsernameOrPasswordToSetError,
     UserAlreadyExistsError,
     ForbiddenUpdateError,
     InvalidUsernameOrPasswordError,
@@ -29,7 +29,8 @@ from core.users.exceptions import (
     UserNotFoundError,
     SameUsernameAndPasswordError
 )
-from core.users.services.user_password import hash_password, check_password_to_set_is_valid
+from core.users.services.user_password import hash_password
+from core.users.services.field_values_constraints import check_password_to_set_constraints
 
 logger = logging.getLogger(USERS_LOGGER)
 
@@ -105,9 +106,9 @@ class UsersServiceImpl:
             raise UserPermissionsError
         if create_user_dto.password == create_user_dto.username:
             raise SameUsernameAndPasswordError
-        if not check_password_to_set_is_valid(create_user_dto.password):
+        if not check_password_to_set_constraints(create_user_dto.password):
             logger.info('Ошибка: Недопустимый пароль.')
-            raise InvalidUserPasswordToSetError
+            raise InvalidUsernameOrPasswordToSetError
 
         user_already_exists: UserEntity = await self.repository.get_one_or_none_by_filters(
             filters={'username': create_user_dto.username}
@@ -175,9 +176,9 @@ class UsersServiceImpl:
         if not customer.is_active:
             logger.info('Запрещено: инициатор не активен.')
             raise InactiveUserError
-        if not check_password_to_set_is_valid(dto.new_password):
+        if not check_password_to_set_constraints(dto.new_password):
             logger.info('Недопустимый пароль: %r', dto.new_password)
-            raise InvalidUserPasswordToSetError
+            raise InvalidUsernameOrPasswordToSetError
 
         if dto.subject in (customer.username, customer.id):
             subject: UserEntity = await self._logic_change_password_myself(customer, dto)
