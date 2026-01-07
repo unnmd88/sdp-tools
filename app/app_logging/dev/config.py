@@ -2,6 +2,8 @@ import logging.config
 
 from core.config import API_V1_PATH, BASE_DIR
 
+print(f'BASE_DIR: {BASE_DIR}')
+
 LOGGING_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -41,6 +43,18 @@ LOGGING_CONFIG = {
             'filename': BASE_DIR / 'app_logging/USERS_RUD.log',
             'formatter': 'simple2',
         },
+        'auth': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'app_logging/auth.log',
+            'formatter': 'simple2',
+        },
+        'JWT': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'app_logging/jwt.log',
+            'formatter': 'simple2',
+        },
     },
     'loggers': {
         '': {
@@ -51,6 +65,16 @@ LOGGING_CONFIG = {
         'common': {
             'level': 'INFO',
             'handlers': ['RUD'],
+            'propagate': True,
+        },
+        'auth': {
+            'level': 'INFO',
+            'handlers': ['auth'],
+            'propagate': True,
+        },
+        'jwt': {
+            'level': 'INFO',
+            'handlers': ['JWT'],
             'propagate': True,
         },
         'users': {
@@ -85,6 +109,8 @@ logging.config.dictConfig(LOGGING_CONFIG)
 
 COMMON_LOGGER = 'common'
 USERS_LOGGER = 'users'
+JWT_LOGGER = 'jwt'
+AUTH_LOGGER = 'auth'
 PASSPORTS_LOGGER = 'passports'
 PASSPORTS_OWNERS_LOGGER = 'passport_groups'
 

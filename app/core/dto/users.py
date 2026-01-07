@@ -11,19 +11,20 @@ class SearchUsersDTO:
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)
-class SearchUserDTO(SearchUsersDTO):
+class GetUserFromRepoDTO:
     """ DTO для поиска сущности в хранилище. """
 
     subject: str
+    raise_if_not_found: bool
+    raise_if_not_active: bool
 
 
-
-@dataclass(kw_only=True)
+@dataclass(slots=True, frozen=True, kw_only=True)
 class UserDTO:
     first_name: str
     last_name: str
     username: str
-    password: str
+    password: str = field(repr=False)
     email: str
     organization: Organizations
     is_active: bool
@@ -33,7 +34,7 @@ class UserDTO:
     description: str
 
 
-@dataclass(kw_only=True)
+@dataclass(slots=True, frozen=True, kw_only=True)
 class CreateUserDTO(UserDTO):
     """DTO для создания нового пользователя системы."""
 
@@ -41,9 +42,10 @@ class CreateUserDTO(UserDTO):
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)
-class ChangeUserPasswordDTO(SearchUserDTO):
+class ChangeUserPasswordDTO:
     """DTO для изменения пароля существующего пользователя системы."""
 
+    subject: str
     old_password: str = field(repr=False)
     new_password: str = field(repr=False)
 

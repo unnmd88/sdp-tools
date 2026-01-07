@@ -10,20 +10,29 @@ from pydantic import(
     field_validator,
 )
 from core.enums import Organizations, Roles
-from core.security_policies.user_password import check_password_to_set_is_valid
+from core.users.services.user_password import check_password_to_set_is_valid
 
 
 class BaseUserSchema(BaseModel):
-    first_name: str
-    last_name: str
-    username: str
-    email: EmailStr | None | str
+    model_config = ConfigDict(use_enum_values=True, strict=True, extra='forbid')
+
+    first_name: Annotated[str | None, Field(examples=[None, 'Иван'])]
+    last_name: Annotated[str | None, Field(examples=[None, 'Иванов'])]
+    username: Annotated[
+        str | None, MinLen(4), MaxLen(16), Field(examples=['user', 'edward'])
+    ]
+    email: EmailStr | None
     is_active: bool
     role: Roles
     organization: Organizations
-    phone_number: str
-    telegram: str
-    description: str
+    phone_number: Annotated[
+        str | None, Field(examples=[None, '988 920 11 55', '988 920 11 55', '988-920-11-55'])
+    ]
+    telegram: Annotated[
+        str | None, Field(examples=[None, '@user', '@jondoe'])
+    ]
+    description: str = ''
+
 
 
 class ResponseUserSchema(BaseUserSchema):
@@ -33,11 +42,8 @@ class ResponseUserSchema(BaseUserSchema):
 
 
 class CreateUserSchema(BaseUserSchema):
-    model_config = ConfigDict(use_enum_values=True, strict=True, extra='forbid')
 
     password: Annotated[str, MinLen(4), MaxLen(32)]
-    email: EmailStr | None | str
-    username: Annotated[str, MinLen(4), MaxLen(16)]
     role: Annotated[Roles, BeforeValidator(lambda val: Roles(val))]
     organization: Annotated[
         Organizations, BeforeValidator(lambda val: Organizations(val))

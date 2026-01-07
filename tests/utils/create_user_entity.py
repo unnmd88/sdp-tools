@@ -33,8 +33,6 @@ def create_user_entity(
             email=email,
             password=password,
             is_active=is_active,
-            is_admin=is_admin,
-            is_superuser=is_superuser,
             role=role,
             phone_number=phone_number,
             telegram=telegram,

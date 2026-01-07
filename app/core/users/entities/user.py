@@ -24,23 +24,23 @@ from core.users.exceptions import (
     INVALID_DESCRIPTION_EXCEPTION_TEXT,
     InvalidUsernameOrPasswordError,
 )
-from core.security_policies.permissions import UserPermissions
-from core.security_policies.user_password import validate_password
+from core.users.entities.permissions import UserPermissions
+from core.users.services.user_password import validate_password
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UserEntity(BaseEntityMixin):
 
-    first_name: str
-    last_name: str
+    first_name: str | None
+    last_name: str | None
     username: str
     organization: Organizations
-    email: str
+    email: str | None
     password: bytes = field(repr=False)
     is_active: bool
     role: Roles
-    phone_number: str
-    telegram: str
+    phone_number: str | None
+    telegram: str | None
     description: str
     permissions: UserPermissions = field(default_factory=UserPermissions)
     full_validate: InitVar[bool] = True

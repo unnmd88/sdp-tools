@@ -32,6 +32,10 @@ class UserNotFoundError(NotFoundError):
         return f'Пользователь не найден.'
 
 
+class UserAdministratorNotFoundError(NotFoundError):
+    """Ошибка поиска пользователя-администратора."""
+
+
 class UserNotFoundByIdError(UserNotFoundError):
     """Ошибка поиска user по id."""
 

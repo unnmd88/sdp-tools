@@ -2,7 +2,7 @@ from contextlib import nullcontext
 
 import pytest
 
-from core.utils import checking_simple_types
+from core.utils import checking_types
 
 
 @pytest.mark.parametrize(
@@ -61,7 +61,7 @@ from core.utils import checking_simple_types
 )
 def test_type_validator(type_to_check, value, expectation):
     with expectation:
-        @checking_simple_types(type_to_check=type_to_check)
+        @checking_types(isinstance_of=type_to_check)
         def stub(v):
             return v
         stub(value)

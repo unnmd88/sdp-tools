@@ -13,10 +13,10 @@ from core.users.constants import (
     MIN_ID,
     MAX_ID,
 )
-from core.utils import checking_simple_types, validate_string_by_pattern
+from core.utils import checking_types, validate_string_by_pattern
 
 
-@checking_simple_types(type_to_check=int, field_name='id')
+@checking_types(isinstance_of=int | None, field_name_for_exception='id')
 def check_field_id_is_valid(value: int) -> bool:
     """
     Проверяет корректность id для любой сущности приложения.
@@ -26,48 +26,48 @@ def check_field_id_is_valid(value: int) -> bool:
     return MIN_ID <= value <= MAX_ID
 
 
-@checking_simple_types(type_to_check=str, field_name='firstname')
+@checking_types(isinstance_of=str | None, field_name_for_exception='firstname')
 def check_firstname_is_valid(value: str) -> bool:
     """
     Проверяет валидность firstname.
     :param value: Строка firstname.
     :return: True or False.
     """
-    return validate_string_by_pattern(value, FIRST_NAME_PATTERN)
+    return value is None or validate_string_by_pattern(value, FIRST_NAME_PATTERN)
 
 
-@checking_simple_types(type_to_check=str, field_name='lastname')
+@checking_types(isinstance_of=str | None, field_name_for_exception='lastname')
 def check_lastname_is_valid(value: str) -> bool:
     """
     Проверяет валидность lastname.
     :param value: Строка lastname.
     :return: True or False.
     """
-    return validate_string_by_pattern(value, LAST_NAME_PATTERN)
+
+    return value is None or validate_string_by_pattern(value, LAST_NAME_PATTERN)
 
 
-@checking_simple_types(type_to_check=str, field_name='username')
+@checking_types(isinstance_of=str, field_name_for_exception='username')
 def check_username_is_valid(value: str) -> bool:
     """
     Проверяет валидность username.
     :param value: Строка username.
     :return: True or False.
     """
-    return len(value) > 2 and value.isalnum()
-    return validate_string_by_pattern(value, USERNAME_PATTERN, allow_empty=False)
+    return 2 < len(value) < 32 and value.isalnum()
 
 
-@checking_simple_types(type_to_check=str, field_name='email')
+@checking_types(isinstance_of=str | None, field_name_for_exception='email')
 def check_email_is_valid(value: str) -> bool:
     """
     Проверяет валидность email.
     :param value: Строка email.
     :return: True or False.
     """
-    return validate_string_by_pattern(value, EMAIL_PATTERN)
+    return value is None or validate_string_by_pattern(value, EMAIL_PATTERN)
 
 
-@checking_simple_types(type_to_check=bytes, field_name='password')
+@checking_types(isinstance_of=bytes, field_name_for_exception='password')
 def check_password_is_valid(value: bytes) -> bool:
     """
     Проверяет валидность password.
@@ -77,29 +77,28 @@ def check_password_is_valid(value: bytes) -> bool:
     return len(value) > 2
 
 
-@checking_simple_types(type_to_check=str, field_name='phone_number')
-def check_phone_number_is_valid(value: str) -> bool:
+@checking_types(isinstance_of=str | None, field_name_for_exception='phone_number')
+def check_phone_number_is_valid(value: str | None) -> bool:
     """
     Проверяет валидность phone_number.
     :param value: Строка phone_number.
     :return: True or False.
     """
-    return validate_string_by_pattern(value, PHONE_NUMBER_PATTERN)
+    return value is None or validate_string_by_pattern(value, PHONE_NUMBER_PATTERN)
 
 
-@checking_simple_types(type_to_check=str, field_name='telegram')
+@checking_types(isinstance_of=str | None, field_name_for_exception='telegram')
 def check_telegram_is_valid(value: str) -> bool:
     """
     Проверяет валидность telegram.
     :param value: Строка telegram.
     :return: True or False.
     """
-    if value == '':
-        return True
-    return value.startswith('@')
+
+    return value is None or (value.startswith('@') and (2 < len(value) < 32))
 
 
-@checking_simple_types(type_to_check=str, field_name='description')
+@checking_types(isinstance_of=str, field_name_for_exception='description')
 def check_description_is_valid(value: str) -> bool:
     """
     Проверяет валидность description.
@@ -126,7 +125,7 @@ def check_is_valid_enum(enum_cls: type[Enum], value: Any) -> bool:
 
 # Блок проверки для Светофорного объекта(TrafficLightObjectEntity)
 
-@checking_simple_types(type_to_check=str, field_name='name')
+@checking_types(isinstance_of=str, field_name_for_exception='name')
 def check_tlo_name_is_valid(value: str) -> bool:
     """
     Проверяет валидность name светофорного объекта.
@@ -136,7 +135,7 @@ def check_tlo_name_is_valid(value: str) -> bool:
     return validate_string_by_pattern(value, NAME_TLO_PATTERN, allow_empty=False)
 
 
-@checking_simple_types(type_to_check=str, field_name='district')
+@checking_types(isinstance_of=str, field_name_for_exception='district')
 def check_tlo_district_is_valid(value: str) -> bool:
     """
     Проверяет валидность district светофорного объекта.
@@ -146,7 +145,7 @@ def check_tlo_district_is_valid(value: str) -> bool:
     return validate_string_by_pattern(value, DISTRICT_TLO_PATTERN, allow_empty=True)
 
 
-@checking_simple_types(type_to_check=str, field_name='street')
+@checking_types(isinstance_of=str, field_name_for_exception='street')
 def check_tlo_street_is_valid(value: str) -> bool:
     """
     Проверяет валидность street светофорного объекта.
@@ -156,7 +155,7 @@ def check_tlo_street_is_valid(value: str) -> bool:
     return validate_string_by_pattern(value, STREET_TLO_PATTERN, allow_empty=True)
 
 
-@checking_simple_types(type_to_check=float, field_name='latitude_or_longitude')
+@checking_types(isinstance_of=float, field_name_for_exception='latitude_or_longitude')
 def check_tlo_latitude_or_longitude_is_valid(value: float) -> bool:
     """
     Проверяет валидность latitude_or_longitude светофорного объекта.

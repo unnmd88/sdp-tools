@@ -1,23 +1,25 @@
-from textwrap import dedent
-
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt import ExpiredSignatureError, DecodeError
 
 from application.interfaces.repositories.passport_groups import PassportGroupRepositoryProtocol
 from application.interfaces.repositories.regions import RegionsRepositoryProtocol
 from application.interfaces.repositories.tlo import TrafficLightObjectRepositoryProtocol
-from application.interfaces.repositories.users import UsersRepositoryProtocol
+from application.interfaces.repositories.users_repo_interface import UsersRepositoryProtocol
 
 from application.interfaces.services.passport_groups_crud import PassportGroupsServiceProtocol
 from application.interfaces.services.regions_crud import RegionsServiceProtocol
 from application.interfaces.services.tlo import TrafficLightObjectServiceProtocol
 from application.interfaces.services.users import UsersServiceProtocol
-from application.jwt_utils import ManagerJWT
-from application.use_cases.auth_jwt_use_case import AuthAndJWTUseCaseImpl
+from application.interfaces.use_cases.create_user_use_case_interface import CreateUserUseCaseProtocol
+from application.interfaces.use_cases.user_login_use_case_interface import UserLoginUseCaseProtocol
+from application.use_cases.users.create_user_use_case import CreateUserUseCaseImpl
+from presentation.api.auth.use_cases.login_and_issue_jwt_use_case import LoginAndIssueJWTUseCaseIml
+from presentation.api.auth.jwt_helper import JWTHelper
+from application.use_cases.auth.user_login_use_case import UserLoginUseCaseImpl
 from application.use_cases.passport_groups.crud import PassportGroupsCrudUseCaseImpl
 from application.use_cases.regions.crud import RegionsCrudUseCaseImpl
 from application.use_cases.tlo.tlo_use_case import TrafficLightObjectUseCaseImpl
-from application.use_cases.users.main_users_use_case import UsersCrudUseCaseImpl
+from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
 
 from typing import Annotated
 
@@ -27,7 +29,7 @@ from starlette import status
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from core.dto.users import SearchUserDTO
+from core.dto.users import GetUserFromRepoDTO
 from core.enums import Roles, TokenTypes
 from core.passport_groups.services.crud import PassportGroupsServiceImpl
 from core.regions.services.crud import RegionsServiceImpl
@@ -39,16 +41,15 @@ from infrastructure.database.passport_groups_repository import PassportGroupsRep
 from infrastructure.database.regions_repository import RegionsRepositorySqlAlchemy
 from infrastructure.database.tlo_repository import TrafficLightObjectSqlAlchemy
 from infrastructure.database.user_reposirory import UsersRepositorySqlAlchemy
-from presentation.api.exceptions import InvalidErrorJWT
+from presentation.api.auth.use_cases.refresh_jwt_use_case import RefreshJWTUseCaseImpl
 
-from presentation.schemas.jwt import PayloadAccessJWTSchema, TokenInfo, ACCESS_TOKEN_TYPE, REFRESH_TOKEN_TYPE, \
-    PayloadRefreshJWTSchema
+from presentation.schemas.jwt import PayloadAccessJWTSchema, PayloadRefreshJWTSchema
 
 #  -- extras --
 
 http_bearer = HTTPBearer()
 
-jwt_manager = ManagerJWT()
+jwt_manager = JWTHelper()
 
 db_session = Annotated[
     AsyncSession,
@@ -159,24 +160,46 @@ def get_crud_users_service(
 
 
 def users_use_case(
-    service: Annotated[UsersServiceProtocol, Depends(get_crud_users_service)],
-) -> UsersCrudUseCaseImpl:
-    return UsersCrudUseCaseImpl(user_service=service)
+    user_repository: Annotated[UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)],
+) -> GetUserUseCaseImpl:
+    return GetUserUseCaseImpl(user_repository=user_repository)
+
+
+def create_user_use_case(
+    user_repository: Annotated[UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)],
+) -> CreateUserUseCaseProtocol:
+    return CreateUserUseCaseImpl(
+        user_repository=user_repository,
+        get_user_use_case=GetUserUseCaseImpl(user_repository=user_repository)
+    )
+
+
+def get_auth_use_case(
+    user_repository: Annotated[UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)],
+) -> UserLoginUseCaseProtocol:
+    return UserLoginUseCaseImpl(user_repository=user_repository)
 
 
 def get_auth_and_jwt_use_case(
-    user_service: Annotated[UsersCrudUseCaseImpl, Depends(get_crud_users_service)]
-)-> AuthAndJWTUseCaseImpl:
-    return AuthAndJWTUseCaseImpl(
-        user_service=user_service,
+    user_repository: Annotated[UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)],
+)-> LoginAndIssueJWTUseCaseIml:
+    user_login_use_case = UserLoginUseCaseImpl(user_repository=user_repository)
+    return LoginAndIssueJWTUseCaseIml(
+        user_login_use_case=user_login_use_case,
     )
+
+
+def get_refresh_jwt_use_case(
+    user_repository: Annotated[UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)],
+)-> RefreshJWTUseCaseImpl:
+    return RefreshJWTUseCaseImpl(users_use_case=GetUserUseCaseImpl(user_repository=user_repository))
 
 
 async def get_user_entity_by_id(
     payload_jwt: Annotated[PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)],
-    users_crud: Annotated[UsersCrudUseCaseImpl, Depends(users_use_case)]
+    users_crud: Annotated[GetUserUseCaseImpl, Depends(users_use_case)]
 ):
-    dto = SearchUserDTO(customer=payload_jwt.user_id, subject=payload_jwt.user_id)
+    dto = GetUserFromRepoDTO(customer=payload_jwt.user_id, subject=payload_jwt.user_id)
     if (user_entity := await users_crud.get_user_by_username_or_id(dto)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, HTTPException
 from starlette import status
 
@@ -7,7 +9,8 @@ from presentation.api.api_v1.documentation.auth_and_jwt.endpoints import POST_LO
 from presentation.api.dependencies.deps import (
     AuthForm,
     PayloadRefreshJWT,
-    AuthAndJWTUseCase
+    AuthAndJWTUseCase, RefreshJWTUseCase,
+    # RefreshJWTUseCase
 )
 
 from presentation.api.exceptions import InactiveUserException
@@ -32,7 +35,8 @@ async def issue_jwt(
         password=auth_schema.password,
     )
     try:
-        return await use_case.authenticate_and_issue_jwt(auth_dto, refresh_token=True)
+        # return await use_case.authenticate_and_issue_jwt(auth_dto, refresh_token=True)
+        return await use_case(login_dto=auth_dto)
     except InvalidUsernameOrPasswordError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -51,9 +55,9 @@ async def issue_jwt(
 )
 async def issue_jwt_by_refresh_jwt(
     payload: PayloadRefreshJWT,
-    use_case: AuthAndJWTUseCase,
+    use_case: RefreshJWTUseCase,
 ):
     try:
-        return await use_case.issue_jwt_by_user_id(payload.user_id, refresh_token=False)
+        return await use_case(username=payload.sub, refresh_token=False,)
     except UserNotFoundByIdError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)

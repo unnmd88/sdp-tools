@@ -28,7 +28,7 @@ class PayloadAccessJWTSchema(BasePayloadJWTSchema):
 
     role: str | Roles
     organization: str | Organizations
-    email: EmailStr | str
+    email: EmailStr | None
 
 
 class PayloadRefreshJWTSchema(BasePayloadJWTSchema):

@@ -1,4 +1,4 @@
-from application.interfaces.repositories.base import BaseCrudProtocol
+from application.interfaces.repositories.base_repo_interface import BaseCrudProtocol
 from core.users.entities.user import UserEntity
 
 
@@ -8,7 +8,3 @@ class UsersRepositoryProtocol(BaseCrudProtocol):
     async def get_user_by_id_or_username_or_none(self, username_or_id: str | int) -> UserEntity: ...
 
     async def add_user(self, entity: UserEntity) -> UserEntity: ...
-
-    async def create_user(self, user_data): ...
-
-    async def update_user(self, user_data): ...

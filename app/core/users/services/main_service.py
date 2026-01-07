@@ -1,19 +1,19 @@
 import logging
 from collections.abc import Sequence
 from dataclasses import asdict
-from multiprocessing.util import sub_warning
 
 from app_logging.dev.config import USERS_LOGGER
 from application.interfaces.cache.users import UsersCacheProtocol
-from application.interfaces.repositories.users import UsersRepositoryProtocol
+from application.interfaces.repositories.users_repo_interface import UsersRepositoryProtocol
 from application.interfaces.services.authentication import AuthenticationSchemaProtocol
 from core.dto.common import ToUpdateRecordDTO
 
 from core.dto.users import (
     CreateUserDTO,
     UpdateUserDTO,
-    SearchUserDTO,
-    SearchUsersDTO, ChangeUserPasswordDTO
+    GetUserFromRepoDTO,
+    SearchUsersDTO,
+    ChangeUserPasswordDTO
 )
 from core.enums import Organizations, Roles, Permissions
 from core.exceptions.base import CreateError, UpdateError, UserPermissionsError, ApplicationError
@@ -29,7 +29,7 @@ from core.users.exceptions import (
     UserNotFoundError,
     SameUsernameAndPasswordError
 )
-from core.security_policies.user_password import hash_password, check_password_to_set_is_valid
+from core.users.services.user_password import hash_password, check_password_to_set_is_valid
 
 logger = logging.getLogger(USERS_LOGGER)
 
@@ -55,7 +55,14 @@ class UsersServiceImpl:
         logger.info('Успешная аутентификация %r', user_entity.username)
         return user_entity
 
-    async def get_user_by_username_or_id(self, search_dto: SearchUserDTO) -> UserEntity:
+    async def get_user_by_username_or_id_or_raise_user_not_found(self, username_or_id: str | int) -> UserEntity:
+
+        user: UserEntity = await self.repository.get_user_by_id_or_username_or_none(username_or_id)
+        if user is None:
+            raise UserNotFoundError
+        return user
+
+    async def get_user_by_username_or_id(self, search_dto: GetUserFromRepoDTO) -> UserEntity:
 
         customer: UserEntity = await self.repository.get_user_by_id_or_username_or_none(search_dto.customer)
         if customer is None:
@@ -71,8 +78,6 @@ class UsersServiceImpl:
         if subject is None:
             raise UserNotFoundByUsernameError
         return subject
-
-    # async get_user_by_username_or_id_by_superuser()
 
     async def get_all_users(self, users_dto: SearchUsersDTO) -> Sequence[UserEntity]:
         customer: UserEntity = await self.repository.get_user_by_id_or_username_or_none(users_dto.customer)
@@ -213,6 +218,7 @@ class UsersServiceImpl:
         if not customer.permissions.has(Permissions.UPDATE_USERS):
             logger.info(f'Запрещено: нет прав для изменения пароля другого пользователя.')
             raise UserPermissionsError('Нет прав обновления пароля другого пользователя.')
+        logger.info(f'Начинаю поиск субъекта с username=%r.', dto.subject)
         subject: UserEntity = await self.repository.get_user_by_id_or_username_or_none(dto.subject)
         if subject is None:
             logger.info('Субъект не найден.')

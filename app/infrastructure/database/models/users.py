@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy import String
+from sqlalchemy import String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from infrastructure.database.models import Base
@@ -12,56 +12,32 @@ class User(
     UpdatedAtMixin,
     Base,
 ):
-    first_name: Mapped[str] = mapped_column(
-        String(32),
-        nullable=False,
+    first_name: Mapped[str | None] = mapped_column(
+        String(32), server_default=text('NULL'), default=None, nullable=True
     )
-    last_name: Mapped[str] = mapped_column(
-        String(32),
-        nullable=False,
+    last_name: Mapped[str | None] = mapped_column(
+        String(32), server_default=text('NULL'), default=None, nullable=True
     )
     organization: Mapped[str] = mapped_column(String(32), nullable=False)
     username: Mapped[str] = mapped_column(
-        String(32),
-        unique=True,
-        nullable=False,
+        String(32), unique=True, nullable=False,
     )
-    email: Mapped[str] = mapped_column(
-        # unique=True,
-        nullable=False,
-        default='',
-        server_default='',
+    email: Mapped[str | None] = mapped_column(
+        String(32), unique=True, default=None,  nullable=True, server_default=None
     )
-    password: Mapped[bytes] = mapped_column(
-        # unique=True,
-        nullable=False,
-    )
+    password: Mapped[bytes]
     is_active: Mapped[bool] = mapped_column(
-        nullable=False,
-        default=True,
-        server_default=sa.sql.expression.true(),
+        nullable=False, default=True, server_default=sa.sql.expression.true(),
     )
-    # is_admin: Mapped[bool] = mapped_column(
-    #     nullable=False,
-    #     default=True,
-    #     server_default=sa.sql.expression.false(),
-    # )
-    # is_superuser: Mapped[bool] = mapped_column(
-    #     nullable=False,
-    #     default=True,
-    #     server_default=sa.sql.expression.false(),
-    # )
     role: Mapped[str] = mapped_column(String(32), nullable=False)
-    phone_number: Mapped[str] = mapped_column(
-        String(32), nullable=False, default='', server_default=''
+    phone_number: Mapped[str | None] = mapped_column(
+        String(32), unique=True, server_default=None, default=None, nullable=True
     )
-    telegram: Mapped[str] = mapped_column(
-        String(32), nullable=False, default='', server_default=''
+    telegram: Mapped[str | None] = mapped_column(
+        String(32), unique=True, nullable=True, default=None,  server_default=None,
     )
     description: Mapped[str] = mapped_column(
-        nullable=False,
-        default='',
-        server_default='',
+        nullable=False, server_default='', default='',
     )
 
     def __str__(self):
@@ -74,9 +50,7 @@ class User(
             f'role={self.role} '
             f'organization={self.organization} '
             f'email={self.email} '
-            f'is_active={self.is_active} '
-            f'is_admin={self.is_admin} '
-            f'is_superuser={self.is_superuser} '
+            f'is_active={self.is_active}'
             f')'
         )
 

@@ -1,18 +1,28 @@
 from dataclasses import dataclass, astuple
+from types import UnionType
+from typing import Annotated, Type, Union
 
+from pydantic import(
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    EmailStr,
+    Field,
+    field_validator,
+)
 
 s1 = {"1", "2"}
 s3 = {"1","2","4","5"}
 
-@dataclass(slots=True, frozen=True, kw_only=True)
-class SearchUserDTO:
-    """ DTO для поиска сущности в хранилище. """
+def foo(union):
+    # if not isinstance(union, UnionType):
+    #     raise TypeError
+    print(isinstance(None, union))
 
-    customer_username: str | None = None
-    customer_email: str
-
-    search_user_id: int
 
 if __name__ == '__main__':
+    foo(None | str)
+    # foo(None)
+    l1 = [int, str]
 
-    print('dasd  ds       . dvcv4re '.replace("  ", ""))
+    print(Union(l1) == int | str)

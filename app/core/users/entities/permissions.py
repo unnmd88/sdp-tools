@@ -5,7 +5,7 @@ from core.enums import Permissions
 
 T_Permissions: TypeAlias = set[Permissions] | frozenset[Permissions]
 
-
+# @dataclass(frozen=True, slots=True, kw_only=True) TODO
 class UserPermissions:
     def __init__(self, *permissions: Permissions):
         self._permissions: T_Permissions = set(permissions)

@@ -1,7 +1,7 @@
 import bcrypt
 
 from core.reg_exps import PASSWORD_PATTERN
-from core.utils import checking_simple_types, validate_string_by_pattern
+from core.utils import checking_types, validate_string_by_pattern
 
 
 def hash_password(
@@ -23,7 +23,7 @@ def validate_password(
     )
 
 
-@checking_simple_types(type_to_check=str, field_name='password')
+@checking_types(isinstance_of=str, field_name_for_exception='password')
 def check_password_to_set_is_valid(value: str) -> bool:
     """
     Проверяет валидность устанавливаемого password.

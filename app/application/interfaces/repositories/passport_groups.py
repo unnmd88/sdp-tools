@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from application.interfaces.repositories.base import BaseCrudProtocol
+from application.interfaces.repositories.base_repo_interface import BaseCrudProtocol
 from core.dto.passport_groups import CreatePassportGroupDTO, UpdatePassportGroupDTO
 from core.passport_groups.entities.passport_group import PassportGroupEntity
 

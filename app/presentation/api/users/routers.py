@@ -3,7 +3,7 @@ from fastapi import APIRouter, status, HTTPException
 from core.dto.users import (
     CreateUserDTO,
     UpdateUserDTO,
-    SearchUserDTO,
+    GetUserFromRepoDTO,
     SearchUsersDTO, ChangeUserPasswordDTO
 )
 from core.enums import Roles
@@ -26,7 +26,7 @@ from presentation.schemas.users import (
 )
 
 router = APIRouter(
-    prefix='/users',
+    prefix='/user',
     tags=['Users'],
 )
 
@@ -42,44 +42,41 @@ async def whoami(
     payload_jwt: PayloadAccessJWT,
     use_case: UsersUseCase,
 ):
-    user_search_dto = SearchUserDTO(
-        customer=payload_jwt.user_id,
-        subject=payload_jwt.user_id,
-    )
-    user = await use_case.get_user_by_username_or_id(user_search_dto)
+
+    user = await use_case.get_user_by_username_or_raise(username=payload_jwt.sub)
     return ResponseUserSchema.model_validate(user, from_attributes=True)
 
 
-@router.get(
-    '/',
-    status_code=status.HTTP_200_OK,
-    response_model=list[ResponseUserSchema],
-    dependencies=[IsSuperuser],
-    summary='Получить список пользователей системы',
-
-)
-async def get_users(
-    payload_jwt: PayloadAccessJWT,
-    use_case: UsersUseCase,
-):
-    user_search_dto = SearchUsersDTO(customer=payload_jwt.user_id)
-    try:
-        users = await use_case.get_all_users(user_search_dto)
-    except UserPermissionsError:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail='Доступ к данным пользователей запрещен.'
-        )
-    return [
-        ResponseUserSchema.model_validate(user, from_attributes=True)
-        for user in users
-    ]
+# @router.get(
+#     '/',
+#     status_code=status.HTTP_200_OK,
+#     response_model=list[ResponseUserSchema],
+#     dependencies=[IsSuperuser],
+#     summary='Получить список пользователей системы',
+#
+# )
+# async def get_users(
+#     payload_jwt: PayloadAccessJWT,
+#     use_case: UsersUseCase,
+# ):
+#     user_search_dto = SearchUsersDTO(customer=payload_jwt.user_id)
+#     try:
+#         users = await use_case.get_all(user_search_dto)
+#     except UserPermissionsError:
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail='Доступ к данным пользователей запрещен.'
+#         )
+#     return [
+#         ResponseUserSchema.model_validate(user, from_attributes=True)
+#         for user in users
+#     ]
 
 
 @router.post(
-    '/',
+    '/admin/',
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseUserSchema,
+    # response_model=ResponseUserSchema,
     dependencies=[IsSuperuser],
     summary='Создать нового пользователя системы',
 )
@@ -88,12 +85,12 @@ async def create_user(
     new_user: CreateUserSchema,
     use_case: UsersUseCase,
 ):
-    create_model_fields = new_user.model_dump(exclude_unset=True)
-    create_model_fields.update(customer_id=jwt_payload.user_id)
+    create_model_fields = new_user.model_dump()
+    create_model_fields.update(customer=jwt_payload.sub)
     user_dto = CreateUserDTO(**create_model_fields)
     new_user_entity = err = _status_code = None
     try:
-        new_user_entity = await use_case.create_user(user_dto)
+        new_user_entity = await use_case.create(user_dto)
     except DomainValidationError as e:
         err = f'Некорректные данные для создания нового пользователя: {e}.'
         _status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
@@ -127,7 +124,7 @@ async def update_user(
         **to_update.model_dump()
         | {'requester_username': payload_jwt.sub, 'is_active': True}
     )
-    return await use_case.update_user(upd_user_dto)
+    return await use_case.update(upd_user_dto)
 
 
 @router.patch(

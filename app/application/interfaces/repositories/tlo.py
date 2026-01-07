@@ -1,4 +1,4 @@
-from application.interfaces.repositories.base import BaseCrudProtocol
+from application.interfaces.repositories.base_repo_interface import BaseCrudProtocol
 from core.tlo.entities.tlo import TrafficLightObjectEntity
 
 

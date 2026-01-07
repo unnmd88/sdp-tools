@@ -71,6 +71,7 @@ class BaseSqlAlchemy:
         if result.scalars().one_or_none() is not None:
             raise CreateErrorAlreadyExists
         new_instance = self.mapper.to_model(entity)
+
         self.session.add(new_instance)
         try:
             await self.session.commit()
