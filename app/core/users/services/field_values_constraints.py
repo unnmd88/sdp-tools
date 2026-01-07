@@ -25,9 +25,27 @@ def check_password_to_set_constraints(value: str):
 
 
 class UserEntityConstraints:
+    """
+    Класс, содержащий константы и ограничения для сущности пользователя системы(UserEntity).
+
+    Этот класс определяет все бизнес-правила, ограничения длины и форматы данных,
+    связанные с пользовательскими сущностями в системе.
+    """
 
     @classmethod
     def check_password(cls, password: str) -> None:
+        """
+        Проверяет валидность имени пользователя и пароля по заданным критериям.
+
+        Args:
+            password (str): Пароль пользователя системы.
+
+        Raises:
+            InvalidValueToSetError: При недопустимом пароле пользователя.
+
+        Returns:
+            None: Если пароль допускается.
+        """
         return check_password_to_set_constraints(password)
         
     @classmethod
@@ -35,8 +53,24 @@ class UserEntityConstraints:
         cls,
         *,
         username: str,
-        password: str = None,
+        password: str,
     ) -> None:
+        """
+        Проверяет валидность имени пользователя и пароля по заданным критериям.
+
+        Этот метод выполняет проверку корректности учетных данных,
+        включая проверку длины, допустимых символов и требований к сложности пароля.
+
+        Args:
+            username (str): Имя пользователя системы.
+            password (str): Пароль пользователя системы.
+
+        Raises:
+            InvalidValueToSetError: При недопустимом username и/или password.
+
+        Returns:
+            None: В случает успешной проверки username и password.
+        """
         if username == settings.default_superuser_creds.name:
             raise InvalidValueToSetError(
                 f"Ошибка: запрещено создавать пользователя "
@@ -58,16 +92,3 @@ class UserEntityConstraints:
             raise InvalidValueToSetError('Ошибка: username и пароль должны отличаться')
         cls.check_password(password)
         return None
-    
-
-@checking_types(isinstance_of=str, field_name_for_exception='password')
-def check_password_to_set_constraints(value: str) -> bool:
-    """
-    Проверяет валидность устанавливаемого password.
-    :param value: Строка password.
-    :return: True or False.
-    """
-    if len(value) > 3 and value.isalnum():
-        return True
-    return False
-    return validate_string_by_pattern(value, PASSWORD_PATTERN, allow_empty=False)
