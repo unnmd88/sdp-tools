@@ -13,24 +13,6 @@ LOGGING_CONFIG = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
-        'file_users': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'core/users/logs/users.log',
-            'formatter': 'simple',
-        },
-        'file_passports': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': API_V1_PATH / 'passports/logs/log.log',
-            'formatter': 'simple2',
-        },
-        'file_passport_groups': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': API_V1_PATH / 'passport_groups/logs/log.log',
-            'formatter': 'simple2',
-        },
         'RUD': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
@@ -82,14 +64,7 @@ LOGGING_CONFIG = {
             'handlers': ['USERS_RUD'],
             'propagate': True,
         },
-        'passports': {
-            'level': 'INFO',
-            'handlers': ['console', 'file_passports'],
-        },
-        'passport_groups': {
-            'level': 'INFO',
-            'handlers': ['console', 'file_passport_groups'],
-        },
+
     },
     'formatters': {
         # "verbose": {
@@ -111,8 +86,7 @@ COMMON_LOGGER = 'common'
 USERS_LOGGER = 'users'
 JWT_LOGGER = 'jwt'
 AUTH_LOGGER = 'auth'
-PASSPORTS_LOGGER = 'passports'
-PASSPORTS_OWNERS_LOGGER = 'passport_groups'
+
 
 # def logging_configure(level=logging.DEBUG):
 #     console_handler = logging.StreamHandler()

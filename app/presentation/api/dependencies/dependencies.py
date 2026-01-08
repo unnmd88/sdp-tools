@@ -53,7 +53,7 @@ from presentation.schemas.jwt import PayloadAccessJWTSchema, PayloadRefreshJWTSc
 #  -- extras --
 
 http_bearer = HTTPBearer()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=settings.login_url)
 jwt_helper = JWTHelper()
 db_session = Annotated[AsyncSession,Depends(db_api.session_getter)]
 

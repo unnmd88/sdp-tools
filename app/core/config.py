@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 from pydantic import BaseModel, PostgresDsn
@@ -14,15 +13,8 @@ API_V1_PATH = BASE_DIR / 'presentation/api/api_v1/'
 class RunConfig(BaseModel):
     protocol: str
     host: str
-    # host: str = '0.0.0.0'
-    # host: str = '192.168.45.248'
     port: int
-    # port: int = 8001
     reload: bool
-
-    @property
-    def base_url(self) -> str:
-        return f'{self.protocol}://{self.host}:{self.port}'
 
 
 class ApiV1Prefix(BaseModel):
@@ -72,7 +64,7 @@ class DatabaseConfig(BaseModel):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=('.env.template', ),
+        env_file=('.env.dev', ),
         env_file_encoding='utf-8',
         case_sensitive=False,
         env_nested_delimiter='__',
@@ -80,18 +72,20 @@ class Settings(BaseSettings):
     )
     run: RunConfig
     api: ApiPrefix = ApiPrefix()
-    # login_url: str = f'http://{run.host}:{run.port}{api.prefix}/auth/login'
     db: DatabaseConfig
     auth_jwt: AuthJWT = AuthJWT()
     default_superuser_creds: DefaultSuperuserCreds
 
-try:
-    settings = Settings()
-except Exception as e:
-    print(f'os.environ: {os.environ}')
-    raise
-print(f'os.environ: {os.environ}')
-print(settings)
-print(settings.run.base_url)
+    @property
+    def base_url(self) -> str:
+        return f'{self.run.protocol}://{self.run.host}:{self.run.port}'
+
+    @property
+    def login_url(self) -> str:
+        return f'{self.base_url}{self.api.prefix}/auth/login'
 
 
+settings = Settings()
+
+
+print(f'settings login_url: {settings.login_url}')
