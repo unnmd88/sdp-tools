@@ -22,9 +22,7 @@ services:
        condition: service_healthy
     ports:
       - "${APP_CONFIG__RUN__PORT}:8080"
-#      - "8001:8080"
-#    command: uv run app/main.py
-    command: "fastapi dev --host 0.0.0.0  app/main.py --port ${APP_CONFIG__RUN__PORT}"
+    command: fastapi dev --host 0.0.0.0  app/main.py --port 8080
   pg:
     image: postgres:18
     container_name: psgr
