@@ -1,5 +1,8 @@
 from dataclasses import InitVar, dataclass, field
+from datetime import datetime
+from enum import StrEnum
 
+from core.base_entity import BaseEntity
 from core.enums import (
     EntityIdRange,
     Organizations,
@@ -19,10 +22,11 @@ from core.field_validators import (
     check_telegram_is_valid,
 )
 from core.mixins import BaseEntityMixin
+from core.services.contract import contract, ContractConditions
+from core.services.field_validators import username_validator, first_name_or_lastname_validator
 from core.users.exceptions import (
     DomainValidationError,
     INVALID_DESCRIPTION_EXCEPTION_TEXT,
-    InvalidUsernameOrPasswordError,
 )
 from core.users.entities.permissions import UserPermissions
 from core.users.services.user_password import validate_password
@@ -118,92 +122,143 @@ class UserEntity(BaseEntityMixin):
         return self.role == Roles.superuser
 
 
-class UserAccessControl:
 
-    def __init__(self, user_entity: UserEntity = None):
-        self._user_entity = user_entity
+class RulesViolationsMessages(StrEnum):
+    username = "username должен быть от 2 до 32 символов длиной и содержать только буквы латинского алфавита и цифры."
+    first_name = "first_name должен быть строкой и содержать только буквы латинского алфавита."
+    last_name = "last_name должен быть строкой и содержать только буквы латинского алфавита."
 
-    def load_user_entity(self, user_entity: UserEntity) -> None:
-        self._user_entity = user_entity
 
-    def updating_another_user(
+class UserEntity(BaseEntity):
+    def __init__(
         self,
-        subject_username: str
-    ) -> None:
-        if self._user_entity.username == subject_username:
-            return None
-        if not self._user_entity.permissions.has(Permissions.UPDATE_USERS):
-            raise UserPermissionsError('обновления другого пользователя')
-        return None
+        entity_id: int | None,
+        username: str,
+        first_name: str | None,
+        last_name: str | None,
+        created_at: datetime | None,
+        updated_at: datetime | None,
 
-    def read_user(self, readable_username_or_id: str | int) -> None:
-        if (
-            self._user_entity.username == readable_username_or_id
-            or self._user_entity.id == readable_username_or_id
-            or self._user_entity.permissions.has(Permissions.READ_USERS)
-        ):
-            return None
-        raise UserPermissionsError('чтения другого пользователя')
+    ):
+        super().__init__(entity_id=entity_id, created_at=created_at, updated_at=updated_at)
+        self._username = self._validate_username(username)
+        self._firstname = self._validate_first_name(first_name)
+        self._lastname = self._validate_last_name(last_name)
 
-    def read_any_user(self) -> None:
-        if not self._user_entity.permissions.has(Permissions.READ_USERS):
-            raise UserPermissionsError('чтения другого пользователя')
+    def __eq__(self, other):
+        if isinstance(other, UserEntity):
+            return self._username == other.username
+        raise NotImplementedError
 
-    def create_user(self) -> None:
-        if not self._user_entity.permissions.has(Permissions.CREATE_USERS):
-            raise UserPermissionsError('создания нового пользователя')
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'id={self.entity_id!r} '
+            f'username={self.username!r} '
+            f'built_at={self.built_at.strftime("%d-%m-%Y, %H:%M:%S")!r}'
+            f')'
+        )
 
-    def change_password_for_any_user(self) -> None:
-        if not self._user_entity.permissions.has(Permissions.UPDATE_USERS):
-            raise UserPermissionsError('изменения другого пользователя')
+    @property
+    def username(self) -> str:
+        return self._username
 
-    def validate_password(self, password: str):
-        if not validate_password(
-            password=password,
-            hashed_password=self._user_entity.password,
-        ):
-            raise InvalidUsernameOrPasswordError
+    @username.setter
+    def username(self, username: str):
+        self._username = self._validate_username(username)
+        if self._username == self._lastname:
+            raise DomainValidationError("username не должен совпадать с last_name")
+        if self._username == self._firstname:
+            raise DomainValidationError("username не должен совпадать с firstname")
 
-    # def access_control(self, *permissions: Permissions):
-    #     """
-    #     Проверка наличия permissions для пользователя. В случае, если один хотя бы одно из permissions
-    #     отсутствует - будет выброшено исключение.
-    #     :param permissions: Разрешения пользователя, подлежащие проверки на наличие.
-    #     :raises UserPermissionsError: Исключение, если хотя бы одно из permissions отсутствует.
-    #     :return: None.
-    #     """
-    #     if not (permissions := set(permissions)):
-    #         raise ValueError('permissions cant be empty.')
-    #     if not permissions.issubset(self._user_entity.permissions.get_all()):
-    #         raise ValueError('Bad members in permissions.')
-    #     difference = self._user_entity.permissions.has_difference(permissions)
-    #     if difference:
-    #         raise UserPermissionsError(f'Отсутствуют права: {",".join(difference)}')
+    @property
+    def firstname(self) -> str | None:
+        return self._firstname
 
-    def read_regions(self):
-        if not self._user_entity.permissions.has(Permissions.READ_REGIONS):
-            raise UserPermissionsError(Permissions.READ_REGIONS)
+    @firstname.setter
+    def firstname(self, first_name: str | None):
+        if first_name is not None:
+            self._firstname = self._validate_first_name(first_name)
+            if self._firstname == self._lastname:
+                raise DomainValidationError("first_name не должен совпадать с last_name")
+            if self._firstname == self._username:
+                raise DomainValidationError("first_name не должен совпадать с username")
+        else:
+            self._firstname = None
 
-    def read_passport_group(self):
-        if not self._user_entity.permissions.has(Permissions.READ_PASSPORT_GROUPS):
-            raise UserPermissionsError(Permissions.READ_PASSPORT_GROUPS)
+    @property
+    def lastname(self) -> str | None:
+        return self._lastname
+
+    @lastname.setter
+    def lastname(self, last_name: str | None):
+        if last_name is not None:
+            self._lastname = self._validate_last_name(last_name)
+            if self._lastname == self._firstname:
+                raise DomainValidationError("last_name не должен совпадать с first_name")
+            if self._lastname == self._username:
+                raise DomainValidationError("last_name не должен совпадать с username")
+        else:
+            self._lastname = None
+
+    @contract(
+        type_check=str,
+        preconditions=ContractConditions(
+            requires=[(username_validator, str(RulesViolationsMessages.username))]
+        ),
+        field_name="username",
+    )
+    def _validate_username(self, username: str) -> str:
+        assert isinstance(username, str), "username должен быть строкой"
+        assert (2 < len(username) < 32), "username должен быть от 2 до 32 символов длиной"
+        assert username.isalnum() and not username.isnumeric(), "username должен содержать только буквы латинского алфавита и цифры."
+        return username
+
+    @contract(
+        type_check=str | None,
+        preconditions=ContractConditions(
+            requires=[(first_name_or_lastname_validator, str(RulesViolationsMessages.first_name))]
+        ),
+        field_name="first_name",
+    )
+    def _validate_first_name(self, first_name: str) -> str:
+        assert isinstance(first_name, str), "first_name должен быть строкой"
+        assert first_name.isalpha(), "first_name должен содержать только буквы латинского алфавита."
+        return first_name
+
+    @contract(
+        type_check=str | None,
+        preconditions=ContractConditions(
+            requires=[(first_name_or_lastname_validator, str(RulesViolationsMessages.last_name))]
+        ),
+        field_name="last_name",
+    )
+    def _validate_last_name(self, last_name: str) -> str:
+        assert isinstance(last_name, str), "last_name должен быть строкой"
+        assert last_name.isalpha(), "last_name должен содержать только буквы латинского алфавита."
+        return last_name
+
+
 
 
 if __name__ == '__main__':
     user = UserEntity(
-        id=321,
-        first_name='Chook',
+        entity_id=321,
+        first_name='dasdsa',
         last_name='Gekk',
-        username='chokk',
-        organization=Organizations.SDP,
-        email='example@example.com',
-        password=b'mysecret',
-        is_active=False,
-        role=Roles.superuser,
-        phone_number='',
-        telegram='',
-        description='',
+        username='333r',
+        created_at=datetime.now(),
+        updated_at=None,
     )
+    print(user)
+    user.username = ('Juker')
+    print(f"user.username = {user.username}")
+    print(user)
+    user.firstname = None
+    print(user)
+    user.lastname = None
+    user.lastname = 'Juker'
+
 
 
 

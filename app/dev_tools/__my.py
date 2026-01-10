@@ -1,4 +1,5 @@
 from dataclasses import dataclass, astuple
+from datetime import datetime
 from types import UnionType
 from typing import Annotated, Type, Union
 
@@ -14,15 +15,22 @@ from pydantic import(
 s1 = {"1", "2"}
 s3 = {"1","2","4","5"}
 
-def foo(union):
-    # if not isinstance(union, UnionType):
-    #     raise TypeError
-    print(isinstance(None, union))
+
+def decorator(func):
+    def foo(*args, **kwargs):
+        arg_names = func.__code__.co_varnames
+        print(arg_names)
+        return func(*args, **kwargs)
+    return foo
+
+
+@decorator
+def bar(a: str | None):
+    print('bar. arg a: ', a, ' type: ', type(a), ' value: ', a)
+
+dtm = datetime.now()
 
 
 if __name__ == '__main__':
-    foo(None | str)
-    # foo(None)
-    l1 = [int, str]
-
-    print(Union(l1) == int | str)
+    bar(None)
+    print(isinstance(dtm, int))
