@@ -1,7 +1,4 @@
-import random
 import re
-import secrets
-import string
 from collections.abc import Callable, Iterable
 from functools import wraps
 from types import UnionType
@@ -34,13 +31,18 @@ def checking_types(
     """
     if isinstance(isinstance_of, Iterable):
         isinstance_of = tuple(isinstance_of)
+
     def decorator(func: Callable):
         @wraps(func)
         def wrapper(value, *args, **kwargs):
             if not isinstance(value, isinstance_of):
-                raise TypeError(f'{field_name_for_exception!r} value must be an instance of {isinstance_of!r}')
+                raise TypeError(
+                    f'{field_name_for_exception!r} value must be an instance of {isinstance_of!r}'
+                )
             return func(value, *args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
@@ -57,25 +59,18 @@ def validate_string_by_pattern(
 def not_none_dataclass_instance_attrs_to_dict(
     dataclass_instance,
     *exclude_fields,
-    default_exclude_fields: frozenset | set | None = frozenset(('id', '_id', 'filters_for_search')),
+    default_exclude_fields: frozenset | set | None = frozenset(
+        ('id', '_id', 'filters_for_search')
+    ),
 ) -> dict:
     exclude = default_exclude_fields or frozenset()
     if exclude_fields:
         exclude = exclude | frozenset(exclude_fields)
     return {
-        k: v for k, v in asdict(dataclass_instance).items()
+        k: v
+        for k, v in asdict(dataclass_instance).items()
         if v is not None and k not in exclude
     }
-
-
-def gen_password(
-    min_length: int = 3,
-    max_length: int = 20,
-) -> str:
-    chars = string.ascii_letters + string.digits + string.punctuation
-    return ''.join(
-        secrets.choice(chars) for _ in range(random.randint(min_length, max_length))
-    )
 
 
 @checking_types(isinstance_of=str | set)

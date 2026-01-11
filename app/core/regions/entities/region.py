@@ -1,18 +1,14 @@
 from dataclasses import dataclass
-from datetime import datetime
 from typing import ClassVar
 
 from core.constants import ALLOWED_REGIONS
 from core.enums import RegionCodes, RegionNames
-from core.mixins import BaseEntityMixin
-from core.exceptions.base import DomainValidationError
 
 T_ALLOWED_REGIONS = frozenset[tuple[RegionNames, RegionCodes]]
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class RegionEntity(BaseEntityMixin):
-
+class RegionEntity:
     entity_name: ClassVar = 'Region'
     allowed_regions: ClassVar[T_ALLOWED_REGIONS] = ALLOWED_REGIONS
 
@@ -20,11 +16,10 @@ class RegionEntity(BaseEntityMixin):
     name: str
 
     def __eq__(self, other):
-         if not isinstance(other, RegionEntity):
-             return NotImplemented
-         return self.code == other.code and self.name == other.name
+        if not isinstance(other, RegionEntity):
+            return NotImplemented
+        return self.code == other.code and self.name == other.name
 
     # def __post_init__(self):
     #     if (self.name, self.code) not in self.allowed_regions:
     #         raise DomainValidationError('Недопустимая пара кода и названия для региона')
-

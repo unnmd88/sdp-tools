@@ -5,14 +5,14 @@ from core.enums import Roles, Organizations
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class SearchUsersDTO:
-    """ DTO для поиска сущности в хранилище. """
+    """DTO для поиска сущности в хранилище."""
 
     customer: str
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class GetUserFromRepoDTO:
-    """ DTO для поиска сущности в хранилище. """
+    """DTO для поиска сущности в хранилище."""
 
     subject: str
     raise_if_not_found: bool
@@ -69,6 +69,3 @@ class UpdateUserDTO:
     phone_number: str | None = None
     telegram: str | None = None
     description: str | None = None
-
-
-

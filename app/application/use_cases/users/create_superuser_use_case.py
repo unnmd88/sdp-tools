@@ -32,16 +32,24 @@ async def create_user_root(
     password: str = None,
 ):
     username_root = settings.default_superuser_creds.name
-    result = CreateUserRootResultDTO(username=username_root,)
-    logger.info('%r: Запрос на создание корневого пользователя системы %r', source.upper(), username_root)
+    result = CreateUserRootResultDTO(
+        username=username_root,
+    )
+    logger.info(
+        '%r: Запрос на создание корневого пользователя системы %r',
+        source.upper(),
+        username_root,
+    )
     try:
         user_root: UserEntity = UserEntity(
             firstname=None,
             lastname=None,
-            username =username_root,
+            username=username_root,
             organization=Organizations.SDP,
             email=None,
-            password=hash_password(password or settings.default_superuser_creds.password),
+            password=hash_password(
+                password or settings.default_superuser_creds.password
+            ),
             is_active=True,
             role=Roles.superuser,
             phone_number=None,
@@ -57,7 +65,9 @@ async def create_user_root(
     async with db_api.session_factory() as session:
         user_repo = UsersRepositorySqlAlchemy(session=session)
         try:
-            root_already_exists: UserEntity = await user_repo.get_user_by_id_or_username_or_none(username_root)
+            root_already_exists: UserEntity = (
+                await user_repo.get_user_by_id_or_username_or_none(username_root)
+            )
             if root_already_exists:
                 msg = f'Пользователь {root_already_exists.username}(id={root_already_exists.id}) существует'
                 logger.warning('Ошибка: %s', msg)
@@ -73,7 +83,11 @@ async def create_user_root(
             msg = 'Ошибка: пользователь  существует'
             logger.warning(msg)
             result.errors.append(msg)
-    logger.info("Пользователь %r создан успешно: %r", created_user_root.username, created_user_root)
+    logger.info(
+        'Пользователь %r создан успешно: %r',
+        created_user_root.username,
+        created_user_root,
+    )
     return result
 
 

@@ -2,7 +2,9 @@ import logging
 from dataclasses import dataclass
 
 from app_logging.dev.config import USERS_LOGGER
-from application.interfaces.repositories.users_repo_interface import UsersRepositoryProtocol
+from application.interfaces.repositories.users_repo_interface import (
+    UsersRepositoryProtocol,
+)
 
 
 from core.users.entities.user import UserEntity
@@ -13,14 +15,15 @@ logger = logging.getLogger(USERS_LOGGER)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class GetUserUseCaseImpl:
-
     user_repository: UsersRepositoryProtocol
 
     async def get_user_by_username_or_none(self, username: str) -> UserEntity | None:
         return await self.user_repository.get_user_by_id_or_username_or_none(username)
 
     async def get_user_by_username_or_raise(self, username: str) -> UserEntity:
-        user: UserEntity | None = await self.user_repository.get_user_by_id_or_username_or_none(username)
+        user: (
+            UserEntity | None
+        ) = await self.user_repository.get_user_by_id_or_username_or_none(username)
         if user is None:
             raise UserNotFoundError
         return user

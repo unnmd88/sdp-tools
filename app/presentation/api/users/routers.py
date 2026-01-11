@@ -4,18 +4,26 @@ from core.dto.users import (
     CreateUserDTO,
     UpdateUserDTO,
     GetUserFromRepoDTO,
-    SearchUsersDTO, ChangeUserPasswordDTO
+    SearchUsersDTO,
+    ChangeUserPasswordDTO,
 )
 from core.enums import Roles
 
-from core.users.exceptions import UserAlreadyExistsError, InvalidUsernameOrPasswordToSetError, \
-    UserNotFoundError, InactiveUserError, InvalidUsernameOrPasswordError, SameUsernameAndPasswordError
-from core.exceptions.base import UserPermissionsError, DomainValidationError
+from core.users.exceptions import (
+    UserAlreadyExistsError,
+    InvalidUsernameOrPasswordToSetError,
+    UserNotFoundError,
+    InactiveUserError,
+    InvalidUsernameOrPasswordError,
+    SameUsernameAndPasswordError,
+)
+from core.exceptions.base import DomainValidationError
+from core.exceptions.users import UserPermissionsError
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
 from presentation.api.dependencies.deps import (
     UsersUseCase,
     PayloadAccessJWT,
-    IsSuperuser
+    IsSuperuser,
 )
 
 from presentation.schemas.users import (
@@ -23,7 +31,8 @@ from presentation.schemas.users import (
     ResponseUserSchema,
     UpdateUserSchema,
     ChangeUserPasswordBaseSchema,
-    ChangeUserPasswordResponse, ChangePasswordMyselfSchema,
+    ChangeUserPasswordResponse,
+    ChangePasswordMyselfSchema,
 )
 
 router = APIRouter(
@@ -43,7 +52,6 @@ async def whoami(
     payload_jwt: PayloadAccessJWT,
     use_case: UsersUseCase,
 ):
-
     user = await use_case.get_user_by_username_or_raise(username=payload_jwt.sub)
     return ResponseUserSchema.model_validate(user, from_attributes=True)
 
@@ -53,7 +61,6 @@ async def whoami(
     status_code=status.HTTP_200_OK,
     # response_model=UserSchema,
     # dependencies=[IsSuperuser],
-
 )
 async def update_user(
     payload_jwt: PayloadAccessJWT,
@@ -85,7 +92,9 @@ async def change_user_password(
     )
     _status_code = _detail = None
     try:
-        result_dto: ChangeUserPasswordDTO = await use_case.change_password(change_password_dto)
+        result_dto: ChangeUserPasswordDTO = await use_case.change_password(
+            change_password_dto
+        )
     except UserNotFoundError:
         _status_code = status.HTTP_404_NOT_FOUND
         _detail = f'Пользователь {payload_jwt.sub!r} не найден.'
@@ -105,7 +114,7 @@ async def change_user_password(
         _status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
         _detail = f'Недопустимый пароль.'
     except Exception:
-        #TODO Залоггировать
+        # TODO Залоггировать
         _status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         _detail = f'Ошибка запроса на стороне сервера.'
     if _status_code or _detail:
@@ -114,5 +123,3 @@ async def change_user_password(
         subject=result_dto.subject,
         new_password=result_dto.new_password,
     )
-
-

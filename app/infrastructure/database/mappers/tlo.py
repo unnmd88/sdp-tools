@@ -10,7 +10,10 @@ from core.passports.entities.passport import PassportEntity
 from core.tlo.entities.tlo import TrafficLightObjectEntity
 from core.tlo.entities.traffic_controller import TrafficController
 from core.tlo.value_objects.network_settings import NetworkSettings
-from infrastructure.database.models import TrafficLightObject as TrafficLightObjectModel, TrafficLightObject
+from infrastructure.database.models import (
+    TrafficLightObject as TrafficLightObjectModel,
+    TrafficLightObject,
+)
 
 
 @final
@@ -27,9 +30,11 @@ class TrafficLightObjectDBMapper(BaseDBMapperProtocol):
                 network=model.ipv4.network if model.ipv4 is not None else None,
                 mask=model.ipv4.netmask if model.ipv4 is not None else None,
                 gateway=model.gateway.ip if model.gateway is not None else None,
-                broadcast=model.ipv4.network.broadcast_address if model.gateway is not None else None,
+                broadcast=model.ipv4.network.broadcast_address
+                if model.gateway is not None
+                else None,
                 mac_address=model.mac_address,
-            )
+            ),
         )
         return TrafficLightObjectEntity(
             id=model.id,
@@ -48,7 +53,9 @@ class TrafficLightObjectDBMapper(BaseDBMapperProtocol):
         )
 
     @classmethod
-    def to_full_entity(cls, tlo_model, passports: Sequence[PassportEntity]) -> TrafficLightObjectEntity:
+    def to_full_entity(
+        cls, tlo_model, passports: Sequence[PassportEntity]
+    ) -> TrafficLightObjectEntity:
         traffic_controller = TrafficController(
             model=ControllerTypes(tlo_model.traffic_controller),
             network_settings=NetworkSettings(
@@ -56,9 +63,11 @@ class TrafficLightObjectDBMapper(BaseDBMapperProtocol):
                 network=tlo_model.ipv4.network if tlo_model.ipv4 is not None else None,
                 mask=tlo_model.ipv4.netmask if tlo_model.ipv4 is not None else None,
                 gateway=tlo_model.gateway.ip if tlo_model.gateway is not None else None,
-                broadcast=tlo_model.ipv4.network.broadcast_address if tlo_model.gateway is not None else None,
+                broadcast=tlo_model.ipv4.network.broadcast_address
+                if tlo_model.gateway is not None
+                else None,
                 mac_address=tlo_model.mac_address,
-            )
+            ),
         )
         return TrafficLightObjectEntity(
             id=tlo_model.id,

@@ -1,3 +1,7 @@
+import random
+import secrets
+import string
+
 import bcrypt
 
 
@@ -20,3 +24,11 @@ def validate_password(
     )
 
 
+def gen_password(
+    min_length: int = 3,
+    max_length: int = 20,
+) -> str:
+    chars = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(
+        secrets.choice(chars) for _ in range(random.randint(min_length, max_length))
+    )

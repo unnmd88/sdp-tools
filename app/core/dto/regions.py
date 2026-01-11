@@ -5,7 +5,8 @@ from core.enums import RegionCodes, RegionNames
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class RegionDTO:
-    """ DTO для экземпляра существующего региона. """
+    """DTO для экземпляра существующего региона."""
+
     code: int
     name: str
 
@@ -27,7 +28,8 @@ class RegionDTO:
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class UpdateRegionDTO:
-    """ DTO для обновления существующего региона. """
+    """DTO для обновления существующего региона."""
+
     # region_name_to_update: RegionNames
     filters_for_search: dict
     code_or_name: str
@@ -38,6 +40,4 @@ class UpdateRegionDTO:
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class CreateRegionDTO(RegionDTO):
-    """ DTO для создания нового региона. """
-
-
+    """DTO для создания нового региона."""

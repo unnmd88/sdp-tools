@@ -10,5 +10,3 @@ class NetworkSettings:
     gateway: IPv4Address | str | None = None
     broadcast: IPv4Address | str | None = None
     mac_address: str | None = None
-
-

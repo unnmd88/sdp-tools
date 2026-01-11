@@ -4,7 +4,6 @@ from typing import Any
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class FiltersFactory:
-
     @classmethod
     def get_filters_dict(
         cls,
@@ -18,4 +17,3 @@ class FiltersFactory:
         if name is not None:
             filters['name'] = name
         return filters
-

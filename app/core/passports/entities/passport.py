@@ -18,7 +18,6 @@ class PassportEntity:
     started_editing_at: datetime
     finished_editing_at: datetime | None
 
-
     # def __post_init__(self):
     #     if not isinstance(self.username, UserEntity):
     #         raise DomainValidationError(

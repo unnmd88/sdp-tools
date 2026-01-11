@@ -3,6 +3,5 @@ from pydantic import BaseModel
 
 
 class UpdatedRecordSchemaResponse(BaseModel):
-
     old: Any
     new: Any

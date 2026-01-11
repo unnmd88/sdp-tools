@@ -13,9 +13,8 @@ from contextlib import nullcontext
 
 
 class TestUserEntity:
-
     def test_create_user_entity_success(self, pk_id):
-        """ Тест на успешное создание сущности UserEntity. """
+        """Тест на успешное создание сущности UserEntity."""
 
         user = UserEntity(
             id=pk_id,
@@ -35,9 +34,9 @@ class TestUserEntity:
         )
 
         assert user.id == pk_id
-        assert user.first_name == "Chook"
-        assert user.last_name == "Gekk"
-        assert user.username == "chokky"
+        assert user.first_name == 'Chook'
+        assert user.last_name == 'Gekk'
+        assert user.username == 'chokky'
         assert user.organization == Organizations.SDP
         assert user.email == 'example@example.com'
         assert user.password == b'mysecret'
@@ -50,23 +49,26 @@ class TestUserEntity:
         assert user.description == ''
 
     @pytest.mark.parametrize(
-        "bad_id,expectation",
+        'bad_id,expectation',
         [
             ('3', pytest.raises(TypeError)),
             (random.uniform(1.0, 32_000.0), pytest.raises(TypeError)),
             (0, pytest.raises(DomainValidationError)),
-            (-random.randint(EntityIdRange.MIN_ID, EntityIdRange.MAX_ID), pytest.raises(DomainValidationError)),
+            (
+                -random.randint(EntityIdRange.MIN_ID, EntityIdRange.MAX_ID),
+                pytest.raises(DomainValidationError),
+            ),
             (32001, pytest.raises(DomainValidationError)),
             (123456789, pytest.raises(DomainValidationError)),
         ],
     )
     def test_create_user_entity_exception_bad_id(self, bad_id, expectation):
-        """ Тест на вызов ошибки при создании сущности UserEntity с невалидными значениями id. """
+        """Тест на вызов ошибки при создании сущности UserEntity с невалидными значениями id."""
         with expectation:
             create_user_entity(_id=bad_id)
 
     @pytest.mark.parametrize(
-        "bad_email,expectation",
+        'bad_email,expectation',
         [
             (list(('abra', 'cadabra', 1)), pytest.raises(TypeError)),
             (random.randint(1, 100000000), pytest.raises(TypeError)),
@@ -76,6 +78,6 @@ class TestUserEntity:
         ],
     )
     def test_create_user_entity_exception_bad_email(self, bad_email, expectation):
-        """ Тест на вызов ошибки при создании сущности UserEntity с невалидными значениями email. """
+        """Тест на вызов ошибки при создании сущности UserEntity с невалидными значениями email."""
         with expectation:
             create_user_entity(email=bad_email)

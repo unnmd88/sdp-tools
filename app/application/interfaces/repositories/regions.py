@@ -3,5 +3,4 @@ from core.regions.entities.region import RegionEntity
 
 
 class RegionsRepositoryProtocol(BaseCrudProtocol):
-
     pass

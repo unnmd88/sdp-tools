@@ -8,17 +8,16 @@ from tests.utils.create_user_entity import create_user_entity
 
 
 class TestTrafficLightObjectEntity:
-
     def test_create_tlo_entity_success(self, pk_id):
-        """ Тест на успешное создание сущности TrafficLightObjectEntity. """
+        """Тест на успешное создание сущности TrafficLightObjectEntity."""
 
         user = create_user_entity(username='chook')
 
         passport = PassportEntity(
-            data={"data": {}},
+            data={'data': {}},
             username=user,
             group=PassportGroups.OVIM,
-            commit_message='test commit message'
+            commit_message='test commit message',
         )
 
         tlo = TrafficLightObjectEntity(
@@ -48,4 +47,3 @@ class TestTrafficLightObjectEntity:
         assert tlo.passport_history == []
         assert isinstance(tlo.created_at, datetime.datetime)
         assert isinstance(tlo.updated_at, datetime.datetime)
-

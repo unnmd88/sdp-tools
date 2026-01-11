@@ -7,7 +7,7 @@ from core.utils import checking_types
 
 @pytest.mark.parametrize(
     'type_to_check,value,expectation',
-    [   #Ok section
+    [  # Ok section
         (int, 1, nullcontext()),
         (str, 'some_text', nullcontext()),
         (list, list(), nullcontext()),
@@ -57,11 +57,13 @@ from core.utils import checking_types
         (set, list(), pytest.raises(TypeError)),
         (set, dict(), pytest.raises(TypeError)),
         (set, None, pytest.raises(TypeError)),
-    ]
+    ],
 )
 def test_type_validator(type_to_check, value, expectation):
     with expectation:
+
         @checking_types(isinstance_of=type_to_check)
         def stub(v):
             return v
+
         stub(value)

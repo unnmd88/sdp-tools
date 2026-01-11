@@ -14,17 +14,12 @@ from core.dto.common import (
     CreateRecordDTO,
     UpdatedRecordDTO,
     ToUpdateRecordDTO,
-    DeleteRecordDTO
+    DeleteRecordDTO,
 )
-from core.exceptions.base import (
-    CreateErrorAlreadyExists,
-    NotFoundError,
-    DeleteError
-)
+from core.exceptions.crud import NotFoundError, CreateErrorAlreadyExists, DeleteError
 from core.regions.entities.region import RegionEntity
 from core.tlo.entities.tlo import TrafficLightObjectEntity
 from core.users.entities.user import UserEntity
-
 
 
 T = TypeVar('T', bound=type[Base])
@@ -56,16 +51,18 @@ class BaseSqlAlchemy:
         result = await self.session.execute(stmt)
         return [self.mapper.to_entity(model) for model in result.scalars().all()]
 
-
     # async def get_all(self, **filters) -> Sequence[Entity]:
     #     stmt = select(self.model).filter_by(**filters)
     #     result = await self.session.execute(stmt)
     #     return [self.mapper.to_entity(model) for model in result.scalars().all()]
 
-
     async def add(self, create_record_dto: CreateRecordDTO) -> Entity | None:
-        entity = self.mapper.entity_validate(**create_record_dto.fields) # Возможно исключение DomainValidationError
-        search_filters = create_record_dto.check_exists_search_filters or create_record_dto.fields
+        entity = self.mapper.entity_validate(
+            **create_record_dto.fields
+        )  # Возможно исключение DomainValidationError
+        search_filters = (
+            create_record_dto.check_exists_search_filters or create_record_dto.fields
+        )
         stmt = select(self.model).filter_by(**search_filters)
         result: Result = await self.session.execute(stmt)
         if result.scalars().one_or_none() is not None:
@@ -94,7 +91,9 @@ class BaseSqlAlchemy:
         old_entity = self.mapper.to_entity(current_model)
         # Создать инстанс сущности для проверки валидности обновляемых полей
         updated_fields = asdict(old_entity) | update_record_dto.fields
-        self.mapper.entity_validate(**updated_fields) # Возможно исключение DomainValidationError
+        self.mapper.entity_validate(
+            **updated_fields
+        )  # Возможно исключение DomainValidationError
 
         # stmt = (
         #     update(self.model)
@@ -106,8 +105,12 @@ class BaseSqlAlchemy:
             for k, v in update_record_dto.fields.items():
                 setattr(current_model, k, v)
             await self.session.commit()
-            updated_entity = await self.get_one_or_none_by_filters({'id': old_entity.id})
-            return UpdatedRecordDTO(old_entity, updated_entity, name=self.model.__name__)
+            updated_entity = await self.get_one_or_none_by_filters(
+                {'id': old_entity.id}
+            )
+            return UpdatedRecordDTO(
+                old_entity, updated_entity, name=self.model.__name__
+            )
         except SQLAlchemyError as e:
             raise
 
@@ -129,7 +132,6 @@ class BaseSqlAlchemy:
     #         raise UpdateError(e)
 
     async def delete_one(self, delete_record_dto: DeleteRecordDTO) -> Entity | None:
-
         entity = await self.get_one_or_none_by_filters(delete_record_dto.search_filters)
         if entity is None:
             raise NotFoundError
@@ -142,7 +144,6 @@ class BaseSqlAlchemy:
         except SQLAlchemyError as e:
             raise DeleteError(e)
         return entity
-
 
     # async def update(
     #     self,
@@ -161,4 +162,3 @@ class BaseSqlAlchemy:
     #         await self.session.rollback()
     #         raise e
     #     return model
-

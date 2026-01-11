@@ -5,4 +5,3 @@ from dataclasses import dataclass
 class UserAuthDTO:
     username: str
     password: str
-

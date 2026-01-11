@@ -2,31 +2,43 @@ import logging
 from dataclasses import dataclass
 
 from app_logging.dev.config import USERS_LOGGER
-from application.interfaces.repositories.users_repo_interface import UsersRepositoryProtocol
-from application.interfaces.use_cases.get_user_use_case_interface import GetUserUseCaseProtocol
+from application.interfaces.repositories.users_repo_interface import (
+    UsersRepositoryProtocol,
+)
+from application.interfaces.use_cases.get_user_use_case_interface import (
+    GetUserUseCaseProtocol,
+)
 from core.dto.common import ToUpdateRecordDTO
 from core.dto.users import ChangeUserPasswordDTO
 from core.exceptions.base import ApplicationError
 from core.users.entities.user import UserEntity
-from core.users.exceptions import UserNotFoundError, InactiveUserError, UserAdministratorNotFoundError, \
-    InvalidUsernameOrPasswordError, InvalidUsernameOrPasswordToSetError, SameUsernameAndPasswordError
+from core.users.exceptions import (
+    UserNotFoundError,
+    InactiveUserError,
+    UserAdministratorNotFoundError,
+    InvalidUsernameOrPasswordError,
+    InvalidUsernameOrPasswordToSetError,
+    SameUsernameAndPasswordError,
+)
 from core.users.services.user_password import hash_password
-from core.users.services.field_values_constraints import check_password_to_set_constraints
+from core.users.services.field_values_constraints import (
+    check_password_to_set_constraints,
+)
 
 logger = logging.getLogger(USERS_LOGGER)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ChangeUserPasswordUseCaseImpl:
-
     user_repository: UsersRepositoryProtocol
     get_user_use_case: GetUserUseCaseProtocol
 
     async def __call__(self, dto: ChangeUserPasswordDTO) -> ChangeUserPasswordDTO:
-
-        logger.info('Запрос на смену пароля с username=%r',  dto.subject)
+        logger.info('Запрос на смену пароля с username=%r', dto.subject)
         try:
-            subject: UserEntity = await self.get_user_use_case.get_active_user_or_raise(dto.subject)
+            subject: UserEntity = await self.get_user_use_case.get_active_user_or_raise(
+                dto.subject
+            )
             logger.info('Пользователь найден: %r.', subject)
         except UserNotFoundError:
             logger.info('Пользователь %r не найден.', dto.subject)
@@ -43,14 +55,18 @@ class ChangeUserPasswordUseCaseImpl:
             raise InvalidUsernameOrPasswordToSetError(f'{msg}.')
         if subject.password == subject.username:
             msg = 'Ошибка: username и пароль должны отличаться'
-            logger.info('%s: username=%r, пароль=%r', msg, subject.username, subject.password)
+            logger.info(
+                '%s: username=%r, пароль=%r', msg, subject.username, subject.password
+            )
             raise InvalidUsernameOrPasswordToSetError(msg)
         update_dto = ToUpdateRecordDTO(
             search_criteria={'id': subject.id},
-            fields={'password': hash_password(dto.new_password)}
+            fields={'password': hash_password(dto.new_password)},
         )
         logger.info('Меняю пароль у пользователя username=%r', subject.username)
-        updated_dto = await self.user_repository.update_one(update_record_dto=update_dto)
+        updated_dto = await self.user_repository.update_one(
+            update_record_dto=update_dto
+        )
 
         updated_entity: UserEntity = updated_dto.new
         if not updated_entity.validate_password(dto.new_password):
@@ -63,4 +79,3 @@ class ChangeUserPasswordUseCaseImpl:
             old_password=dto.old_password,
             new_password=dto.new_password,
         )
-

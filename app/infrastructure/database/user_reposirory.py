@@ -3,10 +3,10 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from core.exceptions.base import CreateErrorAlreadyExists
+from core.exceptions.crud import CreateErrorAlreadyExists
 from core.users.entities.user import UserEntity
 from infrastructure.database.api import db_api
-from infrastructure.database.mappers.users import UserDBMapper
+from infrastructure.database.mappers.users_mapper import UserDBMapper
 from infrastructure.database.models import User
 from infrastructure.database.base_repository import BaseSqlAlchemy, Entity
 
@@ -28,7 +28,9 @@ class UsersRepositorySqlAlchemy(BaseSqlAlchemy):
             raise e
         return self.mapper.to_entity(new_instance)
 
-    async def get_user_by_id_or_username_or_none(self, username_or_id: int | str) -> UserEntity | None:
+    async def get_user_by_id_or_username_or_none(
+        self, username_or_id: int | str
+    ) -> UserEntity | None:
         if isinstance(username_or_id, int):
             return await self.get_one_by_id_or_none(username_or_id)
         stmt = select(self.model).filter_by(username=username_or_id)

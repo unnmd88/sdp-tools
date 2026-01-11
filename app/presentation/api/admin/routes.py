@@ -1,17 +1,27 @@
 from fastapi import APIRouter, status, HTTPException
 
 from core.dto.users import CreateUserDTO, SearchUsersDTO
-from core.exceptions.base import UserPermissionsError, DomainValidationError
-from core.users.exceptions import InvalidUsernameOrPasswordToSetError, UserAlreadyExistsError, \
-    InvalidValueToSetError
+from core.exceptions.base import DomainValidationError
+from core.exceptions.users import UserPermissionsError
+from core.users.exceptions import (
+    InvalidUsernameOrPasswordToSetError,
+    UserAlreadyExistsError,
+    InvalidValueToSetError,
+)
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
-from presentation.api.dependencies.deps import IsSuperuser, PayloadAccessJWT, UsersUseCase, CreateUserUseCase
+from presentation.api.dependencies.deps import (
+    IsSuperuser,
+    PayloadAccessJWT,
+    UsersUseCase,
+    CreateUserUseCase,
+)
 from presentation.schemas.users import CreateUserSchema, ResponseUserSchema
 
 router = APIRouter(
     prefix='/admin',
     tags=['Administration'],
 )
+
 
 @router.get(
     '/whoami/',
@@ -25,9 +35,9 @@ async def whoami(
     payload_jwt: PayloadAccessJWT,
     use_case: UsersUseCase,
 ):
-
     user = await use_case.get_user_by_username_or_raise(username=payload_jwt.sub)
     return ResponseUserSchema.model_validate(user, from_attributes=True)
+
 
 # @router.get(
 #     '/',
@@ -108,7 +118,9 @@ async def change_user_password(
     )
     _status_code = _detail = None
     try:
-        result_dto: ChangeUserPasswordDTO = await use_case.change_password(change_password_dto)
+        result_dto: ChangeUserPasswordDTO = await use_case.change_password(
+            change_password_dto
+        )
     except UserNotFoundError:
         _status_code = status.HTTP_404_NOT_FOUND
         _detail = f'Пользователь {payload_jwt.sub!r} не найден.'
@@ -128,7 +140,7 @@ async def change_user_password(
         _status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
         _detail = f'Недопустимый пароль.'
     except Exception:
-        #TODO Залоггировать
+        # TODO Залоггировать
         _status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         _detail = f'Ошибка запроса на стороне сервера.'
     if _status_code or _detail:
@@ -136,5 +148,5 @@ async def change_user_password(
     return ChangeUserPasswordResponse(
         subject=result_dto.subject,
         new_password=result_dto.new_password,
-        old_password=result_dto.old_password
+        old_password=result_dto.old_password,
     )

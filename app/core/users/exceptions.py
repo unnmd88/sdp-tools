@@ -4,8 +4,8 @@
 
 from core.exceptions.base import (
     ApplicationError,
-    NotFoundError,
-    CreateError, UpdateError, )
+)
+from core.exceptions.crud import NotFoundError, CreateError, UpdateError
 
 INVALID_DESCRIPTION_EXCEPTION_TEXT = (
     'Поле description не должно превышать 255 символов.'
@@ -13,7 +13,7 @@ INVALID_DESCRIPTION_EXCEPTION_TEXT = (
 
 
 class UserInactiveError(ApplicationError):
-    """Неактивный пользователь пытается осуществлять какие-либо действия. """
+    """Неактивный пользователь пытается осуществлять какие-либо действия."""
 
 
 class UserNotFoundError(NotFoundError):
@@ -85,8 +85,6 @@ class InvalidUsernameOrPasswordToSetError(ApplicationError):
         return f'Ошибка установки username/пароля пользователя.'
 
 
-
-
 class SameUsernameAndPasswordError(ApplicationError):
     """Ошибка совпадения username и пароля пользователя."""
 
@@ -100,10 +98,11 @@ class ForbiddenUpdateError(UpdateError):
 
 
 class InvalidUsernameOrPasswordError(ApplicationError):
-    def __init__(self, user: str | int = ""):
-        self.detail = f'Неверный логин или пароль пользователя {user}.'.replace("  ", "")
+    def __init__(self, user: str | int = ''):
+        self.detail = f'Неверный логин или пароль пользователя {user}.'.replace(
+            '  ', ''
+        )
         super().__init__(self.detail)
 
 
-class InactiveUserError(ApplicationError):
-    ...
+class InactiveUserError(ApplicationError): ...

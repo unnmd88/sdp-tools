@@ -1,12 +1,10 @@
 from collections.abc import Sequence
 
 from application.interfaces.repositories.tlo import TrafficLightObjectRepositoryProtocol
-from core.services import BaseService
 from core.tlo.entities.tlo import TrafficLightObjectEntity
 
 
-class TrafficLightObjectServiceImpl(BaseService):
-
+class TrafficLightObjectServiceImpl:
     repository: TrafficLightObjectRepositoryProtocol
 
     async def get_tlo_by_name_or_none(self, name: str) -> TrafficLightObjectEntity:

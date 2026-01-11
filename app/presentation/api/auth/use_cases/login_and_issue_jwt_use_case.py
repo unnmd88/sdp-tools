@@ -14,11 +14,10 @@ logger = logging.getLogger(JWT_LOGGER)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LoginAndIssueJWTUseCaseIml:
-
     user_login_use_case: UserLoginUseCaseImpl
 
     async def __call__(self, login_dto: UserAuthDTO) -> TokenDataDTO:
-        user_entity:UserEntity = await self.user_login_use_case(login_dto)
+        user_entity: UserEntity = await self.user_login_use_case(login_dto)
         token_data = JWTHelper.issue_jwt(
             user_entity=user_entity,
             refresh_token=True,

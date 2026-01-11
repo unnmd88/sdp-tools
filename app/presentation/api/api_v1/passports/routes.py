@@ -11,13 +11,7 @@ from infrastructure.database.models import TrafficLightObject
 from fastapi import APIRouter, Depends
 from starlette import status
 
-from presentation.api.api_v1.passports.dependencies import (
-    passport_group_found_or_404,
-    valid_data_from_db_or_404,
-)
-from presentation.api.api_v1.passports.filters import (
-    PassportCurrentFilter,
-)
+
 from presentation.api.api_v1.passports.schemas import (
     CapturedPassport,
     CapturePassportSchema,

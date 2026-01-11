@@ -5,11 +5,15 @@ from starlette import status
 
 from core.dto.auth import UserAuthDTO
 from core.users.exceptions import UserNotFoundByIdError, InvalidUsernameOrPasswordError
-from presentation.api.api_v1.documentation.auth_and_jwt.endpoints import POST_LOGIN_user, POST_REFRESH
+from presentation.api.api_v1.documentation.auth_and_jwt.endpoints import (
+    POST_LOGIN_user,
+    POST_REFRESH,
+)
 from presentation.api.dependencies.deps import (
     AuthForm,
     PayloadRefreshJWT,
-    AuthAndJWTUseCase, RefreshJWTUseCase,
+    AuthAndJWTUseCase,
+    RefreshJWTUseCase,
     # RefreshJWTUseCase
 )
 
@@ -40,7 +44,7 @@ async def issue_jwt(
     except InvalidUsernameOrPasswordError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Неверный логин или пароль.'
+            detail='Неверный логин или пароль.',
         )
     except InactiveUserException:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
@@ -58,6 +62,9 @@ async def issue_jwt_by_refresh_jwt(
     use_case: RefreshJWTUseCase,
 ):
     try:
-        return await use_case(username=payload.sub, refresh_token=False,)
+        return await use_case(
+            username=payload.sub,
+            refresh_token=False,
+        )
     except UserNotFoundByIdError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)

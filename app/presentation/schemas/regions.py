@@ -23,7 +23,6 @@ class RegionCreateSchema(BaseModel):
 
 
 class RegionSchemaResponse(IdSchemaMixin, DateTimeSchemaMixin, RegionCreateSchema):
-
     model_config = ConfigDict(extra='ignore')
 
 

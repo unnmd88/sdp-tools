@@ -42,7 +42,7 @@ class UserEntityConstraints:
             None: Если пароль допускается.
         """
         return check_password_to_set_constraints(password)
-        
+
     @classmethod
     def check_username_and_password(
         cls,
@@ -68,9 +68,9 @@ class UserEntityConstraints:
         """
         if username == settings.default_superuser_creds.name:
             raise InvalidValueToSetError(
-                f"Ошибка: запрещено создавать пользователя "
+                f'Ошибка: запрещено создавать пользователя '
                 f"с 'username'={settings.default_superuser_creds.name!r} "
-                f"через данный интерфейс."
+                f'через данный интерфейс.'
             )
         for pattern in forbidden_patterns_in_username:
             if pattern in username:

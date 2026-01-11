@@ -10,11 +10,10 @@ from core.dto.passport_groups import (
     UpdatePassportGroupDTO,
 )
 from core.passport_groups.entities.passport_group import PassportGroupEntity
-from presentation.api.dependencies.deps import PassportGroupsCrudUseCase
 from presentation.schemas.passport_groups import (
     PassportGroupsSchema,
     PassportGroupsCreate,
-    PassportGroupsUpdate
+    PassportGroupsUpdate,
 )
 
 
@@ -32,15 +31,14 @@ router = APIRouter(
 )
 async def get_group_by_name(
     group_name: str,
-    use_case: PassportGroupsCrudUseCase,
+    # use_case: PassportGroupsCrudUseCase,
 ) -> PassportGroupsSchema:
     if (region := await use_case.get_passport_group_by_name(group_name)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Регион с именем={group_name} не найден.'
+            detail=f'Регион с именем={group_name} не найден.',
         )
     return PassportGroupsSchema.model_validate(region, from_attributes=True)
-
 
 
 @router.get(
@@ -50,12 +48,12 @@ async def get_group_by_name(
 )
 async def get_group_by_id(
     group_id: int,
-    use_case: PassportGroupsCrudUseCase,
+    # use_case: PassportGroupsCrudUseCase,
 ) -> PassportGroupsSchema:
     if (region := await use_case.get_passport_group_by_id(group_id)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Регион с id={group_id} не найден.'
+            detail=f'Регион с id={group_id} не найден.',
         )
     return PassportGroupsSchema.model_validate(region, from_attributes=True)
 
@@ -66,7 +64,7 @@ async def get_group_by_id(
     response_model=Sequence[PassportGroupsSchema],
 )
 async def get_all_groups(
-    use_case: PassportGroupsCrudUseCase,
+    # use_case: PassportGroupsCrudUseCase,
 ) -> Sequence[PassportGroupsSchema]:
     return [
         PassportGroupsSchema.model_validate(m, from_attributes=True)
@@ -80,11 +78,11 @@ async def get_all_groups(
     response_model=PassportGroupsSchema,
 )
 async def create_group(
-    use_case: PassportGroupsCrudUseCase,
+    # use_case: PassportGroupsCrudUseCase,
     group_data: PassportGroupsCreate,
 ) -> PassportGroupsSchema:
     dto = CreatePassportGroupDTO(**group_data.model_dump())
-    new_passport_group: PassportGroupEntity= await use_case.create_passport_group(dto)
+    new_passport_group: PassportGroupEntity = await use_case.create_passport_group(dto)
     return PassportGroupsSchema.model_validate(new_passport_group, from_attributes=True)
 
 
@@ -94,9 +92,13 @@ async def create_group(
     response_model=PassportGroupsSchema,
 )
 async def update_group(
-    use_case: PassportGroupsCrudUseCase,
+    # use_case: PassportGroupsCrudUseCase,
     group_data_to_update: PassportGroupsUpdate,
 ) -> PassportGroupsSchema:
     dto = UpdatePassportGroupDTO(**group_data_to_update.model_dump())
-    updated_passport_group: PassportGroupEntity = await use_case.update_passport_group(dto)
-    return PassportGroupsSchema.model_validate(updated_passport_group, from_attributes=True)
+    updated_passport_group: PassportGroupEntity = await use_case.update_passport_group(
+        dto
+    )
+    return PassportGroupsSchema.model_validate(
+        updated_passport_group, from_attributes=True
+    )

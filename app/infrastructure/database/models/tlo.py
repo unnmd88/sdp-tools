@@ -30,11 +30,17 @@ class TrafficLightObject(
     region_id: Mapped[int] = mapped_column(
         ForeignKey('regions.id'),
     )
-    latitude: Mapped[float] = mapped_column(default=0, server_default=text("0"))
-    longitude: Mapped[float] = mapped_column(default=0, server_default=text("0"))
-    ipv4: Mapped[IPv4Interface | None] = mapped_column(INET, server_default=text("Null"), default=None)
-    gateway: Mapped[IPv4Interface | None] = mapped_column(INET, server_default=text("Null"), default=None)
-    mac_address: Mapped[IPv4Address | None] = mapped_column(String(17), server_default=text("Null"), default=None)
+    latitude: Mapped[float] = mapped_column(default=0, server_default=text('0'))
+    longitude: Mapped[float] = mapped_column(default=0, server_default=text('0'))
+    ipv4: Mapped[IPv4Interface | None] = mapped_column(
+        INET, server_default=text('Null'), default=None
+    )
+    gateway: Mapped[IPv4Interface | None] = mapped_column(
+        INET, server_default=text('Null'), default=None
+    )
+    mac_address: Mapped[IPv4Address | None] = mapped_column(
+        String(17), server_default=text('Null'), default=None
+    )
     traffic_controller: Mapped[str | None]
     district: Mapped[str] = mapped_column(
         default='',

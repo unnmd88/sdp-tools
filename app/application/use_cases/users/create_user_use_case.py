@@ -3,18 +3,23 @@ import logging
 from dataclasses import dataclass
 
 from app_logging.dev.config import USERS_LOGGER
-from application.interfaces.repositories.users_repo_interface import UsersRepositoryProtocol
-from application.interfaces.use_cases.get_user_use_case_interface import GetUserUseCaseProtocol
+from application.interfaces.repositories.users_repo_interface import (
+    UsersRepositoryProtocol,
+)
+from application.interfaces.use_cases.get_user_use_case_interface import (
+    GetUserUseCaseProtocol,
+)
 
 from core.dto.users import CreateUserDTO
 from core.enums import Permissions, Organizations, Roles
-from core.exceptions.base import UserPermissionsError, ApplicationError
+from core.exceptions.base import ApplicationError
+from core.exceptions.users import UserPermissionsError
 from core.users.entities.user import UserEntity
 from core.users.exceptions import (
     UserNotFoundError,
     InactiveUserError,
     UserAlreadyExistsError,
-    InvalidValueToSetError
+    InvalidValueToSetError,
 )
 from core.users.services.user_password import hash_password
 from core.users.services.field_values_constraints import UserEntityConstraints
@@ -25,14 +30,21 @@ logger = logging.getLogger(USERS_LOGGER)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreateUserUseCaseImpl:
-
     user_repository: UsersRepositoryProtocol
     get_user_use_case: GetUserUseCaseProtocol
 
     async def __call__(self, create_user_dto: CreateUserDTO) -> UserEntity:
-        logger.info('Запрос на создание нового пользователя от инициатора=%r: %r' ,create_user_dto.username, create_user_dto)
+        logger.info(
+            'Запрос на создание нового пользователя от инициатора=%r: %r',
+            create_user_dto.username,
+            create_user_dto,
+        )
         try:
-            customer_entity: UserEntity = await self.get_user_use_case.get_active_user_or_raise(create_user_dto.customer)
+            customer_entity: UserEntity = (
+                await self.get_user_use_case.get_active_user_or_raise(
+                    create_user_dto.customer
+                )
+            )
             logger.info('Инициатор=%r найден', customer_entity.username)
         except UserNotFoundError:
             msg = f'Ошибка: {create_user_dto.customer!r} не найден.'
@@ -57,8 +69,10 @@ class CreateUserUseCaseImpl:
         except InvalidValueToSetError as e:
             logger.info('%s: %r', e, create_user_dto.password)
             raise
-        user_already_exists: UserEntity = await self.get_user_use_case.get_user_by_username_or_none(
-            create_user_dto.username
+        user_already_exists: UserEntity = (
+            await self.get_user_use_case.get_user_by_username_or_none(
+                create_user_dto.username
+            )
         )
         if user_already_exists:
             msg = f'Пользователь с username={user_already_exists.username}(id={user_already_exists.id}) существует.'

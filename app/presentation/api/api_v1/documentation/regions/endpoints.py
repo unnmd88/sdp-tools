@@ -1,5 +1,4 @@
-GET_region_by_code_description = (
-    """
+GET_region_by_code_description = """
     ```
     Получить данные существующего региона светофорного объекта по его коду.
     q-param region_code - целочисленный номер региона.
@@ -8,10 +7,8 @@ GET_region_by_code_description = (
     Если регион с region_code не найден - вернётся HTTP_404.
     ```
     """
-)
 
-GET_region_by_id_description = (
-    """
+GET_region_by_id_description = """
     ```
     Получить данные существующего региона светофорного объекта по его коду.
     q-param id - целочисленный id региона.
@@ -19,18 +16,14 @@ GET_region_by_id_description = (
     Если регион с id не найден - вернётся HTTP_404.
     ```
     """
-)
 
-GET_all_regions_description = (
-    """
+GET_all_regions_description = """
     ```
     Получить список всех существующих регионов светофорного объекта.
     ```
     """
-)
 
-POST_region_description = (
-    """
+POST_region_description = """
     ```
     Создать новый регион светофорного объекта.
     В теле запроса ожидаются поля со значениями, 
@@ -39,10 +32,8 @@ POST_region_description = (
     Если регион уже существует - вернётся HTTP_409.
     ```
     """
-)
 
-PATCH_region_by_code_description = (
-    """
+PATCH_region_by_code_description = """
     ```
     Обновить данные существующего региона светофорного объекта по его коду.
     q-param region_code - целочисленный номер региона .
@@ -53,10 +44,8 @@ PATCH_region_by_code_description = (
     Если регион с region_code не найден - вернётся HTTP_404.
     ```
     """
-)
 
-DELETE_region_by_code_description = (
-    """
+DELETE_region_by_code_description = """
     ```
     Удалить существующий регион светофорного объекта его коду.
     q-param region_code - целочисленный номер региона.
@@ -65,4 +54,3 @@ DELETE_region_by_code_description = (
     Если регион с region_code не найден - вернётся HTTP_404.
     ```
     """
-)

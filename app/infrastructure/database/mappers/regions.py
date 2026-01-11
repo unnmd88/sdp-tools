@@ -9,7 +9,6 @@ from infrastructure.database.models import Region as RegionModel
 @final
 @dataclass(frozen=True, slots=True)
 class RegionDBMapper(BaseDBMapperProtocol):
-
     entity = RegionEntity
 
     @classmethod
@@ -35,6 +34,4 @@ class RegionDBMapper(BaseDBMapperProtocol):
             id=entity.id,
             code=entity.code,
             name=entity.name,
-            )
-
-
+        )

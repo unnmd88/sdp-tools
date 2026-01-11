@@ -8,14 +8,12 @@ from fastapi import (
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from presentation.api.api_v1.tlo.crud import TloCrud
 from presentation.api.api_v1.tlo.schemas import (
     TrafficLightCreate,
     TrafficLightSchema,
     TrafficLightUpdate,
 )
 from infrastructure.database.api import db_api
-from presentation.api.dependencies.deps import TrafficLightObjectUseCase
 
 # from presentation.api.dependencies.dependencies import CrudTloUseCase
 
@@ -39,7 +37,7 @@ async def get_traffic_light_object_by_id(
 @router.get('/name/{name}')
 async def get_traffic_light_object_by_name(
     tlo_name: str,
-    use_case: TrafficLightObjectUseCase,
+    # use_case: TrafficLightObjectUseCase,
 ):
     # res = await use_case.get_tlo_by_name(tlo_name)
     res = await use_case.get_base_tlo_by_name(tlo_name)

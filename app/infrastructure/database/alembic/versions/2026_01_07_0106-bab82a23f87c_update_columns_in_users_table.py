@@ -23,6 +23,7 @@ depends_on: Union[str, Sequence[str], None] = None
 # Руками установил значение None для existing_server_default вышеперечисленных полей.
 # Также руками добавил length=32 в existing_type=sa.VARCHAR() для поля email.
 
+
 def upgrade() -> None:
     """Upgrade schema."""
     op.alter_column(

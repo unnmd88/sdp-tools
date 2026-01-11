@@ -3,7 +3,7 @@ from datetime import datetime
 from types import UnionType, NoneType
 from typing import Annotated, Type, Union, get_type_hints
 
-from pydantic import(
+from pydantic import (
     BaseModel,
     BeforeValidator,
     ConfigDict,
@@ -12,8 +12,8 @@ from pydantic import(
     field_validator,
 )
 
-s1 = {"1", "2"}
-s3 = {"1","2","4","5"}
+s1 = {'1', '2'}
+s3 = {'1', '2', '4', '5'}
 
 
 def bar(x: int | None) -> None:
@@ -22,7 +22,8 @@ def bar(x: int | None) -> None:
     print(bar.__annotations__)
 
 
-
 if __name__ == '__main__':
-    print(isinstance(1, NoneType))
-    bar(None)
+    try:
+        v = int([])
+    except TypeError as e:
+        print(e)

@@ -8,17 +8,17 @@ from infrastructure.database.models import (
     Passport as PassportModel,
     User as UserModel,
     PassportGroup as PassportGroupModel,
-
 )
 from infrastructure.database.base_repository import BaseSqlAlchemy
 
 
 class TrafficLightObjectSqlAlchemy(BaseSqlAlchemy):
-
     model = TrafficLightModel
     mapper = TrafficLightObjectDBMapper
 
-    async def get_tlo_by_name_or_none(self, tlo_name: str) -> TrafficLightObjectEntity | None:
+    async def get_tlo_by_name_or_none(
+        self, tlo_name: str
+    ) -> TrafficLightObjectEntity | None:
         return await self.get_one_or_none_by_filters(name=tlo_name)
 
     async def _get_tlo_by_name_or_none(
@@ -54,10 +54,12 @@ class TrafficLightObjectSqlAlchemy(BaseSqlAlchemy):
 
         tlo_model = await self.get_one_or_none_by_filters(name=tlo_name)
 
-    async def get_base_tlo_by_name_or_none(self, tlo_name: str) -> TrafficLightObjectEntity | None:
+    async def get_base_tlo_by_name_or_none(
+        self, tlo_name: str
+    ) -> TrafficLightObjectEntity | None:
         return await self._get_tlo_by_name_or_none(tlo_name, limit_passports=1)
 
-
-
-    async def get_full_tlo_by_name_or_none(self, tlo_name: str) -> TrafficLightObjectEntity | None:
+    async def get_full_tlo_by_name_or_none(
+        self, tlo_name: str
+    ) -> TrafficLightObjectEntity | None:
         pass

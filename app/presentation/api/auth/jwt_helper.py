@@ -12,12 +12,13 @@ from core.users.entities.user import UserEntity
 
 
 class JWTHelper:
-
     @classmethod
     def encode_jwt(
         cls,
         payload: dict,
-        private_key: str = settings.auth_jwt.private_key_path.read_text(encoding='utf-8'),
+        private_key: str = settings.auth_jwt.private_key_path.read_text(
+            encoding='utf-8'
+        ),
         algorithm: str = settings.auth_jwt.algorithm,
         expire_timedelta: timedelta | None = None,
         expire_minutes: int = settings.auth_jwt.access_expire_minutes,
@@ -95,5 +96,7 @@ class JWTHelper:
     ) -> TokenDataDTO:
         return TokenDataDTO(
             access_token=cls.create_access_jwt(user_entity),
-            refresh_token=cls.create_refresh_jwt(user_entity) if refresh_token else None,
+            refresh_token=cls.create_refresh_jwt(user_entity)
+            if refresh_token
+            else None,
         )

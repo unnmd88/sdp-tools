@@ -7,7 +7,6 @@ from core.passport_groups.entities.passport_group import PassportGroupEntity
 from infrastructure.database.models import PassportGroup as PassportGroupModel
 
 
-
 @final
 @dataclass(frozen=True, slots=True)
 class PassportGroupsDBMapper(BaseDBMapperProtocol):
@@ -32,4 +31,4 @@ class PassportGroupsDBMapper(BaseDBMapperProtocol):
             id=entity.id,
             group_name=entity.group_name,
             description=entity.description,
-            )
+        )

@@ -64,7 +64,6 @@ LOGGING_CONFIG = {
             'handlers': ['USERS_RUD'],
             'propagate': True,
         },
-
     },
     'formatters': {
         # "verbose": {

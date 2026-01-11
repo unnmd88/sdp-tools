@@ -3,28 +3,31 @@ from typing import Annotated
 from fastapi import Depends
 from fastapi.params import Form
 
-from application.interfaces.use_cases.create_user_use_case_interface import CreateUserUseCaseProtocol
-from presentation.api.auth.use_cases.login_and_issue_jwt_use_case import LoginAndIssueJWTUseCaseIml
+from application.interfaces.use_cases.create_user_use_case_interface import (
+    CreateUserUseCaseProtocol,
+)
+from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
+from presentation.api.auth.use_cases.login_and_issue_jwt_use_case import (
+    LoginAndIssueJWTUseCaseIml,
+)
 from presentation.api.auth.jwt_helper import JWTHelper
 
-from application.use_cases.passport_groups.crud import PassportGroupsCrudUseCaseImpl
-from application.use_cases.regions.crud import RegionsCrudUseCaseImpl
-from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
+
 from core.tlo.services.main_tlo_service import TrafficLightObjectServiceImpl
 from core.users.entities.user import UserEntity
 from presentation.api.auth.use_cases.refresh_jwt_use_case import RefreshJWTUseCaseImpl
 from presentation.api.dependencies.dependencies import (
     users_use_case,
     get_access_jwt_payload_schema,
-    get_regions_crud_use_case,
+
     is_superuser,
     is_admin,
     get_user_entity_by_id,
-    get_passport_groups_use_case,
-    get_tlo_use_case,
+
     get_refresh_jwt_payload_schema,
     get_auth_and_jwt_use_case,
-    get_refresh_jwt_use_case, create_user_use_case,
+    get_refresh_jwt_use_case,
+    create_user_use_case,
 )
 from presentation.api.dependencies.utils import get_filters_for_region_or_name_search
 from presentation.schemas.auth import AuthSchema
@@ -37,14 +40,21 @@ def auth_form(
 ):
     return AuthSchema(username=username, password=password)
 
+
 ## Auth and JWT
 AuthForm = Annotated[AuthSchema, Depends(auth_form)]
 # AccessAndRefreshJWT = Annotated[TokenInfo, Depends()]
 RefreshJWTUseCase = Annotated[RefreshJWTUseCaseImpl, Depends(get_refresh_jwt_use_case)]
-AuthAndJWTUseCase = Annotated[LoginAndIssueJWTUseCaseIml, Depends(get_auth_and_jwt_use_case)]
+AuthAndJWTUseCase = Annotated[
+    LoginAndIssueJWTUseCaseIml, Depends(get_auth_and_jwt_use_case)
+]
 ManagerJWTDep = Annotated[JWTHelper, Depends(JWTHelper)]
-PayloadAccessJWT = Annotated[PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)]
-PayloadRefreshJWT = Annotated[PayloadRefreshJWTSchema, Depends(get_refresh_jwt_payload_schema)]
+PayloadAccessJWT = Annotated[
+    PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)
+]
+PayloadRefreshJWT = Annotated[
+    PayloadRefreshJWTSchema, Depends(get_refresh_jwt_payload_schema)
+]
 IsSuperuser = Depends(is_superuser)
 IsAdmin = Depends(is_admin)
 # TO DO  AccessFromRefreshJWT = Annotated[TokenInfo, Depends(auth_user_and_issue_access_and_refresh_jwt)]
@@ -56,10 +66,12 @@ CreateUserUseCase = Annotated[CreateUserUseCaseProtocol, Depends(create_user_use
 UserEntityDep = Annotated[UserEntity, Depends(get_user_entity_by_id)]
 
 ## Regions
-RegionsCrudUseCase = Annotated[RegionsCrudUseCaseImpl, Depends(get_regions_crud_use_case)]
-regions_filters_for_search = Annotated[int | str, Depends(get_filters_for_region_or_name_search)]
+
+regions_filters_for_search = Annotated[
+    int | str, Depends(get_filters_for_region_or_name_search)
+]
 ## PassportGroups
-PassportGroupsCrudUseCase = Annotated[PassportGroupsCrudUseCaseImpl, Depends(get_passport_groups_use_case)]
+
 
 ## TrafficLightObjects
-TrafficLightObjectUseCase = Annotated[TrafficLightObjectServiceImpl, Depends(get_tlo_use_case)]
+

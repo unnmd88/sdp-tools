@@ -1,19 +1,21 @@
 from collections.abc import Sequence
 
-from application.interfaces.repositories.passport_groups import PassportGroupRepositoryProtocol
+from application.interfaces.repositories.passport_groups import (
+    PassportGroupRepositoryProtocol,
+)
 from core.dto.passport_groups import CreatePassportGroupDTO, UpdatePassportGroupDTO
 from core.enums import Permissions
-from core.exceptions.base import CreateError, UpdateError
+from core.exceptions.crud import CreateError, UpdateError
 from core.passport_groups.entities.passport_group import PassportGroupEntity
-from core.services import BaseService
 from core.utils import not_none_dataclass_instance_attrs_to_dict
 
 
-class PassportGroupsServiceImpl(BaseService):
-
+class PassportGroupsServiceImpl:
     repository: PassportGroupRepositoryProtocol
 
-    async def get_passport_group_by_name_or_none(self, name: str) -> PassportGroupEntity:
+    async def get_passport_group_by_name_or_none(
+        self, name: str
+    ) -> PassportGroupEntity:
         self.user_entity.access_control_read_passport_groups()
         return await self.repository.get_passport_group_by_name_or_none(name)
 
@@ -25,7 +27,9 @@ class PassportGroupsServiceImpl(BaseService):
         self.user_entity.access_control_read_passport_groups()
         return await self.repository.get_all()
 
-    async def create_passport_group(self, passport_group_dto: CreatePassportGroupDTO) -> PassportGroupEntity:
+    async def create_passport_group(
+        self, passport_group_dto: CreatePassportGroupDTO
+    ) -> PassportGroupEntity:
         self.user_entity.access_control(Permissions.CREATE_PASSPORT_GROUPS)
         passport_group_entity = PassportGroupEntity(
             group_name=passport_group_dto.group_name,
@@ -38,10 +42,14 @@ class PassportGroupsServiceImpl(BaseService):
             raise CreateError('Паспортная группа уже существует.')
         return await self.repository.add(passport_group_entity)
 
-    async def update_passport_group(self, passport_group_dto: UpdatePassportGroupDTO) -> PassportGroupEntity:
+    async def update_passport_group(
+        self, passport_group_dto: UpdatePassportGroupDTO
+    ) -> PassportGroupEntity:
         self.user_entity.access_control(Permissions.UPDATE_PASSPORT_GROUPS)
-        current_passport_group = await self.repository.get_passport_group_by_name_or_none(
-            passport_group_dto.group_name_to_update
+        current_passport_group = (
+            await self.repository.get_passport_group_by_name_or_none(
+                passport_group_dto.group_name_to_update
+            )
         )
         if current_passport_group is None:
             raise UpdateError('Паспортная группа с данным названием не найдена.')

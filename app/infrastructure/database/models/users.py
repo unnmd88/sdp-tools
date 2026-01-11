@@ -20,24 +20,34 @@ class User(
     )
     organization: Mapped[str] = mapped_column(String(32), nullable=False)
     username: Mapped[str] = mapped_column(
-        String(32), unique=True, nullable=False,
+        String(32),
+        unique=True,
+        nullable=False,
     )
     email: Mapped[str | None] = mapped_column(
-        String(32), unique=True, default=None,  nullable=True, server_default=None
+        String(32), unique=True, default=None, nullable=True, server_default=None
     )
     password: Mapped[bytes]
     is_active: Mapped[bool] = mapped_column(
-        nullable=False, default=True, server_default=sa.sql.expression.true(),
+        nullable=False,
+        default=True,
+        server_default=sa.sql.expression.true(),
     )
     role: Mapped[str] = mapped_column(String(32), nullable=False)
     phone_number: Mapped[str | None] = mapped_column(
         String(32), unique=True, server_default=None, default=None, nullable=True
     )
     telegram: Mapped[str | None] = mapped_column(
-        String(32), unique=True, nullable=True, default=None,  server_default=None,
+        String(32),
+        unique=True,
+        nullable=True,
+        default=None,
+        server_default=None,
     )
     description: Mapped[str] = mapped_column(
-        nullable=False, server_default='', default='',
+        nullable=False,
+        server_default='',
+        default='',
     )
 
     def __str__(self):

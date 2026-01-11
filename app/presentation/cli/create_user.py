@@ -110,12 +110,10 @@ def create_user(
 #         description=description,
 #     )
 
+
 @app.command('create-root')
 def create_root(
-    password: Annotated[
-        str,  typer.Option(help='password for root')
-    ] = None,
-
+    password: Annotated[str, typer.Option(help='password for root')] = None,
 ) -> None:
     """
     Создаёт корневого пользователя системы.

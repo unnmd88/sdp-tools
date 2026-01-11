@@ -11,7 +11,6 @@ class PassportGroupDTO:
 
 @dataclass(kw_only=True)
 class UpdatePassportGroupDTO:
-
     group_name_to_update: PassportGroups
 
     group_name: PassportGroups | None = None
@@ -20,6 +19,5 @@ class UpdatePassportGroupDTO:
 
 @dataclass(kw_only=True)
 class CreatePassportGroupDTO:
-
     group_name: PassportGroups
     description: str | None = ''
