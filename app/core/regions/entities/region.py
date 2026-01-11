@@ -5,7 +5,7 @@ from typing import ClassVar
 from core.constants import ALLOWED_REGIONS
 from core.enums import RegionCodes, RegionNames
 from core.mixins import BaseEntityMixin
-from core.users.exceptions import DomainValidationError
+from core.exceptions.base import DomainValidationError
 
 T_ALLOWED_REGIONS = frozenset[tuple[RegionNames, RegionCodes]]
 

@@ -1,7 +1,7 @@
 from dataclasses import dataclass, astuple
 from datetime import datetime
-from types import UnionType
-from typing import Annotated, Type, Union
+from types import UnionType, NoneType
+from typing import Annotated, Type, Union, get_type_hints
 
 from pydantic import(
     BaseModel,
@@ -16,21 +16,13 @@ s1 = {"1", "2"}
 s3 = {"1","2","4","5"}
 
 
-def decorator(func):
-    def foo(*args, **kwargs):
-        arg_names = func.__code__.co_varnames
-        print(arg_names)
-        return func(*args, **kwargs)
-    return foo
+def bar(x: int | None) -> None:
+    print(get_type_hints(bar))
+    print(locals())
+    print(bar.__annotations__)
 
-
-@decorator
-def bar(a: str | None):
-    print('bar. arg a: ', a, ' type: ', type(a), ' value: ', a)
-
-dtm = datetime.now()
 
 
 if __name__ == '__main__':
+    print(isinstance(1, NoneType))
     bar(None)
-    print(isinstance(dtm, int))

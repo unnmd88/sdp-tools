@@ -8,10 +8,9 @@ from core.dto.common import FiltersForSearchDTO, CreateRecordDTO, UpdatedRecordD
 # from core.dto.filters import FiltersForSearchDTO
 from core.dto.regions import UpdateRegionDTO, CreateRegionDTO
 from core.enums import Permissions
-from core.exceptions.base import CreateError, UpdateError, CreateErrorAlreadyExists
+from core.exceptions.base import CreateError, UpdateError, CreateErrorAlreadyExists, DomainValidationError
 from core.regions.entities.region import RegionEntity
 from core.services import BaseService
-from core.users.exceptions import DomainValidationError
 from core.utils import not_none_dataclass_instance_attrs_to_dict
 
 logger = logging.getLogger(COMMON_LOGGER)

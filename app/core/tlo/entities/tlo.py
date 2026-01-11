@@ -14,7 +14,7 @@ from core.field_validators import (
 from core.passports.entities.passport import PassportEntity
 from core.tlo.entities.traffic_controller import TrafficController
 from core.tlo.value_objects.peripheral_equipments import PeripheralEquipment
-from core.users.exceptions import DomainValidationError
+from core.exceptions.base import DomainValidationError
 
 
 @final

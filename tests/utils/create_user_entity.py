@@ -26,8 +26,8 @@ def create_user_entity(
 ) -> UserEntity:
     return UserEntity(
             id=_id,
-            first_name=first_name,
-            last_name=last_name,
+            firstname=first_name,
+            lastname=last_name,
             username=username,
             organization=organization,
             email=email,

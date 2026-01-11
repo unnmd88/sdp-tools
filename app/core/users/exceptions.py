@@ -12,27 +12,6 @@ INVALID_DESCRIPTION_EXCEPTION_TEXT = (
 )
 
 
-class DomainValidationError(ApplicationError):
-    """Ошибка валидации доменной сущности."""
-
-
-class DominTypeValidationError(DomainValidationError):
-    """Ошибка валидации типа данных доменной сущности."""
-
-    def __init__(
-        self,
-        *,
-        field_name: str,
-        expected: str,
-    ):
-        self._detail = f'Неверный тип данных для {field_name!r}. Ожидается {expected!r}.'
-        super().__init__(self._detail)
-
-    @property
-    def detail(self):
-        return self._detail
-
-
 class UserInactiveError(ApplicationError):
     """Неактивный пользователь пытается осуществлять какие-либо действия. """
 

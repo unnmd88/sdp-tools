@@ -8,9 +8,9 @@ from core.dto.users import (
 )
 from core.enums import Roles
 
-from core.users.exceptions import UserAlreadyExistsError, DomainValidationError, InvalidUsernameOrPasswordToSetError, \
+from core.users.exceptions import UserAlreadyExistsError, InvalidUsernameOrPasswordToSetError, \
     UserNotFoundError, InactiveUserError, InvalidUsernameOrPasswordError, SameUsernameAndPasswordError
-from core.exceptions.base import UserPermissionsError
+from core.exceptions.base import UserPermissionsError, DomainValidationError
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
 from presentation.api.dependencies.deps import (
     UsersUseCase,

@@ -6,7 +6,7 @@ from core.enums import EntityIdRange
 from core.enums import Organizations
 from core.enums import Roles
 from core.users.entities.user import UserEntity
-from core.users.exceptions import DomainValidationError
+from core.exceptions.base import DomainValidationError
 from tests.utils.create_user_entity import create_user_entity
 
 from contextlib import nullcontext
@@ -19,8 +19,8 @@ class TestUserEntity:
 
         user = UserEntity(
             id=pk_id,
-            first_name='Chook',
-            last_name='Gekk',
+            firstname='Chook',
+            lastname='Gekk',
             username='chokky',
             organization=Organizations.SDP,
             email='example@example.com',

@@ -1,14 +1,16 @@
+import os
 from dataclasses import InitVar, dataclass, field
 from datetime import datetime
-from enum import StrEnum
+from typing import Any
 
-from core.base_entity import BaseEntity
+from core.base_entity import AbstractEntity
 from core.enums import (
     EntityIdRange,
     Organizations,
     Roles, Permissions,
 )
-from core.exceptions.base import UserPermissionsError
+from core.exceptions.base import DomainValidationError
+from core.exceptions.contract import ContractViolationBusinessRulesError
 from core.field_validators import (
     check_description_is_valid,
     check_email_is_valid,
@@ -23,12 +25,15 @@ from core.field_validators import (
 )
 from core.mixins import BaseEntityMixin
 from core.services.contract import contract, ContractConditions
+from core.services.contract.contracts import ContractRequire
 from core.services.field_validators import username_validator, first_name_or_lastname_validator
 from core.users.exceptions import (
-    DomainValidationError,
     INVALID_DESCRIPTION_EXCEPTION_TEXT,
 )
 from core.users.entities.permissions import UserPermissions
+from core.users.requires import username_pre_requires, firstname_pre_requires, \
+    lastname_pre_requires
+from core.users.rules_messages import BusinessRulesViolationsMessages
 from core.users.services.user_password import validate_password
 
 
@@ -122,28 +127,22 @@ class UserEntity(BaseEntityMixin):
         return self.role == Roles.superuser
 
 
-
-class RulesViolationsMessages(StrEnum):
-    username = "username должен быть от 2 до 32 символов длиной и содержать только буквы латинского алфавита и цифры."
-    first_name = "first_name должен быть строкой и содержать только буквы латинского алфавита."
-    last_name = "last_name должен быть строкой и содержать только буквы латинского алфавита."
-
-
-class UserEntity(BaseEntity):
+class UserEntity(AbstractEntity):
     def __init__(
         self,
-        entity_id: int | None,
+        id: int,
         username: str,
-        first_name: str | None,
-        last_name: str | None,
+        firstname: str | None,
+        lastname: str | None,
         created_at: datetime | None,
         updated_at: datetime | None,
 
     ):
-        super().__init__(entity_id=entity_id, created_at=created_at, updated_at=updated_at)
-        self._username = self._validate_username(username)
-        self._firstname = self._validate_first_name(first_name)
-        self._lastname = self._validate_last_name(last_name)
+        super().__init__(id=id, created_at=created_at, updated_at=updated_at)
+        self._username = self.set_username(username)
+        self._firstname = self.set_firstname(firstname)
+        self._lastname = self.set_lastname(lastname)
+        self.invariant_names()
 
     def __eq__(self, other):
         if isinstance(other, UserEntity):
@@ -153,111 +152,105 @@ class UserEntity(BaseEntity):
     def __repr__(self):
         return (
             f'{self.__class__.__name__}('
-            f'id={self.entity_id!r} '
+            f'id={self._id!r} '
             f'username={self.username!r} '
-            f'built_at={self.built_at.strftime("%d-%m-%Y, %H:%M:%S")!r}'
+            f'built_at={self.built_at.strftime(self.time_format)!r}'
             f')'
         )
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self._id,
+            "username": self._username,
+            "firstname": self._firstname,
+            "lastname": self._lastname,
+            "created_at": self._created_at.strftime(self.time_format) if self._created_at is not None else None,
+            "updated_at": self._updated_at.strftime(self.time_format) if self._updated_at is not None else None,
+            "built_at": self._built_at.strftime(self.time_format),
+        }
 
     @property
     def username(self) -> str:
         return self._username
 
-    @username.setter
-    def username(self, username: str):
-        self._username = self._validate_username(username)
-        if self._username == self._lastname:
-            raise DomainValidationError("username не должен совпадать с last_name")
-        if self._username == self._firstname:
-            raise DomainValidationError("username не должен совпадать с firstname")
-
     @property
     def firstname(self) -> str | None:
         return self._firstname
-
-    @firstname.setter
-    def firstname(self, first_name: str | None):
-        if first_name is not None:
-            self._firstname = self._validate_first_name(first_name)
-            if self._firstname == self._lastname:
-                raise DomainValidationError("first_name не должен совпадать с last_name")
-            if self._firstname == self._username:
-                raise DomainValidationError("first_name не должен совпадать с username")
-        else:
-            self._firstname = None
 
     @property
     def lastname(self) -> str | None:
         return self._lastname
 
-    @lastname.setter
-    def lastname(self, last_name: str | None):
-        if last_name is not None:
-            self._lastname = self._validate_last_name(last_name)
-            if self._lastname == self._firstname:
-                raise DomainValidationError("last_name не должен совпадать с first_name")
-            if self._lastname == self._username:
-                raise DomainValidationError("last_name не должен совпадать с username")
-        else:
+    def set_username(self, username: str) -> str:
+        username = self._validate_username(username, _locals=locals())
+        self._username = username
+        return self._username
+
+    def set_firstname(self, firstname: str | None) -> str | None:
+        if firstname is None:
+            self._firstname = None
+            return self._firstname
+        firstname = self._validate_first_name(firstname, _locals=locals())
+        self._firstname = firstname
+        return self._firstname
+
+    def set_lastname(self, lastname: str | None) -> str | None:
+        if lastname is None:
             self._lastname = None
+            return self._lastname
+        lastname = self._validate_last_name(lastname, _locals=locals())
+        self._lastname = lastname
+        return self._lastname
 
     @contract(
-        type_check=str,
-        preconditions=ContractConditions(
-            requires=[(username_validator, str(RulesViolationsMessages.username))]
-        ),
-        field_name="username",
+        checking_types_of_args=True,
+        checking_return_type=True,
+        preconditions=username_pre_requires,
+        # postconditions=username_post_requires if  not os.environ.get("PROD") else None,
     )
-    def _validate_username(self, username: str) -> str:
-        assert isinstance(username, str), "username должен быть строкой"
-        assert (2 < len(username) < 32), "username должен быть от 2 до 32 символов длиной"
-        assert username.isalnum() and not username.isnumeric(), "username должен содержать только буквы латинского алфавита и цифры."
+    def _validate_username(self, username: str, _locals: dict[str, Any] = None,) -> str:
         return username
 
     @contract(
-        type_check=str | None,
-        preconditions=ContractConditions(
-            requires=[(first_name_or_lastname_validator, str(RulesViolationsMessages.first_name))]
-        ),
-        field_name="first_name",
+        checking_types_of_args=True,
+        checking_return_type=True,
+        preconditions=firstname_pre_requires,
     )
-    def _validate_first_name(self, first_name: str) -> str:
-        assert isinstance(first_name, str), "first_name должен быть строкой"
-        assert first_name.isalpha(), "first_name должен содержать только буквы латинского алфавита."
+    def _validate_first_name(self, first_name: str, _locals: dict[str, Any] = None,) -> str:
         return first_name
 
     @contract(
-        type_check=str | None,
-        preconditions=ContractConditions(
-            requires=[(first_name_or_lastname_validator, str(RulesViolationsMessages.last_name))]
-        ),
-        field_name="last_name",
+        checking_types_of_args=True,
+        checking_return_type=True,
+        preconditions=lastname_pre_requires,
     )
-    def _validate_last_name(self, last_name: str) -> str:
-        assert isinstance(last_name, str), "last_name должен быть строкой"
-        assert last_name.isalpha(), "last_name должен содержать только буквы латинского алфавита."
-        return last_name
+    def _validate_last_name(self, lastname: str) -> str:
+        return lastname
 
-
+    def invariant_names(self):
+        if self._username == self._lastname:
+            raise ContractViolationBusinessRulesError(
+                BusinessRulesViolationsMessages.username_and_last_name_must_be_different
+            )
+        if self._username == self._firstname:
+            raise ContractViolationBusinessRulesError(
+                BusinessRulesViolationsMessages.username_and_first_name_must_be_different
+            )
 
 
 if __name__ == '__main__':
     user = UserEntity(
-        entity_id=321,
-        first_name='dasdsa',
-        last_name='Gekk',
-        username='333r',
+        id=1,
+        firstname='Junkers',
+        lastname=None,
+        username='Junker',
         created_at=datetime.now(),
         updated_at=None,
     )
     print(user)
-    user.username = ('Juker')
-    print(f"user.username = {user.username}")
-    print(user)
-    user.firstname = None
-    print(user)
-    user.lastname = None
-    user.lastname = 'Juker'
+    print(user.to_dict())
+    print(user.to_json())
+
 
 
 

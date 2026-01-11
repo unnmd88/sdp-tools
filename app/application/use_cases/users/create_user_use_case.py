@@ -65,8 +65,8 @@ class CreateUserUseCaseImpl:
             logger.warning(msg)
             raise UserAlreadyExistsError(msg)
         entity = UserEntity(
-            first_name=create_user_dto.first_name,
-            last_name=create_user_dto.last_name,
+            firstname=create_user_dto.first_name,
+            lastname=create_user_dto.last_name,
             username=create_user_dto.username,
             password=hash_password(create_user_dto.password),
             email=create_user_dto.email,

@@ -1,33 +1,52 @@
+import json
+from abc import ABC, abstractmethod
 from datetime import datetime
 
-from core.services.contract import contract, ContractConditions
+from core.exceptions.contract import (
+    ContractViolationPreConditionError,
+    ContractViolationValueTypeError,
+    ContractViolationInvariantError
+)
 from core.users.constants import MIN_ID, MAX_ID
-from core.users.exceptions import DominTypeValidationError, DomainValidationError
-
-_ID_MSG = f'id должен быть в диапазоне от {MIN_ID} до {MAX_ID} или None'
+from core.users.rules_messages import DomainRulesViolationsMessages
 
 
-class BaseEntity:
+class AbstractEntity(ABC):
+
+    time_format = '%Y-%m-%d %H:%M:%S'
 
     def __init__(
         self,
         *,
-        entity_id: int | None,
+        id: int,
         created_at: datetime | None,
         updated_at: datetime | None,
     ):
         self._built_at = datetime.now()
-        self._id = self._validate_id(entity_id)
-        self._created_at = self._validate_created_at(created_at)
-        self._updated_at = self._validate_updated_at(updated_at)
+        self._id = self.set_id(id)
+        self._created_at = self.set_created_at(created_at)
+        self._updated_at = self.set_updated_at(updated_at)
+        self.check_invariant_datetime()
 
-    @property
-    def entity_id(self) -> int | None:
-        return self._id
+    @abstractmethod
+    def to_dict(self) -> dict:
+        ...
+
+    def to_json(
+        self,
+        *,
+        ensure_ascii: bool = True,
+        indent: None | int | str = 2,
+    ) -> str:
+        return json.dumps(self.to_dict(), ensure_ascii=ensure_ascii, indent=indent)
 
     @property
     def built_at(self) -> datetime:
         return self._built_at
+
+    @property
+    def id(self) -> int | None:
+        return self._id
 
     @property
     def created_at(self) -> datetime | None:
@@ -37,41 +56,47 @@ class BaseEntity:
     def updated_at(self) -> datetime | None:
         return self._updated_at
 
-    @contract(
-        type_check=int | None,
-        preconditions=ContractConditions(
-            requires=[
-                    (lambda x: x is None or (MIN_ID <= x <= MAX_ID), _ID_MSG),
-                ],
-            exception=DomainValidationError
-        ),
-        field_name="id",
-    )
-    def _validate_id(self, id: int | None) -> int | None:
-        assert isinstance(id, int | None)
-        assert id is not None and MIN_ID <= id <= MAX_ID
-        return id
+    def set_id(self, id: int) -> int:
+        if not isinstance(id, int):
+            # TODO: добавить логирование!!
+            raise ContractViolationValueTypeError(DomainRulesViolationsMessages.id_isinstance)
+        if not MIN_ID <= id <= MAX_ID:
+            raise ContractViolationPreConditionError(DomainRulesViolationsMessages.id_range)
+        self._id = id
+        return self._id
 
-    @contract(
-        type_check=datetime | None,
-        field_name="created_at",
-    )
-    def _validate_created_at(self, date_time: datetime | None) -> datetime | None:
-        assert self._built_at > date_time if date_time else date_time is None
-        return date_time
+    def set_created_at(self, created_at: datetime | None) -> datetime | None:
+        if created_at is None:
+            self._created_at = created_at
+            return self._created_at
+        if not isinstance(created_at, datetime):
+            raise ContractViolationValueTypeError(DomainRulesViolationsMessages.created_at_isinstance)
+        self._created_at = created_at
+        return self._created_at
 
-    @contract(
-        type_check=datetime | None,
-        field_name="updated_at",
-    )
-    def _validate_updated_at(self, date_time: datetime | None) -> datetime | None:
-        assert self._built_at > date_time if date_time else date_time is None
-        return date_time
+    def set_updated_at(self, updated_at: datetime | None) -> datetime | None:
+        if updated_at is None:
+            self._updated_at = updated_at
+            return self._updated_at
+        if not isinstance(updated_at, datetime):
+            raise ContractViolationValueTypeError(DomainRulesViolationsMessages.updated_at_isinstance)
+        self._updated_at = updated_at
+        return self._updated_at
+
+    def check_invariant_datetime(self) -> None:
+        """ Проверка инвариантов даты и времени. """
+        if self._created_at is not None:
+            if self._updated_at is not None and self._created_at > self._updated_at:
+                # TODO: добавить логирование!!
+                raise ContractViolationInvariantError(DomainRulesViolationsMessages.created_rule)
+        if self._updated_at is not None:
+            if self._created_at is not None and self._created_at > self._updated_at:
+                # TODO: добавить логирование!!
+                raise ContractViolationInvariantError(DomainRulesViolationsMessages.updated_rule)
 
 
 if __name__ == '__main__':
-    print(int | None)
-    print(str(int | None).replace('|', 'или'))
-    o = BaseEntity(1, datetime.now(), None)
-    print(o.get_id())
-    print(o.built_at)
+
+    o = AbstractEntity(id=1, created_at=None, updated_at=None)
+    print(o.id)
+

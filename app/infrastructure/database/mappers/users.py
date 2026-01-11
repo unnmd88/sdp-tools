@@ -20,8 +20,8 @@ class UserDBMapper(BaseDBMapperProtocol):
         """ """
         return UserEntity(
             id=model.id,
-            first_name=model.first_name,
-            last_name=model.last_name,
+            firstname=model.first_name,
+            lastname=model.last_name,
             username=model.username,
             organization=Organizations(model.organization),
             email=model.email,

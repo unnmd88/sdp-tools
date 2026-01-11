@@ -1,0 +1,22 @@
+from enum import StrEnum
+
+from core.users.constants import MIN_ID, MAX_ID
+
+
+class DomainRulesViolationsMessages(StrEnum):
+    id_isinstance = "'id' должен быть числом"
+    id_range = f"'id' должен быть числом в диапазоне от {MIN_ID} до {MAX_ID}."
+    created_at_isinstance = "'created_at' должен быть типом 'datetime'"
+    updated_at_isinstance = "'updated_at' должен быть типом 'datetime'"
+    created_rule = "'created_at должен быть меньше updated_at'"
+    updated_rule = "'updated_at должен быть больше created_at'"
+
+
+class BusinessRulesViolationsMessages(StrEnum):
+    username = "'username' должен быть от 2 до 32 символов длиной и содержать только буквы латинского алфавита и цифры."
+    first_name = "'first_name' должен быть строкой и содержать только буквы латинского алфавита."
+    last_name = "'last_name' должен быть строкой и содержать только буквы латинского алфавита."
+    first_name_and_last_name_must_be_different = "'firstname' и 'lastname' должны быть разными."
+    username_and_password_must_be_different = "username' и 'password' должны быть разными."
+    username_and_first_name_must_be_different = "'username' и 'firstname' должны быть разными."
+    username_and_last_name_must_be_different = "'username' и 'lastname' должны быть разными."

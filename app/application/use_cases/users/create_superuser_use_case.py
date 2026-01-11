@@ -9,7 +9,7 @@ from core.config import settings
 
 from core.enums import Organizations, Roles
 from core.users.entities.user import UserEntity
-from core.users.exceptions import DomainValidationError
+from core.exceptions.base import DomainValidationError
 from core.users.services.user_password import hash_password
 from infrastructure.database.api import db_api
 from infrastructure.database.user_reposirory import UsersRepositorySqlAlchemy
@@ -36,8 +36,8 @@ async def create_user_root(
     logger.info('%r: Запрос на создание корневого пользователя системы %r', source.upper(), username_root)
     try:
         user_root: UserEntity = UserEntity(
-            first_name=None,
-            last_name =None,
+            firstname=None,
+            lastname=None,
             username =username_root,
             organization=Organizations.SDP,
             email=None,

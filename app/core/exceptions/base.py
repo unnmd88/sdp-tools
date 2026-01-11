@@ -7,6 +7,27 @@ class ApplicationError(Exception):
     """Ошибка приложения."""
 
 
+class DomainValidationError(ApplicationError):
+    """Ошибка валидации доменной сущности."""
+
+
+class DomainTypeValidationError(DomainValidationError):
+    """Ошибка валидации типа данных доменной сущности."""
+
+    def __init__(
+        self,
+        *,
+        arg_name: str,
+        expected: str,
+    ):
+        self._detail = f'Неверный тип данных для {arg_name!r}. Ожидается {expected!r}.'
+        super().__init__(self._detail)
+
+    @property
+    def detail(self):
+        return self._detail
+
+
 class NotFoundError(ApplicationError):
     """Ошибка поиска объекта."""
 
@@ -33,3 +54,6 @@ class UserPermissionsError(ApplicationError):
     def __init__(self, type_permission: str = ''):
         self.detail = f'Доступ {type_permission} запрещён'.replace("  ", "")
         super().__init__(self.detail)
+
+
+

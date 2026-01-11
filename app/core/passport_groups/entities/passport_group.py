@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from core.enums import PassportGroups
 from core.field_validators import check_is_valid_enum, check_description_is_valid
 from core.users.exceptions import (
-    DomainValidationError,
     INVALID_DESCRIPTION_EXCEPTION_TEXT,
 )
+from core.exceptions.base import DomainValidationError
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

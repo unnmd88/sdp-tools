@@ -1,8 +1,8 @@
 from fastapi import APIRouter, status, HTTPException
 
 from core.dto.users import CreateUserDTO, SearchUsersDTO
-from core.exceptions.base import UserPermissionsError
-from core.users.exceptions import DomainValidationError, InvalidUsernameOrPasswordToSetError, UserAlreadyExistsError, \
+from core.exceptions.base import UserPermissionsError, DomainValidationError
+from core.users.exceptions import InvalidUsernameOrPasswordToSetError, UserAlreadyExistsError, \
     InvalidValueToSetError
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
 from presentation.api.dependencies.deps import IsSuperuser, PayloadAccessJWT, UsersUseCase, CreateUserUseCase

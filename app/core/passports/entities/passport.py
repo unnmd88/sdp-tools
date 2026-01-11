@@ -4,7 +4,7 @@ from typing import final
 
 from core.enums import PassportGroups
 from core.users.entities.user import UserEntity
-from core.users.exceptions import DomainValidationError
+from core.exceptions.base import DomainValidationError
 
 
 @final

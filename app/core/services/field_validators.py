@@ -1,3 +1,9 @@
+from core.users.constants import MIN_ID, MAX_ID
+
+
+def entity_id_validator(_id: int) -> bool:
+    return isinstance(_id, int) and MIN_ID <= _id <= MAX_ID
+
 
 def username_validator(value: str) -> bool:
     return (
