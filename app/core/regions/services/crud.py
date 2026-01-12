@@ -41,7 +41,7 @@ class RegionsServiceImpl:
         self.user_entity.access_control(Permissions.CREATE_REGIONS)
         logger.info(
             'Юзер %r: запрос на создание нового региона: %r',
-            self.user_entity.username,
+            self.user_entity.username_length,
             create_dto.fields,
         )
         try:
@@ -64,7 +64,7 @@ class RegionsServiceImpl:
         self.user_entity.access_control(Permissions.UPDATE_REGIONS)
         logger.info(
             'Юзер %r: запрос на обновление региона %r\nДанные для обновления: %r',
-            self.user_entity.username,
+            self.user_entity.username_length,
             update_dto.search_criteria,
             update_dto.fields,
         )
@@ -84,7 +84,7 @@ class RegionsServiceImpl:
         self.user_entity.access_control(Permissions.DELETE_REGIONS)
         logger.info(
             'Юзер %r: запрос на удаление региона: %r',
-            self.user_entity.username,
+            self.user_entity.username_length,
             filters_dto.search_filters,
         )
         try:

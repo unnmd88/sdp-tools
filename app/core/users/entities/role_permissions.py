@@ -2,7 +2,6 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 
 from core.enums import Permissions, Roles
-from core.users.services.role_permissions import superuser_permissions
 
 """
 Описание ролей юзеров.
@@ -11,9 +10,9 @@ admin - доступ к ресурсам, кроме создания и ред�
 worker - доступ к ресурсам, кроме создания, чтения и редактирования пользователей и ролей
 """
 
+
 @dataclass(frozen=True, kw_only=True, slots=True)
 class RolePermissions:
-
     role_name: Roles
     permissions: Iterable[Permissions | str]
 
@@ -23,7 +22,3 @@ class RolePermissions:
 
     def __contains__(self, item: Permissions) -> bool:
         return item in self.permissions
-
-
-if __name__ == '__main__':
-    print(superuser_permissions)

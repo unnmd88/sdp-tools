@@ -19,11 +19,9 @@ from presentation.api.auth.use_cases.refresh_jwt_use_case import RefreshJWTUseCa
 from presentation.api.dependencies.dependencies import (
     users_use_case,
     get_access_jwt_payload_schema,
-
     is_superuser,
     is_admin,
     get_user_entity_by_id,
-
     get_refresh_jwt_payload_schema,
     get_auth_and_jwt_use_case,
     get_refresh_jwt_use_case,
@@ -74,4 +72,3 @@ regions_filters_for_search = Annotated[
 
 
 ## TrafficLightObjects
-

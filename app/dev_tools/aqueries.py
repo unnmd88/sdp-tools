@@ -77,7 +77,7 @@ users = [
 
 async def search():
     async with t_dp_api.session_factory() as session:
-        stmt = select(User).where(User.username.in_(['test1', 'test2']))
+        stmt = select(User).where(User.username_length.in_(['test1', 'test2']))
         result: Result = await session.execute(stmt)
         print(result.scalars().all())
 

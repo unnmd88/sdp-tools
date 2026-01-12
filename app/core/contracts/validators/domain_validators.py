@@ -1,13 +1,37 @@
 from enum import Enum
+from types import UnionType
 from typing import Any
 
+from core.exceptions.contract import (
+    ContractViolationValueTypeError,
+    ContractViolationError,
+)
 from core.reg_exps import EMAIL_PATTERN, PHONE_NUMBER_PATTERN
 from core.users.constants import MIN_ID, MAX_ID
+from core.users.rules_messages import DomainRulesViolationsMessages
 from core.utils import validate_string_by_pattern
 
 
+def isinstance_validator(
+    *,
+    name: str,
+    value: Any,
+    expected: type | UnionType | tuple[type],
+    raise_if_failed: bool = True,
+) -> bool:
+    if isinstance(value, expected):
+        return True
+    if raise_if_failed:
+        raise ContractViolationValueTypeError(
+            arg_name=name, got=value, expected=expected
+        )
+    return False
+
+
 def id_validator(value: int) -> bool:
-    return MIN_ID < value < MAX_ID
+    if not MIN_ID < value < MAX_ID:
+        raise ContractViolationError(DomainRulesViolationsMessages.id_range)
+    return True
 
 
 class EnumValidator:

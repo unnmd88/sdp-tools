@@ -1,3 +1,5 @@
+from types import UnionType
+
 from core.exceptions.base import DomainValidationError
 
 
@@ -13,9 +15,12 @@ class ContractViolationValueTypeError(ContractViolationError):
         *,
         arg_name: str,
         got: type,
-        expected: str,
+        expected: str | type | tuple[str | type, ...] | UnionType,
     ):
-        self._detail = f'Неверный тип данных для {arg_name!r}: {got.__class__.__name__!r}. Ожидается {expected!r}.'
+        self._detail = (
+            f'Неверный тип данных для {arg_name!r}.'
+            f' Значение={got!r}({got.__class__!r}). Ожидается {str(expected)!r}.'
+        )
         super().__init__(self._detail)
 
     @property
@@ -25,6 +30,10 @@ class ContractViolationValueTypeError(ContractViolationError):
 
 class ContractViolationBusinessRulesError(ContractViolationError):
     """Ошибка нарушения контракта бизнес-правил."""
+
+
+class ContractViolationPreProcessingError(ContractViolationError):
+    """Ошибка нарушения контракта предобработки."""
 
 
 class ContractViolationPreConditionError(ContractViolationError):

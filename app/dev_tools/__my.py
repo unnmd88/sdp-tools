@@ -1,3 +1,4 @@
+from collections import ChainMap
 from dataclasses import dataclass, astuple
 from datetime import datetime
 from types import UnionType, NoneType
@@ -22,7 +23,15 @@ def bar(x: int | None) -> None:
     print(bar.__annotations__)
 
 
+cm = ChainMap({1: '1'}, {2: '2', 1: '1'})
+
 if __name__ == '__main__':
+    print(cm)
+    print(cm.pop(1))
+    print(cm)
+    print(cm.pop(1))
+    print(cm)
+
     try:
         v = int([])
     except TypeError as e:

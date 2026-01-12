@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from core.enums import PassportGroups
 
 
-
 @dataclass(frozen=True, slots=True, kw_only=True)
 class PassportGroupEntity:
     id: int | None = None

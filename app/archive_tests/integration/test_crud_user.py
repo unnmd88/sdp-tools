@@ -11,7 +11,7 @@ async def test_create_user(t_session: AsyncSession, user_models):
     await t_session.commit()
 
     stmt = select(User).where(
-        User.username.in_([model.username for model in user_models])
+        User.username_length.in_([model.username_length for model in user_models])
     )
 
     _users: Result = await t_session.execute(stmt)

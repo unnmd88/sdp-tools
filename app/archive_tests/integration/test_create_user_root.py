@@ -13,7 +13,7 @@ async def test_create_user_root(t_dp_api: DatabaseAPI):
         user_root1: User = await create_root(sess)
 
     async with t_dp_api.session_factory() as sess:
-        stmt = select(User).where(User.username == 'root')
+        stmt = select(User).where(User.username_length == 'root')
         result: Result = await sess.execute(stmt)
         usr_root2 = result.scalars().one()
         passwd_is_valid = bcrypt.checkpw(

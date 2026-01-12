@@ -1,7 +1,5 @@
 from typing import Protocol, TypeVar, ClassVar, Any
 
-from core.contracts.field_contracts_validators.common import id_field_contract
-from core.contracts.contract_field_validator import FieldValidatorContract
 
 TM = TypeVar('TM')
 TE = TypeVar('TE')
@@ -14,7 +12,6 @@ def abstactmethod(args):
 class BaseDBMapperProtocol(Protocol):
     entity: ClassVar
 
-    id_contract: FieldValidatorContract = id_field_contract
 
     @classmethod
     @abstactmethod

@@ -231,5 +231,3 @@ async def get_user_entity_by_id(
             detail=f'Пользователь с id={payload_jwt.user_id!r} не найден.',
         )
     return user_entity
-
-

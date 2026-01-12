@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Any
 
 from core.exceptions.contract import (
     ContractViolationError,
     ContractViolationValueTypeError,
+    ContractViolationPreProcessingError,
 )
 
 

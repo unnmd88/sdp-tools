@@ -1,6 +1,17 @@
 from enum import StrEnum
 
-from core.users.constants import MIN_ID, MAX_ID, MAX_LEN_PASSWORD, MIN_LEN_PASSWORD
+from core.users.constants import (
+    MIN_ID,
+    MAX_ID,
+    MAX_LEN_PASSWORD,
+    MIN_LEN_PASSWORD,
+    MIN_LEN_USERNAME,
+    MAX_LEN_USERNAME,
+    MIN_LEN_FIRSTNAME,
+    MAX_LEN_FIRSTNAME,
+    MIN_LEN_LASTNAME,
+    MAX_LEN_LASTNAME,
+)
 
 
 class DomainRulesViolationsMessages(StrEnum):
@@ -21,13 +32,35 @@ class DomainRulesViolationsMessages(StrEnum):
 
 
 class BusinessRulesViolationsMessages(StrEnum):
-    username = "'username' должен быть от 2 до 32 символов длиной и содержать только буквы латинского алфавита и цифры."
-    firstname = (
-        "'first_name' должен быть строкой и содержать только буквы латинского алфавита."
+    must_be_from_to_chars = '{} Должно содержать от {} до {} символов.'
+
+    err_username = "Ошибка поля 'username'."
+    err_firstname = "Ошибка поля 'firstname'."
+    err_lastname = "Ошибка поля 'lastname'."
+
+    username_length = must_be_from_to_chars.format(
+        str(err_username), MIN_LEN_USERNAME, MAX_LEN_USERNAME
     )
-    lastname = (
-        "'last_name' должен быть строкой и содержать только буквы латинского алфавита."
+    username_contents = (
+        '{} Должно содержать только буквы латинского алфавита или цифры от 0-9.'.format(
+            err_username
+        )
     )
+
+    firstname_length = must_be_from_to_chars.format(
+        str(err_firstname), MIN_LEN_FIRSTNAME, MAX_LEN_FIRSTNAME
+    )
+    firstname_contents = '{} Должно содержать только буквы латинского алфавита.'.format(
+        err_firstname
+    )
+
+    lastname_length = must_be_from_to_chars.format(
+        str(err_lastname), MIN_LEN_LASTNAME, MAX_LEN_LASTNAME
+    )
+    lastname_contents = '{} Должно содержать только буквы латинского алфавита.'.format(
+        err_lastname
+    )
+
     firstname_and_lastname_must_be_different = (
         "'firstname' и 'lastname' должны быть разными."
     )
@@ -40,3 +73,7 @@ class BusinessRulesViolationsMessages(StrEnum):
     username_and_lastname_must_be_different = (
         "'username' и 'lastname' должны быть разными."
     )
+
+
+if __name__ == '__main__':
+    print(BusinessRulesViolationsMessages.username_length)

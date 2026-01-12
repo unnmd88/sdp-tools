@@ -56,7 +56,7 @@ def create_user(
         description=description,
     )
     print(
-        f'[yellow]Try to create user with username [bold]{user_schema.username!r}[/bold]...[/yellow]'
+        f'[yellow]Try to create user with username [bold]{user_schema.username_length!r}[/bold]...[/yellow]'
     )
     try:
         user: User = asyncio.run(create_user_async_wrap(user_schema))
