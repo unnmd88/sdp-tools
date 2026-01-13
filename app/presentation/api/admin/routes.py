@@ -18,17 +18,17 @@ from presentation.api.dependencies.deps import (
 from presentation.schemas.users import CreateUserSchema, ResponseUserSchema
 
 router = APIRouter(
-    prefix='/admin',
-    tags=['Administration'],
+    prefix="/admin",
+    tags=["Administration"],
 )
 
 
 @router.get(
-    '/whoami/',
+    "/whoami/",
     dependencies=[IsSuperuser],
     status_code=status.HTTP_200_OK,
     response_model=ResponseUserSchema,
-    summary='Данные о пользователе из access jwt',
+    summary="Данные о пользователе из access jwt",
     description=GET_whoami,
 )
 async def whoami(
@@ -66,11 +66,11 @@ async def whoami(
 
 
 @router.post(
-    '/create-user/',
+    "/create-user/",
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseUserSchema,
     dependencies=[IsSuperuser],
-    summary='Создать нового пользователя системы',
+    summary="Создать нового пользователя системы",
 )
 async def create_user(
     jwt_payload: PayloadAccessJWT,
@@ -87,13 +87,13 @@ async def create_user(
         err = str(e)
         _status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
     except DomainValidationError as e:
-        err = f'Некорректные данные для создания нового пользователя: {e}.'
+        err = f"Некорректные данные для создания нового пользователя: {e}."
         _status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
     except UserAlreadyExistsError:
-        err = 'Пользователь с данным username уже существует.'
+        err = "Пользователь с данным username уже существует."
         _status_code = status.HTTP_409_CONFLICT
     except UserPermissionsError:
-        err = 'Нет прав для создания нового пользователя.'
+        err = "Нет прав для создания нового пользователя."
         _status_code = status.HTTP_403_FORBIDDEN
     if err is not None:
         raise HTTPException(status_code=_status_code, detail=err)
@@ -101,7 +101,7 @@ async def create_user(
 
 
 @router.patch(
-    '/change-user-password/{username}',
+    "/change-user-password/{username}",
     status_code=status.HTTP_202_ACCEPTED,
     # response_model=ChangeUserPasswordResponse,
 )
@@ -123,26 +123,26 @@ async def change_user_password(
         )
     except UserNotFoundError:
         _status_code = status.HTTP_404_NOT_FOUND
-        _detail = f'Пользователь {payload_jwt.sub!r} не найден.'
+        _detail = f"Пользователь {payload_jwt.sub!r} не найден."
     except InactiveUserError:
         _status_code = status.HTTP_403_FORBIDDEN
-        _detail = f'Пользователь {payload_jwt.sub!r} не активен.'
+        _detail = f"Пользователь {payload_jwt.sub!r} не активен."
     except UserPermissionsError:
         _status_code = status.HTTP_403_FORBIDDEN
-        _detail = f'У пользователя {payload_jwt.sub!r} нет прав для изменения пароля.'
+        _detail = f"У пользователя {payload_jwt.sub!r} нет прав для изменения пароля."
     except InvalidUsernameOrPasswordError:
         _status_code = status.HTTP_401_UNAUTHORIZED
-        _detail = f'Неверный логин или пароль пользователя {payload_jwt.sub!r}.'
+        _detail = f"Неверный логин или пароль пользователя {payload_jwt.sub!r}."
     except SameUsernameAndPasswordError:
         _status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
-        _detail = f'Пароль и логин должны отличаться.'
+        _detail = f"Пароль и логин должны отличаться."
     except InvalidUsernameOrPasswordToSetError:
         _status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
-        _detail = f'Недопустимый пароль.'
+        _detail = f"Недопустимый пароль."
     except Exception:
         # TODO Залоггировать
         _status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        _detail = f'Ошибка запроса на стороне сервера.'
+        _detail = f"Ошибка запроса на стороне сервера."
     if _status_code or _detail:
         raise HTTPException(status_code=_status_code, detail=_detail)
     return ChangeUserPasswordResponse(

@@ -17,14 +17,14 @@ class TestPasswordUtils:
             assert passwd_length == len(_passwd) and isinstance(_passwd, str)
 
     @pytest.mark.parametrize(
-        ('password', 'expected'),
+        ("password", "expected"),
         [
-            ('pass1', nullcontext()),
-            ('d;asmas', nullcontext()),
-            ('osdnf', nullcontext()),
+            ("pass1", nullcontext()),
+            ("d;asmas", nullcontext()),
+            ("osdnf", nullcontext()),
             (1, pytest.raises(AttributeError)),
             ([1, 2, 3], pytest.raises(AttributeError)),
-            (list('1234fbi'), pytest.raises(AttributeError)),
+            (list("1234fbi"), pytest.raises(AttributeError)),
         ],
     )
     def test_hash_password(self, password, expected):
@@ -41,7 +41,7 @@ class TestPasswordUtils:
         chars = string.ascii_letters + string.digits + string.punctuation
         for passwd in passwords:
             hashed_passwd = hash_password(passwd)
-            chars_added_to_passwd = ''.join(
+            chars_added_to_passwd = "".join(
                 random.choices(chars, k=random.randint(1, 10))
             )
             mut_passwd = passwd + chars_added_to_passwd

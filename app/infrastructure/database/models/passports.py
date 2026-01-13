@@ -21,13 +21,13 @@ class Passport(
     Base,
 ):
     tlo_id: Mapped[int] = mapped_column(
-        ForeignKey('traffic_light_objects.id'),
+        ForeignKey("traffic_light_objects.id"),
     )
     user_id: Mapped[int] = mapped_column(
-        ForeignKey('users.id'),
+        ForeignKey("users.id"),
     )
     group_id: Mapped[int] = mapped_column(
-        ForeignKey('passport_groups.id'),
+        ForeignKey("passport_groups.id"),
     )
     data = mapped_column(
         JSONB,
@@ -38,7 +38,7 @@ class Passport(
         nullable=True,
     )
     editing_now: Mapped[bool] = mapped_column(
-        server_default='true',
+        server_default="true",
     )
 
     # tlo: Mapped["TrafficLightObject"] = relationship(
@@ -50,15 +50,15 @@ class Passport(
 
     def __repr__(self):
         return (
-            f'{self.__class__.__name__}('
-            f'id={self.id} '
-            f'tlo_id={self.tlo_id} '
-            f'group_id={self.group_id} '
-            f'editing_now={self.editing_now} '
-            f'data={"{...}" if self.data else self.data} '
-            f'user_id={self.user_id} '
-            f'commit_message={self.commit_message}'
-            f')'
+            f"{self.__class__.__name__}("
+            f"id={self.id} "
+            f"tlo_id={self.tlo_id} "
+            f"group_id={self.group_id} "
+            f"editing_now={self.editing_now} "
+            f"data={'{...}' if self.data else self.data} "
+            f"user_id={self.user_id} "
+            f"commit_message={self.commit_message}"
+            f")"
         )
 
 

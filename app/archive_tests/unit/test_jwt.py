@@ -6,10 +6,10 @@ class TestJWT:
     @pytest.fixture
     def jwt_payloads(self):
         return [
-            {'iss': 'sdp'},
-            {'sub': '1'},
-            {'uname': '2'},
-            {'sub': '3', 'uname': '2', 'blabla': 'bla'},
+            {"iss": "sdp"},
+            {"sub": "1"},
+            {"uname": "2"},
+            {"sub": "3", "uname": "2", "blabla": "bla"},
         ]
 
     def test_encode_jwt(self, jwt_payloads):
@@ -20,10 +20,10 @@ class TestJWT:
         for payload in jwt_payloads:
             encoded_token = encode_jwt(payload=payload)
             decoded_payload: dict = decode_jwt(token=encoded_token)
-            assert 'iat' in decoded_payload
-            assert 'exp' in decoded_payload
-            iat = decoded_payload['iat']
-            exp = decoded_payload['exp']
+            assert "iat" in decoded_payload
+            assert "exp" in decoded_payload
+            iat = decoded_payload["iat"]
+            exp = decoded_payload["exp"]
             assert all(isinstance(k, int) for k in (exp, iat))
             assert exp > iat
             # Все ключи и значения словаря payload присутствуют в decoded_payload

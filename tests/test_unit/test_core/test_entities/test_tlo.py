@@ -11,23 +11,23 @@ class TestTrafficLightObjectEntity:
     def test_create_tlo_entity_success(self, pk_id):
         """Тест на успешное создание сущности TrafficLightObjectEntity."""
 
-        user = create_user_entity(username='chook')
+        user = create_user_entity(username="chook")
 
         passport = PassportEntity(
-            data={'data': {}},
+            data={"data": {}},
             username=user,
             group=PassportGroups.OVIM,
-            commit_message='test commit message',
+            commit_message="test commit message",
         )
 
         tlo = TrafficLightObjectEntity(
             id=pk_id,
             region=RegionNames.MOSCOW,
-            name='413',
-            district='ЦАО',
-            street='Площадь Тверской заставы',
+            name="413",
+            district="ЦАО",
+            street="Площадь Тверской заставы",
             service_organization=ServiceOrganizations.CODD,
-            description='Тестовый объект',
+            description="Тестовый объект",
             editing_now=False,
             current_passport=passport,
             passport_history=[],
@@ -36,11 +36,11 @@ class TestTrafficLightObjectEntity:
         )
         assert tlo.id == pk_id
         assert tlo.region == RegionNames.MOSCOW
-        assert tlo.name == '413'
-        assert tlo.district == 'ЦАО'
-        assert tlo.street == 'Площадь Тверской заставы'
+        assert tlo.name == "413"
+        assert tlo.district == "ЦАО"
+        assert tlo.street == "Площадь Тверской заставы"
         assert tlo.service_organization == ServiceOrganizations.CODD
-        assert tlo.description == 'Тестовый объект'
+        assert tlo.description == "Тестовый объект"
         assert tlo.editing_now == False
         assert tlo.current_passport == passport
         assert tlo.current_passport.username == user

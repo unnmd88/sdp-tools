@@ -1,4 +1,4 @@
-from core.exceptions.contract import ContractViolationBusinessRulesError
+from core.contracts.exc import ContractViolationBusinessRulesError
 from core.users.constants import (
     MIN_LEN_FIRSTNAME,
     MAX_LEN_FIRSTNAME,
@@ -21,11 +21,11 @@ def br_username_validator(value: str) -> bool:
     """
     err_msg = None
     if not 2 < len(value) < 32:
-        err_msg = f'{str(BusinessRulesViolationsMessages.username_length)}. Длина: {len(value)}'
+        err_msg = f"{str(BusinessRulesViolationsMessages.username_length)}. Длина: {len(value)}"
     elif not value.isalnum() or value.isnumeric():
         err_msg = str(BusinessRulesViolationsMessages.username_contents)
     if err_msg:
-        raise ContractViolationBusinessRulesError(f'{err_msg}. Значение={value}.')
+        raise ContractViolationBusinessRulesError(f"{err_msg}. Значение={value}.")
     return True
 
 
@@ -41,11 +41,11 @@ def br_first_name_validator(value: str) -> bool:
     """
     err_msg = None
     if not MIN_LEN_LASTNAME < len(value) < MAX_LEN_LASTNAME:
-        err_msg = f'{str(BusinessRulesViolationsMessages.firstname_length)}. Длина: {len(value)}'
+        err_msg = f"{str(BusinessRulesViolationsMessages.firstname_length)}. Длина: {len(value)}"
     if not value.isalpha():
         err_msg = str(BusinessRulesViolationsMessages.firstname_contents)
     if err_msg:
-        raise ContractViolationBusinessRulesError(f'{err_msg}. Значение={value}.')
+        raise ContractViolationBusinessRulesError(f"{err_msg}. Значение={value}.")
     return True
 
 
@@ -64,9 +64,9 @@ def br_lastname_validator(value: str) -> bool:
     """
     err_msg = None
     if not MIN_LEN_FIRSTNAME < len(value) < MAX_LEN_FIRSTNAME:
-        err_msg = f'{str(BusinessRulesViolationsMessages.lastname_length)}. Длина: {len(value)}'
+        err_msg = f"{str(BusinessRulesViolationsMessages.lastname_length)}. Длина: {len(value)}"
     if not value.isalpha():
         err_msg = str(BusinessRulesViolationsMessages.lastname_contents)
     if err_msg:
-        raise ContractViolationBusinessRulesError(f'{err_msg}. Значение={value}.')
+        raise ContractViolationBusinessRulesError(f"{err_msg}. Значение={value}.")
     return True

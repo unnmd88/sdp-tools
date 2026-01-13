@@ -18,7 +18,7 @@ from sqlalchemy.sql.expression import select
 
 
 t_dp_api = DatabaseAPI(
-    url='postgresql+asyncpg://admin2:1111@localhost:5433/db_test',
+    url="postgresql+asyncpg://admin2:1111@localhost:5433/db_test",
     echo=True,
     echo_pool=True,
     pool_size=50,
@@ -28,34 +28,34 @@ t_dp_api = DatabaseAPI(
 
 users = [
     {
-        'first_name': 'Gimmo',
-        'last_name': 'Gimmo',
-        'username': 'Gimmo',
-        'organization': 'Spetsdorproject',
-        'email': 'user@example.com',
-        'password': b'1234',
-        'is_active': True,
-        'is_admin': True,
-        'is_superuser': True,
-        'role': 'superuser',
-        'phone_number': '',
-        'telegram': '',
-        'description': 'Тестовый юзер 2',
+        "first_name": "Gimmo",
+        "last_name": "Gimmo",
+        "username": "Gimmo",
+        "organization": "Spetsdorproject",
+        "email": "user@example.com",
+        "password": b"1234",
+        "is_active": True,
+        "is_admin": True,
+        "is_superuser": True,
+        "role": "superuser",
+        "phone_number": "",
+        "telegram": "",
+        "description": "Тестовый юзер 2",
     },
     {
-        'first_name': 'Test',
-        'last_name': 'Testov',
-        'username': 'test1',
-        'organization': 'Spetsdorproject',
-        'email': 'user@example.com',
-        'password': b'1234',
-        'is_active': True,
-        'is_admin': True,
-        'is_superuser': True,
-        'role': 'superuser',
-        'phone_number': '',
-        'telegram': '',
-        'description': 'Тестовый юзер 1',
+        "first_name": "Test",
+        "last_name": "Testov",
+        "username": "test1",
+        "organization": "Spetsdorproject",
+        "email": "user@example.com",
+        "password": b"1234",
+        "is_active": True,
+        "is_admin": True,
+        "is_superuser": True,
+        "role": "superuser",
+        "phone_number": "",
+        "telegram": "",
+        "description": "Тестовый юзер 1",
     },
     # {
     #     'first_name': 'Test1',
@@ -77,7 +77,7 @@ users = [
 
 async def search():
     async with t_dp_api.session_factory() as session:
-        stmt = select(User).where(User.username_length.in_(['test1', 'test2']))
+        stmt = select(User).where(User.username_length.in_(["test1", "test2"]))
         result: Result = await session.execute(stmt)
         print(result.scalars().all())
 
@@ -90,9 +90,9 @@ async def create_users(db_api: DatabaseAPI):
 async def create_traffic_light_objects(
     db_api: DatabaseAPI,
     region_id=1,
-    name='laba_test',
-    district='ЦАО',
-    street='BAZA BEREG',
+    name="laba_test",
+    district="ЦАО",
+    street="BAZA BEREG",
 ):
     objects = [
         TrafficLightObject(
@@ -104,10 +104,10 @@ async def create_traffic_light_objects(
         ),
         TrafficLightObject(
             region_id=region_id,
-            name='laba_test2',
+            name="laba_test2",
             district=district,
             service_organization=ServiceOrganizations.CODD,
-            street='BAZA BEREG2',
+            street="BAZA BEREG2",
         ),
     ]
     async for session in db_api.session_getter_commit():
@@ -117,7 +117,7 @@ async def create_traffic_light_objects(
 async def create_region(
     db_api: DatabaseAPI,
     num: int = 77,
-    name='Москва',
+    name="Москва",
 ):
     objects = [
         Region(code=num, name=name),
@@ -133,12 +133,12 @@ async def create_passport(
     owner_id=1,
     user_id=1,
     data: dict = None,
-    commit_message='commit tets',
+    commit_message="commit tets",
 ):
     objects = [
         Passport(
             tlo_id=tlo_id,
-            data=data or {'Test1': 1, 'Test2': 2, 55: 'abra'},
+            data=data or {"Test1": 1, "Test2": 2, 55: "abra"},
             user_id=user_id,
             owner_id=owner_id,
             commit_message=commit_message,
@@ -153,9 +153,9 @@ async def create_passports_owners(
 ):
     owners = (
         PassportGroup(
-            owner='ovim',
+            owner="ovim",
         ),
-        PassportGroup(owner='stroycontrol'),
+        PassportGroup(owner="stroycontrol"),
     )
     async for session in db_api.session_getter_commit():
         session.add_all(owners)
@@ -195,5 +195,5 @@ async def main():
     # await  create_passport(db_api=db_api_main)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

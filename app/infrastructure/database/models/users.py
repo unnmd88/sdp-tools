@@ -13,10 +13,10 @@ class User(
     Base,
 ):
     first_name: Mapped[str | None] = mapped_column(
-        String(32), server_default=text('NULL'), default=None, nullable=True
+        String(32), server_default=text("NULL"), default=None, nullable=True
     )
     last_name: Mapped[str | None] = mapped_column(
-        String(32), server_default=text('NULL'), default=None, nullable=True
+        String(32), server_default=text("NULL"), default=None, nullable=True
     )
     organization: Mapped[str] = mapped_column(String(32), nullable=False)
     username: Mapped[str] = mapped_column(
@@ -46,23 +46,23 @@ class User(
     )
     description: Mapped[str] = mapped_column(
         nullable=False,
-        server_default='',
-        default='',
+        server_default="",
+        default="",
     )
 
     def __str__(self):
         return (
-            f'{self.__class__.__name__}('
-            f'id={self.id} '
-            f'first_name={self.first_name} '
-            f'last_name={self.last_name} '
-            f'username={self.username} '
-            f'role={self.role} '
-            f'organization={self.organization} '
-            f'email={self.email} '
-            f'is_active={self.is_active}'
-            f')'
+            f"{self.__class__.__name__}("
+            f"id={self.id} "
+            f"first_name={self.first_name} "
+            f"last_name={self.last_name} "
+            f"username={self.username} "
+            f"role={self.role} "
+            f"organization={self.organization} "
+            f"email={self.email} "
+            f"is_active={self.is_active}"
+            f")"
         )
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(id={self.id} username={self.username})'
+        return f"{self.__class__.__name__}(id={self.id} username={self.username})"

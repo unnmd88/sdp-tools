@@ -20,4 +20,4 @@ class UpdatePassportGroupDTO:
 @dataclass(kw_only=True)
 class CreatePassportGroupDTO:
     group_name: PassportGroups
-    description: str | None = ''
+    description: str | None = ""

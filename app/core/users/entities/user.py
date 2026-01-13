@@ -3,7 +3,7 @@ from typing import Any
 
 from core.base_entity import AbstractEntity, PublicAttr
 from core.contracts import contract
-from core.contracts.field_contracts.user import (
+from core.users.field_contracts import (
     ContractFieldUsername,
     ContractFieldFirstname,
     ContractFieldLastname,
@@ -12,7 +12,7 @@ from core.enums import (
     Organizations,
     Roles,
 )
-from core.exceptions.contract import (
+from core.contracts.exc import (
     ContractViolationBusinessRulesError,
     ContractViolationInvariantError,
 )
@@ -28,14 +28,14 @@ from core.users.services.user_password import validate_password
 
 class UserEntity(AbstractEntity):
     __public_attrs__ = AbstractEntity.__public_attrs__ + (
-        PublicAttr(attr_name='_username', alias='username'),
-        PublicAttr(attr_name='_firstname', alias='firstname'),
-        PublicAttr(attr_name='_lastname', alias='lastname'),
-        PublicAttr(attr_name='_role', alias='role'),
-        PublicAttr(attr_name='_organization', alias='organization'),
-        PublicAttr(attr_name='_email', alias='email'),
-        PublicAttr(attr_name='_phone_number', alias='phone_number'),
-        PublicAttr(attr_name='_telegram', alias='telegram'),
+        PublicAttr(attr_name="_username", alias="username"),
+        PublicAttr(attr_name="_firstname", alias="firstname"),
+        PublicAttr(attr_name="_lastname", alias="lastname"),
+        PublicAttr(attr_name="_role", alias="role"),
+        PublicAttr(attr_name="_organization", alias="organization"),
+        PublicAttr(attr_name="_email", alias="email"),
+        PublicAttr(attr_name="_phone_number", alias="phone_number"),
+        PublicAttr(attr_name="_telegram", alias="telegram"),
     )
 
     contract_username = ContractFieldUsername(use_cache=True, nullable=False)
@@ -183,36 +183,36 @@ class UserEntity(AbstractEntity):
     def invariant_password(self) -> None:
         if self._password is None:
             # TODO: Обязательно добавить логирование!!
-            raise ContractViolationInvariantError('Пароль не может быть пустым')
+            raise ContractViolationInvariantError("Пароль не может быть пустым")
         if not isinstance(self._password, bytes):
             # TODO: Обязательно добавить логирование!!
-            raise ContractViolationInvariantError('Пароль должен быть типа bytes')
+            raise ContractViolationInvariantError("Пароль должен быть типа bytes")
 
     def invariant_permissions(self) -> None:
         if not self._is_active and self._permissions:
             raise ContractViolationInvariantError(
-                f'У пользователя с username: {self._username!r} не должно быть разрешений, т.к. он не активен.'
+                f"У пользователя с username: {self._username!r} не должно быть разрешений, т.к. он не активен."
             )
         # TODO: добавить проверку на наполнение разрешений в зависимости от роли.
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass
     user = UserEntity(
         id=1,
-        firstname='Junkers',
+        firstname="Junkers",
         lastname=None,
-        username='Junker',
+        username="Junker",
         created_at=datetime.now(),
         organization=Organizations.SDP,
         updated_at=None,
-        password=b'12345678',
+        password=b"12345678",
         is_active=True,
         role=Roles.admin,
         email=None,
         phone_number=None,
         telegram=None,
-        description='',
+        description="",
     )
     print(user)
     print(repr(user))

@@ -20,14 +20,14 @@ from presentation.api.dependencies.deps import (
 from presentation.api.exceptions import InactiveUserException
 from presentation.schemas.jwt import TokenInfo
 
-router = APIRouter(prefix='/auth', tags=['Authentication'])
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 @router.post(
-    '/login/',
+    "/login/",
     response_model=TokenInfo,
     response_model_exclude_none=True,
-    summary='Аутентификация пользователя и выпуск jwt',
+    summary="Аутентификация пользователя и выпуск jwt",
     description=POST_LOGIN_user,
 )
 async def issue_jwt(
@@ -44,17 +44,17 @@ async def issue_jwt(
     except InvalidUsernameOrPasswordError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Неверный логин или пароль.',
+            detail="Неверный логин или пароль.",
         )
     except InactiveUserException:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
 
 @router.post(
-    '/refresh/',
+    "/refresh/",
     response_model=TokenInfo,
     response_model_exclude_none=True,
-    summary='Выпуск access jwt по refresh jwt',
+    summary="Выпуск access jwt по refresh jwt",
     description=POST_REFRESH,
 )
 async def issue_jwt_by_refresh_jwt(

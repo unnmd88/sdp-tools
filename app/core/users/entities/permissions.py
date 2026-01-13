@@ -11,7 +11,7 @@ class UserPermissions:
         self._permissions: T_Permissions = set(permissions)
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self._permissions})'
+        return f"{self.__class__.__name__}({self._permissions})"
 
     def get_all(self) -> T_Permissions:
         return self._permissions
@@ -39,9 +39,9 @@ class UserPermissions:
 
     def has_difference(self, permissions: set[Permissions]) -> set[Permissions]:
         if not permissions:
-            raise ValueError('permissions cant be empty.')
+            raise ValueError("permissions cant be empty.")
         if not permissions.issubset(self._permissions):
-            raise ValueError('Bad members in permissions.')
+            raise ValueError("Bad members in permissions.")
         return self._permissions - permissions  # Разность множеств
 
     def has(self, permission: Permissions):
@@ -54,7 +54,7 @@ class UserPermissions:
         return Permissions.UPDATE_USERS in self._permissions
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     up = UserPermissions()
     print(up.read_users)
     up.add(Permissions.READ_USERS)

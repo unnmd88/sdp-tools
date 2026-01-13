@@ -4,8 +4,8 @@ from types import UnionType
 from typing import Sequence, get_type_hints
 from typing_extensions import deprecated
 
-from core.contracts.templates import ContractRequire
-from core.exceptions.contract import ContractViolationError
+from core.contracts import ContractRequire
+from core.contracts.exc import ContractViolationError
 from core.services.type_cheker import TypeChecker
 
 
@@ -25,8 +25,8 @@ def _contract_wrapper_factory(
         def wrapper(*args, **kwargs):
             # Проверка типов входных параметров функции/метода
             if checking_types_of_args:
-                if (_locals := kwargs.get('_locals')) is None:
-                    raise AttributeError('Не передан словарь локальных переменных')
+                if (_locals := kwargs.get("_locals")) is None:
+                    raise AttributeError("Не передан словарь локальных переменных")
                 TypeChecker.vector_types_check(
                     locals_args=_locals, annotations=type_hints
                 )
@@ -38,8 +38,8 @@ def _contract_wrapper_factory(
             # Проверка типа возвращаемого значения
             if not isinstance(result, returns):
                 raise TypeError(
-                    f'Функция {func.__name__} должна возвращать {returns.__name__}, '
-                    f'а не {type(result).__name__}.'
+                    f"Функция {func.__name__} должна возвращать {returns.__name__}, "
+                    f"а не {type(result).__name__}."
                 )
             # Проверка постусловий
             for predicate, exception in postconditions:
@@ -54,7 +54,7 @@ def _contract_wrapper_factory(
             for predicate, exception in preconditions:
                 if not predicate(*args[args_exclude_self]):
                     raise exception or ContractViolationError
-            print(f'DEBUG1: {func.__name__}')
+            print(f"DEBUG1: {func.__name__}")
             result = func(*args, **kwargs)
             # Проверка постусловий
             for predicate, exception in postconditions:
@@ -77,8 +77,8 @@ def contract(
 
     def decorator(func):
         type_hints = get_type_hints(func)
-        if (returns := type_hints.get('return')) is None and checking_types_of_args:
-            raise AttributeError('Не указан тип возвращаемого значения')
+        if (returns := type_hints.get("return")) is None and checking_types_of_args:
+            raise AttributeError("Не указан тип возвращаемого значения")
         wrapper = _contract_wrapper_factory(
             func=func,
             returns=returns,
@@ -92,7 +92,7 @@ def contract(
     return decorator
 
 
-@deprecated('Используйте @contract')
+@deprecated("Используйте @contract")
 def _contract(
     *,
     has_self: bool = True,
@@ -108,15 +108,15 @@ def _contract(
 
     def decorator(func):
         type_hints = get_type_hints(func)
-        if checking_return_type and (returns := type_hints.get('return')) is None:
-            raise AttributeError('Не указан тип возвращаемого значения')
+        if checking_return_type and (returns := type_hints.get("return")) is None:
+            raise AttributeError("Не указан тип возвращаемого значения")
 
         @wraps(func)
         def wrapper(*args, **kwargs):
             # Проверка типов входных параметров функции/метода
             if checking_types_of_args:
-                if (_locals := kwargs.get('_locals')) is None:
-                    raise AttributeError('Не передан словарь локальных переменных')
+                if (_locals := kwargs.get("_locals")) is None:
+                    raise AttributeError("Не передан словарь локальных переменных")
                 TypeChecker.vector_types_check(
                     locals_args=_locals, annotations=type_hints
                 )
@@ -128,8 +128,8 @@ def _contract(
             # Проверка типа возвращаемого значения
             if checking_return_type and not isinstance(result, returns):
                 raise TypeError(
-                    f'Функция {func.__name__} должна возвращать {returns.__name__}, '
-                    f'а не {type(result).__name__}.'
+                    f"Функция {func.__name__} должна возвращать {returns.__name__}, "
+                    f"а не {type(result).__name__}."
                 )
             # Проверка постусловий
             for predicate, exception in postconditions:
@@ -142,7 +142,7 @@ def _contract(
     return decorator
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(isinstance(ContractViolationError(), ContractViolationError))
     # o = Foo('first')
     # o.set_username('second')

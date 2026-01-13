@@ -33,35 +33,20 @@ class UserDBMapper(BaseDBMapperProtocol):
             description=model.description,
             created_at=model.created_at,
             updated_at=model.updated_at,
-
-            # id=cls.id_contract(model.id),
-            # firstname=firstname_field_contract(model.first_name),
-            # lastname=lastname_field_contract(model.last_name),
-            # username=username_field_contract(model.username),
-            # organization=organization_field_contract(model.organization),
-            # email=email_field_contract(model.email),
-            # password=password_field_contract(model.password),
-            # is_active=is_active_field_contract(model.is_active),
-            # role=role_field_contract(Roles(model.role)),
-            # phone_number=phone_number_field_contract(model.phone_number),
-            # telegram=telegram_field_contract(model.telegram),
-            # description=description_field_contract(model.description),
-            # created_at=created_at_field_contract(model.created_at),
-            # updated_at=updated_at_field_contract(model.updated_at),
         )
 
     @classmethod
     def to_model(cls, entity: UserEntity) -> UserModel:
         """ """
         return UserModel(
-            first_name=entity.first_name,
-            last_name=entity.last_name,
+            first_name=entity.firstname,
+            last_name=entity.lastname,
             username=entity.username,
-            organization=Organizations(entity.organization),
+            organization=entity.organization,
             email=entity.email,
             password=entity.password,
             is_active=entity.is_active,
-            role=Roles(entity.role),
+            role=entity.role,
             phone_number=entity.phone_number,
             telegram=entity.telegram,
             description=entity.description,

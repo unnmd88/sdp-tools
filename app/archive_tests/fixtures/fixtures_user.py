@@ -16,8 +16,8 @@ def user_schemas() -> Sequence[UserSchema | UserFromDbFullSchema]:
     return [
         UserSchema(
             id=1,
-            username='chook',
-            email='chook@exapmle.com',
+            username="chook",
+            email="chook@exapmle.com",
             is_active=True,
             is_admin=True,
             is_superuser=True,
@@ -26,12 +26,12 @@ def user_schemas() -> Sequence[UserSchema | UserFromDbFullSchema]:
         ),
         UserFromDbFullSchema(
             id=4,
-            email='gekk@example.com',
-            first_name='gekk',
-            last_name='gekkov',
-            username='iamgekk',
+            email="gekk@example.com",
+            first_name="gekk",
+            last_name="gekkov",
+            username="iamgekk",
             organization=Organizations.SDP,
-            password=b'ofshpsabdhf',
+            password=b"ofshpsabdhf",
             is_active=True,
             is_admin=True,
             is_superuser=True,

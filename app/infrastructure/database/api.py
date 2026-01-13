@@ -46,18 +46,18 @@ class DatabaseAPI:
         async def wrapper():
             async with self.session_factory() as session:
                 try:
-                    print('BEFORE yield session!' * 100)
+                    print("BEFORE yield session!" * 100)
                     yield session
                     if commit:
                         await session.commit()
-                    print('AFTER yield session!' * 100)
+                    print("AFTER yield session!" * 100)
                 except Exception:  # todo logging
                     if rollback:
                         await session.rollback()
                 finally:
                     await session.close()
-                    with open('lllog.log', 'a+') as f:
-                        f.write('NEW GEN!' * 100)
+                    with open("lllog.log", "a+") as f:
+                        f.write("NEW GEN!" * 100)
 
         return wrapper
 

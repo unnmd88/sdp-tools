@@ -18,14 +18,14 @@ from presentation.schemas.passport_groups import (
 
 
 router = APIRouter(
-    prefix='/passport-groups',
-    tags=['Passport groups'],
+    prefix="/passport-groups",
+    tags=["Passport groups"],
     # dependencies=[Depends(check_user_is_active)],
 )
 
 
 @router.get(
-    '/name/{name}',
+    "/name/{name}",
     status_code=status.HTTP_200_OK,
     response_model=PassportGroupsSchema,
 )
@@ -36,13 +36,13 @@ async def get_group_by_name(
     if (region := await use_case.get_passport_group_by_name(group_name)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Регион с именем={group_name} не найден.',
+            detail=f"Регион с именем={group_name} не найден.",
         )
     return PassportGroupsSchema.model_validate(region, from_attributes=True)
 
 
 @router.get(
-    '/{id}',
+    "/{id}",
     status_code=status.HTTP_200_OK,
     response_model=PassportGroupsSchema,
 )
@@ -53,13 +53,13 @@ async def get_group_by_id(
     if (region := await use_case.get_passport_group_by_id(group_id)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Регион с id={group_id} не найден.',
+            detail=f"Регион с id={group_id} не найден.",
         )
     return PassportGroupsSchema.model_validate(region, from_attributes=True)
 
 
 @router.get(
-    '/',
+    "/",
     status_code=status.HTTP_200_OK,
     response_model=Sequence[PassportGroupsSchema],
 )
@@ -73,7 +73,7 @@ async def get_all_groups(
 
 
 @router.post(
-    '/',
+    "/",
     status_code=status.HTTP_201_CREATED,
     response_model=PassportGroupsSchema,
 )
@@ -87,7 +87,7 @@ async def create_group(
 
 
 @router.patch(
-    '/',
+    "/",
     status_code=status.HTTP_200_OK,
     response_model=PassportGroupsSchema,
 )

@@ -9,7 +9,7 @@ T_ALLOWED_REGIONS = frozenset[tuple[RegionNames, RegionCodes]]
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class RegionEntity:
-    entity_name: ClassVar = 'Region'
+    entity_name: ClassVar = "Region"
     allowed_regions: ClassVar[T_ALLOWED_REGIONS] = ALLOWED_REGIONS
 
     code: int

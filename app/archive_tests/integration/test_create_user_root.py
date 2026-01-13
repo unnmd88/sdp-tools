@@ -7,17 +7,17 @@ from sqlalchemy.sql.expression import select
 from core.users.services.create_root import create_root
 
 
-@pytest.mark.asyncio(loop_scope='session')
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_user_root(t_dp_api: DatabaseAPI):
     async with t_dp_api.session_factory() as sess:
         user_root1: User = await create_root(sess)
 
     async with t_dp_api.session_factory() as sess:
-        stmt = select(User).where(User.username_length == 'root')
+        stmt = select(User).where(User.username_length == "root")
         result: Result = await sess.execute(stmt)
         usr_root2 = result.scalars().one()
         passwd_is_valid = bcrypt.checkpw(
-            password=b'sdp2025',
+            password=b"sdp2025",
             hashed_password=usr_root2.password,
         )
         assert isinstance(user_root1, User) and isinstance(usr_root2, User)

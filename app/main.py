@@ -6,7 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 from app.core.config import settings
 
 app = FastAPI(
-    title='Api для работы с паспортами светофорного объекта.',
+    title="Api для работы с паспортами светофорного объекта.",
 )
 app.include_router(router=api_v1_router)
 
@@ -14,16 +14,16 @@ app.include_router(router=api_v1_router)
 app.add_middleware(
     CORSMiddleware,
     # allow_origins=["http://192.168.45.66", "http://192.168.45.90"],  # или ["http://localhost:5173", "http://твой_домен"]
-    allow_origins=['*'],  # или ["http://localhost:5173", "http://твой_домен"]
+    allow_origins=["*"],  # или ["http://localhost:5173", "http://твой_домен"]
     allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     uvicorn.run(
-        'main:app',
+        "main:app",
         host=settings.run.host,
         port=settings.run.port,
         reload=settings.run.reload,

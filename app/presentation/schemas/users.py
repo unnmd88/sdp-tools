@@ -16,25 +16,25 @@ from core.users.services.field_values_constraints import (
 
 
 class BaseUserSchema(BaseModel):
-    model_config = ConfigDict(use_enum_values=True, strict=True, extra='forbid')
+    model_config = ConfigDict(use_enum_values=True, strict=True, extra="forbid")
 
-    first_name: Annotated[str | None, Field(examples=[None, 'Иван'])]
-    last_name: Annotated[str | None, Field(examples=[None, 'Иванов'])]
-    username: Annotated[str, Field(examples=['user', 'edward'])]
+    first_name: Annotated[str | None, Field(examples=[None, "Иван"])]
+    last_name: Annotated[str | None, Field(examples=[None, "Иванов"])]
+    username: Annotated[str, Field(examples=["user", "edward"])]
     email: EmailStr | None
     is_active: bool
     role: Roles
     organization: Organizations
     phone_number: Annotated[
         str | None,
-        Field(examples=[None, '988 920 11 55', '988 920 11 55', '988-920-11-55']),
+        Field(examples=[None, "988 920 11 55", "988 920 11 55", "988-920-11-55"]),
     ]
-    telegram: Annotated[str | None, Field(examples=[None, '@user', '@jondoe'])]
-    description: str = ''
+    telegram: Annotated[str | None, Field(examples=[None, "@user", "@jondoe"])]
+    description: str = ""
 
 
 class ResponseUserSchema(BaseUserSchema):
-    model_config = ConfigDict(strict=True, extra='ignore')
+    model_config = ConfigDict(strict=True, extra="ignore")
 
     id: int
 
@@ -60,11 +60,11 @@ class CreateUserSchema(BaseUserSchema):
 
 
 class UpdateUserSchema(BaseModel):
-    model_config = ConfigDict(use_enum_values=True, strict=True, extra='forbid')
+    model_config = ConfigDict(use_enum_values=True, strict=True, extra="forbid")
 
     subject_username: str
     first_name: Annotated[
-        str | None, MaxLen(32), Field(default=None), Field(examples=['dsd', 'das'])
+        str | None, MaxLen(32), Field(default=None), Field(examples=["dsd", "das"])
     ]
     last_name: Annotated[str | None, MaxLen(32), Field(default=None)]
     username: Annotated[str | None, MinLen(3), MaxLen(32), Field(default=None)]
@@ -91,17 +91,17 @@ class UpdateUserSchema(BaseModel):
 
 
 class ChangeUserPasswordBaseSchema(BaseModel):
-    model_config = ConfigDict(strict=True, extra='forbid')
+    model_config = ConfigDict(strict=True, extra="forbid")
 
     new_password: str
 
-    @field_validator('new_password')
+    @field_validator("new_password")
     def check_password(cls, v, info: FieldValidationInfo):
-        has_old_password_attr = info.data.get('old_password')
+        has_old_password_attr = info.data.get("old_password")
         if has_old_password_attr is not None and v == has_old_password_attr:
-            raise ValueError('Пароли не должны совпадать')
+            raise ValueError("Пароли не должны совпадать")
         if not check_password_to_set_constraints:
-            raise ValueError('Недопустимый пароль')
+            raise ValueError("Недопустимый пароль")
         return v
 
 

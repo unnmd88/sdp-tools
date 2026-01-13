@@ -72,28 +72,28 @@ def get_jwt_payload_schema(
     expected_token_type: TokenTypes,
 ) -> PayloadAccessJWTSchema | PayloadRefreshJWTSchema:
     try:
-        print(f'TOKEN: {token}')
+        print(f"TOKEN: {token}")
         # payload = jwt_helper.decode_jwt(credentials)
         payload = jwt_helper.decode_jwt(token)
         if (
-            payload['typ'] == expected_token_type
+            payload["typ"] == expected_token_type
             and expected_token_type == TokenTypes.access
         ):
             return PayloadAccessJWTSchema(**payload)
         elif (
-            payload['typ'] == expected_token_type
+            payload["typ"] == expected_token_type
             and expected_token_type == TokenTypes.refresh
         ):
             return PayloadRefreshJWTSchema(**payload)
         else:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail=f'Некорректный тип токена. Ожидаемый тип: {str(expected_token_type)}.',
+                detail=f"Некорректный тип токена. Ожидаемый тип: {str(expected_token_type)}.",
             )
     except ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f'Срок действия токена истёк.',
+            detail=f"Срок действия токена истёк.",
         )
     except DecodeError:
         # TODO Залоггировать!
@@ -125,7 +125,7 @@ def is_admin(
 ):
     if not payload.is_admin:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail='Доступ запрещен'
+            status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен"
         )
 
 
@@ -134,7 +134,7 @@ def is_superuser(
 ):
     if payload.role != Roles.superuser:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail='Доступ запрещен.'
+            status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен."
         )
 
 
@@ -228,6 +228,6 @@ async def get_user_entity_by_id(
     if (user_entity := await users_crud.get_user_by_username_or_id(dto)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Пользователь с id={payload_jwt.user_id!r} не найден.',
+            detail=f"Пользователь с id={payload_jwt.user_id!r} не найден.",
         )
     return user_entity

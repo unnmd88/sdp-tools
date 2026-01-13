@@ -13,8 +13,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'bab82a23f87c'
-down_revision: Union[str, Sequence[str], None] = '0b2c46d04c56'
+revision: str = "bab82a23f87c"
+down_revision: Union[str, Sequence[str], None] = "0b2c46d04c56"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -27,68 +27,68 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """Upgrade schema."""
     op.alter_column(
-        'users', 'first_name', existing_type=sa.VARCHAR(length=32), nullable=True
+        "users", "first_name", existing_type=sa.VARCHAR(length=32), nullable=True
     )
     op.alter_column(
-        'users', 'last_name', existing_type=sa.VARCHAR(length=32), nullable=True
+        "users", "last_name", existing_type=sa.VARCHAR(length=32), nullable=True
     )
     op.alter_column(
-        'users',
-        'email',
+        "users",
+        "email",
         existing_type=sa.VARCHAR(length=32),
         nullable=True,
         existing_server_default=None,
     )
     op.alter_column(
-        'users',
-        'phone_number',
+        "users",
+        "phone_number",
         existing_type=sa.VARCHAR(length=32),
         nullable=True,
         existing_server_default=None,
     )
     op.alter_column(
-        'users',
-        'telegram',
+        "users",
+        "telegram",
         existing_type=sa.VARCHAR(length=32),
         nullable=True,
         existing_server_default=None,
     )
-    op.create_unique_constraint(op.f('uq_users_email'), 'users', ['email'])
+    op.create_unique_constraint(op.f("uq_users_email"), "users", ["email"])
     op.create_unique_constraint(
-        op.f('uq_users_phone_number'), 'users', ['phone_number']
+        op.f("uq_users_phone_number"), "users", ["phone_number"]
     )
-    op.create_unique_constraint(op.f('uq_users_telegram'), 'users', ['telegram'])
+    op.create_unique_constraint(op.f("uq_users_telegram"), "users", ["telegram"])
 
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_constraint(op.f('uq_users_telegram'), 'users', type_='unique')
-    op.drop_constraint(op.f('uq_users_phone_number'), 'users', type_='unique')
-    op.drop_constraint(op.f('uq_users_email'), 'users', type_='unique')
+    op.drop_constraint(op.f("uq_users_telegram"), "users", type_="unique")
+    op.drop_constraint(op.f("uq_users_phone_number"), "users", type_="unique")
+    op.drop_constraint(op.f("uq_users_email"), "users", type_="unique")
     op.alter_column(
-        'users',
-        'telegram',
+        "users",
+        "telegram",
         existing_type=sa.VARCHAR(length=32),
         nullable=False,
         existing_server_default=sa.text("''::character varying"),
     )
     op.alter_column(
-        'users',
-        'phone_number',
+        "users",
+        "phone_number",
         existing_type=sa.VARCHAR(length=32),
         nullable=False,
         existing_server_default=sa.text("''::character varying"),
     )
     op.alter_column(
-        'users',
-        'email',
+        "users",
+        "email",
         existing_type=sa.VARCHAR(),
         nullable=False,
         existing_server_default=sa.text("''::character varying"),
     )
     op.alter_column(
-        'users', 'last_name', existing_type=sa.VARCHAR(length=32), nullable=False
+        "users", "last_name", existing_type=sa.VARCHAR(length=32), nullable=False
     )
     op.alter_column(
-        'users', 'first_name', existing_type=sa.VARCHAR(length=32), nullable=False
+        "users", "first_name", existing_type=sa.VARCHAR(length=32), nullable=False
     )

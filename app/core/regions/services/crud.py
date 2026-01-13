@@ -40,7 +40,7 @@ class RegionsServiceImpl:
     async def create_region(self, create_dto: CreateRecordDTO) -> RegionEntity:
         self.user_entity.access_control(Permissions.CREATE_REGIONS)
         logger.info(
-            'Юзер %r: запрос на создание нового региона: %r',
+            "Юзер %r: запрос на создание нового региона: %r",
             self.user_entity.username_length,
             create_dto.fields,
         )
@@ -48,22 +48,22 @@ class RegionsServiceImpl:
             new_region_entity = await self.repository.add(create_dto)
         except DomainValidationError:
             logger.info(
-                'Некорректные данные для создания региона: %r', create_dto.fields
+                "Некорректные данные для создания региона: %r", create_dto.fields
             )
             raise
         except CreateErrorAlreadyExists:
-            logger.info('Регион уже существует')
+            logger.info("Регион уже существует")
             raise
         except CreateError:
-            logger.error('Ошибка создания региона: %r', create_dto.fields)
+            logger.error("Ошибка создания региона: %r", create_dto.fields)
             raise
-        logger.info('Новый регион успешно создан: %r', new_region_entity)
+        logger.info("Новый регион успешно создан: %r", new_region_entity)
         return new_region_entity
 
     async def update_region(self, update_dto: ToUpdateRecordDTO) -> UpdatedRecordDTO:
         self.user_entity.access_control(Permissions.UPDATE_REGIONS)
         logger.info(
-            'Юзер %r: запрос на обновление региона %r\nДанные для обновления: %r',
+            "Юзер %r: запрос на обновление региона %r\nДанные для обновления: %r",
             self.user_entity.username_length,
             update_dto.search_criteria,
             update_dto.fields,
@@ -71,10 +71,10 @@ class RegionsServiceImpl:
         try:
             update_dto = await self.repository.update_one(update_dto)
         except UpdateError as e:
-            logger.error('Ошибка обновления данных: %r', e)
+            logger.error("Ошибка обновления данных: %r", e)
             raise UpdateError
         logger.info(
-            'Регион обновлён.\nСтарые значения: %r\nНовые значения:  %r',
+            "Регион обновлён.\nСтарые значения: %r\nНовые значения:  %r",
             update_dto.old,
             update_dto.new,
         )
@@ -83,14 +83,14 @@ class RegionsServiceImpl:
     async def delete_region(self, filters_dto: FiltersForSearchDTO) -> RegionEntity:
         self.user_entity.access_control(Permissions.DELETE_REGIONS)
         logger.info(
-            'Юзер %r: запрос на удаление региона: %r',
+            "Юзер %r: запрос на удаление региона: %r",
             self.user_entity.username_length,
             filters_dto.search_filters,
         )
         try:
             entity = await self.repository.delete_one(filters_dto)
         except UpdateError as e:
-            logger.info('Ошибка удаления: %r', e)
+            logger.info("Ошибка удаления: %r", e)
             raise UpdateError
-        logger.info('Регион удалён: %r', entity)
+        logger.info("Регион удалён: %r", entity)
         return entity

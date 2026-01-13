@@ -34,46 +34,46 @@ class ChangeUserPasswordUseCaseImpl:
     get_user_use_case: GetUserUseCaseProtocol
 
     async def __call__(self, dto: ChangeUserPasswordDTO) -> ChangeUserPasswordDTO:
-        logger.info('Запрос на смену пароля с username=%r', dto.subject)
+        logger.info("Запрос на смену пароля с username=%r", dto.subject)
         try:
             subject: UserEntity = await self.get_user_use_case.get_active_user_or_raise(
                 dto.subject
             )
-            logger.info('Пользователь найден: %r.', subject)
+            logger.info("Пользователь найден: %r.", subject)
         except UserNotFoundError:
-            logger.info('Пользователь %r не найден.', dto.subject)
+            logger.info("Пользователь %r не найден.", dto.subject)
             raise
         except InactiveUserError:
-            logger.warning('Ошибка: пользователь %r не активен.', dto.subject)
+            logger.warning("Ошибка: пользователь %r не активен.", dto.subject)
             raise
         if not subject.validate_password(dto.old_password):
-            logger.warning('Ошибка: неверный пароль пользователя %r.', subject.username)
+            logger.warning("Ошибка: неверный пароль пользователя %r.", subject.username)
             raise InvalidUsernameOrPasswordError
         if not check_password_to_set_constraints(dto.new_password):
-            msg = 'Ошибка: Недопустимый пароль'
-            logger.info('%s: %r', msg, dto.new_password)
-            raise InvalidUsernameOrPasswordToSetError(f'{msg}.')
+            msg = "Ошибка: Недопустимый пароль"
+            logger.info("%s: %r", msg, dto.new_password)
+            raise InvalidUsernameOrPasswordToSetError(f"{msg}.")
         if subject.password == subject.username:
-            msg = 'Ошибка: username и пароль должны отличаться'
+            msg = "Ошибка: username и пароль должны отличаться"
             logger.info(
-                '%s: username=%r, пароль=%r', msg, subject.username, subject.password
+                "%s: username=%r, пароль=%r", msg, subject.username, subject.password
             )
             raise InvalidUsernameOrPasswordToSetError(msg)
         update_dto = ToUpdateRecordDTO(
-            search_criteria={'id': subject.id},
-            fields={'password': hash_password(dto.new_password)},
+            search_criteria={"id": subject.id},
+            fields={"password": hash_password(dto.new_password)},
         )
-        logger.info('Меняю пароль у пользователя username=%r', subject.username)
+        logger.info("Меняю пароль у пользователя username=%r", subject.username)
         updated_dto = await self.user_repository.update_one(
             update_record_dto=update_dto
         )
 
         updated_entity: UserEntity = updated_dto.new
         if not updated_entity.validate_password(dto.new_password):
-            msg = '!!! Ошибка логики обновления пароля.'
+            msg = "!!! Ошибка логики обновления пароля."
             logger.critical(msg)
             raise ApplicationError(msg)
-        logger.info('Пароль успешно изменён.')
+        logger.info("Пароль успешно изменён.")
         return ChangeUserPasswordDTO(
             subject=subject.username,
             old_password=dto.old_password,

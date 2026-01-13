@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select
 
 
-@pytest.mark.asyncio(loop_scope='session')
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_user(t_session: AsyncSession, user_models):
     t_session.add_all(user_models)
     await t_session.commit()

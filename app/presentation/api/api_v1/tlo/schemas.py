@@ -11,7 +11,7 @@ class TrafficLightCreate(BaseModel):
     district: Districts
     street: str
     service_organization: ServiceOrganizations
-    description: Annotated[str, Field(default='')]
+    description: Annotated[str, Field(default="")]
 
 
 class TrafficLightSchema(BaseModel):
@@ -26,7 +26,7 @@ class TrafficLightSchema(BaseModel):
 
 class TrafficLightUpdate(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
 
     region_id: Annotated[int, Field(ge=1)] | None

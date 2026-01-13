@@ -18,13 +18,13 @@ from infrastructure.database.api import db_api
 # from presentation.api.dependencies.dependencies import CrudTloUseCase
 
 router = APIRouter(
-    prefix='/traffic-light-objects',
-    tags=['Traffic Light Objects'],
+    prefix="/traffic-light-objects",
+    tags=["Traffic Light Objects"],
     # dependencies=[Depends(check_user_is_active)],
 )
 
 
-@router.get('/as-tets-ddd/{id}')
+@router.get("/as-tets-ddd/{id}")
 async def get_traffic_light_object_by_id(
     tlo_id: int,
     # use_case: CrudTloUseCase,
@@ -34,7 +34,7 @@ async def get_traffic_light_object_by_id(
     # return await TloCrud.get_one_by_id_or_404(session, traffic_light_object_id)
 
 
-@router.get('/name/{name}')
+@router.get("/name/{name}")
 async def get_traffic_light_object_by_name(
     tlo_name: str,
     # use_case: TrafficLightObjectUseCase,
@@ -45,7 +45,7 @@ async def get_traffic_light_object_by_name(
     return await TloCrud.get_one_by_id_or_404(session, traffic_light_object_id)
 
 
-@router.get('/{id}')
+@router.get("/{id}")
 async def get_traffic_light_object_by_id(
     traffic_light_object_id: int,
     session: Annotated[AsyncSession, Depends(db_api.session_getter)],
@@ -53,7 +53,7 @@ async def get_traffic_light_object_by_id(
     return await TloCrud.get_one_by_id_or_404(session, traffic_light_object_id)
 
 
-@router.get('/')
+@router.get("/")
 async def get_traffic_light_objects(
     session: Annotated[AsyncSession, Depends(db_api.session_getter)],
 ):
@@ -61,7 +61,7 @@ async def get_traffic_light_objects(
 
 
 @router.post(
-    '/',
+    "/",
     status_code=status.HTTP_201_CREATED,
     response_model=TrafficLightSchema,
 )
@@ -75,7 +75,7 @@ async def create_traffic_light_object(
 
 
 @router.patch(
-    '/{id}',
+    "/{id}",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=TrafficLightSchema,
 )

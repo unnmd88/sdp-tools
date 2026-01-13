@@ -1,10 +1,10 @@
 __all__ = (
-    'Base',
-    'User',
-    'TrafficLightObject',
-    'Region',
-    'PassportGroup',
-    'Passport',
+    "Base",
+    "User",
+    "TrafficLightObject",
+    "Region",
+    "PassportGroup",
+    "Passport",
 )
 
 from infrastructure.database.models.base import Base

@@ -8,7 +8,7 @@ from core.exceptions.base import (
 from core.exceptions.crud import NotFoundError, CreateError, UpdateError
 
 INVALID_DESCRIPTION_EXCEPTION_TEXT = (
-    'Поле description не должно превышать 255 символов.'
+    "Поле description не должно превышать 255 символов."
 )
 
 
@@ -21,7 +21,7 @@ class UserNotFoundError(NotFoundError):
 
     @property
     def detail(self):
-        return f'Пользователь не найден.'
+        return f"Пользователь не найден."
 
 
 class UserAdministratorNotFoundError(NotFoundError):
@@ -40,7 +40,7 @@ class UserNotFoundByIdError(UserNotFoundError):
 
     @property
     def detail(self):
-        return f'Пользователь с id={self._id!r} не найден.'
+        return f"Пользователь с id={self._id!r} не найден."
 
 
 class UserNotFoundByUsernameError(UserNotFoundError):
@@ -55,7 +55,7 @@ class UserNotFoundByUsernameError(UserNotFoundError):
 
     @property
     def detail(self):
-        return f'Пользователь с username={self._id!r} не найден.'
+        return f"Пользователь с username={self._id!r} не найден."
 
 
 class UserAlreadyExistsError(CreateError):
@@ -63,14 +63,14 @@ class UserAlreadyExistsError(CreateError):
 
     def __init__(
         self,
-        username: str = '',
+        username: str = "",
     ):
         self._id = username
         super().__init__(self.detail)
 
     @property
     def detail(self):
-        return f'Пользователь с username={self._id!r} уже существует.'
+        return f"Пользователь с username={self._id!r} уже существует."
 
 
 class InvalidValueToSetError(CreateError):
@@ -82,7 +82,7 @@ class InvalidUsernameOrPasswordToSetError(ApplicationError):
 
     @property
     def detail(self):
-        return f'Ошибка установки username/пароля пользователя.'
+        return f"Ошибка установки username/пароля пользователя."
 
 
 class SameUsernameAndPasswordError(ApplicationError):
@@ -98,9 +98,9 @@ class ForbiddenUpdateError(UpdateError):
 
 
 class InvalidUsernameOrPasswordError(ApplicationError):
-    def __init__(self, user: str | int = ''):
-        self.detail = f'Неверный логин или пароль пользователя {user}.'.replace(
-            '  ', ''
+    def __init__(self, user: str | int = ""):
+        self.detail = f"Неверный логин или пароль пользователя {user}.".replace(
+            "  ", ""
         )
         super().__init__(self.detail)
 

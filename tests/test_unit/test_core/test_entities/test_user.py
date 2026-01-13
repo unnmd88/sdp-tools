@@ -18,40 +18,40 @@ class TestUserEntity:
 
         user = UserEntity(
             id=pk_id,
-            firstname='Chook',
-            lastname='Gekk',
-            username='chokky',
+            firstname="Chook",
+            lastname="Gekk",
+            username="chokky",
             organization=Organizations.SDP,
-            email='example@example.com',
-            password=b'mysecret',
+            email="example@example.com",
+            password=b"mysecret",
             is_active=True,
             is_admin=True,
             is_superuser=True,
             role=Roles.superuser,
-            phone_number='',
-            telegram='',
-            description='',
+            phone_number="",
+            telegram="",
+            description="",
         )
 
         assert user.id == pk_id
-        assert user.first_name == 'Chook'
-        assert user.last_name == 'Gekk'
-        assert user.username == 'chokky'
+        assert user.first_name == "Chook"
+        assert user.last_name == "Gekk"
+        assert user.username == "chokky"
         assert user.organization == Organizations.SDP
-        assert user.email == 'example@example.com'
-        assert user.password == b'mysecret'
+        assert user.email == "example@example.com"
+        assert user.password == b"mysecret"
         assert user.is_active is True
         assert user.is_admin is True
         assert user.is_superuser is True
         assert user.role == Roles.superuser
-        assert user.phone_number == ''
-        assert user.telegram == ''
-        assert user.description == ''
+        assert user.phone_number == ""
+        assert user.telegram == ""
+        assert user.description == ""
 
     @pytest.mark.parametrize(
-        'bad_id,expectation',
+        "bad_id,expectation",
         [
-            ('3', pytest.raises(TypeError)),
+            ("3", pytest.raises(TypeError)),
             (random.uniform(1.0, 32_000.0), pytest.raises(TypeError)),
             (0, pytest.raises(DomainValidationError)),
             (
@@ -68,13 +68,13 @@ class TestUserEntity:
             create_user_entity(_id=bad_id)
 
     @pytest.mark.parametrize(
-        'bad_email,expectation',
+        "bad_email,expectation",
         [
-            (list(('abra', 'cadabra', 1)), pytest.raises(TypeError)),
+            (list(("abra", "cadabra", 1)), pytest.raises(TypeError)),
             (random.randint(1, 100000000), pytest.raises(TypeError)),
-            ('@example.com', pytest.raises(DomainValidationError)),
-            ('@', pytest.raises(DomainValidationError)),
-            ('12e1e12', pytest.raises(DomainValidationError)),
+            ("@example.com", pytest.raises(DomainValidationError)),
+            ("@", pytest.raises(DomainValidationError)),
+            ("12e1e12", pytest.raises(DomainValidationError)),
         ],
     )
     def test_create_user_entity_exception_bad_email(self, bad_email, expectation):

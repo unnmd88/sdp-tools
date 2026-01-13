@@ -23,8 +23,8 @@ from core.dto.common import FiltersForSearchDTO, ToUpdateRecordDTO, CreateRecord
 from core.exceptions.crud import NotFoundError, CreateError, CreateErrorAlreadyExists
 
 router = APIRouter(
-    prefix='/regions',
-    tags=['Regions of Traffic Light Objects'],
+    prefix="/regions",
+    tags=["Regions of Traffic Light Objects"],
 )
 
 
@@ -47,10 +47,10 @@ router = APIRouter(
 
 
 @router.get(
-    '/{code}',
+    "/{code}",
     response_model=RegionSchemaResponse,
     status_code=status.HTTP_200_OK,
-    summary='Получить данные существующего региона по его коду.',
+    summary="Получить данные существующего региона по его коду.",
     description=GET_region_by_code_description,
 )
 async def get_region_by_code(
@@ -63,16 +63,16 @@ async def get_region_by_code(
     if (region := await use_case.get_region_by_filters(filters_for_search_dto)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Регион {region_code!r} не найден.',
+            detail=f"Регион {region_code!r} не найден.",
         )
     return RegionSchemaResponse.model_validate(region, from_attributes=True)
 
 
 @router.get(
-    '/id/{id}',
+    "/id/{id}",
     response_model=RegionSchemaResponse,
     status_code=status.HTTP_200_OK,
-    summary='Получить данные региона светофорного объекта по id',
+    summary="Получить данные региона светофорного объекта по id",
     description=GET_region_by_id_description,
 )
 async def get_region_by_id(
@@ -82,16 +82,16 @@ async def get_region_by_id(
     if (region := await use_case.get_region_by_id(region_id)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Регион с id={region_id} не найден.',
+            detail=f"Регион с id={region_id} не найден.",
         )
     return RegionSchemaResponse.model_validate(region, from_attributes=True)
 
 
 @router.get(
-    '/',
+    "/",
     response_model=list[RegionSchemaResponse],
     status_code=status.HTTP_200_OK,
-    summary='Список всех имеющихся регионов светофорного объекта',
+    summary="Список всех имеющихся регионов светофорного объекта",
     description=GET_all_regions_description,
 )
 async def get_all_regions(use_case):
@@ -99,10 +99,10 @@ async def get_all_regions(use_case):
 
 
 @router.post(
-    '/',
+    "/",
     status_code=status.HTTP_201_CREATED,
     response_model=RegionSchemaResponse,
-    summary='Создать новый регион светофорного объекта',
+    summary="Создать новый регион светофорного объекта",
     description=POST_region_description,
 )
 async def create_region(
@@ -116,18 +116,18 @@ async def create_region(
     except (CreateError, CreateErrorAlreadyExists):
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail='Регион с таким названием/кодом уже существует.',
+            detail="Регион с таким названием/кодом уже существует.",
         )
     return RegionSchemaResponse.model_validate(
-        db_region, extra='ignore', from_attributes=True
+        db_region, extra="ignore", from_attributes=True
     )
 
 
 @router.patch(
-    '/{code}',
+    "/{code}",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=UpdatedRecordSchemaResponse,
-    summary='Обновить данные существующего региона.',
+    summary="Обновить данные существующего региона.",
     description=PATCH_region_by_code_description,
 )
 async def update_region(
@@ -144,16 +144,16 @@ async def update_region(
     except NotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Регион {region_code!r} не найден.',
+            detail=f"Регион {region_code!r} не найден.",
         )
     return result
 
 
 @router.delete(
-    '/{code}',
+    "/{code}",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=RegionSchemaResponse,
-    summary='Удалить существующий регион.',
+    summary="Удалить существующий регион.",
     description=DELETE_region_by_code_description,
 )
 async def delete_region(
@@ -168,7 +168,7 @@ async def delete_region(
     except NotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Регион {region_code} не найден.',
+            detail=f"Регион {region_code} не найден.",
         )
     return RegionSchemaResponse.model_validate(
         result,

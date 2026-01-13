@@ -16,26 +16,26 @@ class BaseAuthException(Exception):
 class InvalidUsernameOrPasswordException(BaseAuthException):
     @property
     def detail(self) -> str:
-        return 'invalid username or password'
+        return "invalid username or password"
 
 
 @final
 @dataclass
 class InactiveUserException(BaseAuthException):
-    user: str | int = ''
+    user: str | int = ""
 
     @property
     def detail(self) -> str:
-        return f'User {self.user!r} is inactive'.replace('  ', ' ')
+        return f"User {self.user!r} is inactive".replace("  ", " ")
 
 
 def get_invalid_type_jwt_exception(
-    current_token: TokenTypes = '',
-    expected_token: TokenTypes = '',
+    current_token: TokenTypes = "",
+    expected_token: TokenTypes = "",
 ) -> HTTPException:
     return HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail=f'invalid token type: {str(current_token)!r}, expected {str(expected_token)!r}',
+        detail=f"invalid token type: {str(current_token)!r}, expected {str(expected_token)!r}",
     )
 
 
@@ -49,25 +49,25 @@ class UserNotFoundHttpException(HTTPException):
 
 
 UnauthorizedErrorHttp401 = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED, detail='invalid username or password'
+    status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid username or password"
 )
 
 InactiveUserErrorHttp403 = HTTPException(
-    status_code=status.HTTP_403_FORBIDDEN, detail='inactive user'
+    status_code=status.HTTP_403_FORBIDDEN, detail="inactive user"
 )
 
 
 ForbiddenSelfUser = HTTPException(
-    status_code=status.HTTP_403_FORBIDDEN, detail='access denied'
+    status_code=status.HTTP_403_FORBIDDEN, detail="access denied"
 )
 
 
 InvalidErrorJWT = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail='Invalid token error',
+    detail="Invalid token error",
 )
 
 ExpiredSignatureJWT = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail='Signature has expired',
+    detail="Signature has expired",
 )

@@ -7,7 +7,7 @@ from pydantic_settings import (
 )
 
 BASE_DIR = Path(__file__).parent.parent
-API_V1_PATH = BASE_DIR / 'presentation/api/api_v1/'
+API_V1_PATH = BASE_DIR / "presentation/api/api_v1/"
 
 
 class RunConfig(BaseModel):
@@ -18,12 +18,12 @@ class RunConfig(BaseModel):
 
 
 class ApiV1Prefix(BaseModel):
-    prefix: str = '/v1'
-    users: str = '/users'
+    prefix: str = "/v1"
+    users: str = "/users"
 
 
 class ApiPrefix(BaseModel):
-    prefix: str = '/api'
+    prefix: str = "/api"
     v1: ApiV1Prefix = ApiV1Prefix()
 
 
@@ -38,9 +38,9 @@ class DefaultSuperuserCreds(BaseModel):
 
 
 class AuthJWT(BaseModel):
-    private_key_path: Path = BASE_DIR / 'certs' / 'private.pem'
-    public_key_path: Path = BASE_DIR / 'certs' / 'public.pem'
-    algorithm: str = 'RS256'
+    private_key_path: Path = BASE_DIR / "certs" / "private.pem"
+    public_key_path: Path = BASE_DIR / "certs" / "public.pem"
+    algorithm: str = "RS256"
     access_expire_minutes: int = 60 * 12
     refresh_expire_days: int = 1
     passwd: Password = Password()
@@ -54,21 +54,21 @@ class DatabaseConfig(BaseModel):
     max_overflow: int = 10
 
     naming_convention: dict[str, str] = {
-        'ix': 'ix_%(column_0_label)s',
-        'uq': 'uq_%(table_name)s_%(column_0_N_name)s',
-        'ck': 'ck_%(table_name)s_%(constraint_name)s',
-        'fk': 'fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s',
-        'pk': 'pk_%(table_name)s',
+        "ix": "ix_%(column_0_label)s",
+        "uq": "uq_%(table_name)s_%(column_0_N_name)s",
+        "ck": "ck_%(table_name)s_%(constraint_name)s",
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+        "pk": "pk_%(table_name)s",
     }
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=('.env.dev',),
-        env_file_encoding='utf-8',
+        env_file=(".env.dev",),
+        env_file_encoding="utf-8",
         case_sensitive=False,
-        env_nested_delimiter='__',
-        env_prefix='APP_CONFIG__',
+        env_nested_delimiter="__",
+        env_prefix="APP_CONFIG__",
     )
     run: RunConfig
     api: ApiPrefix = ApiPrefix()
@@ -78,14 +78,14 @@ class Settings(BaseSettings):
 
     @property
     def base_url(self) -> str:
-        return f'{self.run.protocol}://{self.run.host}:{self.run.port}'
+        return f"{self.run.protocol}://{self.run.host}:{self.run.port}"
 
     @property
     def login_url(self) -> str:
-        return f'{self.base_url}{self.api.prefix}/auth/login'
+        return f"{self.base_url}{self.api.prefix}/auth/login"
 
 
 settings = Settings()
 
 
-print(f'settings login_url: {settings.login_url}')
+print(f"settings login_url: {settings.login_url}")

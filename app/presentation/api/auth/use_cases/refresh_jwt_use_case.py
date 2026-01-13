@@ -30,8 +30,8 @@ class RefreshJWTUseCaseImpl:
                 await self.users_use_case.get_active_user_or_raise(username)
             )
         except UserNotFoundError:
-            logger.warning('Пользователь %r не найден.', username)
-            raise UserNotFoundError(f'Пользователь {username!r} не найден.')
+            logger.warning("Пользователь %r не найден.", username)
+            raise UserNotFoundError(f"Пользователь {username!r} не найден.")
         token_data = JWTHelper.issue_jwt(  # TODO JWTHelper выделить в интерфейс
             user_entity=user_entity,
             refresh_token=refresh_token,

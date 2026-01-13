@@ -12,8 +12,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = '2b8baff9d9d4'
-down_revision: str | Sequence[str] | None = '3ee3d6ea3f42'
+revision: str = "2b8baff9d9d4"
+down_revision: str | Sequence[str] | None = "3ee3d6ea3f42"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
@@ -21,25 +21,25 @@ depends_on: str | Sequence[str] | None = None
 def upgrade() -> None:
     """Upgrade schema."""
     op.create_table(
-        'passport_groups',
-        sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column('group_name', sa.String(), nullable=False),
-        sa.Column('group_name_route', sa.String(length=32), nullable=False),
-        sa.Column('description', sa.Text(), server_default='', nullable=False),
+        "passport_groups",
+        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column("group_name", sa.String(), nullable=False),
+        sa.Column("group_name_route", sa.String(length=32), nullable=False),
+        sa.Column("description", sa.Text(), server_default="", nullable=False),
         sa.Column(
-            'created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False
+            "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
         sa.Column(
-            'updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False
+            "updated_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
-        sa.PrimaryKeyConstraint('id', name=op.f('pk_passport_groups')),
-        sa.UniqueConstraint('group_name', name=op.f('uq_passport_groups_group_name')),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_passport_groups")),
+        sa.UniqueConstraint("group_name", name=op.f("uq_passport_groups_group_name")),
         sa.UniqueConstraint(
-            'group_name_route', name=op.f('uq_passport_groups_group_name_route')
+            "group_name_route", name=op.f("uq_passport_groups_group_name_route")
         ),
     )
 
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_table('passport_groups')
+    op.drop_table("passport_groups")

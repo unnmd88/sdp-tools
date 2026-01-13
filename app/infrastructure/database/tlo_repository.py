@@ -49,7 +49,7 @@ class TrafficLightObjectSqlAlchemy(BaseSqlAlchemy):
         result = await self.session.execute(stmt_passports)
         r_r = result.mappings().all()
         pspts = [PassportEntity(**kw) for kw in r_r]
-        print(f'result.mappings().all(): {pspts}')
+        print(f"result.mappings().all(): {pspts}")
         return pspts
 
         tlo_model = await self.get_one_or_none_by_filters(name=tlo_name)

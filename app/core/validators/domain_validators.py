@@ -2,10 +2,7 @@ from enum import Enum
 from types import UnionType
 from typing import Any
 
-from core.exceptions.contract import (
-    ContractViolationValueTypeError,
-    ContractViolationError,
-)
+from core.contracts.exc import ContractViolationError, ContractViolationValueTypeError
 from core.reg_exps import EMAIL_PATTERN, PHONE_NUMBER_PATTERN
 from core.users.constants import MIN_ID, MAX_ID
 from core.users.rules_messages import DomainRulesViolationsMessages

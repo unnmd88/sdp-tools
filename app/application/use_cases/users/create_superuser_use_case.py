@@ -36,7 +36,7 @@ async def create_user_root(
         username=username_root,
     )
     logger.info(
-        '%r: Запрос на создание корневого пользователя системы %r',
+        "%r: Запрос на создание корневого пользователя системы %r",
         source.upper(),
         username_root,
     )
@@ -54,12 +54,12 @@ async def create_user_root(
             role=Roles.superuser,
             phone_number=None,
             telegram=None,
-            description='Корневой пользователь системы',
+            description="Корневой пользователь системы",
         )
     except DomainValidationError as e:
         result.errors.append(str(e))
         result.success = False
-        logger.warning('Ошибка: %s', str(e))
+        logger.warning("Ошибка: %s", str(e))
         return result
 
     async with db_api.session_factory() as session:
@@ -69,8 +69,8 @@ async def create_user_root(
                 await user_repo.get_user_by_id_or_username_or_none(username_root)
             )
             if root_already_exists:
-                msg = f'Пользователь {root_already_exists.username}(id={root_already_exists.id}) существует'
-                logger.warning('Ошибка: %s', msg)
+                msg = f"Пользователь {root_already_exists.username}(id={root_already_exists.id}) существует"
+                logger.warning("Ошибка: %s", msg)
                 result.errors.append(msg)
                 result.id = root_already_exists.id
             else:
@@ -80,16 +80,16 @@ async def create_user_root(
                 result.success = True
         except IntegrityError:
             await session.rollback()
-            msg = 'Ошибка: пользователь  существует'
+            msg = "Ошибка: пользователь  существует"
             logger.warning(msg)
             result.errors.append(msg)
     logger.info(
-        'Пользователь %r создан успешно: %r',
+        "Пользователь %r создан успешно: %r",
         created_user_root.username,
         created_user_root,
     )
     return result
 
 
-if __name__ == '__main__':
-    asyncio.run(create_user_root(source='python-script'))
+if __name__ == "__main__":
+    asyncio.run(create_user_root(source="python-script"))

@@ -14,13 +14,13 @@ from core.enums import Roles, Organizations
 app = typer.Typer(no_args_is_help=True)
 
 
-@app.command('create-user')
+@app.command("create-user")
 def create_user(
-    username: Annotated[str, typer.Option(help='username for user')],
-    password: Annotated[str, typer.Option(help='password for user')],
-    first_name: Annotated[str, typer.Option(help='first_name for user')] = '',
-    last_name: Annotated[str, typer.Option(help='last_name for user')] = '',
-    email: Annotated[str, typer.Option(help='email for user')] = 'user@mail.com',
+    username: Annotated[str, typer.Option(help="username for user")],
+    password: Annotated[str, typer.Option(help="password for user")],
+    first_name: Annotated[str, typer.Option(help="first_name for user")] = "",
+    last_name: Annotated[str, typer.Option(help="last_name for user")] = "",
+    email: Annotated[str, typer.Option(help="email for user")] = "user@mail.com",
     is_active: Annotated[
         bool, typer.Option(help='Bool flag "is_active" for user')
     ] = True,
@@ -30,13 +30,13 @@ def create_user(
     is_superuser: Annotated[
         bool, typer.Option(help='Bool flag "is_superuser" for user')
     ] = False,
-    role: Annotated[Roles, typer.Option(help='role for user')] = Roles.worker,
+    role: Annotated[Roles, typer.Option(help="role for user")] = Roles.worker,
     organization: Annotated[
-        Organizations, typer.Option(help='organization for user')
+        Organizations, typer.Option(help="organization for user")
     ] = Organizations.SDP,
-    phone_number: Annotated[str, typer.Option(help='phone_number for user')] = '',
-    telegram: Annotated[str, typer.Option(help='telegram for user')] = '',
-    description: Annotated[str, typer.Option(help='description for user')] = '',
+    phone_number: Annotated[str, typer.Option(help="phone_number for user")] = "",
+    telegram: Annotated[str, typer.Option(help="telegram for user")] = "",
+    description: Annotated[str, typer.Option(help="description for user")] = "",
 ) -> None:
     """Create user for fastapi application."""
 
@@ -56,13 +56,13 @@ def create_user(
         description=description,
     )
     print(
-        f'[yellow]Try to create user with username [bold]{user_schema.username_length!r}[/bold]...[/yellow]'
+        f"[yellow]Try to create user with username [bold]{user_schema.username_length!r}[/bold]...[/yellow]"
     )
     try:
         user: User = asyncio.run(create_user_async_wrap(user_schema))
-        print(f'[green] User created successfully:[/green]\n[blue]{user}[/blue]')
+        print(f"[green] User created successfully:[/green]\n[blue]{user}[/blue]")
     except HTTPException as e:
-        print(f'[red]{e.detail}[/red]')
+        print(f"[red]{e.detail}[/red]")
 
 
 # @app.command('create-superuser')
@@ -111,9 +111,9 @@ def create_user(
 #     )
 
 
-@app.command('create-root')
+@app.command("create-root")
 def create_root(
-    password: Annotated[str, typer.Option(help='password for root')] = None,
+    password: Annotated[str, typer.Option(help="password for root")] = None,
 ) -> None:
     """
     Создаёт корневого пользователя системы.
@@ -125,8 +125,8 @@ def create_root(
 
     """
 
-    print(asyncio.run(create_user_root(source='CLI', password=password)))
+    print(asyncio.run(create_user_root(source="CLI", password=password)))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app()

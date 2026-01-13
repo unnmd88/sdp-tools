@@ -13,36 +13,36 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '0b2c46d04c56'
-down_revision: Union[str, Sequence[str], None] = '4dccc0000006'
+revision: str = "0b2c46d04c56"
+down_revision: Union[str, Sequence[str], None] = "4dccc0000006"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
     """Upgrade schema."""
-    op.drop_column('users', 'is_superuser')
-    op.drop_column('users', 'is_admin')
+    op.drop_column("users", "is_superuser")
+    op.drop_column("users", "is_admin")
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     op.add_column(
-        'users',
+        "users",
         sa.Column(
-            'is_admin',
+            "is_admin",
             sa.BOOLEAN(),
-            server_default=sa.text('false'),
+            server_default=sa.text("false"),
             autoincrement=False,
             nullable=False,
         ),
     )
     op.add_column(
-        'users',
+        "users",
         sa.Column(
-            'is_superuser',
+            "is_superuser",
             sa.BOOLEAN(),
-            server_default=sa.text('false'),
+            server_default=sa.text("false"),
             autoincrement=False,
             nullable=False,
         ),

@@ -2,89 +2,89 @@ import logging.config
 
 from core.config import API_V1_PATH, BASE_DIR
 
-print(f'BASE_DIR: {BASE_DIR}')
+print(f"BASE_DIR: {BASE_DIR}")
 
 LOGGING_CONFIG = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
         },
-        'RUD': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'app_logging/RUD.log',
-            'formatter': 'simple2',
+        "RUD": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "app_logging/RUD.log",
+            "formatter": "simple2",
         },
-        'USERS_RUD': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'app_logging/USERS_RUD.log',
-            'formatter': 'simple2',
+        "USERS_RUD": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "app_logging/USERS_RUD.log",
+            "formatter": "simple2",
         },
-        'auth': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'app_logging/auth.log',
-            'formatter': 'simple2',
+        "auth": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "app_logging/auth.log",
+            "formatter": "simple2",
         },
-        'JWT': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'app_logging/jwt.log',
-            'formatter': 'simple2',
-        },
-    },
-    'loggers': {
-        '': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': True,
-        },
-        'common': {
-            'level': 'INFO',
-            'handlers': ['RUD'],
-            'propagate': True,
-        },
-        'auth': {
-            'level': 'INFO',
-            'handlers': ['auth'],
-            'propagate': True,
-        },
-        'jwt': {
-            'level': 'INFO',
-            'handlers': ['JWT'],
-            'propagate': True,
-        },
-        'users': {
-            'level': 'INFO',
-            'handlers': ['USERS_RUD'],
-            'propagate': True,
+        "JWT": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "app_logging/jwt.log",
+            "formatter": "simple2",
         },
     },
-    'formatters': {
+    "loggers": {
+        "": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": True,
+        },
+        "common": {
+            "level": "INFO",
+            "handlers": ["RUD"],
+            "propagate": True,
+        },
+        "auth": {
+            "level": "INFO",
+            "handlers": ["auth"],
+            "propagate": True,
+        },
+        "jwt": {
+            "level": "INFO",
+            "handlers": ["JWT"],
+            "propagate": True,
+        },
+        "users": {
+            "level": "INFO",
+            "handlers": ["USERS_RUD"],
+            "propagate": True,
+        },
+    },
+    "formatters": {
         # "verbose": {
         #     "format": "{name} {levelname} {asctime} {module} {lineno} {funcName} {message} ",
         #     "style": "{",
         # },
-        'simple': {
-            'format': '%(levelname)s %(message)s %(asctime)s %(filename)s %(lineno)s',
+        "simple": {
+            "format": "%(levelname)s %(message)s %(asctime)s %(filename)s %(lineno)s",
         },
-        'simple2': {
-            'format': '%(asctime)s %(levelname)s %(message)s %(filename)s %(lineno)s',
+        "simple2": {
+            "format": "%(asctime)s %(levelname)s %(message)s %(filename)s %(lineno)s",
         },
     },
 }
 
 logging.config.dictConfig(LOGGING_CONFIG)
 
-COMMON_LOGGER = 'common'
-USERS_LOGGER = 'users'
-JWT_LOGGER = 'jwt'
-AUTH_LOGGER = 'auth'
+COMMON_LOGGER = "common"
+USERS_LOGGER = "users"
+JWT_LOGGER = "jwt"
+AUTH_LOGGER = "auth"
 
 
 # def logging_configure(level=logging.DEBUG):

@@ -9,7 +9,7 @@ def hash_password(
     password: str,
 ) -> bytes:
     return bcrypt.hashpw(
-        password.encode('utf-8'),
+        password.encode("utf-8"),
         bcrypt.gensalt(),
     )
 
@@ -19,7 +19,7 @@ def validate_password(
     hashed_password: bytes,
 ) -> bool:
     return bcrypt.checkpw(
-        password=password.encode('utf-8'),
+        password=password.encode("utf-8"),
         hashed_password=hashed_password,
     )
 
@@ -29,6 +29,6 @@ def gen_password(
     max_length: int = 20,
 ) -> str:
     chars = string.ascii_letters + string.digits + string.punctuation
-    return ''.join(
+    return "".join(
         secrets.choice(chars) for _ in range(random.randint(min_length, max_length))
     )

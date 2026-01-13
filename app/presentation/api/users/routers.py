@@ -36,16 +36,16 @@ from presentation.schemas.users import (
 )
 
 router = APIRouter(
-    prefix='/user',
-    tags=['Users'],
+    prefix="/user",
+    tags=["Users"],
 )
 
 
 @router.get(
-    '/whoami/',
+    "/whoami/",
     status_code=status.HTTP_200_OK,
     response_model=ResponseUserSchema,
-    summary='Данные о пользователе из access jwt',
+    summary="Данные о пользователе из access jwt",
     description=GET_whoami,
 )
 async def whoami(
@@ -57,7 +57,7 @@ async def whoami(
 
 
 @router.patch(
-    '/',
+    "/",
     status_code=status.HTTP_200_OK,
     # response_model=UserSchema,
     # dependencies=[IsSuperuser],
@@ -69,13 +69,13 @@ async def update_user(
 ):
     upd_user_dto = UpdateUserDTO(
         **to_update.model_dump()
-        | {'requester_username': payload_jwt.sub, 'is_active': True}
+        | {"requester_username": payload_jwt.sub, "is_active": True}
     )
     return await use_case.update(upd_user_dto)
 
 
 @router.patch(
-    '/change-password/',
+    "/change-password/",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=ChangeUserPasswordResponse,
 )
@@ -97,26 +97,26 @@ async def change_user_password(
         )
     except UserNotFoundError:
         _status_code = status.HTTP_404_NOT_FOUND
-        _detail = f'Пользователь {payload_jwt.sub!r} не найден.'
+        _detail = f"Пользователь {payload_jwt.sub!r} не найден."
     except InactiveUserError:
         _status_code = status.HTTP_403_FORBIDDEN
-        _detail = f'Пользователь {payload_jwt.sub!r} не активен.'
+        _detail = f"Пользователь {payload_jwt.sub!r} не активен."
     except UserPermissionsError:
         _status_code = status.HTTP_403_FORBIDDEN
-        _detail = f'У пользователя {payload_jwt.sub!r} нет прав для изменения пароля.'
+        _detail = f"У пользователя {payload_jwt.sub!r} нет прав для изменения пароля."
     except InvalidUsernameOrPasswordError:
         _status_code = status.HTTP_401_UNAUTHORIZED
-        _detail = f'Неверный логин или пароль пользователя {payload_jwt.sub!r}.'
+        _detail = f"Неверный логин или пароль пользователя {payload_jwt.sub!r}."
     except SameUsernameAndPasswordError:
         _status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
-        _detail = f'Пароль и логин должны отличаться.'
+        _detail = f"Пароль и логин должны отличаться."
     except InvalidUsernameOrPasswordToSetError:
         _status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
-        _detail = f'Недопустимый пароль.'
+        _detail = f"Недопустимый пароль."
     except Exception:
         # TODO Залоггировать
         _status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        _detail = f'Ошибка запроса на стороне сервера.'
+        _detail = f"Ошибка запроса на стороне сервера."
     if _status_code or _detail:
         raise HTTPException(status_code=_status_code, detail=_detail)
     return ChangeUserPasswordResponse(

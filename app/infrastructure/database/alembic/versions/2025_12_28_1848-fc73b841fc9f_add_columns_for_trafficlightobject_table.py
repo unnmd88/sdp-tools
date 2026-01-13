@@ -13,8 +13,8 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'fc73b841fc9f'
-down_revision: Union[str, Sequence[str], None] = 'e68ea444cf4e'
+revision: str = "fc73b841fc9f"
+down_revision: Union[str, Sequence[str], None] = "e68ea444cf4e"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -22,45 +22,45 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """Upgrade schema."""
     op.add_column(
-        'traffic_light_objects',
-        sa.Column('latitude', sa.Float(), server_default=sa.text('0'), nullable=False),
+        "traffic_light_objects",
+        sa.Column("latitude", sa.Float(), server_default=sa.text("0"), nullable=False),
     )
     op.add_column(
-        'traffic_light_objects',
-        sa.Column('longitude', sa.Float(), server_default=sa.text('0'), nullable=False),
+        "traffic_light_objects",
+        sa.Column("longitude", sa.Float(), server_default=sa.text("0"), nullable=False),
     )
     op.add_column(
-        'traffic_light_objects',
+        "traffic_light_objects",
         sa.Column(
-            'ipv4', postgresql.INET(), server_default=sa.text('Null'), nullable=True
+            "ipv4", postgresql.INET(), server_default=sa.text("Null"), nullable=True
         ),
     )
     op.add_column(
-        'traffic_light_objects',
+        "traffic_light_objects",
         sa.Column(
-            'gateway', postgresql.INET(), server_default=sa.text('Null'), nullable=True
+            "gateway", postgresql.INET(), server_default=sa.text("Null"), nullable=True
         ),
     )
     op.add_column(
-        'traffic_light_objects',
+        "traffic_light_objects",
         sa.Column(
-            'mac_address',
+            "mac_address",
             sa.String(length=17),
-            server_default=sa.text('Null'),
+            server_default=sa.text("Null"),
             nullable=True,
         ),
     )
     op.add_column(
-        'traffic_light_objects',
-        sa.Column('traffic_controller', sa.String(), nullable=True),
+        "traffic_light_objects",
+        sa.Column("traffic_controller", sa.String(), nullable=True),
     )
 
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_column('traffic_light_objects', 'traffic_controller')
-    op.drop_column('traffic_light_objects', 'mac_address')
-    op.drop_column('traffic_light_objects', 'gateway')
-    op.drop_column('traffic_light_objects', 'ipv4')
-    op.drop_column('traffic_light_objects', 'longitude')
-    op.drop_column('traffic_light_objects', 'latitude')
+    op.drop_column("traffic_light_objects", "traffic_controller")
+    op.drop_column("traffic_light_objects", "mac_address")
+    op.drop_column("traffic_light_objects", "gateway")
+    op.drop_column("traffic_light_objects", "ipv4")
+    op.drop_column("traffic_light_objects", "longitude")
+    op.drop_column("traffic_light_objects", "latitude")

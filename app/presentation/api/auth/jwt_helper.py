@@ -17,7 +17,7 @@ class JWTHelper:
         cls,
         payload: dict,
         private_key: str = settings.auth_jwt.private_key_path.read_text(
-            encoding='utf-8'
+            encoding="utf-8"
         ),
         algorithm: str = settings.auth_jwt.algorithm,
         expire_timedelta: timedelta | None = None,
@@ -29,7 +29,7 @@ class JWTHelper:
         else:
             expire = now + timedelta(minutes=expire_minutes)
         return jwt.encode(
-            {k: v for k, v in payload.items()} | {'exp': expire, 'iat': now},
+            {k: v for k, v in payload.items()} | {"exp": expire, "iat": now},
             private_key,
             algorithm,
         )
@@ -38,7 +38,7 @@ class JWTHelper:
     def decode_jwt(
         cls,
         token: AnyStr,
-        public_key: str = settings.auth_jwt.public_key_path.read_text(encoding='utf-8'),
+        public_key: str = settings.auth_jwt.public_key_path.read_text(encoding="utf-8"),
         algorithm: str = settings.auth_jwt.algorithm,
     ) -> dict[str, str]:
         return jwt.decode(

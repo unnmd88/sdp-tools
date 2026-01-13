@@ -3,18 +3,18 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 from core.enums import Roles, Organizations
 
 
-ACCESS_TOKEN_TYPE = 'access'
-REFRESH_TOKEN_TYPE = 'refresh'
+ACCESS_TOKEN_TYPE = "access"
+REFRESH_TOKEN_TYPE = "refresh"
 
 
 class TokenInfo(BaseModel):
     access_token: str
     refresh_token: str | None = None
-    token_type: str = 'Bearer'
+    token_type: str = "Bearer"
 
 
 class BasePayloadJWTSchema(BaseModel):
-    model_config = ConfigDict(strict=True, extra='forbid')
+    model_config = ConfigDict(strict=True, extra="forbid")
 
     user_id: int
     sub: str
@@ -24,7 +24,7 @@ class BasePayloadJWTSchema(BaseModel):
 
 
 class PayloadAccessJWTSchema(BasePayloadJWTSchema):
-    model_config = ConfigDict(strict=True, extra='forbid')
+    model_config = ConfigDict(strict=True, extra="forbid")
 
     role: str | Roles
     organization: str | Organizations

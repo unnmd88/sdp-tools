@@ -35,7 +35,7 @@ class CreateUserUseCaseImpl:
 
     async def __call__(self, create_user_dto: CreateUserDTO) -> UserEntity:
         logger.info(
-            'Запрос на создание нового пользователя от инициатора=%r: %r',
+            "Запрос на создание нового пользователя от инициатора=%r: %r",
             create_user_dto.username,
             create_user_dto,
         )
@@ -45,20 +45,20 @@ class CreateUserUseCaseImpl:
                     create_user_dto.customer
                 )
             )
-            logger.info('Инициатор=%r найден', customer_entity.username)
+            logger.info("Инициатор=%r найден", customer_entity.username)
         except UserNotFoundError:
-            msg = f'Ошибка: {create_user_dto.customer!r} не найден.'
+            msg = f"Ошибка: {create_user_dto.customer!r} не найден."
             logger.info(msg)
             raise UserNotFoundError(msg)
         except InactiveUserError:
-            msg = f'Ошибка: {create_user_dto.customer!r} не активен.'
+            msg = f"Ошибка: {create_user_dto.customer!r} не активен."
             logger.info(msg)
             raise InactiveUserError(msg)
         except ApplicationError as e:
-            logger.critical('Ошибка логики создания нового пользователя: %r', e)
+            logger.critical("Ошибка логики создания нового пользователя: %r", e)
             raise
         if not customer_entity.permissions.has(Permissions.CREATE_USERS):
-            msg = f'У {customer_entity.username!r} нет прав для создания пользователей.'
+            msg = f"У {customer_entity.username!r} нет прав для создания пользователей."
             logger.warning(msg)
             raise UserPermissionsError(msg)
         try:
@@ -67,7 +67,7 @@ class CreateUserUseCaseImpl:
                 password=create_user_dto.password,
             )
         except InvalidValueToSetError as e:
-            logger.info('%s: %r', e, create_user_dto.password)
+            logger.info("%s: %r", e, create_user_dto.password)
             raise
         user_already_exists: UserEntity = (
             await self.get_user_use_case.get_user_by_username_or_none(
@@ -75,7 +75,7 @@ class CreateUserUseCaseImpl:
             )
         )
         if user_already_exists:
-            msg = f'Пользователь с username={user_already_exists.username}(id={user_already_exists.id}) существует.'
+            msg = f"Пользователь с username={user_already_exists.username}(id={user_already_exists.id}) существует."
             logger.warning(msg)
             raise UserAlreadyExistsError(msg)
         entity = UserEntity(
@@ -96,8 +96,8 @@ class CreateUserUseCaseImpl:
             new_user_entity = await self.user_repository.add_user(entity)
             assert new_user_entity == entity
         except Exception as e:
-            msg = f'Ошибка логики приложения при добавлении пользователя в репозиторий: {e}'
+            msg = f"Ошибка логики приложения при добавлении пользователя в репозиторий: {e}"
             logger.critical(msg)
             raise ApplicationError(msg)
-        logger.info('Успешно создан новый пользователь: %r', new_user_entity)
+        logger.info("Успешно создан новый пользователь: %r", new_user_entity)
         return new_user_entity

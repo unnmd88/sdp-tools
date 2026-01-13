@@ -7,7 +7,7 @@ from core.enums import PassportGroups
 class PassportGroupEntity:
     id: int | None = None
     group_name: PassportGroups
-    description: str = ''
+    description: str = ""
 
     # def __post_init__(self):
     #     if not check_description_is_valid(self.description):

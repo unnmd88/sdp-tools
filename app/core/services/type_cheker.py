@@ -1,6 +1,6 @@
 from typing import Any, get_type_hints
 
-from core.exceptions.contract import ContractViolationValueTypeError
+from core.contracts.exc import ContractViolationValueTypeError
 
 
 class TypeChecker:
@@ -14,7 +14,7 @@ class TypeChecker:
     ) -> None:
         if locals_args is None:
             return None
-        locals_args.pop('self', None)
+        locals_args.pop("self", None)
         for arg_name, arg_val in locals_args.items():
             if not isinstance(arg_val, annotations.get(arg_name, object)):
                 raise ContractViolationValueTypeError(
@@ -43,5 +43,5 @@ def foo(x: int, y: str, z=4) -> int | None:
     return
 
 
-if __name__ == '__main__':
-    foo(1, '2')
+if __name__ == "__main__":
+    foo(1, "2")

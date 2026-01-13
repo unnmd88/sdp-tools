@@ -7,7 +7,7 @@ from fastapi import HTTPException
 
 
 @pytest.mark.parametrize(
-    ('token_type', 'expected_token_type', 'expected_res'),
+    ("token_type", "expected_token_type", "expected_res"),
     [
         (TokenTypes.access, TokenTypes.access, nullcontext()),
         (TokenTypes.refresh, TokenTypes.refresh, nullcontext()),

@@ -1,158 +1,257 @@
-import itertools
-from collections.abc import MutableSequence, Sequence
-from datetime import timedelta, datetime
-from enum import IntEnum
-from time import perf_counter
+from collections.abc import Sequence, Generator
+from enum import Enum
+
 from types import UnionType
 from typing import (
     Callable,
     Any,
     Iterable,
-    MutableMapping,
 )
 
-from core.contracts import ContractRequire
-from core.exceptions.contract import (
-    ContractViolationValueTypeError,
-    ContractViolationPreConditionError,
+
+from core.contracts.enums import ValidationLevels
+from core.contracts.exc import (
+    ContractViolationError,
     ContractViolationPreProcessingError,
+    ContractViolationValueTypeError,
 )
-from core.contracts.validators.domain_validators import (
-    id_validator,
-    isinstance_validator,
-)
+from core.contracts.interfaces.cahe_interface import CacheFieldProtocol
+from core.contracts.requires import ContractRequire
+from core.contracts.utils import get_contract_require
 
-
-class ValidationLevels(IntEnum):
-    strict = 60
-    soft = 50
-    liberal = 40
-
-
-class CacheSetup:
-    def __init__(
-        self,
-        *,
-        use_cache: bool = False,
-        cache: dict = None,
-        expiration_time: timedelta = None,
-    ):
-        self._cache = cache
-        if use_cache and cache is None:
-            self._cache = {}
-        if expiration_time is not None and not isinstance(expiration_time, timedelta):
-            raise TypeError('Время жизни должно быть экземпляром класса timedelta.')
-        self.expiration_time = expiration_time
-
-    def set_cache(self, cache: MutableMapping[Any, timedelta | None]):
-        if not isinstance(cache, MutableMapping):
-            raise TypeError(
-                f'Cache должен быть экземпляром класса {MutableMapping.__name__!r}.'
-            )
-        self._cache = cache
-
-    def get_cache(self):
-        return self._cache
-
-    def get(self, value: Any):
-        return self._cache.get(value)
-
-    def update(self, **kwargs):
-        self._cache.update(**kwargs)
-
-    def pop(self, key: Any) -> Any | None:
-        return self._cache.pop(key, None)
-
-    def clear(self):
-        self._cache.clear()
+type RequireTypeData = ContractRequire | Callable[..., bool]
+type IsInstanceType = type | tuple[type, ...] | UnionType | Enum
 
 
 class ContractField[T]:
-    _name_by_default: str = 'Generic'
-    _expected_types: type | tuple[type, ...] | UnionType = Any
-    _cache_valid_values: set[T] = set()
-    _nullable_by_default: bool = False
-    _requires: Sequence[ContractRequire] = ()
+    _CALLABLE_OBJ_POS_IN_ANNOTATED = 0
+    _MESSAGE_OBJ_POS_IN_ANNOTATED = 1
 
-    __slots__ = (
-        '_name',
-        '_raise_if_isinstance_failed',
-        '_use_cache',
-        '_nullable',
-        '_preprocess_value_before_requires',
-        '_isinstance_check_types',
-        '_all_requires',
-        '_repair',
-        '_level',
-    )
+    _is_enum_cls_: bool = False
+    _cache: CacheFieldProtocol = set[T]()
+
+    expected_types: IsInstanceType = object
+    base_requires: Sequence[RequireTypeData] = ()
+
+    def __init_subclass__(cls, *, cache: CacheFieldProtocol = None, **kwargs):
+        if cache is None:
+            cls._cache = set()
+        else:
+            cls._cache = cache
+        for require in cls.base_requires:
+            if not cls._check_valid_require(require):
+                raise TypeError(
+                    f"Тип аргумента 'require' должен быть "
+                    f"{ContractRequire.__name__!r} или callable-объектом."
+                    f"Предоставленный тип: {type(require)!r}."
+                )
+        if cls.expected_types and issubclass(cls.expected_types, Enum):
+            cls._is_enum_cls_ = True
+        cls._check_types_for_isinstance(cls.expected_types)
+        super().__init_subclass__(**kwargs)
+
+    @classmethod
+    def _check_valid_require(cls, require: RequireTypeData) -> bool:
+        return isinstance(require, ContractRequire) or callable(require)
+
+    @classmethod
+    def _check_types_for_isinstance(cls, value: Any) -> bool:
+        if isinstance(value, type):
+            return True
+        if isinstance(value, UnionType):
+            return True
+        if value and isinstance(value, Iterable) and all(isinstance(t, type) for t in value):
+            return True
+        if value and issubclass(value, Enum):
+            return True
+        raise TypeError(
+            f"Для проверки типов данных в {cls!r}.Ожидается:\n"
+            f"тип (Например: bool)\nили объединение 'UnionType'(например: int | str)"
+            f"\nили кортеж типов(например: (list, tuple, dict)). "
+            f"Получено: {value!r}({type(value)!r})."
+        )
 
     def __init__(
         self,
         *,
+        name: str,
         use_cache: bool,
-        name: str = None,
         nullable: bool = None,
-        isinstance_check_types: bool = True,
-        raise_if_isinstance_failed: bool = True,
-        preprocess_value_before_requires: Callable[[T], Any | T] = None,
-        extra_requires: Iterable[ContractRequire] = (),
-        repair: Callable[[T], Any | T] = None,
+        check_isinstance: bool = True,
+        preprocess_value_before_requires: RequireTypeData = None,
+        override_self_expected_types: IsInstanceType = None,
+        override_isinstance_base_validator: RequireTypeData = None,
+        extra_requires: Iterable[RequireTypeData] = (),
         level: ValidationLevels = ValidationLevels.strict,
     ):
-        self._name = name or self._name_by_default
-        self._isinstance_check_types = isinstance_check_types
+        if self._is_enum_cls_ is None:
+            self._current_isinstance_validator = self._isinstance_validator
+        else:
+            self._current_isinstance_validator = self._isinstance_enum_validator
+        self._name = name
+        self._check_isinstance = check_isinstance
+        self._nullable = nullable
         self._use_cache = use_cache
-        self._nullable = nullable or self._nullable_by_default
-        self._preprocess_value_before_requires = preprocess_value_before_requires
-        self._raise_if_isinstance_failed = raise_if_isinstance_failed
-        if any(
-            not isinstance(predicate, ContractRequire) for predicate in extra_requires
-        ):
-            raise TypeError(
-                f'Дополнительные валидаторы должны быть итерируемым объектом, '
-                f'содержащим элементы типа {ContractRequire.__name__!r}'
-            )
-        self._all_requires = set(
-            r for r in itertools.chain(self._requires, (extra_requires or ()))
-        )
-        self._all_requires = tuple(self._all_requires)
+        self._override_self_expected_types = override_self_expected_types
+        self._override_isinstance_base_validator = override_isinstance_base_validator
+        self._check_override_isinstance_base_validator()
 
-        self._repair = repair
+        if override_self_expected_types is not None:
+            self._check_types_for_isinstance(override_self_expected_types)
+            self._expected_types = override_self_expected_types
+        else:
+            self._expected_types = self.expected_types
+
+        self._is_enum = issubclass(self._expected_types, Enum)
+        if self._is_enum:
+            self._current_isinstance_validator = self._isinstance_enum_validator
+
+        print(f"{self._is_enum=}")
+        print(f"{self._is_enum_cls_=}")
+
+        self._preprocess_value_before_requires = preprocess_value_before_requires
+        # Проверка preprocess_value_before_requires
+        self._extra_requires = extra_requires
+        self._all_requires = tuple(self._collect_requires_pipeline())
+        # Финальная проверка, что все элементы в _all_requires - ContractRequire
+        for i, require in enumerate(self._all_requires):
+            assert isinstance(require, ContractRequire), (
+                f"Все элементы в {self._all_requires!r} "
+                f"должны быть экземплярами класса {ContractRequire.__name__!r}."
+                f"Недопустимый объект: {require!r}  c индексом={i}."
+            )
         self._level = level
 
-        if self._preprocess_value_before_requires is not None:
-            if not callable(self._preprocess_value_before_requires):
-                raise TypeError(
-                    'preprocess_value_before_requires должен быть вызываемым объектом'
-                )
         if not isinstance(self._nullable, bool):
-            raise TypeError('Nullable должно быть булевым значением')
-
+            raise TypeError("аргумент 'nullable' должен быть булевым значением")
         try:
             ValidationLevels(self._level)
         except ValueError:
             raise TypeError(
-                f"Неверное значение для поля 'mode'. Допустимы из класса {ValidationLevels.__name__!r}"
+                f"Неверное значение атрибута 'mode'. Допустимы из класса {ValidationLevels.__name__!r}"
             )
+        print(f"{self._all_requires=}")
 
-    def __repr__(self):
-        return (
-            f'{self.__class__.__name__}('
-            f'name={self._name!r} '
-            f'expected_types={self._expected_types!r} '
-            f'nullable_by_default={self._nullable_by_default!r} '
-            f'nullable={self._nullable!r} '
-            f'isinstance_check_types={self._isinstance_check_types!r} '
-            f'use_cache={self._use_cache!r} '
-            f'all_requires_count={len(self._all_requires)!r}'
-            f')'
+    def _check_override_isinstance_base_validator(self) -> bool:
+        if self._override_isinstance_base_validator is None:
+            return True
+        if self._override_isinstance_base_validator:
+            if isinstance(self._override_isinstance_base_validator, ContractRequire):
+                return True
+            if callable(self._override_isinstance_base_validator):
+                return True
+        raise TypeError(
+            f"Аргумент 'override_isinstance_base_validator' должен быть "
+            f"экземпляром класса {ContractRequire.__name__!r} или callable-объектом."
         )
 
+    def _collect_requires_pipeline(self) -> Generator[ContractRequire, None, None]:
+        collected_requires = []
+        collected_requires += self._collect_preprocess_requires()
+        collected_requires += self._collect_isinstance_requires()
+        collected_requires += self._collect_cls_requires()
+        collected_requires += self._collect_extra_requires()
+        assert all(
+            isinstance(require, ContractRequire) for require in collected_requires
+        ), f"Все элементы должны быть экземплярами класса {ContractRequire.__name__!r}."
+
+        return (r for r in dict.fromkeys(collected_requires))
+
+    def _collect_preprocess_requires(self) -> Generator[ContractRequire, None, None]:
+        if self._preprocess_value_before_requires is not None:
+            yield get_contract_require(
+                obj=self._preprocess_value_before_requires,
+                attr_name_for_raise_detail="preprocess_value_before_requires!r",
+                description=f"Ошибка при обработке значения поля {self._name!r}.",
+            )
+
+    def _collect_isinstance_requires(self) -> Generator[ContractRequire, None, None]:
+        if self._override_isinstance_base_validator:
+            self._check_types_for_isinstance(self._override_isinstance_base_validator)
+            if not self._check_valid_require(self._override_isinstance_base_validator):
+                TypeError(
+                    f"Атрибут 'preprocess_value_before_requires' должен быть "
+                    f"callable-объектом или {ContractRequire.__name__!r}."
+                )
+            yield get_contract_require(
+                obj=self._override_isinstance_base_validator,
+                attr_name_for_raise_detail="override_isinstance_check_types!r",
+                description=f"Ошибка при обработке значения поля {self._name!r}.",
+            )
+        elif self._check_isinstance:
+            yield get_contract_require(
+                obj=self._current_isinstance_validator,
+                attr_name_for_raise_detail="override_isinstance_check_types!r",
+                description=(
+                    f"Нарушен контракт проверки типа поля {self._name!r}. "
+                    f" Ожидается {self._expected_types!r}."
+                ),
+            )
+
+    def _collect_cls_requires(self) -> Generator[ContractRequire, None, None]:
+        for predicate in self.base_requires:
+            yield get_contract_require(
+                obj=predicate,
+                attr_name_for_raise_detail=f"cls {self.__class__.__name__!r} 'requires'",
+            )
+
+    def _collect_extra_requires(self) -> Generator[ContractRequire, None, None]:
+        for i, predicate in enumerate(self._extra_requires) or ():
+            yield get_contract_require(
+                obj=predicate,
+                attr_name_for_raise_detail=(
+                    f"Элемент в аргументе 'extra_requires'(индекс={i}) "
+                    f"метода  __init__() в классе {self.__class__.__name__!r}"
+                ),
+            )
+
+    def _validation(self, value: T) -> T:
+        for require, msg, exc in self._all_requires:
+            if not require(value):
+                exc = exc or ContractViolationError
+                raise exc(
+                    f"Нарушен контракт {require.__qualname__!r} поля {self._name!r}. "
+                    f"Значение: {value!r}({type(value)!r}). Описание: {msg}."
+                )
+        return value
+
+    def _isinstance_validator(self, value: Any) -> bool:
+        if not isinstance(value, self._expected_types):
+            try:
+                self._expected_types(value) # Проверка на Enum
+                return True
+            except (ValueError, ):
+                pass
+            raise ContractViolationValueTypeError(
+                arg_name=self._name,
+                got=value,
+                expected=self._expected_types,
+            )
+        return True
+
+    def _isinstance_enum_validator(self, value: Any) -> bool:
+        try:
+            self._expected_types(value)
+        except ValueError:
+            raise ContractViolationValueTypeError(
+                arg_name=self._name,
+                got=value,
+                expected=self._expected_types,
+            )
+
+        return True
+
     def __call__(self, value: T) -> T:
-        if self._use_cache and (value in self._cache_valid_values):
+        if value is None:
+            if self._nullable:
+                return None
+            raise ContractViolationValueTypeError(
+                arg_name=self._name,
+                got=None,
+                expected=self._expected_types,
+            )
+        if self._use_cache and (value in self._cache):
             return value
-        if value is None and self._nullable:
-            return None
         try:
             value = (
                 self._preprocess_value_before_requires(value)
@@ -162,41 +261,33 @@ class ContractField[T]:
         except Exception as e:
             raise ContractViolationPreProcessingError(e)
 
-        if not self.isinstance_validator(value):
-            pass  # TODO: Если self._raise_if_isinstance_failed=False, то логировать или например метрику собирать
+        self._validation(value)
 
-        value = self._validation(value)
-        self._cache_valid_values.add(value)
+        if self._check_isinstance and not self._is_enum:
+            assert isinstance(value, self._expected_types), (
+                f"Неверный тип данных после всех валидаций. Значение={value!r}. "
+                f"Ожидается: {self._expected_types!r}. Получено {type(value)!r}."
+            )
+        if self._use_cache:
+            self._cache.add(value)
+            assert value in self._cache, "Элемент не был добавлен в кеш."
         return value
 
-    def _validation(self, value: Any) -> bool:
-        for predicate, exception in self._requires:
-            if not predicate(value):
-                if self._level < ValidationLevels.strict and self._repair is not None:
-                    if predicate(repaired_val := self._repair(value)):
-                        return repaired_val
-                if isinstance(exception, type) and issubclass(
-                    exception, ContractViolationValueTypeError
-                ):
-                    raise ContractViolationValueTypeError(
-                        arg_name=self._name,
-                        got=value,
-                        expected=self._expected_types,
-                    )
-                raise ContractViolationPreConditionError
-        return value
-
-    def isinstance_validator(self, value: Any) -> bool:
-        return isinstance_validator(
-            name=f'поля {self._name!r}',
-            value=value,
-            expected=self._expected_types,
-            raise_if_failed=self._raise_if_isinstance_failed,
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}("
+            f"name={self._name!r} "
+            f"expected_types={self._expected_types!r} "
+            f"nullable={self._nullable!r} "
+            f"is_enum={self._is_enum!r } "
+            f"use_cache={self._use_cache!r} "
+            f"all_requires_count={len(self._all_requires)!r} "
+            f")"
         )
 
     @classmethod
-    def get_cache(cls) -> set[T]:
-        return cls._cache_valid_values
+    def get_cache(cls) -> CacheFieldProtocol:
+        return cls._cache
 
     @property
     def name(self):
@@ -204,31 +295,34 @@ class ContractField[T]:
 
     @property
     def default_err_message(self):
-        return f'Нарушен контракта поля {self._name!r}.'
+        return f"Нарушен контракта поля {self._name!r}."
 
 
-class ContractFieldId(ContractField):
-    _name_by_default = 'id'
-    _expected_types = int
-    _requires = [ContractRequire(predicate=id_validator)]
+class ContractEnumField(ContractField):
+    _is_enum_cls_ = True
 
-    __slots__ = ContractField.__slots__
-
-
-class ContractFieldCreatedAt(ContractField):
-    _name_by_default = 'created_at'
-    _expected_types = datetime
-    _nullable_by_default = True
-
-    __slots__ = ContractField.__slots__
-
-
-class ContractFieldUpdatedAt(ContractField):
-    _name_by_default = 'updated_at'
-    _expected_types = datetime
-    _nullable_by_default = True
-
-    __slots__ = ContractField.__slots__
+# class ContractFieldId(ContractField):
+#     _name_by_default = 'id'
+#     _expected_types = int
+#     _requires = [ContractRequire(predicate=id_validator)]
+#
+#     __slots__ = ContractField.__slots__
+#
+#
+# class ContractFieldCreatedAt(ContractField):
+#     _name_by_default = 'created_at'
+#     _expected_types = datetime
+#     _nullable_by_default = True
+#
+#     __slots__ = ContractField.__slots__
+#
+#
+# class ContractFieldUpdatedAt(ContractField):
+#     _name_by_default = 'updated_at'
+#     _expected_types = datetime
+#     _nullable_by_default = True
+#
+#     __slots__ = ContractField.__slots__
 
 
 #
@@ -258,22 +352,20 @@ class ContractFieldUpdatedAt(ContractField):
 # )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # print(id_field_contract)
 
-    id_contract = ContractFieldId(
+    id_contract = ContractField(
+        name="id",
+        check_isinstance=False,
+        override_isinstance_base_validator=0,
         nullable=False,
-        use_cache=True,
-        extra_requires=[ContractRequire(predicate=id_validator)],
-        isinstance_check_types=True,
+        use_cache=False,
     )
-    print(id_contract._expected_types)
-    print(id_contract.get_cache())
-    id_contract(1)
-    print(id_contract.get_cache())
-    id_contract(1)
-    print(id_contract.get_cache())
-    id_contract(2)
-
-    print(id_contract.get_cache())
     print(id_contract)
+    print(id_contract(1))
+    print(id_contract.get_cache())
+    print(id_contract(2))
+    print(id_contract(3))
+    print(id_contract(424))
+    print(id_contract.get_cache())

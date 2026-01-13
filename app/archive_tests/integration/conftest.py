@@ -7,8 +7,8 @@ from starlette.testclient import TestClient
 from core.users import users as user_examples
 
 BASE_URL = (
-    f'http://{settings.run.host}:{settings.run.port}'
-    f'{settings.api.prefix}{settings.api.v1.prefix}'
+    f"http://{settings.run.host}:{settings.run.port}"
+    f"{settings.api.prefix}{settings.api.v1.prefix}"
 )
 
 FILL_DATA_TO_TABLES_DB = True
@@ -19,10 +19,10 @@ client = TestClient(
 )
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def t_dp_api():
     yield DatabaseAPI(
-        url='postgresql+asyncpg://test1:1111@192.168.200.3:5432/test',
+        url="postgresql+asyncpg://test1:1111@192.168.200.3:5432/test",
         echo=True,
         echo_pool=True,
         pool_size=50,
@@ -33,7 +33,7 @@ def t_dp_api():
 # @pytest.fixture(scope='session')
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 async def t_session(t_dp_api):
     async with t_dp_api.session_factory() as session:
         yield session

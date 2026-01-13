@@ -22,17 +22,17 @@ class DomainRulesViolationsMessages(StrEnum):
     created_rule = "'created_at должен быть меньше updated_at'"
     updated_rule = "'updated_at должен быть больше created_at'"
     email = "'email' должен быть допустимым типом почтового ящика."
-    password_type_must_be_bytes = 'Пароль должен быть последовательностью байтов.'
+    password_type_must_be_bytes = "Пароль должен быть последовательностью байтов."
     password_length = (
-        f'Пароль должен от {MIN_LEN_PASSWORD} до {MAX_LEN_PASSWORD} символов.'
+        f"Пароль должен от {MIN_LEN_PASSWORD} до {MAX_LEN_PASSWORD} символов."
     )
-    bad_phone_number = 'Неверный формат номера телефона.'
-    bad_telegram_username = 'Неверный формат @username для telegram-аккаунта.'
+    bad_phone_number = "Неверный формат номера телефона."
+    bad_telegram_username = "Неверный формат @username для telegram-аккаунта."
     description_must_be_lt_255 = "'Описание' должно быть не более 255 символов."
 
 
 class BusinessRulesViolationsMessages(StrEnum):
-    must_be_from_to_chars = '{} Должно содержать от {} до {} символов.'
+    must_be_from_to_chars = "{} Должно содержать от {} до {} символов."
 
     err_username = "Ошибка поля 'username'."
     err_firstname = "Ошибка поля 'firstname'."
@@ -42,7 +42,7 @@ class BusinessRulesViolationsMessages(StrEnum):
         str(err_username), MIN_LEN_USERNAME, MAX_LEN_USERNAME
     )
     username_contents = (
-        '{} Должно содержать только буквы латинского алфавита или цифры от 0-9.'.format(
+        "{} Должно содержать только буквы латинского алфавита или цифры от 0-9.".format(
             err_username
         )
     )
@@ -50,14 +50,14 @@ class BusinessRulesViolationsMessages(StrEnum):
     firstname_length = must_be_from_to_chars.format(
         str(err_firstname), MIN_LEN_FIRSTNAME, MAX_LEN_FIRSTNAME
     )
-    firstname_contents = '{} Должно содержать только буквы латинского алфавита.'.format(
+    firstname_contents = "{} Должно содержать только буквы латинского алфавита.".format(
         err_firstname
     )
 
     lastname_length = must_be_from_to_chars.format(
         str(err_lastname), MIN_LEN_LASTNAME, MAX_LEN_LASTNAME
     )
-    lastname_contents = '{} Должно содержать только буквы латинского алфавита.'.format(
+    lastname_contents = "{} Должно содержать только буквы латинского алфавита.".format(
         err_lastname
     )
 
@@ -75,5 +75,5 @@ class BusinessRulesViolationsMessages(StrEnum):
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(BusinessRulesViolationsMessages.username_length)

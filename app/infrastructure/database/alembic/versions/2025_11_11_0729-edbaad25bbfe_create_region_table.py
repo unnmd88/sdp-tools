@@ -12,8 +12,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = 'edbaad25bbfe'
-down_revision: str | Sequence[str] | None = '02220211904e'
+revision: str = "edbaad25bbfe"
+down_revision: str | Sequence[str] | None = "02220211904e"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
@@ -22,23 +22,23 @@ def upgrade() -> None:
     """Upgrade schema."""
 
     op.create_table(
-        'regions',
-        sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column('code', sa.Integer(), nullable=False),
-        sa.Column('name', sa.String(length=32), nullable=False),
+        "regions",
+        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column("code", sa.Integer(), nullable=False),
+        sa.Column("name", sa.String(length=32), nullable=False),
         sa.Column(
-            'created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False
+            "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
         sa.Column(
-            'updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False
+            "updated_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
-        sa.PrimaryKeyConstraint('id', name=op.f('pk_regions')),
-        sa.UniqueConstraint('code', name=op.f('uq_regions_code')),
-        sa.UniqueConstraint('name', name=op.f('uq_regions_name')),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_regions")),
+        sa.UniqueConstraint("code", name=op.f("uq_regions_code")),
+        sa.UniqueConstraint("name", name=op.f("uq_regions_name")),
     )
 
 
 def downgrade() -> None:
     """Downgrade schema."""
 
-    op.drop_table('regions')
+    op.drop_table("regions")

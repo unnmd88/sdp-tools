@@ -13,7 +13,7 @@ class FiltersFactory:
     ) -> dict[str, Any]:
         filters = {}
         if code is not None:
-            filters['code'] = code
+            filters["code"] = code
         if name is not None:
-            filters['name'] = name
+            filters["name"] = name
         return filters

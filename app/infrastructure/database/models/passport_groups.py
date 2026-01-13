@@ -19,6 +19,6 @@ class PassportGroup(
     )
     description: Mapped[str] = mapped_column(
         Text,
-        default='',
-        server_default='',
+        default="",
+        server_default="",
     )

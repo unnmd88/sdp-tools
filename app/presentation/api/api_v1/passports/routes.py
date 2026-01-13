@@ -26,8 +26,8 @@ from presentation.api.dependencies.dependencies import (
 )
 
 router = APIRouter(
-    prefix='/passports',
-    tags=['Passports of Traffic Light Objects'],
+    prefix="/passports",
+    tags=["Passports of Traffic Light Objects"],
     # dependencies=[Depends(check_user_is_active)],
 )
 

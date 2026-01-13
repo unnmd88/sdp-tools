@@ -1,22 +1,19 @@
 import json
 from abc import ABC
-from collections.abc import Iterable, Generator
+from collections.abc import Generator
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from core.contracts import ContractRequire
-from core.contracts.field_contracts import ContractField
 from core.contracts.field_contracts.base import (
     ContractFieldId,
     ContractFieldCreatedAt,
     ContractFieldUpdatedAt,
 )
-from core.contracts.validators.domain_validators import id_validator
 from core.exceptions.contract import (
     ContractViolationPreConditionError,
-    ContractViolationInvariantError,
 )
+from core.contracts.exc import ContractViolationInvariantError
 from core.users.constants import MIN_ID, MAX_ID
 from core.users.rules_messages import DomainRulesViolationsMessages
 
@@ -28,13 +25,13 @@ class PublicAttr:
 
 
 class AbstractEntity(ABC):
-    time_format = '%Y-%m-%d %H:%M:%S'
+    time_format = "%Y-%m-%d %H:%M:%S"
 
     __public_attrs__ = (
-        PublicAttr(attr_name='_id', alias='id'),
-        PublicAttr(attr_name='_built_at', alias='built_at'),
-        PublicAttr(attr_name='_updated_at', alias='updated_at'),
-        PublicAttr(attr_name='_created_at', alias='created_at'),
+        PublicAttr(attr_name="_id", alias="id"),
+        PublicAttr(attr_name="_built_at", alias="built_at"),
+        PublicAttr(attr_name="_updated_at", alias="updated_at"),
+        PublicAttr(attr_name="_created_at", alias="created_at"),
     )
 
     contract_id = ContractFieldId(
@@ -73,15 +70,15 @@ class AbstractEntity(ABC):
             yield attr.alias, getattr(self, attr.attr_name)
 
     def __str__(self):
-        attrs = ' '.join(
-            f'{attr}={value.strftime(self.time_format) if isinstance(value, datetime) else value}'
+        attrs = " ".join(
+            f"{attr}={value.strftime(self.time_format) if isinstance(value, datetime) else value}"
             for attr, value in self
         )
-        return f'{self.__class__.__name__}({attrs})'
+        return f"{self.__class__.__name__}({attrs})"
 
     def __repr__(self):
-        attrs = ' '.join(f'{attr}={value!r}' for attr, value in self)
-        return f'{self.__class__.__name__}({attrs})'
+        attrs = " ".join(f"{attr}={value!r}" for attr, value in self)
+        return f"{self.__class__.__name__}({attrs})"
 
     def to_dict(
         self,
@@ -162,7 +159,7 @@ class AbstractEntity(ABC):
                 )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     o = AbstractEntity(id=1, created_at=None, updated_at=None)
     print(o.id)
     print(list(o))

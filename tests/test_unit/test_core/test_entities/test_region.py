@@ -18,7 +18,7 @@ class TestRegionEntity:
         assert region.code == RegionCodes.MOSCOW77
 
     @pytest.mark.parametrize(
-        'region_name,region_code,expectation',
+        "region_name,region_code,expectation",
         [
             (1, 2, pytest.raises(TypeError)),
             (

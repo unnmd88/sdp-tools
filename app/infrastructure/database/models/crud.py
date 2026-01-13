@@ -13,7 +13,7 @@ from infrastructure.database.models import Base, User
 
 # from core.models import Base, User
 
-T = TypeVar('T', bound=Base)
+T = TypeVar("T", bound=Base)
 
 
 class BaseCrud[T]:
@@ -35,7 +35,7 @@ class BaseCrud[T]:
         if (res := await session.get(User, user_id)) is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f'User with id={user_id} not found',
+                detail=f"User with id={user_id} not found",
             )
         return UserFromDbFullSchema.model_validate(res)
 
@@ -51,9 +51,9 @@ class BaseCrud[T]:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=(
-                    f'Instance of {from_model.__class__.__name__!r} '
-                    f'with filters {" ".join(f"{k!r}={v!r}" for k, v in filters.items())} '
-                    f'not found'
+                    f"Instance of {from_model.__class__.__name__!r} "
+                    f"with filters {' '.join(f'{k!r}={v!r}' for k, v in filters.items())} "
+                    f"not found"
                 ),
             )
         return pk_id
@@ -63,7 +63,7 @@ class BaseCrud[T]:
         if (res := await session.get(cls.model, pk_id)) is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=(f'{cls.model.__name__!r} with pk_id {pk_id!r} not found '),
+                detail=(f"{cls.model.__name__!r} with pk_id {pk_id!r} not found "),
             )
         return res
 
@@ -89,23 +89,23 @@ class BaseCrud[T]:
     ):
         new_instance = cls.model(**model.model_dump(exclude_unset=True))
         cls.logger.info(
-            'Попытка добавить строку в таблицу %r из данных %r',
+            "Попытка добавить строку в таблицу %r из данных %r",
             cls.model.__name__,
             model,
         )
         session.add(new_instance)
         try:
             await session.commit()
-            cls.logger.info('Новая запись добавлена успешно: %r', new_instance)
+            cls.logger.info("Новая запись добавлена успешно: %r", new_instance)
         except IntegrityError:
-            cls.logger.warning('Новая запись не была добавлена: данные уже существуют')
+            cls.logger.warning("Новая запись не была добавлена: данные уже существуют")
             await session.rollback()
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail='Already exists.',
+                detail="Already exists.",
             )
         except SQLAlchemyError as e:
-            cls.logger.error('Ошибка добавления данных: %r', e)
+            cls.logger.error("Ошибка добавления данных: %r", e)
             await session.rollback()
             raise e
         return new_instance

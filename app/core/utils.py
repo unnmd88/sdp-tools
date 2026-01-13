@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 def checking_types(
     *,
     isinstance_of: type | UnionType | Iterable[type],
-    field_name_for_exception: str = 'field_name',
+    field_name_for_exception: str = "field_name",
 ):
     """
     Декоратор, проверяющий корректность типа объекта.
@@ -37,7 +37,7 @@ def checking_types(
         def wrapper(value, *args, **kwargs):
             if not isinstance(value, isinstance_of):
                 raise TypeError(
-                    f'{field_name_for_exception!r} value must be an instance of {isinstance_of!r}'
+                    f"{field_name_for_exception!r} value must be an instance of {isinstance_of!r}"
                 )
             return func(value, *args, **kwargs)
 
@@ -51,7 +51,7 @@ def validate_string_by_pattern(
     pattern: re.Pattern,
     allow_empty: bool = True,
 ) -> bool:
-    if allow_empty and string_to_validate == '':
+    if allow_empty and string_to_validate == "":
         return True
     return re.match(pattern, string_to_validate) is not None
 
@@ -60,7 +60,7 @@ def not_none_dataclass_instance_attrs_to_dict(
     dataclass_instance,
     *exclude_fields,
     default_exclude_fields: frozenset | set | None = frozenset(
-        ('id', '_id', 'filters_for_search')
+        ("id", "_id", "filters_for_search")
     ),
 ) -> dict:
     exclude = default_exclude_fields or frozenset()
@@ -78,6 +78,6 @@ def foo(value):
     print(value)
 
 
-if __name__ == '__main__':
-    foo('1')
+if __name__ == "__main__":
+    foo("1")
     foo([2])

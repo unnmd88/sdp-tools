@@ -39,7 +39,7 @@ class PassportGroupsServiceImpl:
             group_name=passport_group_dto.group_name,
         )
         if passport_group_exists is not None:
-            raise CreateError('Паспортная группа уже существует.')
+            raise CreateError("Паспортная группа уже существует.")
         return await self.repository.add(passport_group_entity)
 
     async def update_passport_group(
@@ -52,14 +52,14 @@ class PassportGroupsServiceImpl:
             )
         )
         if current_passport_group is None:
-            raise UpdateError('Паспортная группа с данным названием не найдена.')
+            raise UpdateError("Паспортная группа с данным названием не найдена.")
         updated_passport_group = PassportGroupEntity(
             id=current_passport_group.id,
             group_name=passport_group_dto.group_name,
             description=passport_group_dto.description,
         )
         if current_passport_group == updated_passport_group:
-            raise UpdateError('Нет отличий в обновляемых полях.')
+            raise UpdateError("Нет отличий в обновляемых полях.")
 
         return await self.repository.update(
             _id=current_passport_group.id,

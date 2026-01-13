@@ -7,10 +7,10 @@ from core.enums import PassportGroups
 
 class PassportGroupsBase(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
     group_name: PassportGroups
-    description: Annotated[str, Field(default='')]
+    description: Annotated[str, Field(default="")]
 
 
 class PassportGroupsSchema(PassportGroupsBase):
@@ -19,13 +19,13 @@ class PassportGroupsSchema(PassportGroupsBase):
 
 class PassportGroupsCreate(PassportGroupsBase):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
 
 
 class PassportGroupsUpdate(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
 
     group_name_to_update: PassportGroups

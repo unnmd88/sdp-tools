@@ -22,9 +22,9 @@ from core.tlo.entities.tlo import TrafficLightObjectEntity
 from core.users.entities.user import UserEntity
 
 
-T = TypeVar('T', bound=type[Base])
+T = TypeVar("T", bound=type[Base])
 Entity: TypeAlias = UserEntity | TrafficLightObjectEntity | RegionEntity
-Record = TypeVar('Record', bound=Base)
+Record = TypeVar("Record", bound=Base)
 
 
 class BaseSqlAlchemy:
@@ -106,7 +106,7 @@ class BaseSqlAlchemy:
                 setattr(current_model, k, v)
             await self.session.commit()
             updated_entity = await self.get_one_or_none_by_filters(
-                {'id': old_entity.id}
+                {"id": old_entity.id}
             )
             return UpdatedRecordDTO(
                 old_entity, updated_entity, name=self.model.__name__
@@ -139,7 +139,7 @@ class BaseSqlAlchemy:
         try:
             await self.session.execute(stmt)
             await self.session.commit()
-            if (await self.get_one_or_none_by_filters({'id': entity.id})) is not None:
+            if (await self.get_one_or_none_by_filters({"id": entity.id})) is not None:
                 raise DeleteError
         except SQLAlchemyError as e:
             raise DeleteError(e)

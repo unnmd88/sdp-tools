@@ -1,8 +1,8 @@
 from typing import Protocol, TypeVar, ClassVar, Any
 
 
-TM = TypeVar('TM')
-TE = TypeVar('TE')
+TM = TypeVar("TM")
+TE = TypeVar("TE")
 
 
 def abstactmethod(args):
@@ -11,7 +11,6 @@ def abstactmethod(args):
 
 class BaseDBMapperProtocol(Protocol):
     entity: ClassVar
-
 
     @classmethod
     @abstactmethod
