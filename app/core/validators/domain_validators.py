@@ -20,7 +20,7 @@ def isinstance_validator(
         return True
     if raise_if_failed:
         raise ContractViolationValueTypeError(
-            arg_name=name, got=value, expected=expected
+            field_name=name, got=value, expected=expected
         )
     return False
 

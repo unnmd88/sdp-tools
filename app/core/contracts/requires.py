@@ -1,5 +1,6 @@
+from collections.abc import Sequence, Container
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Any
 
 
 @dataclass(kw_only=True, frozen=True, slots=True)
@@ -35,6 +36,7 @@ class ContractRequire:
     predicate: Callable[..., bool] | Callable[[], bool]
     description: str = ""
     custom_exception: Exception | type[Exception] = None
+    environments: Container[str] = None
 
     def __iter__(self):
         return (el for el in (self.predicate, self.description, self.custom_exception))
@@ -53,3 +55,6 @@ class ContractRequire:
                 f"Аргумент 'custom_exception' должен быть подклассом "
                 f"{Exception.__name__!r} или экземпляром подкласса."
             )
+
+    def __call__(self, *args, **kwargs) -> Any:
+        return self.predicate(*args, **kwargs)

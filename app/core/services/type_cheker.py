@@ -18,7 +18,7 @@ class TypeChecker:
         for arg_name, arg_val in locals_args.items():
             if not isinstance(arg_val, annotations.get(arg_name, object)):
                 raise ContractViolationValueTypeError(
-                    arg_name=arg_name, expected=annotations[arg_name].__name__
+                    field_name=arg_name, expected=annotations[arg_name].__name__
                 )
         return None
 
