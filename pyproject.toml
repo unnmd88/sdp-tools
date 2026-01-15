@@ -23,6 +23,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "mypy>=1.19.1",
     "pytest>=8.4.2",
     "ruff>=0.14.1",
 ]
@@ -56,3 +57,28 @@ skip-magic-trailing-comma = false
 # Pytest config
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+
+[tool.mypy]
+incremental = true                    # Инкрементальная проверка (быстрее)
+skip_cache_mtime_checks = true        # Пропустить проверки mtime (быстрее)
+
+# ==================== ОПЦИИ СТРОГОСТИ ====================
+strict = false
+
+files = [
+    "app/core/contracts",
+]
+
+# 🚫 Исключения (для скорости)
+exclude = [
+    "build/",
+    "dist/",
+    ".venv/",
+    ".uv/",
+    "__pycache__/",
+    ".*.py",
+    "migrations/",
+    "tests/",                         # Исключить тесты для скорости
+    "test_*.py",
+    "*_test.py",
+]
