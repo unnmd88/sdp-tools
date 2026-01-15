@@ -2,7 +2,6 @@ from datetime import datetime
 from enum import Enum, StrEnum
 
 from core.contracts.field_contracts import ContractField
-from core.contracts.field_contracts.base import ContractEnumField
 from core.contracts.requires import ContractRequire
 
 
@@ -11,7 +10,7 @@ class ContractIdPositiveIntegerField(ContractField):
     base_requires = (
         ContractRequire(
             predicate=lambda value: value > 0,
-            description="Значение должно быть целым положительным числом больше нуля.",
+            detail="Значение должно быть целым положительным числом больше нуля.",
         ),
     )
 
@@ -33,7 +32,7 @@ class ContractRoleField(ContractEnumField):
 
 if __name__ == "__main__":
     ob = ContractIdPositiveIntegerField(
-        name="id",
+        field_name="id",
         nullable=False,
         use_cache=True,
     )
@@ -42,13 +41,13 @@ if __name__ == "__main__":
     print(ob(2))
 
     ob2 = ContractDateField(
-        name="created_at",
+        field_name="created_at",
         nullable=True,
         use_cache=False,
     )
 
     ob3 = ContractField(
-        name="role",
+        field_name="role",
         nullable=False,
         use_cache=True,
         override_self_expected_types=E,
@@ -57,7 +56,7 @@ if __name__ == "__main__":
     print(ob3)
 
     ob4 = ContractRoleField(
-        name="role",
+        field_name="role",
         nullable=False,
         use_cache=True,
 

@@ -1,33 +1,60 @@
-from types import UnionType
+from typing import Any
 
 
 class ContractViolationError(Exception):
     """Базовый класс для исключений, возникающих при нарушении контракта."""
+
+    def __init__(
+        self,
+        *,
+        contract: str = "",
+        violation: str = "",
+        field_name: str = "",
+        value: Any = None,
+        detail: str = ""
+    ):
+        self.contract = contract
+        self.violation = violation
+        self.value = value
+        self.field_name = field_name
+        self.detail = detail
+        self.message = (
+            f"Контракт={self.contract!r}. "
+            f"Нарушение={self.violation!r}. "
+            f"Значение={self.value!r} "
+            f"Поле={self.field_name!r} "
+            f"detail={self.detail!r}."
+        )
+        super().__init__(self.message)
 
 
 class ContractViolationPreProcessingError(ContractViolationError):
     """ Класс исключений, возникающих при нарушении контракта предобработки. """
 
 
-class ContractViolationValueTypeError(ContractViolationError):
-    """ Класс исключений, возникающих при нарушении контракта типа значения."""
+class ContractViolationFieldError(ContractViolationError):
+    """ Класс исключений, возникающих при нарушении контракта поля. """
 
-    def __init__(
-        self,
-        *,
-        field_name: str,
-        got: type | None,
-        expected: str | type | tuple[str | type, ...] | UnionType,
-    ):
-        self._detail = (
-            f"Некорректный тип для поля {field_name!r}."
-            f" Значение={got!r}({got.__class__!r}). Ожидается {str(expected)!r}."
-        )
-        super().__init__(self._detail)
 
-    @property
-    def detail(self):
-        return self._detail
+# class ContractViolationValueTypeError(ContractViolationError):
+#     """ Класс исключений, возникающих при нарушении контракта типа значения."""
+#
+#     def __init__(
+#         self,
+#         *,
+#         field_name: str,
+#         got: type | None,
+#         expected: str | type | tuple[str | type, ...] | UnionType,
+#     ):
+#         self._detail = (
+#             f"Некорректный тип для поля {field_name!r}."
+#             f" Значение={got!r}({got.__class__!r}). Ожидается {str(expected)!r}."
+#         )
+#         super().__init__(self._detail)
+#
+#     @property
+#     def detail(self):
+#         return self._detail
 
 
 class ContractViolationBusinessRulesError(ContractViolationError):

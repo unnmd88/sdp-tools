@@ -1,5 +1,5 @@
 import inspect
-from collections.abc import Iterable
+from collections.abc import Iterable, Container
 from typing import get_origin, Annotated, Any, get_args, Protocol, Callable
 
 from core.contracts.custom_types import AcceptRequireType, AcceptTypesCreateRequire
@@ -44,7 +44,7 @@ def get_contract_require(
     if callable(obj):
         return ContractRequire(
             predicate=obj,
-            description=description,
+            detail=description,
         )
     raise TypeError(
         f"Передан невалидный объект-зависимости."
@@ -108,6 +108,18 @@ def protocol_compliance_checker(obj: Any, protocol: type[Protocol]):
     }
 
 
+def replace_self_from_attr_name(attr: str) -> str:
+    new_name = attr.split("=")[0].replace("self.", "")
+    return new_name[1:] if new_name.startswith("_") else new_name
+
+
+class Aa:
+    def __init__(self, obj: Any):
+        self._obj = obj
+        self.gaba = 12
+        print(replace_self_from_attr_name(f"{self._obj=}"))
+        print(replace_self_from_attr_name(f"{self.gaba=}"))
+
 if __name__ == "__main__":
     o = Annotated[int, "Abra", "CAdabra"]
     print(to_annotated(o))
@@ -115,37 +127,6 @@ if __name__ == "__main__":
     print(to_annotated(o1))
     print(ProtocolComplianceChecker.light_inspect(obj=TestClas(1), protocol=TestProtocol))
 
+    print(Aa(1))
 
-def create_contract_require(
-    obj: AcceptTypesCreateRequire,
-) -> ContractRequireProtocol:
-    require = None
-    if isinstance(obj, ContractRequireProtocol):
-        require = obj
-    elif callable(obj):
-        require = ContractRequire(predicate=obj)
-    elif isinstance(obj, tuple):
-        if len(obj) != 3:
-            raise TypeError(
-                f"Кортеж должен содержать 3 элемента(передано{len(obj)}):\n"
-                f"1) callable-объект(предикат)\n"
-                f"2) str - описание ошибки\n"
-                f"3) Exception - класс исключения(либо его экземпляр), либо None.\n"
-                f"если None, то используется исключение по умолчанию.\n"
-            )
-        require = ContractRequire(predicate=obj[0], description=obj[1], custom_exception=obj[2])
-    if require is None:
-        arg_name = list(inspect.signature(create_contract_require).parameters)[0]
-        raise TypeError(
-            f"Некорректный тип аргумента {arg_name!r}={obj!r}'. "
-            f"Аргумент должен соответствовать протоколу {ContractRequireProtocol.__name__!r} "
-            f"или быть callable-объектом или кортежем из 3 элементов, где:\n"
-            f"[0] -> callable-объект(предикат)\n"
-            f"[1] -> str - описание ошибки\n"
-            f"[2] -> Exception - класс исключения(либо его экземпляр), либо None.\n"
-            f"если None, то используется исключение по умолчанию.\n"
-        )
-    assert isinstance(require, ContractRequireProtocol), (
-        f"Не удалось создать экземпляр класса {ContractRequire.__name__!r}."
-    )
-    return require
+

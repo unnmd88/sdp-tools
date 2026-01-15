@@ -2,9 +2,11 @@ from collections.abc import Sequence, Container
 from dataclasses import dataclass
 from typing import Callable, Any
 
+from core.contracts.interfaces.require import ContractRequireProtocol
+
 
 @dataclass(kw_only=True, frozen=True, slots=True)
-class ContractRequire:
+class ContractRequire(ContractRequireProtocol):
     """
     Контейнер для описания зависимостей и условий в контрактах.
 
@@ -16,7 +18,7 @@ class ContractRequire:
         predicate (Callable[..., bool] | Callable[[], bool]): Функция-предикат,
             проверяющая условие контракта. Должна возвращать True, если условие
             выполнено, и False в противном случае.
-        description (str): Человеко-читаемое описание условия. Используется для
+        detail (str): Человеко-читаемое описание условия. Используется для
             формирования понятных сообщений об ошибках и логирования.
             По умолчанию: пустая строка.
         custom_exception (Exception | type[Exception] | None): Пользовательское
@@ -28,24 +30,33 @@ class ContractRequire:
         - Реализует протокол итератора для распаковки атрибутов.
     Raises:
             TypeError: Если 'predicate' не является callable-объектом.
-            TypeError: Если 'description' не является строкой.
+            TypeError: Если 'detail' не является строкой.
             TypeError: Если 'custom_exception' не является экземпляром
                 Exception или классом, унаследованным от Exception.
     """
 
-    predicate: Callable[..., bool] | Callable[[], bool]
-    description: str = ""
-    custom_exception: Exception | type[Exception] = None
-    environments: Container[str] = None
+    predicate: Callable[..., bool]
+    contract: str = ""
+    violation: str = ""
+    detail: str = ""
+    custom_exception: Exception | type[Exception] | None = None
+    environments: Container[str] | None = None
 
-    def __iter__(self):
-        return (el for el in (self.predicate, self.description, self.custom_exception))
+    # def __iter__(self):
+    #     return (el for el in (
+    #         self.predicate,
+    #         self.contract_name,
+    #         self.violation_name,
+    #         self.detail,
+    #         self.custom_exception,
+    #         self.environments)
+    #     )
 
     def __post_init__(self) -> None:
         if not callable(self.predicate):
             raise TypeError("Аргумент 'predicate' должен быть callable-объектом.")
-        if not isinstance(self.description, str):
-            raise TypeError("Аргумент 'description должен быть строкой.'")
+        if not isinstance(self.detail, str):
+            raise TypeError("Аргумент 'detail' должен быть строкой.'")
         if isinstance(self.custom_exception, Exception):
             return
         if isinstance(self.custom_exception, type) and not issubclass(
@@ -56,5 +67,5 @@ class ContractRequire:
                 f"{Exception.__name__!r} или экземпляром подкласса."
             )
 
-    def __call__(self, *args, **kwargs) -> Any:
+    def __call__(self, *args, **kwargs) -> bool:
         return self.predicate(*args, **kwargs)
