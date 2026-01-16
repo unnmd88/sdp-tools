@@ -47,9 +47,9 @@ class ContractIntegerField(AbstractContractField):
 
     def _validate(self, value: Any) -> Any:
         err = None
-        if value < self._min_value:
+        if self._min_value is not None and value < self._min_value:
             err = f"Значение {value} меньше минимального {self._min_value}."
-        elif value > self._max_value:
+        elif self._max_value is not None and value > self._max_value:
             err = f"Значение {value} больше максимального {self._max_value}."
 
         if err is not None:

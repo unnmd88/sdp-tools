@@ -5,14 +5,6 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from core.contracts.field_contracts.base import (
-    ContractFieldId,
-    ContractFieldCreatedAt,
-    ContractFieldUpdatedAt,
-)
-from core.exceptions.contract import (
-    ContractViolationPreConditionError,
-)
 from core.contracts.exc import ContractViolationInvariantError
 from core.users.constants import MIN_ID, MAX_ID
 from core.users.rules_messages import DomainRulesViolationsMessages
