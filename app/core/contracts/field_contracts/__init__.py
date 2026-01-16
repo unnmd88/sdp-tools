@@ -1,3 +1,3 @@
 __all__ = ("ContractField",)
 
-from .base import ContractField
+from .general_purpose_contract import ContractField

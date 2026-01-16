@@ -2,7 +2,7 @@ from collections.abc import Sequence, Container
 from dataclasses import dataclass
 from typing import Callable, Any
 
-from core.contracts.interfaces.require import ContractRequireProtocol
+from core.contracts.interfaces.require import ContractRequireProtocol, ContractProcessValueRequireProtocol
 
 
 @dataclass(kw_only=True, frozen=True, slots=True)
@@ -15,7 +15,7 @@ class ContractRequire(ContractRequireProtocol):
     контракта.
 
     Args:
-        predicate (Callable[..., bool] | Callable[[], bool]): Функция-предикат,
+        handler (Callable[..., bool] | Callable[[], bool]): Функция-предикат,
             проверяющая условие контракта. Должна возвращать True, если условие
             выполнено, и False в противном случае.
         detail (str): Человеко-читаемое описание условия. Используется для
@@ -35,7 +35,7 @@ class ContractRequire(ContractRequireProtocol):
                 Exception или классом, унаследованным от Exception.
     """
 
-    predicate: Callable[..., bool]
+    handler: Callable[..., bool]
     contract: str = ""
     violation: str = ""
     detail: str = ""
@@ -53,8 +53,8 @@ class ContractRequire(ContractRequireProtocol):
     #     )
 
     def __post_init__(self) -> None:
-        if not callable(self.predicate):
-            raise TypeError("Аргумент 'predicate' должен быть callable-объектом.")
+        if not callable(self.handler):
+            raise TypeError("Аргумент 'handler' должен быть callable-объектом.")
         if not isinstance(self.detail, str):
             raise TypeError("Аргумент 'detail' должен быть строкой.'")
         if isinstance(self.custom_exception, Exception):
@@ -68,4 +68,18 @@ class ContractRequire(ContractRequireProtocol):
             )
 
     def __call__(self, *args, **kwargs) -> bool:
-        return self.predicate(*args, **kwargs)
+        return self.handler(*args, **kwargs)
+
+
+@dataclass(kw_only=True, frozen=True, slots=True)
+class ContractProcessValueRequire(ContractProcessValueRequireProtocol):
+
+    handler: Callable[[Any], Any]
+    contract: str = ""
+    violation: str = ""
+    detail: str = ""
+    custom_exception: Exception | type[Exception] | None = None
+    environments: Container[str] | None = None
+
+    def __call__(self, *args, **kwargs) -> Any:
+        return self.handler(*args, **kwargs)

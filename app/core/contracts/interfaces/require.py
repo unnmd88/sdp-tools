@@ -1,12 +1,11 @@
 from collections.abc import Container, Callable
-from dataclasses import dataclass
 from typing import Protocol, runtime_checkable, Any
 
 
 @runtime_checkable
 class ContractRequireProtocol(Protocol):
 
-    predicate: Callable[..., bool]
+    handler: Callable[..., bool]
     contract: str
     violation: str
     detail: str
@@ -17,10 +16,8 @@ class ContractRequireProtocol(Protocol):
 
 
 @runtime_checkable
-class ContractPreprocessRequireProtocol(ContractRequireProtocol, Protocol):
+class ContractProcessValueRequireProtocol(ContractRequireProtocol, Protocol):
 
-    # @property
-    # def predicate(self) -> Callable[[Any], Any]: ...
-    predicate:  Callable[[Any], Any]
+    handler:  Callable[[Any], Any]
 
     def __call__(self, *args, **kwargs) -> Any: ...

@@ -1,6 +1,7 @@
-from typing import Protocol, Any
+from typing import Protocol, Any, runtime_checkable
 
 
+@runtime_checkable
 class CacheFieldProtocol(Protocol):
     def add(self, value: Any): ...
     # def remove(self, key: Any) -> Any | None: ...
