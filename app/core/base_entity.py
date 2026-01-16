@@ -6,6 +6,8 @@ from datetime import datetime
 from typing import Any
 
 from core.contracts.exc import ContractViolationInvariantError
+from core.contracts.field_contracts.datetime_contract import ContractDateTimeField
+from core.contracts.field_contracts.integer_contract import ContractIntegerField
 from core.users.constants import MIN_ID, MAX_ID
 from core.users.rules_messages import DomainRulesViolationsMessages
 
@@ -26,15 +28,18 @@ class AbstractEntity(ABC):
         PublicAttr(attr_name="_created_at", alias="created_at"),
     )
 
-    contract_id = ContractFieldId(
+    contract_id = ContractIntegerField(
+        field_name="id",
         nullable=False,
         use_cache=True,
     )
-    contract_created_at = ContractFieldCreatedAt(
+    contract_created_at = ContractDateTimeField(
+        field_name="created_at",
         use_cache=False,
         nullable=True,
     )
-    contract_updated_at = ContractFieldUpdatedAt(
+    contract_updated_at = ContractDateTimeField(
+        field_name="updated_at",
         use_cache=False,
         nullable=True,
     )
@@ -57,7 +62,7 @@ class AbstractEntity(ABC):
             return self._id == other.id
         raise NotImplementedError
 
-    def __iter__(self) -> Generator[tuple[str, Any], None, None]:
+    def __iter__(self) -> Generator[Any, None, None]:
         for attr in self.__public_attrs__:
             yield attr.alias, getattr(self, attr.attr_name)
 
@@ -116,39 +121,16 @@ class AbstractEntity(ABC):
     def updated_at(self) -> datetime | None:
         return self._updated_at
 
-    def set_id(self, id: int) -> int:
-        # В принципе можно эту проверку делать только при получении id из репозитория.
-        if not MIN_ID <= id <= MAX_ID:
-            raise ContractViolationPreConditionError(
-                DomainRulesViolationsMessages.id_range
-            )
-        self._id = id
-        return self._id
-
-    def set_created_at(self, created_at: datetime | None) -> datetime | None:
-        self._created_at = created_at
-        self.check_invariant_datetime()
-        return self._created_at
-
-    def set_updated_at(self, updated_at: datetime | None) -> datetime | None:
-        self._updated_at = updated_at
-        self.check_invariant_datetime()
-        return self._updated_at
-
     def check_invariant_datetime(self) -> None:
         """Проверка инвариантов даты и времени."""
         if self._created_at is not None:
             if self._updated_at is not None and self._created_at > self._updated_at:
                 # TODO: добавить логирование!!
-                raise ContractViolationInvariantError(
-                    DomainRulesViolationsMessages.created_rule
-                )
+                raise ContractViolationInvariantError
         if self._updated_at is not None:
             if self._created_at is not None and self._created_at > self._updated_at:
                 # TODO: добавить логирование!!
-                raise ContractViolationInvariantError(
-                    DomainRulesViolationsMessages.updated_rule
-                )
+                raise ContractViolationInvariantError
 
 
 if __name__ == "__main__":
