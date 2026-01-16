@@ -1,3 +1,4 @@
+import math
 from collections.abc import Sequence
 from typing import Any
 
@@ -7,9 +8,14 @@ from core.contracts.interfaces.require import ContractProcessValueRequireProtoco
 
 from core.contracts.requires import ContractRequire, ContractProcessValueRequire
 
+MINUS_INFINITY = -math.inf
+PLUS_INFINITY = math.inf
+
 
 class ContractIntegerField(AbstractContractField):
     """ Класс для создания контракта целочисленного поля. """
+
+
 
     def __init__(
         self,
@@ -22,8 +28,8 @@ class ContractIntegerField(AbstractContractField):
         invariants: Sequence[ContractRequireProtocol] | None = None,
         env_name: str | None = None,
         use_cache: bool = False,
-        min_value: int = 0,
-        max_value: int | None = None,
+        min_value: int = MINUS_INFINITY,
+        max_value: int = PLUS_INFINITY,
     ):
         self._min_value = min_value
         self._max_value = max_value
