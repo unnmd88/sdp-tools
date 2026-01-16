@@ -3,8 +3,7 @@ from typing import Protocol, runtime_checkable, Any
 
 
 @runtime_checkable
-class ContractRequireProtocol(Protocol):
-
+class ContractRequireSchemaProtocol(Protocol):
     handler: Callable[..., bool]
     contract: str
     violation: str
@@ -16,8 +15,9 @@ class ContractRequireProtocol(Protocol):
 
 
 @runtime_checkable
-class ContractProcessValueRequireProtocol(ContractRequireProtocol, Protocol):
-
-    handler:  Callable[[Any], Any]
+class ContractProcessValueSchemaRequireProtocol(
+    ContractRequireSchemaProtocol, Protocol
+):
+    handler: Callable[[Any], Any]
 
     def __call__(self, *args, **kwargs) -> Any: ...

@@ -2,45 +2,10 @@ from enum import Enum
 from types import UnionType
 from typing import Any
 
-from core.contracts.exc import ContractViolationError, ContractViolationValueTypeError
 from core.reg_exps import EMAIL_PATTERN, PHONE_NUMBER_PATTERN
 from core.users.constants import MIN_ID, MAX_ID
 from core.users.rules_messages import DomainRulesViolationsMessages
 from core.utils import validate_string_by_pattern
-
-
-def isinstance_validator(
-    *,
-    name: str,
-    value: Any,
-    expected: type | UnionType | tuple[type],
-    raise_if_failed: bool = True,
-) -> bool:
-    if isinstance(value, expected):
-        return True
-    if raise_if_failed:
-        raise ContractViolationValueTypeError(
-            field_name=name, got=value, expected=expected
-        )
-    return False
-
-
-def id_validator(value: int) -> bool:
-    if not MIN_ID < value < MAX_ID:
-        raise ContractViolationError(DomainRulesViolationsMessages.id_range)
-    return True
-
-
-class EnumValidator:
-    def __init__(self, enum_cls: type[Enum]):
-        self._enum_cls = enum_cls
-
-    def __call__(self, value: Any) -> bool:
-        try:
-            self._enum_cls(value)
-        except ValueError:
-            return False
-        return True
 
 
 def email_validator(value: str) -> bool:

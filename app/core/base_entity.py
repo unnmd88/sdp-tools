@@ -1,9 +1,9 @@
 import json
-from abc import ABC
+from abc import ABC, abstractclassmethod, abstractmethod
 from collections.abc import Generator
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any
+from typing import Any, Self
 
 from core.contracts.exc import ContractViolationInvariantError
 from core.contracts.field_contracts.datetime_contract import ContractDateTimeField
@@ -77,6 +77,10 @@ class AbstractEntity(ABC):
         attrs = " ".join(f"{attr}={value!r}" for attr, value in self)
         return f"{self.__class__.__name__}({attrs})"
 
+    @classmethod
+    @abstractmethod
+    def validate(cls, **kwargs) -> Self: ...
+
     def to_dict(
         self,
         *,
@@ -131,10 +135,3 @@ class AbstractEntity(ABC):
             if self._created_at is not None and self._created_at > self._updated_at:
                 # TODO: добавить логирование!!
                 raise ContractViolationInvariantError
-
-
-if __name__ == "__main__":
-    o = AbstractEntity(id=1, created_at=None, updated_at=None)
-    print(o.id)
-    print(list(o))
-    print(list(o))

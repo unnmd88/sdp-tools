@@ -2,7 +2,7 @@ from core.contracts.field_contracts.base import AbstractContractField
 
 
 class ContractField(AbstractContractField):
-    """ Базовый класс для создания контракта полей. """
+    """Базовый класс для создания контракта полей."""
 
 
 if __name__ == "__main__":
@@ -12,7 +12,3 @@ if __name__ == "__main__":
     )
 
     print(contract_field(()))
-
-
-
-

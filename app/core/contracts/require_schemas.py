@@ -2,11 +2,14 @@ from collections.abc import Sequence, Container
 from dataclasses import dataclass
 from typing import Callable, Any
 
-from core.contracts.interfaces.require import ContractRequireProtocol, ContractProcessValueRequireProtocol
+from core.contracts.interfaces.require_schemas_interfaces import (
+    ContractRequireSchemaProtocol,
+    ContractProcessValueSchemaRequireProtocol,
+)
 
 
 @dataclass(kw_only=True, frozen=True, slots=True)
-class ContractRequire(ContractRequireProtocol):
+class ContractRequireSchema(ContractRequireSchemaProtocol):
     """
     Контейнер для описания зависимостей и условий в контрактах.
 
@@ -42,16 +45,6 @@ class ContractRequire(ContractRequireProtocol):
     custom_exception: Exception | type[Exception] | None = None
     environments: Container[str] | None = None
 
-    # def __iter__(self):
-    #     return (el for el in (
-    #         self.predicate,
-    #         self.contract_name,
-    #         self.violation_name,
-    #         self.detail,
-    #         self.custom_exception,
-    #         self.environments)
-    #     )
-
     def __post_init__(self) -> None:
         if not callable(self.handler):
             raise TypeError("Аргумент 'handler' должен быть callable-объектом.")
@@ -72,8 +65,7 @@ class ContractRequire(ContractRequireProtocol):
 
 
 @dataclass(kw_only=True, frozen=True, slots=True)
-class ContractProcessValueRequire(ContractProcessValueRequireProtocol):
-
+class ContractProcessValueRequireSchema(ContractProcessValueSchemaRequireProtocol):
     handler: Callable[[Any], Any]
     contract: str = ""
     violation: str = ""

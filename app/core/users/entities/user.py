@@ -1,13 +1,16 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Self
 
 from core.base_entity import AbstractEntity, PublicAttr
-from core.contracts import contract
-from core.users.field_contracts import (
-    ContractFieldUsername,
-    ContractFieldFirstname,
-    ContractFieldLastname,
+from core.contracts import (
+    ContractStringField,
+    contract,
 )
+from core.contracts.field_contracts.boolean_contract import ContractBooleanField
+from core.contracts.field_contracts.email_contract import ContractEmailField
+from core.contracts.field_contracts.enum_contract import ContactEnumField
+from core.contracts.field_contracts.password_contract import ContractHashedPasswordField
+
 from core.enums import (
     Organizations,
     Roles,
@@ -16,12 +19,23 @@ from core.contracts.exc import (
     ContractViolationBusinessRulesError,
     ContractViolationInvariantError,
 )
-
-from core.users.requires import (
-    username_pre_requires,
-    firstname_pre_requires,
-    lastname_pre_requires,
+from core.reg_exps import (
+    USERNAME_PATTERN,
+    FIRST_NAME_PATTERN,
+    LAST_NAME_PATTERN,
+    PASSWORD_PATTERN,
 )
+from core.users.constants import (
+    MIN_LEN_USERNAME,
+    MAX_LEN_USERNAME,
+    MIN_LEN_FIRSTNAME,
+    MAX_LEN_FIRSTNAME,
+    MIN_LEN_LASTNAME,
+    MAX_LEN_LASTNAME,
+    MIN_LEN_PASSWORD,
+    MAX_LEN_PASSWORD,
+)
+
 from core.users.rules_messages import BusinessRulesViolationsMessages
 from core.users.services.user_password import validate_password
 
@@ -38,9 +52,93 @@ class UserEntity(AbstractEntity):
         PublicAttr(attr_name="_telegram", alias="telegram"),
     )
 
-    contract_username = ContractFieldUsername(use_cache=True, nullable=False)
-    contract_firstname = ContractFieldFirstname(use_cache=True, nullable=True)
-    contract_lastname = ContractFieldLastname(use_cache=True, nullable=True)
+    contract_username = ContractStringField(
+        field_name="username",
+        nullable=False,
+        use_cache=True,
+        min_length=MIN_LEN_USERNAME,
+        max_length=MAX_LEN_USERNAME,
+        pattern=USERNAME_PATTERN,
+    )
+    contract_firstname = ContractStringField(
+        field_name="firstname",
+        nullable=True,
+        use_cache=True,
+        min_length=MIN_LEN_FIRSTNAME,
+        max_length=MAX_LEN_FIRSTNAME,
+        pattern=FIRST_NAME_PATTERN,
+    )
+    contract_lastname = ContractStringField(
+        field_name="lastname",
+        nullable=True,
+        use_cache=True,
+        min_length=MIN_LEN_LASTNAME,
+        max_length=MAX_LEN_LASTNAME,
+        pattern=LAST_NAME_PATTERN,
+    )
+    contract_organization = ContactEnumField(
+        field_name="organization",
+        nullable=False,
+        use_cache=True,
+        enum=Organizations,
+    )
+    contract_email = ContractEmailField(
+        field_name="email",
+        nullable=True,
+        use_cache=True,
+    )
+    contract_password = ContractHashedPasswordField(field_name="password")
+    contract_is_active = ContractBooleanField(
+        field_name="is_active",
+        nullable=False,
+        allow_1_and_0_as_true_and_false=True,
+    )
+    contract_role = ContactEnumField(
+        field_name="role",
+        nullable=False,
+        use_cache=True,
+        enum=Roles,
+    )
+    contract_phone_number = ContractStringField(
+
+    )
+
+
+    @classmethod
+    def validate(
+        cls,
+        *,
+        id: int,
+        username: str,
+        firstname: str | None,
+        lastname: str | None,
+        organization: Organizations,
+        email: str | None,
+        password: bytes,
+        is_active: bool,
+        role: Roles,
+        phone_number: str | None,
+        telegram: str | None,
+        description: str,
+        created_at: datetime | None,
+        updated_at: datetime | None,
+    ) -> Self:
+        return cls(
+            id=cls.contract_id(id),
+            username=cls.contract_username(username),
+            firstname=cls.contract_firstname(firstname),
+            lastname=cls.contract_lastname(lastname),
+            organization=cls.contract_organization(organization),
+            email=cls.contract_email(email),
+            password=cls.contract_password(password),
+            is_active=is_active,
+            role=role,
+            phone_number=phone_number,
+            telegram=telegram,
+            description=description,
+            created_at=cls.contract_created_at(created_at),
+            updated_at=cls.contract_updated_at(updated_at),
+        )
 
     def __init__(
         self,
@@ -60,9 +158,9 @@ class UserEntity(AbstractEntity):
         updated_at: datetime | None,
     ):
         super().__init__(id=id, created_at=created_at, updated_at=updated_at)
-        self._username = self.contract_username(username)
-        self._firstname = self.contract_firstname(firstname)
-        self._lastname = self.contract_lastname(lastname)
+        self._username = username
+        self._firstname = firstname
+        self._lastname = lastname
         self._organization = organization
         self._email = email
         self._password = password
@@ -72,7 +170,6 @@ class UserEntity(AbstractEntity):
         self._telegram = telegram
         self._description = description
         self.invariant_names()
-        self.invariant_password()
 
     def __eq__(self, other):
         if isinstance(other, UserEntity):
@@ -148,7 +245,7 @@ class UserEntity(AbstractEntity):
         return validate_password(password, self._password)
 
     @contract(
-        preconditions=username_pre_requires,
+        # preconditions=username_pre_requires,
         # postconditions=username_post_requires if not os.environ.get("PROD") else None,
     )
     def _validate_username(
@@ -158,7 +255,7 @@ class UserEntity(AbstractEntity):
     ) -> str:
         return username
 
-    @contract(preconditions=firstname_pre_requires)
+    # @contract(preconditions=firstname_pre_requires)
     def _validate_first_name(
         self,
         first_name: str,
@@ -166,7 +263,7 @@ class UserEntity(AbstractEntity):
     ) -> str:
         return first_name
 
-    @contract(preconditions=lastname_pre_requires)
+    # @contract(preconditions=lastname_pre_requires)
     def _validate_last_name(self, lastname: str) -> str:
         return lastname
 
@@ -188,17 +285,26 @@ class UserEntity(AbstractEntity):
             # TODO: Обязательно добавить логирование!!
             raise ContractViolationInvariantError("Пароль должен быть типа bytes")
 
-    def invariant_permissions(self) -> None:
-        if not self._is_active and self._permissions:
-            raise ContractViolationInvariantError(
-                f"У пользователя с username: {self._username!r} не должно быть разрешений, т.к. он не активен."
-            )
-        # TODO: добавить проверку на наполнение разрешений в зависимости от роли.
-
 
 if __name__ == "__main__":
     pass
     user = UserEntity(
+        id=1,
+        firstname="Junkers",
+        lastname=None,
+        username="Jr",
+        created_at=datetime.now(),
+        organization=Organizations.SDP,
+        updated_at=None,
+        password=b"118",
+        is_active=True,
+        role=Roles.admin,
+        email=None,
+        phone_number=None,
+        telegram=None,
+        description="",
+    )
+    user = UserEntity.validate(
         id=1,
         firstname="Junkers",
         lastname=None,
@@ -214,6 +320,7 @@ if __name__ == "__main__":
         telegram=None,
         description="",
     )
+
     print(user)
     print(repr(user))
     print(user.to_dict())

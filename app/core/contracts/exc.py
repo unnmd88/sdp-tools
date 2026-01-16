@@ -11,7 +11,7 @@ class ContractViolationError(Exception):
         violation: str = "",
         field_name: str = "",
         value: Any = None,
-        detail: str = ""
+        detail: str = "",
     ):
         self.contract = contract
         self.violation = violation
@@ -29,11 +29,11 @@ class ContractViolationError(Exception):
 
 
 class ContractViolationPreProcessingError(ContractViolationError):
-    """ Класс исключений, возникающих при нарушении контракта предобработки. """
+    """Класс исключений, возникающих при нарушении контракта предобработки."""
 
 
 class ContractViolationFieldError(ContractViolationError):
-    """ Класс исключений, возникающих при нарушении контракта поля. """
+    """Класс исключений, возникающих при нарушении контракта поля."""
 
 
 # class ContractViolationValueTypeError(ContractViolationError):

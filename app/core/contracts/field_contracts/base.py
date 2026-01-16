@@ -4,7 +4,8 @@ from collections.abc import Sequence, Iterable
 from types import UnionType
 from typing import (
     Callable,
-    Any, )
+    Any,
+)
 
 
 from core.contracts.exc import (
@@ -13,32 +14,32 @@ from core.contracts.exc import (
 )
 
 from core.contracts.interfaces.cahe_interface import CacheFieldProtocol
-from core.contracts.interfaces.require import ContractRequireProtocol, ContractProcessValueRequireProtocol
+from core.contracts.interfaces.require_schemas_interfaces import (
+    ContractRequireSchemaProtocol,
+    ContractProcessValueSchemaRequireProtocol,
+)
 from core.contracts.utils import replace_self_from_attr_name
 
-type RequireTypeData = ContractRequireProtocol | Callable[..., bool]
+type RequireTypeData = ContractRequireSchemaProtocol | Callable[..., bool]
 type IsInstanceType = type | tuple[type, ...] | UnionType
 
 
 class AbstractContractField(ABC):
-
     _cache: CacheFieldProtocol
-    base_requires: Sequence[ContractRequireProtocol] | None = None
+    base_requires: Sequence[ContractRequireSchemaProtocol] | None = None
 
     def __init_subclass__(cls, *, cache: CacheFieldProtocol | None = None, **kwargs):
-
         cls.set_cache(cache=cache)
         if cls.base_requires is None:
             cls.base_requires = ()
         for i, require in enumerate(cls.base_requires):
-            if not isinstance(require, ContractRequireProtocol):
+            if not isinstance(require, ContractRequireSchemaProtocol):
                 raise TypeError(
                     f"Тип аргумента {cls.base_requires!r}' должен быть "
-                    f"соответствовать протоколу {ContractRequireProtocol.__name__!r}. "
+                    f"соответствовать протоколу {ContractRequireSchemaProtocol.__name__!r}. "
                     f"Предоставленный тип: {type(require)!r}. Индекс={i}."
                 )
         super().__init_subclass__(**kwargs)
-
 
     @classmethod
     def set_cache(
@@ -72,17 +73,27 @@ class AbstractContractField(ABC):
         *,
         field_name: str,
         nullable: bool = False,
-        pipeline_preprocess_value: Iterable[ContractProcessValueRequireProtocol] | None = None,
-        pipeline_postprocess_value: Iterable[ContractProcessValueRequireProtocol] | None = None,
-        requires: Iterable[ContractRequireProtocol] | None = None,
-        invariants: Iterable[ContractRequireProtocol] | None = None,
+        pipeline_preprocess_value: Iterable[ContractProcessValueSchemaRequireProtocol]
+        | None = None,
+        pipeline_postprocess_value: Iterable[ContractProcessValueSchemaRequireProtocol]
+        | None = None,
+        requires: Iterable[ContractRequireSchemaProtocol] | None = None,
+        invariants: Iterable[ContractRequireSchemaProtocol] | None = None,
         env_name: str | None = None,
         use_cache: bool | None = True,
     ):
         self._name = field_name
         self._nullable = nullable
-        self._pipeline_preprocess_value = tuple(pipeline_preprocess_value) if pipeline_preprocess_value is not None else ()
-        self._pipeline_postprocess_value = tuple(pipeline_postprocess_value) if pipeline_postprocess_value is not None else ()
+        self._pipeline_preprocess_value = (
+            tuple(pipeline_preprocess_value)
+            if pipeline_preprocess_value is not None
+            else ()
+        )
+        self._pipeline_postprocess_value = (
+            tuple(pipeline_postprocess_value)
+            if pipeline_postprocess_value is not None
+            else ()
+        )
         self._requires = tuple(requires) if requires is not None else ()
         self._invariants = tuple(invariants) if invariants is not None else ()
         self._env_name = env_name
@@ -93,23 +104,29 @@ class AbstractContractField(ABC):
         self._check_requires_is_valid()
 
     def _check_requires_is_valid(self) -> None:
-        """ Проверяет, что все элементы в каждом из контейнеров с зависимостями соответствуют протоколу. """
+        """Проверяет, что все элементы в каждом из контейнеров с зависимостями соответствуют протоколу."""
         to_check = [
             (requires, attr_data_as_string_for_exception)
             for requires, attr_data_as_string_for_exception in [
-                (self._pipeline_preprocess_value, f"{self._pipeline_preprocess_value=}"),
-                (self._pipeline_postprocess_value, f"{self._pipeline_postprocess_value=}"),
+                (
+                    self._pipeline_preprocess_value,
+                    f"{self._pipeline_preprocess_value=}",
+                ),
+                (
+                    self._pipeline_postprocess_value,
+                    f"{self._pipeline_postprocess_value=}",
+                ),
                 (self._requires, f"{self._requires=}"),
                 (self._invariants, f"{self._invariants=}"),
             ]
         ]
         for requires, name in to_check:
             for i, require in enumerate(requires):
-                if not isinstance(require, ContractRequireProtocol):
+                if not isinstance(require, ContractRequireSchemaProtocol):
                     formatted_attr_name = replace_self_from_attr_name(name)
                     raise TypeError(
                         f"Тип аргумента {formatted_attr_name!r} должен "
-                        f"соответствовать протоколу {ContractRequireProtocol.__name__!r}. "
+                        f"соответствовать протоколу {ContractRequireSchemaProtocol.__name__!r}. "
                         f"Предоставленный тип: {type(require)!r}. "
                         f"Значение={require!r}. "
                         f"Индекс={i}."
@@ -141,10 +158,7 @@ class AbstractContractField(ABC):
                 )
 
     def _pipeline(
-        self,
-        *,
-        value: Any,
-        handlers: Sequence[ContractRequireProtocol]
+        self, *, value: Any, handlers: Sequence[ContractRequireSchemaProtocol]
     ) -> Any:
         for require in handlers:
             value = require(value)
@@ -194,6 +208,3 @@ class AbstractContractField(ABC):
     @property
     def name(self):
         return self._name
-
-
-

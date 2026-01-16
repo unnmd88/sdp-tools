@@ -1,21 +1,23 @@
 from collections.abc import Callable, Iterable, Container
 
-from core.contracts.interfaces.require import ContractRequireProtocol
-
-
-AcceptRequireTypeAsTuple = (
-    tuple[
-        Callable[..., bool] | Callable[[], bool],
-        str,
-        str,
-        Exception | type[Exception] | None,
-        Container[str] | None
-    ]
+from core.contracts.interfaces.require_schemas_interfaces import (
+    ContractRequireSchemaProtocol,
 )
 
 
-AcceptRequireType = Iterable[
-    ContractRequireProtocol | Callable[..., bool] | AcceptRequireTypeAsTuple
+AcceptRequireTypeAsTuple = tuple[
+    Callable[..., bool] | Callable[[], bool],
+    str,
+    str,
+    Exception | type[Exception] | None,
+    Container[str] | None,
 ]
 
-AcceptTypesCreateRequire = ContractRequireProtocol | Callable[..., bool] | AcceptRequireTypeAsTuple
+
+AcceptRequireType = Iterable[
+    ContractRequireSchemaProtocol | Callable[..., bool] | AcceptRequireTypeAsTuple
+]
+
+AcceptTypesCreateRequire = (
+    ContractRequireSchemaProtocol | Callable[..., bool] | AcceptRequireTypeAsTuple
+)

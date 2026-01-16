@@ -37,9 +37,9 @@ cm = ChainMap({1: "1"}, {2: "2", 1: "1"})
 
 FieldName = Annotated[str, "Имя поля. Не должно быть пустым и превышать 100 символов."]
 
+
 class E(Enum):
     x = 1
-
 
 
 if __name__ == "__main__":

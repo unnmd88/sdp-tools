@@ -4,16 +4,15 @@ from types import UnionType
 from typing import Sequence, get_type_hints
 from typing_extensions import deprecated
 
-from core.contracts import ContractRequire
 from core.contracts.exc import ContractViolationError
-from core.services.type_cheker import TypeChecker
+from core.contracts.require_schemas import ContractRequireSchema
 
 
 def _contract_wrapper_factory(
     func: Callable,
     returns: type | tuple[type, ...] | UnionType,
-    preconditions: Sequence[ContractRequire],
-    postconditions: Sequence[ContractRequire],
+    preconditions: Sequence[ContractRequireSchema],
+    postconditions: Sequence[ContractRequireSchema],
     checking_types_of_args: bool,
     has_self: bool,
 ):
@@ -69,8 +68,8 @@ def contract(
     *,
     has_self: bool = True,
     checking_types_of_args: bool = False,
-    preconditions: Sequence[ContractRequire] = None,
-    postconditions: Sequence[ContractRequire] = None,
+    preconditions: Sequence[ContractRequireSchema] = None,
+    postconditions: Sequence[ContractRequireSchema] = None,
 ):
     preconditions = preconditions or ()
     postconditions = postconditions or ()
@@ -98,8 +97,8 @@ def _contract(
     has_self: bool = True,
     checking_types_of_args: bool = False,
     checking_return_type: bool = False,
-    preconditions: Sequence[ContractRequire] = None,
-    postconditions: Sequence[ContractRequire] = None,
+    preconditions: Sequence[ContractRequireSchema] = None,
+    postconditions: Sequence[ContractRequireSchema] = None,
 ):
     args_exclude_self = slice(1 if has_self else 0, None)
 

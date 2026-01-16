@@ -1,31 +1,34 @@
-import math
 from collections.abc import Sequence
 from typing import Any
 
+from core.contracts.constants import MINUS_INFINITY, PLUS_INFINITY
 from core.contracts.exc import ContractViolationFieldError
 from core.contracts.field_contracts.base import AbstractContractField
-from core.contracts.interfaces.require import ContractProcessValueRequireProtocol, ContractRequireProtocol
+from core.contracts.interfaces.require_schemas_interfaces import (
+    ContractProcessValueSchemaRequireProtocol,
+    ContractRequireSchemaProtocol,
+)
 
-from core.contracts.requires import ContractRequire, ContractProcessValueRequire
-
-MINUS_INFINITY = -math.inf
-PLUS_INFINITY = math.inf
+from core.contracts.require_schemas import (
+    ContractRequireSchema,
+    ContractProcessValueRequireSchema,
+)
 
 
 class ContractIntegerField(AbstractContractField):
-    """ Класс для создания контракта целочисленного поля. """
-
-
+    """Класс для создания контракта целочисленного поля."""
 
     def __init__(
         self,
         *,
         field_name: str,
         nullable: bool = False,
-        pipeline_preprocess_value: Sequence[ContractProcessValueRequireProtocol] | None = None,
-        pipeline_postprocess_value: Sequence[ContractProcessValueRequireProtocol] | None = None,
-        requires: Sequence[ContractRequireProtocol] | None = None,
-        invariants: Sequence[ContractRequireProtocol] | None = None,
+        pipeline_preprocess_value: Sequence[ContractProcessValueSchemaRequireProtocol]
+        | None = None,
+        pipeline_postprocess_value: Sequence[ContractProcessValueSchemaRequireProtocol]
+        | None = None,
+        requires: Sequence[ContractRequireSchemaProtocol] | None = None,
+        invariants: Sequence[ContractRequireSchemaProtocol] | None = None,
         env_name: str | None = None,
         use_cache: bool = False,
         min_value: int = MINUS_INFINITY,
@@ -72,16 +75,23 @@ class ContractIntegerField(AbstractContractField):
         return super()._validate(value)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pos_int = ContractIntegerField(
         field_name="test2",
         min_value=0,
         max_value=1000,
         nullable=False,
         pipeline_preprocess_value=[
-            ContractProcessValueRequire(handler=int),
+            ContractProcessValueRequireSchema(handler=int),
         ],
-        invariants=[ContractRequire(handler=lambda x: x <= 450, contract="test", violation="test", detail="Значение не должно быть больше 450")],
+        invariants=[
+            ContractRequireSchema(
+                handler=lambda x: x <= 450,
+                contract="test",
+                violation="test",
+                detail="Значение не должно быть больше 450",
+            )
+        ],
         use_cache=True,
     )
     print(pos_int(4))
@@ -89,4 +99,3 @@ if __name__ == '__main__':
     print(pos_int("10"))
     print(pos_int.get_cache())
     print(repr(pos_int))
-
