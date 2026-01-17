@@ -1,5 +1,5 @@
 import json
-from abc import ABC, abstractclassmethod, abstractmethod
+from abc import ABC, abstractmethod
 from collections.abc import Generator
 from dataclasses import dataclass
 from datetime import datetime
@@ -8,8 +8,6 @@ from typing import Any, Self
 from core.contracts.exc import ContractViolationInvariantError
 from core.contracts.field_contracts.datetime_contract import ContractDateTimeField
 from core.contracts.field_contracts.integer_contract import ContractIntegerField
-from core.users.constants import MIN_ID, MAX_ID
-from core.users.rules_messages import DomainRulesViolationsMessages
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)
@@ -28,17 +26,17 @@ class AbstractEntity(ABC):
         PublicAttr(attr_name="_created_at", alias="created_at"),
     )
 
-    contract_id = ContractIntegerField(
+    _contract_id = ContractIntegerField(
         field_name="id",
         nullable=False,
         use_cache=True,
     )
-    contract_created_at = ContractDateTimeField(
+    _contract_created_at = ContractDateTimeField(
         field_name="created_at",
         use_cache=False,
         nullable=True,
     )
-    contract_updated_at = ContractDateTimeField(
+    _contract_updated_at = ContractDateTimeField(
         field_name="updated_at",
         use_cache=False,
         nullable=True,
@@ -52,9 +50,9 @@ class AbstractEntity(ABC):
         updated_at: datetime | None,
     ):
         self._built_at = datetime.now()
-        self._id = self.contract_id(id)
-        self._created_at = self.contract_created_at(created_at)
-        self._updated_at = self.contract_updated_at(updated_at)
+        self._id = id
+        self._created_at = created_at
+        self._updated_at = updated_at
         self.check_invariant_datetime()
 
     def __eq__(self, other):

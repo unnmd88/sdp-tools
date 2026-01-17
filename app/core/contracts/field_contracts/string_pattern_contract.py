@@ -5,6 +5,7 @@ from typing import Any
 
 from core.contracts.exc import ContractViolationFieldError
 from core.contracts.field_contracts.base import AbstractContractField
+from core.contracts.interfaces.cahe_interface import CacheFieldProtocol
 from core.contracts.interfaces.require_schemas_interfaces import (
     ContractProcessValueSchemaRequireProtocol,
     ContractRequireSchemaProtocol,
@@ -30,6 +31,7 @@ class ContractStringField(AbstractContractField):
         invariants: Sequence[ContractRequireSchemaProtocol] | None = None,
         env_name: str | None = None,
         use_cache: bool = False,
+        override_default_cache: CacheFieldProtocol | None = None,
     ):
         self._min_length = min_length
         self._max_length = max_length
@@ -43,6 +45,7 @@ class ContractStringField(AbstractContractField):
             invariants=invariants,
             env_name=env_name,
             use_cache=use_cache,
+            override_default_cache=override_default_cache,
         )
 
     def _validate(self, value: Any) -> Any:
@@ -73,12 +76,27 @@ class ContractStringField(AbstractContractField):
 
 
 if __name__ == "__main__":
-    s = ContractStringField(
+    s1 = ContractStringField(
         min_length=1,
         max_length=100,
         pattern=r"[a-z]+",
         field_name="name",
         nullable=False,
+        use_cache=True,
     )
 
-    print(s("tllofromfunc"))
+    s2 = ContractStringField(
+        min_length=1,
+        max_length=100,
+        pattern=r"[a-z]+",
+        field_name="name",
+        nullable=False,
+        use_cache=True,
+    )
+    print(s1("tllofromfunc"))
+    print(s1("tllofromfunc"))
+    print(s2("s2"))
+
+    print("Local cache:\n")
+    print(s1.get_cache())
+    print(s2.get_cache())

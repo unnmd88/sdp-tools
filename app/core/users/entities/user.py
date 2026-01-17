@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 from typing import Any, Self
 
@@ -16,16 +17,10 @@ from core.enums import (
     Roles,
 )
 from core.contracts.exc import (
-    ContractViolationBusinessRulesError,
-    ContractViolationInvariantError,
+    ContractViolationError,
 )
-from core.reg_exps import (
-    USERNAME_PATTERN,
-    FIRST_NAME_PATTERN,
-    LAST_NAME_PATTERN,
-    PASSWORD_PATTERN,
-)
-from core.users.constants import (
+from core.exceptions.base import DomainValidationError
+from core.users.business_rules import (
     MIN_LEN_USERNAME,
     MAX_LEN_USERNAME,
     MIN_LEN_FIRSTNAME,
@@ -34,6 +29,12 @@ from core.users.constants import (
     MAX_LEN_LASTNAME,
     MIN_LEN_PASSWORD,
     MAX_LEN_PASSWORD,
+    FIRST_NAME_PATTERN,
+    LAST_NAME_PATTERN,
+    USERNAME_PATTERN,
+    PASSWORD_PATTERN,
+    TELEGRAM_PATTERN,
+    MAX_LEN_DESCRIPTION,
 )
 
 from core.users.rules_messages import BusinessRulesViolationsMessages
@@ -51,8 +52,7 @@ class UserEntity(AbstractEntity):
         PublicAttr(attr_name="_phone_number", alias="phone_number"),
         PublicAttr(attr_name="_telegram", alias="telegram"),
     )
-
-    contract_username = ContractStringField(
+    _contract_username = ContractStringField(
         field_name="username",
         nullable=False,
         use_cache=True,
@@ -60,7 +60,7 @@ class UserEntity(AbstractEntity):
         max_length=MAX_LEN_USERNAME,
         pattern=USERNAME_PATTERN,
     )
-    contract_firstname = ContractStringField(
+    _contract_firstname = ContractStringField(
         field_name="firstname",
         nullable=True,
         use_cache=True,
@@ -68,7 +68,7 @@ class UserEntity(AbstractEntity):
         max_length=MAX_LEN_FIRSTNAME,
         pattern=FIRST_NAME_PATTERN,
     )
-    contract_lastname = ContractStringField(
+    _contract_lastname = ContractStringField(
         field_name="lastname",
         nullable=True,
         use_cache=True,
@@ -76,33 +76,47 @@ class UserEntity(AbstractEntity):
         max_length=MAX_LEN_LASTNAME,
         pattern=LAST_NAME_PATTERN,
     )
-    contract_organization = ContactEnumField(
+    _contract_organization = ContactEnumField(
         field_name="organization",
         nullable=False,
         use_cache=True,
         enum=Organizations,
     )
-    contract_email = ContractEmailField(
+    _contract_email = ContractEmailField(
         field_name="email",
         nullable=True,
         use_cache=True,
     )
-    contract_password = ContractHashedPasswordField(field_name="password")
-    contract_is_active = ContractBooleanField(
+    _contract_password = ContractHashedPasswordField(field_name="password")
+    _contract_is_active = ContractBooleanField(
         field_name="is_active",
         nullable=False,
         allow_1_and_0_as_true_and_false=True,
     )
-    contract_role = ContactEnumField(
+    _contract_role = ContactEnumField(
         field_name="role",
         nullable=False,
         use_cache=True,
         enum=Roles,
     )
-    contract_phone_number = ContractStringField(
-
+    _contract_phone_number = ContractStringField(
+        field_name="phone_number",
+        nullable=True,
+        use_cache=True,
+        pattern=PASSWORD_PATTERN,
     )
-
+    _contract_telegram = ContractStringField(
+        field_name="telegram",
+        nullable=True,
+        use_cache=True,
+        pattern=TELEGRAM_PATTERN,
+    )
+    _contract_description = ContractStringField(
+        field_name="description",
+        nullable=False,
+        use_cache=True,
+        max_length=MAX_LEN_DESCRIPTION,
+    )
 
     @classmethod
     def validate(
@@ -123,22 +137,61 @@ class UserEntity(AbstractEntity):
         created_at: datetime | None,
         updated_at: datetime | None,
     ) -> Self:
-        return cls(
-            id=cls.contract_id(id),
-            username=cls.contract_username(username),
-            firstname=cls.contract_firstname(firstname),
-            lastname=cls.contract_lastname(lastname),
-            organization=cls.contract_organization(organization),
-            email=cls.contract_email(email),
-            password=cls.contract_password(password),
-            is_active=is_active,
-            role=role,
-            phone_number=phone_number,
-            telegram=telegram,
-            description=description,
-            created_at=cls.contract_created_at(created_at),
-            updated_at=cls.contract_updated_at(updated_at),
-        )
+        try:
+            return cls(
+                id=cls._contract_id(id),
+                username=cls._contract_username(username),
+                firstname=cls._contract_firstname(firstname),
+                lastname=cls._contract_lastname(lastname),
+                organization=cls._contract_organization(organization),
+                email=cls._contract_email(email),
+                password=cls._contract_password(password),
+                is_active=is_active,
+                role=cls._contract_role(role),
+                phone_number=phone_number,
+                telegram=telegram,
+                description=description,
+                created_at=cls._contract_created_at(created_at),
+                updated_at=cls._contract_updated_at(updated_at),
+            )
+        except ContractViolationError as e:
+            raise DomainValidationError(e.detail)
+
+    @classmethod
+    def create_new(
+        cls,
+        *,
+        username: str,
+        firstname: str | None,
+        lastname: str | None,
+        organization: Organizations,
+        email: str | None,
+        password: bytes,
+        is_active: bool,
+        role: Roles,
+        phone_number: str | None,
+        telegram: str | None,
+        description: str,
+    ) -> Self:
+        try:
+            return cls(
+                id=None,
+                username=cls._contract_username(username),
+                firstname=cls._contract_firstname(firstname),
+                lastname=cls._contract_lastname(lastname),
+                organization=cls._contract_organization(organization),
+                email=cls._contract_email(email),
+                password=cls._contract_password(password),
+                is_active=is_active,
+                role=cls._contract_role(role),
+                phone_number=phone_number,
+                telegram=telegram,
+                description=description,
+                created_at=None,
+                updated_at=None,
+            )
+        except ContractViolationError as e:
+            raise DomainValidationError(e.detail)
 
     def __init__(
         self,
@@ -220,6 +273,10 @@ class UserEntity(AbstractEntity):
     def description(self) -> str:
         return self._description
 
+    @property
+    def is_superuser(self) -> bool:
+        return self._role == Roles.superuser
+
     def set_username(self, username: str) -> str:
         username = self._validate_username(username, _locals=locals())
         self._username = username
@@ -269,11 +326,11 @@ class UserEntity(AbstractEntity):
 
     def invariant_names(self):
         if self._username == self._lastname:
-            raise ContractViolationBusinessRulesError(
+            raise DomainValidationError(
                 BusinessRulesViolationsMessages.username_and_lastname_must_be_different
             )
         if self._username == self._firstname:
-            raise ContractViolationBusinessRulesError(
+            raise DomainValidationError(
                 BusinessRulesViolationsMessages.username_and_firstname_must_be_different
             )
 
@@ -288,38 +345,45 @@ class UserEntity(AbstractEntity):
 
 if __name__ == "__main__":
     pass
-    user = UserEntity(
-        id=1,
-        firstname="Junkers",
-        lastname=None,
-        username="Jr",
-        created_at=datetime.now(),
-        organization=Organizations.SDP,
-        updated_at=None,
-        password=b"118",
-        is_active=True,
-        role=Roles.admin,
-        email=None,
-        phone_number=None,
-        telegram=None,
-        description="",
-    )
-    user = UserEntity.validate(
-        id=1,
-        firstname="Junkers",
-        lastname=None,
-        username="Junker",
-        created_at=datetime.now(),
-        organization=Organizations.SDP,
-        updated_at=None,
-        password=b"12345678",
-        is_active=True,
-        role=Roles.admin,
-        email=None,
-        phone_number=None,
-        telegram=None,
-        description="",
-    )
+
+    start_time = time.perf_counter()
+    for _ in range(1000):
+        user = UserEntity(
+            id=1,
+            firstname="Junkers",
+            lastname=None,
+            username="Jr",
+            created_at=datetime.now(),
+            organization=Organizations.SDP,
+            updated_at=None,
+            password=b"118",
+            is_active=True,
+            role=Roles.admin,
+            email=None,
+            phone_number=None,
+            telegram=None,
+            description="",
+        )
+    print(f"Время выполнения без валидации: {time.perf_counter() - start_time} секунд")
+    start_time = time.perf_counter()
+    for _ in range(1000):
+        user = UserEntity.validate(
+            id=1,
+            firstname="Junkers",
+            lastname=None,
+            username="Junker",
+            created_at=datetime.now(),
+            organization=Organizations.SDP,
+            updated_at=None,
+            password=b"12345678",
+            is_active=True,
+            role=Roles.admin,
+            email=None,
+            phone_number=None,
+            telegram=None,
+            description="",
+        )
+    print(f"Время выполнения с валидацией: {time.perf_counter() - start_time} секунд")
 
     print(user)
     print(repr(user))

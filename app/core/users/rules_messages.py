@@ -1,6 +1,6 @@
 from enum import StrEnum
 
-from core.users.constants import (
+from core.users.business_rules import (
     MIN_ID,
     MAX_ID,
     MAX_LEN_PASSWORD,

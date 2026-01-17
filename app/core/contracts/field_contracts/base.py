@@ -18,18 +18,16 @@ from core.contracts.interfaces.require_schemas_interfaces import (
     ContractRequireSchemaProtocol,
     ContractProcessValueSchemaRequireProtocol,
 )
-from core.contracts.utils import replace_self_from_attr_name
+from core.contracts.utils import replace_self_from_attr_name, SimpleCache
 
 type RequireTypeData = ContractRequireSchemaProtocol | Callable[..., bool]
 type IsInstanceType = type | tuple[type, ...] | UnionType
 
 
 class AbstractContractField(ABC):
-    _cache: CacheFieldProtocol
     base_requires: Sequence[ContractRequireSchemaProtocol] | None = None
 
     def __init_subclass__(cls, *, cache: CacheFieldProtocol | None = None, **kwargs):
-        cls.set_cache(cache=cache)
         if cls.base_requires is None:
             cls.base_requires = ()
         for i, require in enumerate(cls.base_requires):
@@ -40,33 +38,6 @@ class AbstractContractField(ABC):
                     f"Предоставленный тип: {type(require)!r}. Индекс={i}."
                 )
         super().__init_subclass__(**kwargs)
-
-    @classmethod
-    def set_cache(
-        cls,
-        *,
-        cache: CacheFieldProtocol | None = None,
-        default=set,
-    ):
-        if cache is None:
-            _cache = default()
-        elif isinstance(cache, CacheFieldProtocol):
-            _cache = cache
-        else:
-            raise TypeError(
-                f"Тип устанавливаемого кэша должен "
-                f"соответствовать протоколу {CacheFieldProtocol.__name__!r}. "
-                f"Предоставленный тип: {type(cache)!r}."
-            )
-        cls._cache = _cache
-
-    @classmethod
-    def get_cache(cls) -> CacheFieldProtocol:
-        return cls._cache
-
-    @classmethod
-    def clear_cache(cls) -> CacheFieldProtocol:
-        return cls._cache.clear()
 
     def __init__(
         self,
@@ -80,7 +51,8 @@ class AbstractContractField(ABC):
         requires: Iterable[ContractRequireSchemaProtocol] | None = None,
         invariants: Iterable[ContractRequireSchemaProtocol] | None = None,
         env_name: str | None = None,
-        use_cache: bool | None = True,
+        use_cache: bool = True,
+        override_default_cache: CacheFieldProtocol | None = None,
     ):
         self._name = field_name
         self._nullable = nullable
@@ -98,6 +70,10 @@ class AbstractContractField(ABC):
         self._invariants = tuple(invariants) if invariants is not None else ()
         self._env_name = env_name
         self._use_cache = use_cache
+
+        self._cache = SimpleCache()
+        if override_default_cache is not None:
+            self.set_cache(cache=override_default_cache)
 
         # Проверка, что все элементы из: self._preprocess_value_requires, self._postprocess_value_require,
         # self._requires, self._invariants соответствуют протоколу ContractRequireProtocol.
@@ -176,7 +152,6 @@ class AbstractContractField(ABC):
                 value=value,
             )
         if self._use_cache and (value in self._cache):
-            self._check_invariants(value)
             return value
         value = self._pipeline(value=value, handlers=self._pipeline_preprocess_value)
         self._validate(value)
@@ -204,6 +179,25 @@ class AbstractContractField(ABC):
             f"count_invariants={len(self._invariants)!r}"
             f")"
         )
+
+    def set_cache(self, cache: CacheFieldProtocol = SimpleCache()):
+        if isinstance(cache, CacheFieldProtocol):
+            raise TypeError(
+                f"Тип устанавливаемого кэша должен "
+                f"соответствовать протоколу {CacheFieldProtocol.__name__!r}. "
+                f"Предоставленный тип: {type(cache)!r}."
+            )
+        self._cache = cache
+        assert self._cache is not None, f"Кэш не установлен cache: {self._cache!r}."
+
+    def get_cache(self) -> CacheFieldProtocol | None:
+        return self._cache
+
+    def enable_cache(self):
+        self._use_cache = True
+
+    def disable_cache(self):
+        self._use_cache = False
 
     @property
     def name(self):

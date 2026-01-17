@@ -1,5 +1,5 @@
 from core.contracts.exc import ContractViolationBusinessRulesError
-from core.users.constants import (
+from core.users.business_rules import (
     MIN_LEN_FIRSTNAME,
     MAX_LEN_FIRSTNAME,
     MIN_LEN_LASTNAME,

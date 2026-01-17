@@ -97,5 +97,5 @@ if __name__ == "__main__":
     print(pos_int(4))
     print(pos_int(5))
     print(pos_int("10"))
-    print(pos_int.get_cache())
+    print(pos_int.get_global_cache())
     print(repr(pos_int))

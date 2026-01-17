@@ -52,7 +52,7 @@ async def whoami(
     payload_jwt: PayloadAccessJWT,
     use_case: UsersUseCase,
 ):
-    user = await use_case.get_user_by_username_or_raise(username=payload_jwt.sub)
+    user =  await use_case.get_user_by_username_or_raise(username=payload_jwt.sub)
     return ResponseUserSchema.model_validate(user, from_attributes=True)
 
 

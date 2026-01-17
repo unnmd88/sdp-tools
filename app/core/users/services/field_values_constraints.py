@@ -1,5 +1,5 @@
 from core.config import settings
-from core.reg_exps import PASSWORD_PATTERN
+from core.users.business_rules import PASSWORD_PATTERN
 from core.users.exceptions import InvalidValueToSetError
 from core.users.user_security_polices import forbidden_patterns_in_username
 from core.utils import checking_types, validate_string_by_pattern

@@ -21,16 +21,16 @@ class GetUserFromRepoDTO:
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class UserDTO:
-    first_name: str
-    last_name: str
+    firstname: str | None
+    lastname: str | None
     username: str
-    password: str = field(repr=False)
-    email: str
+    password: str | bytes = field(repr=False)
+    email: str | None
     organization: Organizations
     is_active: bool
     role: Roles
-    phone_number: str
-    telegram: str
+    phone_number: str | None
+    telegram: str | None
     description: str
 
 

@@ -36,27 +36,6 @@ class ContractViolationFieldError(ContractViolationError):
     """Класс исключений, возникающих при нарушении контракта поля."""
 
 
-# class ContractViolationValueTypeError(ContractViolationError):
-#     """ Класс исключений, возникающих при нарушении контракта типа значения."""
-#
-#     def __init__(
-#         self,
-#         *,
-#         field_name: str,
-#         got: type | None,
-#         expected: str | type | tuple[str | type, ...] | UnionType,
-#     ):
-#         self._detail = (
-#             f"Некорректный тип для поля {field_name!r}."
-#             f" Значение={got!r}({got.__class__!r}). Ожидается {str(expected)!r}."
-#         )
-#         super().__init__(self._detail)
-#
-#     @property
-#     def detail(self):
-#         return self._detail
-
-
 class ContractViolationBusinessRulesError(ContractViolationError):
     """Ошибка нарушения контракта бизнес-правил."""
 

@@ -3,6 +3,7 @@ from typing import Sequence, Any
 
 from core.contracts.exc import ContractViolationFieldError
 from core.contracts.field_contracts.base import AbstractContractField
+from core.contracts.interfaces.cahe_interface import CacheFieldProtocol
 from core.contracts.interfaces.require_schemas_interfaces import (
     ContractProcessValueSchemaRequireProtocol,
     ContractRequireSchemaProtocol,
@@ -30,6 +31,7 @@ class ContactEnumField(AbstractContractField):
         invariants: Sequence[ContractRequireSchemaProtocol] | None = None,
         env_name: str | None = None,
         use_cache: bool = False,
+        override_default_cache: CacheFieldProtocol | None = None,
     ) -> None:
         self._enum = enum
         if not isinstance(self._enum, type) and not issubclass(enum, Enum):
@@ -47,6 +49,7 @@ class ContactEnumField(AbstractContractField):
             invariants=invariants,
             env_name=env_name,
             use_cache=use_cache,
+            override_default_cache=override_default_cache,
         )
 
     def repr_schema(self):

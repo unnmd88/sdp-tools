@@ -28,6 +28,8 @@ from core.users.services.field_values_constraints import UserEntityConstraints
 logger = logging.getLogger(USERS_LOGGER)
 
 
+
+
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreateUserUseCaseImpl:
     user_repository: UsersRepositoryProtocol
@@ -36,7 +38,7 @@ class CreateUserUseCaseImpl:
     async def __call__(self, create_user_dto: CreateUserDTO) -> UserEntity:
         logger.info(
             "Запрос на создание нового пользователя от инициатора=%r: %r",
-            create_user_dto.username,
+            create_user_dto.customer,
             create_user_dto,
         )
         try:
@@ -57,7 +59,7 @@ class CreateUserUseCaseImpl:
         except ApplicationError as e:
             logger.critical("Ошибка логики создания нового пользователя: %r", e)
             raise
-        if not customer_entity.permissions.has(Permissions.CREATE_USERS):
+        if not customer_entity.is_superuser:
             msg = f"У {customer_entity.username!r} нет прав для создания пользователей."
             logger.warning(msg)
             raise UserPermissionsError(msg)
@@ -78,9 +80,10 @@ class CreateUserUseCaseImpl:
             msg = f"Пользователь с username={user_already_exists.username}(id={user_already_exists.id}) существует."
             logger.warning(msg)
             raise UserAlreadyExistsError(msg)
-        entity = UserEntity(
-            firstname=create_user_dto.first_name,
-            lastname=create_user_dto.last_name,
+
+        entity: UserEntity = UserEntity.create_new(
+            firstname=create_user_dto.firstname,
+            lastname=create_user_dto.lastname,
             username=create_user_dto.username,
             password=hash_password(create_user_dto.password),
             email=create_user_dto.email,
@@ -91,6 +94,7 @@ class CreateUserUseCaseImpl:
             telegram=create_user_dto.telegram,
             description=create_user_dto.description,
         )
+
         logger.warning(entity)
         try:
             new_user_entity = await self.user_repository.add_user(entity)

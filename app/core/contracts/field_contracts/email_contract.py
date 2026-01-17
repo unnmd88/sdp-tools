@@ -5,6 +5,7 @@ from typing import Any
 
 from core.contracts.exc import ContractViolationFieldError
 from core.contracts.field_contracts.base import AbstractContractField
+from core.contracts.interfaces.cahe_interface import CacheFieldProtocol
 from core.contracts.interfaces.require_schemas_interfaces import (
     ContractProcessValueSchemaRequireProtocol,
     ContractRequireSchemaProtocol,
@@ -31,6 +32,7 @@ class ContractEmailField(AbstractContractField):
         invariants: Sequence[ContractRequireSchemaProtocol] | None = None,
         env_name: str | None = None,
         use_cache: bool = False,
+        override_default_cache: CacheFieldProtocol | None = None,
     ):
         self._pattern = re.compile(
             pattern if pattern is not None else DEFAULT_EMAIL_PATTERN
@@ -44,6 +46,7 @@ class ContractEmailField(AbstractContractField):
             invariants=invariants,
             env_name=env_name,
             use_cache=use_cache,
+            override_default_cache=override_default_cache,
         )
 
     def _validate(self, value: Any) -> Any:
@@ -55,7 +58,6 @@ class ContractEmailField(AbstractContractField):
                 value=value,
                 detail="Нарушен контракт поля, содержащего 'email'",
             )
-
         return super()._validate(value)
 
 

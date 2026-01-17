@@ -18,8 +18,8 @@ from core.users.services.field_values_constraints import (
 class BaseUserSchema(BaseModel):
     model_config = ConfigDict(use_enum_values=True, strict=True, extra="forbid")
 
-    first_name: Annotated[str | None, Field(examples=[None, "Иван"])]
-    last_name: Annotated[str | None, Field(examples=[None, "Иванов"])]
+    firstname: Annotated[str | None, Field(examples=[None, "Иван"])]
+    lastname: Annotated[str | None, Field(examples=[None, "Иванов"])]
     username: Annotated[str, Field(examples=["user", "edward"])]
     email: EmailStr | None
     is_active: bool
