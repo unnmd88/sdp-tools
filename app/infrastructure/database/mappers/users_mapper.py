@@ -4,9 +4,12 @@ from typing import final, Any, ClassVar
 from application.interfaces.mappers.db import BaseDBMapperProtocol
 
 
-from core.dto.users import UpdateUserDTO
-from core.enums import Roles, Organizations
-from core.users.entities.user import UserEntity
+from domain.dto.users import UpdateUserDTO
+from domain.enums.unsorted import Roles, Organizations
+from domain.services.entity_factories.user_entity_factory_service import (
+    UserEntityFactoryService,
+)
+from domain.users.entities.user import UserEntity
 from infrastructure.database.models import User as UserModel
 
 
@@ -18,7 +21,7 @@ class UserDBMapper(BaseDBMapperProtocol):
     @classmethod
     def to_entity(cls, model: UserModel) -> UserEntity:
         """ """
-        return UserEntity.validate(
+        return UserEntityFactoryService.create_existing(
             id=model.id,
             firstname=model.first_name,
             lastname=model.last_name,

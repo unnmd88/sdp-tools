@@ -11,7 +11,7 @@ from starlette import status
 
 from infrastructure.database.models import Base, User
 
-# from core.models import Base, User
+# from domain.models import Base, User
 
 T = TypeVar("T", bound=Base)
 

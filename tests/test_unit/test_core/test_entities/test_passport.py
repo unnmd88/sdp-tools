@@ -1,5 +1,5 @@
-from core.enums import PassportGroups
-from core.passports.entities.passport import PassportEntity
+from domain.enums import PassportGroups
+from domain.passports.entities.passport import PassportEntity
 import pytest
 
 from tests.utils.create_user_entity import create_user_entity

@@ -4,12 +4,12 @@ from datetime import datetime
 from typing import final
 
 from application.interfaces.mappers.db import BaseDBMapperProtocol
-from core.dto.tlo import TrafficLightObjectDTO
-from core.enums import ServiceOrganizations, RegionNames, ControllerTypes
-from core.passports.entities.passport import PassportEntity
-from core.tlo.entities.tlo import TrafficLightObjectEntity
-from core.tlo.entities.traffic_controller import TrafficController
-from core.tlo.value_objects.network_settings import NetworkSettings
+from domain.dto.tlo import TrafficLightObjectDTO
+from domain.enums.unsorted import ServiceOrganizations, RegionNames, ControllerTypes
+from domain.passports.entities.passport import PassportEntity
+from domain.tlo.entities.tlo import TrafficLightObjectEntity
+from domain.tlo.entities.traffic_controller import TrafficController
+from domain.tlo.value_objects.network_settings import NetworkSettings
 from infrastructure.database.models import (
     TrafficLightObject as TrafficLightObjectModel,
     TrafficLightObject,

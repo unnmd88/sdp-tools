@@ -5,8 +5,8 @@ from application.interfaces.use_cases.get_user_use_case_interface import (
     GetUserUseCaseProtocol,
 )
 
-from core.dto.users import CreateUserDTO
-from core.users.entities.user import UserEntity
+from domain.dto.users import CreateUserDTO
+from domain.users.entities.user import UserEntity
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

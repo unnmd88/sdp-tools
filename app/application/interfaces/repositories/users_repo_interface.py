@@ -1,5 +1,5 @@
 from application.interfaces.repositories.base_repo_interface import BaseCrudProtocol
-from core.users.entities.user import UserEntity
+from domain.users.entities.user import UserEntity
 
 
 class UsersRepositoryProtocol(BaseCrudProtocol):

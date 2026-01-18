@@ -3,7 +3,7 @@ from presentation.api import router as api_v1_router
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from app.core.config import settings
+from core.config import settings
 
 app = FastAPI(
     title="Api для работы с паспортами светофорного объекта.",

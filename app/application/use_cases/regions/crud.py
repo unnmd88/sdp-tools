@@ -1,15 +1,15 @@
 from collections.abc import Sequence
 
-from core.dto.common import (
+from domain.dto.common import (
     CreateRecordDTO,
     FiltersForSearchDTO,
     ToUpdateRecordDTO,
     UpdatedRecordDTO,
 )
 
-# from core.dto.filters import FiltersForSearchDTO
-from core.dto.regions import CreateRegionDTO, UpdateRegionDTO
-from core.regions.entities.region import RegionEntity
+# from domain.dto.filters import FiltersForSearchDTO
+from domain.dto.regions import CreateRegionDTO, UpdateRegionDTO
+from domain.regions.entities.region import RegionEntity
 
 
 # class RegionsCrudUseCaseImpl:

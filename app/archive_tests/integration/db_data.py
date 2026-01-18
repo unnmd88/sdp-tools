@@ -1,10 +1,10 @@
 import random
 from collections.abc import Sequence
 
-from core.enums import PassportGroups, ServiceOrganizations
-from core.models import Passport, PassportGroup, Region, TrafficLightObject, User
-from core.users import Organizations
-from core.users import Roles
+from domain.enums import PassportGroups, ServiceOrganizations
+from domain.models import Passport, PassportGroup, Region, TrafficLightObject, User
+from domain.users import Organizations
+from domain.users import Roles
 
 
 def users_models():

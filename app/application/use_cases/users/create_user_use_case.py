@@ -9,31 +9,42 @@ from application.interfaces.repositories.users_repo_interface import (
 from application.interfaces.use_cases.get_user_use_case_interface import (
     GetUserUseCaseProtocol,
 )
-
-from core.dto.users import CreateUserDTO
-from core.enums import Permissions, Organizations, Roles
-from core.exceptions.base import ApplicationError
-from core.exceptions.users import UserPermissionsError
-from core.users.entities.user import UserEntity
-from core.users.exceptions import (
-    UserNotFoundError,
-    InactiveUserError,
-    UserAlreadyExistsError,
-    InvalidValueToSetError,
+from application.interfaces.services.entity_factories.base_entity_factory_interface import (
+    EntityFactoryServiceProtocol,
 )
-from core.users.services.user_password import hash_password
-from core.users.services.field_values_constraints import UserEntityConstraints
+from application.interfaces.services.user_password_service_interface import (
+    UserPasswordServiceProtocol,
+)
+
+from domain.dto.users import CreateUserDTO
+from domain.enums.unsorted import Organizations, Roles
+from domain.exceptions.base import ApplicationError
+from domain.exceptions.users import UserPermissionsError
+from domain.services.entity_factories.user_entity_factory_service import (
+    UserEntityFactoryService,
+)
+from domain.users.entities.user import UserEntity
+# from domain.users.exceptions import (
+#     UserNotFoundError,
+#     InactiveUserError,
+#     UserAlreadyExistsError,
+#     InvalidValueToSetError,
+# )
+from domain.services.user_password_service import hash_password, UserPasswordService
+from domain.services.field_values_constraints import UserEntityBusinessRules
 
 
 logger = logging.getLogger(USERS_LOGGER)
 
 
-
-
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreateUserUseCaseImpl:
+    """Класс для создания нового пользователя системы."""
+
     user_repository: UsersRepositoryProtocol
     get_user_use_case: GetUserUseCaseProtocol
+    user_factory: type[EntityFactoryServiceProtocol] = UserEntityFactoryService
+    user_password_service: type[UserPasswordServiceProtocol] = UserPasswordService
 
     async def __call__(self, create_user_dto: CreateUserDTO) -> UserEntity:
         logger.info(
@@ -64,7 +75,7 @@ class CreateUserUseCaseImpl:
             logger.warning(msg)
             raise UserPermissionsError(msg)
         try:
-            UserEntityConstraints.check_username_and_password(
+            UserEntityBusinessRules.check_username_and_password(
                 username=create_user_dto.username,
                 password=create_user_dto.password,
             )
@@ -81,7 +92,7 @@ class CreateUserUseCaseImpl:
             logger.warning(msg)
             raise UserAlreadyExistsError(msg)
 
-        entity: UserEntity = UserEntity.create_new(
+        entity: UserEntity = self.user_factory.create_new(
             firstname=create_user_dto.firstname,
             lastname=create_user_dto.lastname,
             username=create_user_dto.username,

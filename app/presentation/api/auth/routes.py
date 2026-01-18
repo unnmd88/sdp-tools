@@ -3,8 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException
 from starlette import status
 
-from core.dto.auth import UserAuthDTO
-from core.users.exceptions import UserNotFoundByIdError, InvalidUsernameOrPasswordError
+from domain.dto.auth import UserAuthDTO
 from presentation.api.api_v1.documentation.auth_and_jwt.endpoints import (
     POST_LOGIN_user,
     POST_REFRESH,

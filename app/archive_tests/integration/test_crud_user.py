@@ -1,5 +1,5 @@
 import pytest
-from core.models import User
+from domain.models import User
 from sqlalchemy.engine.result import Result
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select

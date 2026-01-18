@@ -1,6 +1,6 @@
 from sqlalchemy.sql.expression import select
 
-from core.regions.entities.region import RegionEntity
+from domain.regions.entities.region import RegionEntity
 from infrastructure.database.base_repository import BaseSqlAlchemy
 from infrastructure.database.mappers.regions import RegionDBMapper
 from infrastructure.database.models import Region

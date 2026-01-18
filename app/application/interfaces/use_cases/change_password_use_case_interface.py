@@ -7,7 +7,7 @@ from application.interfaces.repositories.users_repo_interface import (
 from application.interfaces.use_cases.get_user_use_case_interface import (
     GetUserUseCaseProtocol,
 )
-from core.dto.users import ChangeUserPasswordDTO
+from domain.dto.users import ChangeUserPasswordDTO
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

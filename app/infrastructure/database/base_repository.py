@@ -10,16 +10,15 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from infrastructure.database.models import Base
 
 from application.interfaces.mappers.db import BaseDBMapperProtocol
-from core.dto.common import (
+from domain.dto.common import (
     CreateRecordDTO,
     UpdatedRecordDTO,
     ToUpdateRecordDTO,
     DeleteRecordDTO,
 )
-from core.exceptions.crud import NotFoundError, CreateErrorAlreadyExists, DeleteError
-from core.regions.entities.region import RegionEntity
-from core.tlo.entities.tlo import TrafficLightObjectEntity
-from core.users.entities.user import UserEntity
+from domain.regions.entities.region import RegionEntity
+from domain.tlo.entities.tlo import TrafficLightObjectEntity
+from domain.users.entities.user import UserEntity
 
 
 T = TypeVar("T", bound=type[Base])
@@ -87,7 +86,7 @@ class BaseSqlAlchemy:
         stmt = select(self.model).filter_by(**update_record_dto.search_criteria)
         result: Result = await self.session.execute(stmt)
         if (current_model := result.scalars().one_or_none()) is None:
-            raise NotFoundError
+            raise EntityNotFoundError
         old_entity = self.mapper.to_entity(current_model)
         # Создать инстанс сущности для проверки валидности обновляемых полей
         updated_fields = asdict(old_entity) | update_record_dto.fields
@@ -134,7 +133,7 @@ class BaseSqlAlchemy:
     async def delete_one(self, delete_record_dto: DeleteRecordDTO) -> Entity | None:
         entity = await self.get_one_or_none_by_filters(delete_record_dto.search_filters)
         if entity is None:
-            raise NotFoundError
+            raise EntityNotFoundError
         stmt = delete(self.model).filter_by(id=entity.id)
         try:
             await self.session.execute(stmt)

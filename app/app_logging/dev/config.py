@@ -1,6 +1,6 @@
 import logging.config
 
-from core.config import API_V1_PATH, BASE_DIR
+from core.config import BASE_DIR
 
 print(f"BASE_DIR: {BASE_DIR}")
 

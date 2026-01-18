@@ -1,6 +1,6 @@
 from typing import Annotated
 
-# from core.database import db_api
+# from domain.database import db_api
 from fastapi import (
     APIRouter,
     Depends,

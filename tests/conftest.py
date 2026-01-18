@@ -3,7 +3,7 @@ import string
 
 import pytest
 
-from core.enums import EntityIdRange
+from domain.enums import EntityIdRange
 
 
 @pytest.fixture

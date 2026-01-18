@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
-from core.passports.entities.passport import PassportEntity
-from core.tlo.entities.tlo import TrafficLightObjectEntity
+from domain.passports.entities.passport import PassportEntity
+from domain.tlo.entities.tlo import TrafficLightObjectEntity
 from infrastructure.database.mappers.tlo import TrafficLightObjectDBMapper
 from infrastructure.database.models import (
     TrafficLightObject as TrafficLightModel,

@@ -1,14 +1,14 @@
 import asyncio
 
-from core.enums import (
+from domain.enums import (
     PassportGroups,
     PassportGroupsRoutes,
     RegionCodes,
     RegionNames,
     ServiceOrganizations,
 )
-from core.database import db_api
-from core.models import PassportGroup, Region, TrafficLightObject
+from domain.database import db_api
+from domain.models import PassportGroup, Region, TrafficLightObject
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select

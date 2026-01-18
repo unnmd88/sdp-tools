@@ -4,7 +4,7 @@ from typing import final
 from fastapi import HTTPException
 from starlette import status
 
-from core.enums import TokenTypes
+from domain.enums.unsorted import TokenTypes
 
 
 class BaseAuthException(Exception):

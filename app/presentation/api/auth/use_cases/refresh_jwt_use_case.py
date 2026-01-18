@@ -6,9 +6,8 @@ from application.interfaces.repositories.users_repo_interface import (
     UsersRepositoryProtocol,
 )
 from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
-from core.dto.auth import UserAuthDTO
-from core.users.entities.user import UserEntity
-from core.users.exceptions import InvalidUsernameOrPasswordError, UserNotFoundError
+from domain.dto.auth import UserAuthDTO
+from domain.users.entities.user import UserEntity
 from presentation.api.auth.jwt_helper import JWTHelper
 
 logger = logging.getLogger(JWT_LOGGER)

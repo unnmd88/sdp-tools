@@ -19,8 +19,7 @@ from presentation.schemas.regions import (
     RegionSchemaResponse,
     RegionUpdate,
 )
-from core.dto.common import FiltersForSearchDTO, ToUpdateRecordDTO, CreateRecordDTO
-from core.exceptions.crud import NotFoundError, CreateError, CreateErrorAlreadyExists
+from domain.dto.common import FiltersForSearchDTO, ToUpdateRecordDTO, CreateRecordDTO
 
 router = APIRouter(
     prefix="/regions",
@@ -141,7 +140,7 @@ async def update_region(
     )
     try:
         result = await use_case.update_region(dto)
-    except NotFoundError:
+    except EntityNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Регион {region_code!r} не найден.",
@@ -165,7 +164,7 @@ async def delete_region(
     )
     try:
         result = await use_case.delete_region(filters_for_search_dto)
-    except NotFoundError:
+    except EntityNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Регион {region_code} не найден.",

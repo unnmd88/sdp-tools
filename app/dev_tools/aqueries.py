@@ -1,9 +1,9 @@
 import asyncio
 
-from core.enums import ServiceOrganizations
-from core.database import db_api as db_api_main
-from core.database import DatabaseAPI
-from core.models import Passport, PassportGroup, Region, TrafficLightObject, User
+from domain.enums import ServiceOrganizations
+from domain.database import db_api as db_api_main
+from domain.database import DatabaseAPI
+from domain.models import Passport, PassportGroup, Region, TrafficLightObject, User
 from sqlalchemy import Result
 from sqlalchemy.sql.expression import select
 

@@ -1,8 +1,8 @@
 # import random
 #
 # import pytest
-# from core.enums import EntityIdRange
-# from core.field_validators import (
+# from domain.enums import EntityIdRange
+# from domain.field_validators import (
 #     check_email_is_valid,
 #     check_field_id_is_valid,
 #     check_firstname_is_valid,

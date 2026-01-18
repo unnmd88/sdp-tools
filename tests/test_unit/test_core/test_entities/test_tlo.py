@@ -1,9 +1,9 @@
 import datetime
 
 
-from core.enums import RegionNames, ServiceOrganizations, PassportGroups
-from core.tlo.entities.tlo import TrafficLightObjectEntity
-from core.passports.entities.passport import PassportEntity
+from domain.enums import RegionNames, ServiceOrganizations, PassportGroups
+from domain.tlo.entities.tlo import TrafficLightObjectEntity
+from domain.passports.entities.passport import PassportEntity
 from tests.utils.create_user_entity import create_user_entity
 
 

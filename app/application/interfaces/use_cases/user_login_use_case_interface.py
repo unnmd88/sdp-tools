@@ -4,8 +4,8 @@ from typing import Protocol
 from application.interfaces.repositories.users_repo_interface import (
     UsersRepositoryProtocol,
 )
-from core.dto.auth import UserAuthDTO
-from core.users.entities.user import UserEntity
+from domain.dto.auth import UserAuthDTO
+from domain.users.entities.user import UserEntity
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

@@ -8,21 +8,19 @@ from application.interfaces.repositories.users_repo_interface import (
 from application.interfaces.use_cases.get_user_use_case_interface import (
     GetUserUseCaseProtocol,
 )
-from core.dto.common import ToUpdateRecordDTO
-from core.dto.users import ChangeUserPasswordDTO
-from core.exceptions.base import ApplicationError
-from core.users.entities.user import UserEntity
-from core.users.exceptions import (
+from domain.dto.common import ToUpdateRecordDTO
+from domain.dto.users import ChangeUserPasswordDTO
+from domain.exceptions.base import ApplicationError
+from domain.users.entities.user import UserEntity
+from domain.users.exceptions import (
     UserNotFoundError,
     InactiveUserError,
-    UserAdministratorNotFoundError,
     InvalidUsernameOrPasswordError,
     InvalidUsernameOrPasswordToSetError,
-    SameUsernameAndPasswordError,
 )
-from core.users.services.user_password import hash_password
-from core.users.services.field_values_constraints import (
-    check_password_to_set_constraints,
+from domain.services.user_password_service import hash_password
+from domain.services.field_values_constraints import (
+    password_validator,
 )
 
 logger = logging.getLogger(USERS_LOGGER)
@@ -49,7 +47,7 @@ class ChangeUserPasswordUseCaseImpl:
         if not subject.validate_password(dto.old_password):
             logger.warning("Ошибка: неверный пароль пользователя %r.", subject.username)
             raise InvalidUsernameOrPasswordError
-        if not check_password_to_set_constraints(dto.new_password):
+        if not password_validator(dto.new_password):
             msg = "Ошибка: Недопустимый пароль"
             logger.info("%s: %r", msg, dto.new_password)
             raise InvalidUsernameOrPasswordToSetError(f"{msg}.")

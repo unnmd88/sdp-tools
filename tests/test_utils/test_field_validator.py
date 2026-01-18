@@ -2,7 +2,7 @@ from contextlib import nullcontext
 
 import pytest
 
-from core.utils import checking_types
+from domain.utils import checking_types
 
 
 @pytest.mark.parametrize(

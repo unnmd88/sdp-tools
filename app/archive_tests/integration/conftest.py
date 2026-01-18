@@ -1,10 +1,10 @@
 import pytest
 from core.config import settings
-from core.database import DatabaseAPI
-from core.models import Base, User
+from domain.database import DatabaseAPI
+from domain.models import Base, User
 from main import app
 from starlette.testclient import TestClient
-from core.users import users as user_examples
+from domain.users import users as user_examples
 
 BASE_URL = (
     f"http://{settings.run.host}:{settings.run.port}"

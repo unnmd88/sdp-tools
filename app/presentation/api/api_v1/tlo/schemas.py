@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from annotated_types import MaxLen
-from core.enums import Districts, ServiceOrganizations
+from domain.enums.unsorted import Districts, ServiceOrganizations
 from pydantic import BaseModel, ConfigDict, Field
 
 

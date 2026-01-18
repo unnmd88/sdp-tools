@@ -1,5 +1,5 @@
 from application.interfaces.repositories.base_repo_interface import BaseCrudProtocol
-from core.tlo.entities.tlo import TrafficLightObjectEntity
+from domain.tlo.entities.tlo import TrafficLightObjectEntity
 
 
 class TrafficLightObjectRepositoryProtocol(BaseCrudProtocol):

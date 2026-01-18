@@ -1,10 +1,10 @@
 import bcrypt
 import pytest
-from core.database import DatabaseAPI
-from core.models import User
+from domain.database import DatabaseAPI
+from domain.models import User
 from sqlalchemy.engine.result import Result
 from sqlalchemy.sql.expression import select
-from core.users.services.create_root import create_root
+from domain.users.services.create_root import create_root
 
 
 @pytest.mark.asyncio(loop_scope="session")

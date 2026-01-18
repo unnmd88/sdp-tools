@@ -1,24 +1,15 @@
 from fastapi import APIRouter, status, HTTPException
 
-from core.dto.users import (
+from domain.dto.users import (
     CreateUserDTO,
     UpdateUserDTO,
     GetUserFromRepoDTO,
     SearchUsersDTO,
     ChangeUserPasswordDTO,
 )
-from core.enums import Roles
+from domain.enums.unsorted import Roles
 
-from core.users.exceptions import (
-    UserAlreadyExistsError,
-    InvalidUsernameOrPasswordToSetError,
-    UserNotFoundError,
-    InactiveUserError,
-    InvalidUsernameOrPasswordError,
-    SameUsernameAndPasswordError,
-)
-from core.exceptions.base import DomainValidationError
-from core.exceptions.users import UserPermissionsError
+from domain.exceptions.users import UserPermissionsError
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
 from presentation.api.dependencies.deps import (
     UsersUseCase,
@@ -52,7 +43,7 @@ async def whoami(
     payload_jwt: PayloadAccessJWT,
     use_case: UsersUseCase,
 ):
-    user =  await use_case.get_user_by_username_or_raise(username=payload_jwt.sub)
+    user = await use_case.get_user_by_username_or_raise(username=payload_jwt.sub)
     return ResponseUserSchema.model_validate(user, from_attributes=True)
 
 

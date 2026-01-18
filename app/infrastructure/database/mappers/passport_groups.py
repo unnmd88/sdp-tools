@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from typing import final
 
 from application.interfaces.mappers.db import BaseDBMapperProtocol
-from core.enums import PassportGroups
-from core.passport_groups.entities.passport_group import PassportGroupEntity
+from domain.enums.unsorted import PassportGroups
+from domain.passport_groups.entities.passport_group import PassportGroupEntity
 from infrastructure.database.models import PassportGroup as PassportGroupModel
 
 

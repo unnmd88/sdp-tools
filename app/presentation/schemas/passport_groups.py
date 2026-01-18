@@ -2,7 +2,7 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field, ConfigDict
 
-from core.enums import PassportGroups
+from domain.enums.unsorted import PassportGroups
 
 
 class PassportGroupsBase(BaseModel):

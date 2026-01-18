@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from core.dto.common import (
+from domain.dto.common import (
     UpdatedRecordDTO,
     CreateRecordDTO,
     ToUpdateRecordDTO,

@@ -7,8 +7,8 @@ from application.interfaces.repositories.users_repo_interface import (
 )
 
 
-from core.users.entities.user import UserEntity
-from core.users.exceptions import UserNotFoundError, InactiveUserError
+from domain.users.entities.user import UserEntity
+
 
 logger = logging.getLogger(USERS_LOGGER)
 

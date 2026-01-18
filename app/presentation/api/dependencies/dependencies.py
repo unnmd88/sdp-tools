@@ -5,9 +5,6 @@ from fastapi.security import (
 )
 from jwt import ExpiredSignatureError, DecodeError
 
-from application.interfaces.repositories.passport_groups import (
-    PassportGroupRepositoryProtocol,
-)
 from application.interfaces.repositories.regions import RegionsRepositoryProtocol
 from application.interfaces.repositories.tlo import TrafficLightObjectRepositoryProtocol
 from application.interfaces.repositories.users_repo_interface import (
@@ -27,7 +24,7 @@ from presentation.api.auth.use_cases.login_and_issue_jwt_use_case import (
     LoginAndIssueJWTUseCaseIml,
 )
 from presentation.api.auth.jwt_helper import JWTHelper
-from application.use_cases.auth.user_login_use_case import UserLoginUseCaseImpl
+from application.use_cases.users.user_login_use_case import UserLoginUseCaseImpl
 from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
 
 from typing import Annotated
@@ -38,12 +35,8 @@ from starlette import status
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from core.dto.users import GetUserFromRepoDTO
-from core.enums import Roles, TokenTypes
-from core.passport_groups.services.crud import PassportGroupsServiceImpl
-from core.regions.services.crud import RegionsServiceImpl
-from core.tlo.services.main_tlo_service import TrafficLightObjectServiceImpl
-from core.users.entities.user import UserEntity
+from domain.dto.users import GetUserFromRepoDTO
+from domain.enums.unsorted import Roles, TokenTypes
 from infrastructure.database.api import db_api
 from infrastructure.database.passport_groups_repository import (
     PassportGroupsRepositorySqlAlchemy,

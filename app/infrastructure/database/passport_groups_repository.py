@@ -1,4 +1,4 @@
-from core.passport_groups.entities.passport_group import PassportGroupEntity
+from domain.passport_groups.entities.passport_group import PassportGroupEntity
 from infrastructure.database.base_repository import BaseSqlAlchemy
 from infrastructure.database.mappers.passport_groups import PassportGroupsDBMapper
 from infrastructure.database.models import PassportGroup as PassportGroupModel

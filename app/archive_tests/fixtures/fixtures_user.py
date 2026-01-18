@@ -2,9 +2,9 @@ from collections.abc import Sequence
 
 import pytest
 from auth import UserSchema
-from core.users import Organizations
-from core.users import Roles
-from core.users import UserFromDbFullSchema
+from domain.users import Organizations
+from domain.users import Roles
+from domain.users import UserFromDbFullSchema
 
 
 @pytest.fixture

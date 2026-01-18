@@ -3,7 +3,7 @@ from typing import Annotated
 
 from annotated_types import MinLen, MaxLen
 
-from core.constants import ALLOWED_REGIONS
+
 from pydantic import BaseModel, ConfigDict, model_validator, Field, computed_field
 
 from presentation.schemas.mixins import IdSchemaMixin, DateTimeSchemaMixin

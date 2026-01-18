@@ -13,8 +13,8 @@ from presentation.api.auth.use_cases.login_and_issue_jwt_use_case import (
 from presentation.api.auth.jwt_helper import JWTHelper
 
 
-from core.tlo.services.main_tlo_service import TrafficLightObjectServiceImpl
-from core.users.entities.user import UserEntity
+from domain.tlo.services.main_tlo_service import TrafficLightObjectServiceImpl
+from domain.users.entities.user import UserEntity
 from presentation.api.auth.use_cases.refresh_jwt_use_case import RefreshJWTUseCaseImpl
 from presentation.api.dependencies.dependencies import (
     users_use_case,

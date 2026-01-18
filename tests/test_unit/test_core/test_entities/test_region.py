@@ -1,8 +1,8 @@
 import random
 import string
 
-from core.enums import RegionNames, RegionCodes
-from core.regions.entities.region import RegionEntity
+from domain.enums import RegionNames, RegionCodes
+from domain.regions.entities.region import RegionEntity
 import pytest
 
 

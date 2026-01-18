@@ -3,8 +3,8 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from core.exceptions.crud import CreateErrorAlreadyExists
-from core.users.entities.user import UserEntity
+from domain.exceptions.crud import CreateErrorAlreadyExists
+from domain.users.entities.user import UserEntity
 from infrastructure.database.api import db_api
 from infrastructure.database.mappers.users_mapper import UserDBMapper
 from infrastructure.database.models import User

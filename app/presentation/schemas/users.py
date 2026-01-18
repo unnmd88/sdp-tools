@@ -9,9 +9,9 @@ from pydantic import (
     Field,
     field_validator,
 )
-from core.enums import Organizations, Roles
-from core.users.services.field_values_constraints import (
-    check_password_to_set_constraints,
+from domain.enums.unsorted import Organizations, Roles
+from domain.services.field_values_constraints import (
+    password_validator,
 )
 
 
@@ -100,7 +100,7 @@ class ChangeUserPasswordBaseSchema(BaseModel):
         has_old_password_attr = info.data.get("old_password")
         if has_old_password_attr is not None and v == has_old_password_attr:
             raise ValueError("Пароли не должны совпадать")
-        if not check_password_to_set_constraints:
+        if not password_validator:
             raise ValueError("Недопустимый пароль")
         return v
 

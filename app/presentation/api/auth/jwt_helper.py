@@ -1,14 +1,13 @@
 import datetime
-from dataclasses import dataclass
 from datetime import timedelta, datetime as dt, timedelta as td
 from typing import AnyStr
 
 import jwt
 
 from core.config import settings
-from core.dto.tokens import TokenDataDTO
-from core.enums import TokenTypes, TokenFields
-from core.users.entities.user import UserEntity
+from domain.dto.tokens import TokenDataDTO
+from domain.enums.unsorted import TokenTypes, TokenFields
+from domain.users.entities.user import UserEntity
 
 
 class JWTHelper:
