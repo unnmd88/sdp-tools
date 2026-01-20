@@ -13,7 +13,7 @@ class ContractDateTimeField(AbstractContractField):
                 violation="Значение не является датой и временем.",
                 field_name=self._name,
                 value=value,
-                detail=f"Нарушен контракт типа значения {value!r} на дату и время.",
+                context=f"Нарушен контракт типа значения {value!r} на дату и время.",
             )
         return super()._validate(value)
 

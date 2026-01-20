@@ -68,7 +68,7 @@ class ContractIntegerField(AbstractContractField):
                 field_name=self._name,
                 violation=err,
                 value=value,
-                detail="Нарушен контракт диапазона допустимых значений целого числа: от {} до {}. {}".format(
+                context="Нарушен контракт диапазона допустимых значений целого числа: от {} до {}. {}".format(
                     self._min_value, self._max_value, err
                 ),
             )
@@ -89,7 +89,7 @@ if __name__ == "__main__":
                 handler=lambda x: x <= 450,
                 contract="test",
                 violation="test",
-                detail="Значение не должно быть больше 450",
+                context="Значение не должно быть больше 450",
             )
         ],
         use_cache=True,

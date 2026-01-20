@@ -56,7 +56,7 @@ class ContractEmailField(AbstractContractField):
                 field_name=self._name,
                 violation="Некорректный формат email",
                 value=value,
-                detail="Нарушен контракт поля, содержащего 'email'",
+                context="Нарушен контракт поля, содержащего 'email'",
             )
         return super()._validate(value)
 

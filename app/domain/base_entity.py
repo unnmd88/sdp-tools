@@ -1,30 +1,17 @@
 import json
-from abc import ABC, abstractmethod
+from abc import ABC
 from collections.abc import Generator
-from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Self
+from typing import Any
 
 from domain.contracts.exc import ContractViolationInvariantError
-from domain.contracts.field_contracts.datetime_contract import ContractDateTimeField
-from domain.contracts.field_contracts.integer_contract import ContractIntegerField
-
-
-@dataclass(frozen=True, kw_only=True, slots=True)
-class PublicAttr:
-    attr_name: str
-    alias: str | None = None
+from domain.entities_public_attrs import PublicAttr, BASE_PUBLIC_ATTRS
 
 
 class AbstractEntity(ABC):
     time_format = "%Y-%m-%d %H:%M:%S"
 
-    __public_attrs__ = (
-        PublicAttr(attr_name="_id", alias="id"),
-        PublicAttr(attr_name="_built_at", alias="built_at"),
-        PublicAttr(attr_name="_updated_at", alias="updated_at"),
-        PublicAttr(attr_name="_created_at", alias="created_at"),
-    )
+    __public_attrs__ = BASE_PUBLIC_ATTRS
 
     # _contract_id = ContractIntegerField(
     #     field_name="id",
@@ -79,7 +66,7 @@ class AbstractEntity(ABC):
         self,
         *,
         exclude: set[str] = None,
-        include: dict = None,
+        **include,
     ) -> dict:
         d = {
             k: v.strftime(self.time_format) if isinstance(v, datetime) else v

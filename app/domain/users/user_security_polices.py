@@ -3,4 +3,6 @@
 которые недопустимы в username и/или пароле пользователя.
 """
 
-forbidden_patterns_in_username: frozenset[str] = frozenset(("root",))
+forbidden_patterns_in_username: frozenset[str] = frozenset(
+    ("root", "None", "admin", "user", "guest")
+)

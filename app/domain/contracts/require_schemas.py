@@ -21,7 +21,7 @@ class ContractRequireSchema(ContractRequireSchemaProtocol):
         handler (Callable[..., bool] | Callable[[], bool]): Функция-предикат,
             проверяющая условие контракта. Должна возвращать True, если условие
             выполнено, и False в противном случае.
-        detail (str): Человеко-читаемое описание условия. Используется для
+        context (str): Человеко-читаемое описание условия. Используется для
             формирования понятных сообщений об ошибках и логирования.
             По умолчанию: пустая строка.
         custom_exception (Exception | type[Exception] | None): Пользовательское
@@ -39,17 +39,13 @@ class ContractRequireSchema(ContractRequireSchemaProtocol):
     """
 
     handler: Callable[..., bool]
-    contract: str = ""
-    violation: str = ""
-    detail: str = ""
+    metadata: Any = None
     custom_exception: Exception | type[Exception] | None = None
     environments: Container[str] | None = None
 
     def __post_init__(self) -> None:
         if not callable(self.handler):
             raise TypeError("Аргумент 'handler' должен быть callable-объектом.")
-        if not isinstance(self.detail, str):
-            raise TypeError("Аргумент 'detail' должен быть строкой.'")
         if isinstance(self.custom_exception, Exception):
             return
         if isinstance(self.custom_exception, type) and not issubclass(
@@ -67,9 +63,7 @@ class ContractRequireSchema(ContractRequireSchemaProtocol):
 @dataclass(kw_only=True, frozen=True, slots=True)
 class ContractProcessValueRequireSchema(ContractProcessValueSchemaRequireProtocol):
     handler: Callable[[Any], Any]
-    contract: str = ""
-    violation: str = ""
-    detail: str = ""
+    metadata: Any = None
     custom_exception: Exception | type[Exception] | None = None
     environments: Container[str] | None = None
 

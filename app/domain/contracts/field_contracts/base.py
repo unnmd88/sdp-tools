@@ -11,6 +11,8 @@ from typing import (
 from domain.contracts.exc import (
     ContractViolationInvariantError,
     ContractViolationFieldError,
+    ContractViolationNotNoneError,
+    ContractViolationError,
 )
 
 from domain.contracts.interfaces.cahe_interface import CacheFieldProtocol
@@ -109,16 +111,27 @@ class AbstractContractField(ABC):
                     )
 
     def _validate(self, value: Any) -> Any:
+        # for require in self._requires:
+        #     if not require(value):
+        #         if require.custom_exception is not None:
+        #             raise require.custom_exception
+        #         raise ContractViolationFieldError(
+        #             field_name=self._name,
+        #             contract=require.contract,
+        #             violation=require.violation,
+        #             value=value,
+        #             context=require.context,
+        #         )
         for require in self._requires:
             if not require(value):
-                if require.custom_exception is not None:
-                    raise require.custom_exception
-                raise ContractViolationFieldError(
+                raise ContractViolationError(
                     field_name=self._name,
-                    contract=require.contract,
-                    violation=require.violation,
+                    context=require.metadata,
+                    handler=require.handler.__name__,
+                    # contract=require.contract,
+                    # violation=require.violation,
                     value=value,
-                    detail=require.detail,
+                    # context=require.context or None,
                 )
         return value
 
@@ -127,10 +140,7 @@ class AbstractContractField(ABC):
             if not require(value):
                 raise ContractViolationInvariantError(
                     field_name=self._name,
-                    contract=require.contract,
-                    violation=require.violation,
                     value=value,
-                    detail=require.detail,
                 )
 
     def _pipeline(
@@ -145,11 +155,10 @@ class AbstractContractField(ABC):
             if self._nullable:
                 self._check_invariants(value)
                 return None
-            raise ContractViolationFieldError(
+            raise ContractViolationNotNoneError(
                 field_name=self._name,
-                contract=f"'nullable'={self._nullable!r}",
-                violation=f"Значение поля не может быть {None!r}",
                 value=value,
+                context=f"Для поля {self._name!r} недопустимое значение None.",
             )
         if self._use_cache and (value in self._cache):
             return value

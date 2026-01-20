@@ -64,7 +64,7 @@ class ContactEnumField(AbstractContractField):
                 violation=self.violation_pattern.format(value, self._enum),
                 field_name=self._name,
                 value=value,
-                detail=f"Нарушен контракт принадлежности значения {value!r} к перечислению Enum: {self._enum.__name__!r}",
+                context=f"Нарушен контракт принадлежности значения {value!r} к перечислению Enum: {self._enum.__name__!r}",
             )
         return super()._validate(value)
 

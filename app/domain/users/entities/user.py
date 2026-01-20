@@ -1,26 +1,21 @@
 import time
 from datetime import datetime
 
-from domain.base_entity import AbstractEntity, PublicAttr
+from domain.base_entity import AbstractEntity
+from domain.entities_public_attrs import PublicAttr, USER_PUBLIC_ATTRS
 
 from domain.enums.unsorted import (
     Organizations,
     Roles,
 )
-from domain.exceptions.business_rules_exc import DomainInvariantViolationBusinessRuleError
+from domain.exceptions.contract_violation_exc import (
+    DomainInvariantViolationBusinessRuleError,
+)
+from domain.users.user_security_polices import forbidden_patterns_in_username
 
 
 class UserEntity(AbstractEntity):
-    __public_attrs__ = AbstractEntity.__public_attrs__ + (
-        PublicAttr(attr_name="_username", alias="username"),
-        PublicAttr(attr_name="_firstname", alias="firstname"),
-        PublicAttr(attr_name="_lastname", alias="lastname"),
-        PublicAttr(attr_name="_role", alias="role"),
-        PublicAttr(attr_name="_organization", alias="organization"),
-        PublicAttr(attr_name="_email", alias="email"),
-        PublicAttr(attr_name="_phone_number", alias="phone_number"),
-        PublicAttr(attr_name="_telegram", alias="telegram"),
-    )
+    __public_attrs__ = USER_PUBLIC_ATTRS
 
     def __init__(
         self,
@@ -130,11 +125,15 @@ class UserEntity(AbstractEntity):
     def invariant_names(self):
         if self._username == self._lastname:
             raise DomainInvariantViolationBusinessRuleError(
-                detail="Поле 'username' должно отличаться от поля 'lastname'",
+                context="Поле 'username' должно отличаться от поля 'lastname'",
             )
         if self._username == self._firstname:
             raise DomainInvariantViolationBusinessRuleError(
-                detail="Поле 'username' должно отличаться от поля 'firstname'",
+                context="Поле 'username' должно отличаться от поля 'firstname'",
+            )
+        if self._username in forbidden_patterns_in_username:
+            raise DomainInvariantViolationBusinessRuleError(
+                context=f"Поле 'username' не должно содержать {forbidden_patterns_in_username}",
             )
 
 

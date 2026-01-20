@@ -80,7 +80,7 @@ class TrafficLightObjectDBMapper(BaseDBMapperProtocol):
             service_organization=ServiceOrganizations(tlo_model.service_organization),
             traffic_controller=traffic_controller,
             current_passport=None,
-            description=tlo_model.detail,
+            description=tlo_model.context,
             created_at=tlo_model.created_at,
             updated_at=tlo_model.updated_at,
         )

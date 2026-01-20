@@ -1,9 +1,14 @@
+import json
+from dataclasses import field, dataclass
 from datetime import datetime
+from typing import Any
 
+from core.error_data import ErrorData
 from domain.contracts import (
     ContractStringField,
+    ContractField,
 )
-from domain.contracts.exc import ContractViolationError
+from domain.contracts.exc import ContractViolationError, ContractViolationNotNoneError
 
 from domain.contracts.field_contracts import (
     ContractBooleanField,
@@ -11,10 +16,18 @@ from domain.contracts.field_contracts import (
     ContactEnumField,
     ContractHashedPasswordField,
 )
+from domain.contracts.require_schemas import ContractRequireSchema
+from domain.enums.business_rules import BusinessRulePatterns
 
 from domain.enums.unsorted import (
     Organizations,
     Roles,
+)
+from domain.enums.violations import Violations
+from domain.exceptions.contract_violation_exc import (
+    DomainValidationError,
+    DomainContractViolationError,
+    DomainBusinessRuleError,
 )
 
 from domain.services.entity_factories.base_entity_factory_service import (
@@ -28,8 +41,6 @@ from domain.users.business_rules import (
     MAX_LEN_FIRSTNAME,
     MIN_LEN_LASTNAME,
     MAX_LEN_LASTNAME,
-    MIN_LEN_PASSWORD,
-    MAX_LEN_PASSWORD,
     FIRST_NAME_PATTERN,
     LAST_NAME_PATTERN,
     USERNAME_PATTERN,
@@ -38,29 +49,106 @@ from domain.users.business_rules import (
     MAX_LEN_DESCRIPTION,
 )
 from domain.users.entities.user import UserEntity
+from domain.validators.domain_validators import username_validator, ValidatorException
+
+
+@dataclass(frozen=True, kw_only=True, slots=True)
+class ContractMetaData:
+    contract: str
+    violation: str
+    expected_type: type = None
+    rule: str = None
+    message: str = ""
+    context: dict[str, Any] = field(default_factory=dict)
+
+    def load_value_to_context(self, value: Any):
+        self.context.update(
+            value=value,
+            current_type=type(value),
+        )
+
+    def load_subject_to_context(self, subject: Any):
+        self.context.update(subject=subject)
+
+    def to_dict(self):
+        return {
+            "name": self.contract,
+            "violation": self.violation,
+            "expected_type": self.expected_type,
+            "context": self.context,
+        } | {
+            k: v
+            for k, v in zip(
+                (("expected_type", self.expected_type), ("rule", self.rule))
+            )
+            if v is not None
+        }
+
+
+STR_ISINSTANCE_REQUIRE = ContractRequireSchema(
+    handler=lambda x: isinstance(x, str),
+    metadata=ContractMetaData(
+        contract=ErrorData.DOMAIN_VALIDATION.code,
+        violation=Violations.invalid_type,
+        message="Значение должно быть строкой",
+        expected_type=str,
+    ),
+)
 
 
 class UserEntityFactoryService(AbstractEntityFactoryService[UserEntity]):
-    contract_username = ContractStringField(
+
+    contract_username = ContractField(
         field_name="username",
         nullable=False,
         use_cache=True,
-        min_length=MIN_LEN_USERNAME,
-        max_length=MAX_LEN_USERNAME,
-        pattern=USERNAME_PATTERN,
+        requires=[
+            ContractRequireSchema(handler=username_validator),
+            # STR_ISINSTANCE_REQUIRE,
+            # ContractRequireSchema(
+            #     handler=lambda x: MIN_LEN_USERNAME <= len(x) <= MAX_LEN_USERNAME,
+            #     metadata=ContractMetaData(
+            #         contract="business_rule",
+            #         violation="value length",
+            #         rule=f"Значение должно быть в диапазоне от {MIN_LEN_USERNAME} до {MAX_LEN_USERNAME} символов",
+            #         message=f"Значение должно быть в диапазоне от {MIN_LEN_USERNAME} до {MAX_LEN_USERNAME} символов",
+            #     ),
+            # ),
+        ],
     )
-    contract_firstname = ContractStringField(
+    contract_firstname = ContractField(
         field_name="firstname",
         nullable=True,
         use_cache=True,
-        min_length=MIN_LEN_FIRSTNAME,
-        max_length=MAX_LEN_FIRSTNAME,
-        pattern=FIRST_NAME_PATTERN,
+        requires=[
+            STR_ISINSTANCE_REQUIRE,
+            ContractRequireSchema(
+                handler=lambda x: MIN_LEN_FIRSTNAME <= len(x) <= MAX_LEN_FIRSTNAME,
+                metadata=ContractMetaData(
+                    contract=ErrorData.BUSINESS_RULE_VIOLATION.code,
+                    violation=Violations.value_length,
+                    rule=BusinessRulePatterns.value_str_length_range,
+                    message=BusinessRulePatterns.value_str_length_range,
+                ),
+            ),
+        ],
     )
     contract_lastname = ContractStringField(
         field_name="lastname",
         nullable=True,
         use_cache=True,
+        requires=[
+            STR_ISINSTANCE_REQUIRE,
+            ContractRequireSchema(
+                handler=lambda x: MIN_LEN_LASTNAME <= len(x) <= MAX_LEN_LASTNAME,
+                metadata=ContractMetaData(
+                    contract=ErrorData.BUSINESS_RULE_VIOLATION.code,
+                    violation=Violations.value_length,
+                    rule=BusinessRulePatterns.value_str_length_range,
+                    message=BusinessRulePatterns.value_str_length_range,
+                ),
+            ),
+        ],
         min_length=MIN_LEN_LASTNAME,
         max_length=MAX_LEN_LASTNAME,
         pattern=LAST_NAME_PATTERN,
@@ -117,11 +205,11 @@ class UserEntityFactoryService(AbstractEntityFactoryService[UserEntity]):
         username: str,
         firstname: str | None,
         lastname: str | None,
-        organization: Organizations,
+        organization: Organizations | str,
         email: str | None,
         password: bytes,
         is_active: bool,
-        role: Roles,
+        role: Roles | str,
         phone_number: str | None,
         telegram: str | None,
         description: str,
@@ -150,8 +238,73 @@ class UserEntityFactoryService(AbstractEntityFactoryService[UserEntity]):
                 created_at=cls.contract_created_at(created_at),
                 updated_at=cls.contract_updated_at(updated_at),
             )
+        except ValidatorException as e:
+            print("11111111111111111111")
+            sub = f"{UserEntity.__name__!r}"
+            contract = e.contract_name
+            if contract == ErrorData.DOMAIN_VALIDATION.code:
+                exc_class = DomainValidationError
+            elif contract == ErrorData.BUSINESS_RULE_VIOLATION.code:
+                exc_class = DomainBusinessRuleError
+            else:
+                exc_class = DomainContractViolationError
+            exc = exc_class(
+                subject=sub,
+                field_name=e.field_name,
+                contract_name=contract,
+                violation=e.violation,
+                expected_type=e.expected_type,
+                rule=e.rule,
+                value=e.value,
+                message=e.message,
+            )
+            print(exc.context)
+            # print(json.dumps(exc.context, indent=2))
+            print(json.dumps(exc.to_dict(), indent=2, ensure_ascii=False))
+
+
+        except ContractViolationNotNoneError as e:
+            exc = DomainValidationError(
+                subject=repr(UserEntity.__name__),
+                field_name=e.field_name,
+                contract_name="nullable",
+                violation="value cannot be None",
+                value=e.value,
+                message=f"Ошибка валидации поля {e.field_name!r}. Значение не может быть None",
+            )
+            print(exc.context)
+            print(
+                json.dumps(
+                    exc.context,
+                    indent=2,
+                )
+            )
+            print(json.dumps(exc.to_dict(), indent=2, ensure_ascii=False))
+
         except ContractViolationError as e:
-            raise DomainValidationError(e.detail)
+            pass
+            # sub = f"{UserEntity.__name__!r}"
+            # meta: ContractMetaData = e.context
+            # meta.context.update(handler=e.handler)
+            # if meta.contract == "type_validation":
+            #     exc_class = DomainValidationError
+            # elif meta.contract == "business_rule":
+            #     exc_class = DomainBusinessRuleError
+            # else:
+            #     exc_class = DomainContractViolationError
+            # exc = exc_class(
+            #     subject=sub,
+            #     field_name=e.field_name,
+            #     contract_name=meta.contract,
+            #     violation=meta.violation,
+            #     expected_type=meta.expected_type,
+            #     rule=meta.rule,
+            #     value=e.value,
+            #     message=meta.message,
+            # )
+            # print(exc.context)
+            # # print(json.dumps(exc.context, indent=2))
+            # print(json.dumps(exc.to_dict(), indent=2, ensure_ascii=False))
 
     @classmethod
     def create_new(
@@ -187,7 +340,7 @@ class UserEntityFactoryService(AbstractEntityFactoryService[UserEntity]):
                 updated_at=None,
             )
         except ContractViolationError as e:
-            raise DomainValidationError(e.detail)
+            raise DomainValidationError(e.context)
 
 
 if __name__ == "__main__":
@@ -195,7 +348,7 @@ if __name__ == "__main__":
         id=1,
         firstname="Junkers",
         lastname=None,
-        username="Junker",
+        username="J",
         created_at=datetime.now(),
         organization=Organizations.SDP,
         updated_at=None,

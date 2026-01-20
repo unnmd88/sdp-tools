@@ -51,7 +51,7 @@ class ContractHashedPasswordField(AbstractContractField):
             field_name=self._name,
             violation=err,
             value=value,
-            detail=f"Нарушен контракт поля, содержащего пароль. {err}",
+            context=f"Нарушен контракт поля, содержащего пароль. {err}",
         )
 
     def _validate(self, value: bytes) -> bytes:

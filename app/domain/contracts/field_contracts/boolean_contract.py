@@ -50,7 +50,7 @@ class ContractBooleanField(AbstractContractField):
                 field_name=self._name,
                 violation=err,
                 value=value,
-                detail=err,
+                context=err,
             )
         assert isinstance(value, bool), "Дольше должно быть bool"
         return value

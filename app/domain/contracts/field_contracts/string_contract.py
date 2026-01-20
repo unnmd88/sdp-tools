@@ -18,10 +18,10 @@ class ContractStringField(AbstractContractField):
     def __init__(
         self,
         *,
+        field_name: str,
         min_length: int = None,
         max_length: int = None,
         pattern: str | Pattern = None,
-        field_name: str,
         nullable: bool = False,
         pipeline_preprocess_value: Sequence[ContractProcessValueSchemaRequireProtocol]
         | None = None,
@@ -59,11 +59,9 @@ class ContractStringField(AbstractContractField):
             err = None
         if err is not None:
             raise ContractViolationFieldError(
-                contract="Требования строкового поля",
                 field_name=self._name,
-                violation=err,
                 value=value,
-                detail=f"Нарушен контракт строкового поля. {err}",
+                context=f"Нарушен контракт строкового поля. {err}",
             )
         return super()._validate(value)
 
@@ -95,8 +93,4 @@ if __name__ == "__main__":
     )
     print(s1("tllofromfunc"))
     print(s1("tllofromfunc"))
-    print(s2("s2"))
-
-    print("Local cache:\n")
-    print(s1.get_cache())
-    print(s2.get_cache())
+    print(s2(1))

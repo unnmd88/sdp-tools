@@ -16,4 +16,4 @@ from .enum_contract import ContactEnumField
 from .general_purpose_contract import ContractField
 from .hashed_password_contract import ContractHashedPasswordField
 from .integer_contract import ContractIntegerField
-from .string_pattern_contract import ContractStringField
+from .string_contract import ContractStringField

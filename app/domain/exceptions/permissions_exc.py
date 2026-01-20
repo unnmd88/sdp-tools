@@ -1,5 +1,5 @@
 from core.http_codes import HTTP_403_FORBIDDEN
-from core.error_codes import ErrorCodes
+from core.error_data import ErrorCodes
 from domain.exceptions.base import DomainError
 
 
