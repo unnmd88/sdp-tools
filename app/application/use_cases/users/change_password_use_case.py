@@ -10,14 +10,9 @@ from application.interfaces.use_cases.get_user_use_case_interface import (
 )
 from domain.dto.common import ToUpdateRecordDTO
 from domain.dto.users import ChangeUserPasswordDTO
-from domain.exceptions.base import ApplicationError
+
 from domain.users.entities.user import UserEntity
-from domain.users.exceptions import (
-    UserNotFoundError,
-    InactiveUserError,
-    InvalidUsernameOrPasswordError,
-    InvalidUsernameOrPasswordToSetError,
-)
+
 from domain.services.user_password_service import hash_password
 from domain.services.field_values_constraints import (
     password_validator,

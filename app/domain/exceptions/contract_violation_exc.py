@@ -1,3 +1,4 @@
+from types import UnionType
 from typing import Any
 
 from core.error_data import ErrorData
@@ -8,13 +9,13 @@ class DomainContractViolationError(DomainError):
     def __init__(
         self,
         *,
-        subject: str,
+        subject: str | None = None,
         handler: str | None = None,
         field_name: str,
         contract_name: str,
         violation: str,
         value: Any = None,
-        expected_type: type = None,
+        expected_type: type | UnionType | tuple[type] = None,
         rule: str | None = None,
         error_code: str | None = None,
         context: dict[str, Any] | None = None,
@@ -64,4 +65,7 @@ class DomainBusinessRuleError(DomainContractViolationError):
 class DomainInvariantViolationBusinessRuleError(DomainBusinessRuleError):
     """Нарушение инварианта."""
 
-    # code = ErrorData.INVARIANT_VIOLATION
+    code = ErrorData.DOMAIN_INVARIANT_VIOLATION.code
+    message = ErrorData.DOMAIN_INVARIANT_VIOLATION.message
+    http_status = ErrorData.DOMAIN_INVARIANT_VIOLATION.http_status_code
+

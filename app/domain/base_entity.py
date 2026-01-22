@@ -4,14 +4,24 @@ from collections.abc import Generator
 from datetime import datetime
 from typing import Any
 
+from domain.contract2.contract_field import ContractField
+from domain.contract2.require import Require
 from domain.contracts.exc import ContractViolationInvariantError
 from domain.entities_public_attrs import PublicAttr, BASE_PUBLIC_ATTRS
+from domain.validators.general_purpose import GeneralPurposeValidator
 
 
 class AbstractEntity(ABC):
     time_format = "%Y-%m-%d %H:%M:%S"
 
     __public_attrs__ = BASE_PUBLIC_ATTRS
+
+    id = ContractField(
+        field_name="id",
+        nullable=True,
+        use_cache=False,
+        requires=[Require(handler=GeneralPurposeValidator.pk_id)]
+    )
 
     # _contract_id = ContractIntegerField(
     #     field_name="id",
@@ -37,7 +47,7 @@ class AbstractEntity(ABC):
         updated_at: datetime | None,
     ):
         self._built_at = datetime.now()
-        self._id = id
+        self.id = id
         self._created_at = created_at
         self._updated_at = updated_at
         self.check_invariant_datetime()
@@ -93,10 +103,6 @@ class AbstractEntity(ABC):
     @property
     def built_at(self) -> datetime:
         return self._built_at
-
-    @property
-    def id(self) -> int | None:
-        return self._id
 
     @property
     def created_at(self) -> datetime | None:

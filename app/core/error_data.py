@@ -68,6 +68,12 @@ class ErrorData(Enum):
         http_status_code=HTTP_404_NOT_FOUND,
     )
 
+    DOMAIN_INVARIANT_VIOLATION = Error(
+        code="domain_invariant_violation",
+        message="Нарушение инварианта домена",
+        http_status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+    )
+
     BUSINESS_RULE_VIOLATION = Error(
         code="business_rule_violation",
         message="Нарушение бизнес-правила",

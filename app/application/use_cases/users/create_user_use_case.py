@@ -18,19 +18,13 @@ from application.interfaces.services.user_password_service_interface import (
 
 from domain.dto.users import CreateUserDTO
 from domain.enums.unsorted import Organizations, Roles
-from domain.exceptions.base import ApplicationError
+
 from domain.exceptions.users import UserPermissionsError
 from domain.services.entity_factories.user_entity_factory_service import (
     UserEntityFactoryService,
 )
 from domain.users.entities.user import UserEntity
 
-# from domain.users.exceptions import (
-#     UserNotFoundError,
-#     InactiveUserError,
-#     UserAlreadyExistsError,
-#     InvalidValueToSetError,
-# )
 from domain.services.user_password_service import hash_password, UserPasswordService
 from domain.services.field_values_constraints import UserEntityBusinessRules
 

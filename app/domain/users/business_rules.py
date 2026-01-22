@@ -31,3 +31,6 @@ FORBIDDEN_NAMES = {
     "anonymous",
     "guest",
 }
+forbidden_patterns_in_username: frozenset[str] = frozenset(
+    ("root", "None", "admin", "user", "guest")
+)

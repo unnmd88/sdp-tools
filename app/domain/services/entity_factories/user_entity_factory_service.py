@@ -17,7 +17,8 @@ from domain.contracts.field_contracts import (
     ContractHashedPasswordField,
 )
 from domain.contracts.require_schemas import ContractRequireSchema
-from domain.enums.business_rules import BusinessRulePatterns
+from domain.enums.validation_err_messages import ErrorMessages
+from domain.enums.public_attrs import PublicAttrsEnum
 
 from domain.enums.unsorted import (
     Organizations,
@@ -49,7 +50,8 @@ from domain.users.business_rules import (
     MAX_LEN_DESCRIPTION,
 )
 from domain.users.entities.user import UserEntity
-from domain.validators.domain_validators import username_validator, ValidatorException
+from domain.users.value_objects.fullname import FullNameVO
+from domain.validators.user_validator import UserEntityValidator
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)
@@ -97,61 +99,11 @@ STR_ISINSTANCE_REQUIRE = ContractRequireSchema(
 
 
 class UserEntityFactoryService(AbstractEntityFactoryService[UserEntity]):
-
     contract_username = ContractField(
-        field_name="username",
+        field_name=str(PublicAttrsEnum.username),
         nullable=False,
         use_cache=True,
-        requires=[
-            ContractRequireSchema(handler=username_validator),
-            # STR_ISINSTANCE_REQUIRE,
-            # ContractRequireSchema(
-            #     handler=lambda x: MIN_LEN_USERNAME <= len(x) <= MAX_LEN_USERNAME,
-            #     metadata=ContractMetaData(
-            #         contract="business_rule",
-            #         violation="value length",
-            #         rule=f"Значение должно быть в диапазоне от {MIN_LEN_USERNAME} до {MAX_LEN_USERNAME} символов",
-            #         message=f"Значение должно быть в диапазоне от {MIN_LEN_USERNAME} до {MAX_LEN_USERNAME} символов",
-            #     ),
-            # ),
-        ],
-    )
-    contract_firstname = ContractField(
-        field_name="firstname",
-        nullable=True,
-        use_cache=True,
-        requires=[
-            STR_ISINSTANCE_REQUIRE,
-            ContractRequireSchema(
-                handler=lambda x: MIN_LEN_FIRSTNAME <= len(x) <= MAX_LEN_FIRSTNAME,
-                metadata=ContractMetaData(
-                    contract=ErrorData.BUSINESS_RULE_VIOLATION.code,
-                    violation=Violations.value_length,
-                    rule=BusinessRulePatterns.value_str_length_range,
-                    message=BusinessRulePatterns.value_str_length_range,
-                ),
-            ),
-        ],
-    )
-    contract_lastname = ContractStringField(
-        field_name="lastname",
-        nullable=True,
-        use_cache=True,
-        requires=[
-            STR_ISINSTANCE_REQUIRE,
-            ContractRequireSchema(
-                handler=lambda x: MIN_LEN_LASTNAME <= len(x) <= MAX_LEN_LASTNAME,
-                metadata=ContractMetaData(
-                    contract=ErrorData.BUSINESS_RULE_VIOLATION.code,
-                    violation=Violations.value_length,
-                    rule=BusinessRulePatterns.value_str_length_range,
-                    message=BusinessRulePatterns.value_str_length_range,
-                ),
-            ),
-        ],
-        min_length=MIN_LEN_LASTNAME,
-        max_length=MAX_LEN_LASTNAME,
-        pattern=LAST_NAME_PATTERN,
+        # requires=[ContractRequireSchema(handler=UserEntityValidator.username)],
     )
     contract_organization = ContactEnumField(
         field_name="organization",
@@ -225,8 +177,9 @@ class UserEntityFactoryService(AbstractEntityFactoryService[UserEntity]):
             return UserEntity(
                 id=cls.contract_id(id),
                 username=cls.contract_username(username),
-                firstname=cls.contract_firstname(firstname),
-                lastname=cls.contract_lastname(lastname),
+                fullname=FullNameVO(firstname=firstname, lastname=lastname),
+                # firstname=cls.contract_firstname(firstname),
+                # lastname=cls.contract_lastname(lastname),
                 organization=cls.contract_organization(organization),
                 email=cls.contract_email(email),
                 password=cls.contract_password(password),
@@ -238,30 +191,12 @@ class UserEntityFactoryService(AbstractEntityFactoryService[UserEntity]):
                 created_at=cls.contract_created_at(created_at),
                 updated_at=cls.contract_updated_at(updated_at),
             )
-        except ValidatorException as e:
-            print("11111111111111111111")
-            sub = f"{UserEntity.__name__!r}"
-            contract = e.contract_name
-            if contract == ErrorData.DOMAIN_VALIDATION.code:
-                exc_class = DomainValidationError
-            elif contract == ErrorData.BUSINESS_RULE_VIOLATION.code:
-                exc_class = DomainBusinessRuleError
-            else:
-                exc_class = DomainContractViolationError
-            exc = exc_class(
-                subject=sub,
-                field_name=e.field_name,
-                contract_name=contract,
-                violation=e.violation,
-                expected_type=e.expected_type,
-                rule=e.rule,
-                value=e.value,
-                message=e.message,
-            )
-            print(exc.context)
-            # print(json.dumps(exc.context, indent=2))
-            print(json.dumps(exc.to_dict(), indent=2, ensure_ascii=False))
 
+        except DomainBusinessRuleError as e:
+            print(json.dumps(e.to_dict(), indent=2))
+            e.subject = repr(UserEntity.__name__)
+            e.message = repr(UserEntity.__name__)
+            raise e
 
         except ContractViolationNotNoneError as e:
             exc = DomainValidationError(
@@ -362,3 +297,4 @@ if __name__ == "__main__":
     )
 
     print(user)
+    print(user.to_json())
