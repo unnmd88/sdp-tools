@@ -10,9 +10,6 @@ from pydantic import (
     field_validator,
 )
 from domain.enums.unsorted import Organizations, Roles
-from domain.services.field_values_constraints import (
-    password_validator,
-)
 
 
 class BaseUserSchema(BaseModel):

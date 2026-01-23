@@ -18,7 +18,7 @@ from domain.contracts.field_contracts import (
 )
 from domain.contracts.require_schemas import ContractRequireSchema
 from domain.enums.validation_err_messages import ErrorMessages
-from domain.enums.public_attrs import PublicAttrsEnum
+from domain.enums.attrs_names import PublicAttrNamesEnum
 
 from domain.enums.unsorted import (
     Organizations,
@@ -50,7 +50,6 @@ from domain.users.business_rules import (
     MAX_LEN_DESCRIPTION,
 )
 from domain.users.entities.user import UserEntity
-from domain.users.value_objects.fullname import FullNameVO
 from domain.validators.user_validator import UserEntityValidator
 
 
@@ -100,7 +99,7 @@ STR_ISINSTANCE_REQUIRE = ContractRequireSchema(
 
 class UserEntityFactoryService(AbstractEntityFactoryService[UserEntity]):
     contract_username = ContractField(
-        field_name=str(PublicAttrsEnum.username),
+        field_name=str(PublicAttrNamesEnum.username),
         nullable=False,
         use_cache=True,
         # requires=[ContractRequireSchema(handler=UserEntityValidator.username)],
@@ -202,7 +201,7 @@ class UserEntityFactoryService(AbstractEntityFactoryService[UserEntity]):
             exc = DomainValidationError(
                 subject=repr(UserEntity.__name__),
                 field_name=e.field_name,
-                contract_name="nullable",
+                contract_code="nullable",
                 violation="value cannot be None",
                 value=e.value,
                 message=f"Ошибка валидации поля {e.field_name!r}. Значение не может быть None",

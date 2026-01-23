@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from domain.enums.public_attrs import PublicAttrsEnum
+from domain.enums.attrs_names import PublicAttrNamesEnum
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)
@@ -8,22 +8,27 @@ class PublicAttr:
     attr_name: str
     alias: str | None = None
 
+    def __iter__(self):
+        return iter((self.attr_name, self.alias))
+
 
 BASE_PUBLIC_ATTRS = (
-    PublicAttr(attr_name="_id", alias=str(PublicAttrsEnum.id)),
-    PublicAttr(attr_name="_built_at", alias=str(PublicAttrsEnum.built_at)),
-    PublicAttr(attr_name="_updated_at", alias=str(PublicAttrsEnum.updated_at)),
-    PublicAttr(attr_name="_created_at", alias=str(PublicAttrsEnum.created_at)),
+    PublicAttr(attr_name="_id", alias=str(PublicAttrNamesEnum.id)),
+    PublicAttr(attr_name="_built_at", alias=str(PublicAttrNamesEnum.built_at)),
+    PublicAttr(attr_name="_updated_at", alias=str(PublicAttrNamesEnum.updated_at)),
+    PublicAttr(attr_name="_created_at", alias=str(PublicAttrNamesEnum.created_at)),
 )
 
 USER_PUBLIC_ATTRS = BASE_PUBLIC_ATTRS + (
-    PublicAttr(attr_name="_username", alias=str(PublicAttrsEnum.username)),
-    PublicAttr(attr_name="_firstname", alias=str(PublicAttrsEnum.firstname)),
-    PublicAttr(attr_name="_lastname", alias=str(PublicAttrsEnum.lastname)),
-    PublicAttr(attr_name="_role", alias=str(PublicAttrsEnum.role)),
-    PublicAttr(attr_name="_organization", alias=str(PublicAttrsEnum.organization)),
-    PublicAttr(attr_name="_email", alias=str(PublicAttrsEnum.email)),
-    PublicAttr(attr_name="_phone_number", alias=str(PublicAttrsEnum.phone_number)),
-    PublicAttr(attr_name="_telegram", alias=str(PublicAttrsEnum.telegram)),
+    PublicAttr(attr_name="_username", alias=str(PublicAttrNamesEnum.username)),
+    PublicAttr(attr_name="_firstname", alias=str(PublicAttrNamesEnum.firstname)),
+    PublicAttr(attr_name="_lastname", alias=str(PublicAttrNamesEnum.lastname)),
+    PublicAttr(attr_name="_is_active", alias=str(PublicAttrNamesEnum.is_active)),
+    PublicAttr(attr_name="_role", alias=str(PublicAttrNamesEnum.role)),
+    PublicAttr(attr_name="is_superuser", alias=str(PublicAttrNamesEnum.is_superuser)),
+    PublicAttr(attr_name="_organization", alias=str(PublicAttrNamesEnum.organization)),
+    PublicAttr(attr_name="_email", alias=str(PublicAttrNamesEnum.email)),
+    PublicAttr(attr_name="_phone_number", alias=str(PublicAttrNamesEnum.phone_number)),
+    PublicAttr(attr_name="_telegram", alias=str(PublicAttrNamesEnum.telegram)),
     PublicAttr(attr_name="_description", alias="description"),
 )

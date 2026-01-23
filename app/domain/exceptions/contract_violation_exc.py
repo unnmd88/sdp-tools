@@ -1,3 +1,4 @@
+from enum import StrEnum
 from types import UnionType
 from typing import Any
 
@@ -9,11 +10,11 @@ class DomainContractViolationError(DomainError):
     def __init__(
         self,
         *,
-        subject: str | None = None,
+        subject: Any = None,
         handler: str | None = None,
         field_name: str,
-        contract_name: str,
-        violation: str,
+        contract_code: str,
+        violation: str | StrEnum,
         value: Any = None,
         expected_type: type | UnionType | tuple[type] = None,
         rule: str | None = None,
@@ -22,22 +23,24 @@ class DomainContractViolationError(DomainError):
         message: str = "",
     ):
         super().__init__(
-            message=message or self.message, code=error_code, context=context
+            message=message or self.message,
+            code=error_code,
+            subject=subject,
+            context=context,
         )
-        self.subject = subject
         self.handler = handler
         self.violation = violation
         self.field_name = field_name
         self.value = value
         self.expected_type = expected_type
-        self.contract_name = contract_name
+        self.contract_code = contract_code
         self.rule = rule
         self.context |= {
             "subject": self.subject,
             "field_name": self.field_name,
             "value": self.value,
             "handler": self.handler,
-            "contract_name": self.contract_name,
+            "contract_code": self.contract_code,
             "violation": self.violation,
             "expected_type": repr(self.expected_type) if self.expected_type else None,
             "rule": self.rule,
@@ -68,4 +71,3 @@ class DomainInvariantViolationBusinessRuleError(DomainBusinessRuleError):
     code = ErrorData.DOMAIN_INVARIANT_VIOLATION.code
     message = ErrorData.DOMAIN_INVARIANT_VIOLATION.message
     http_status = ErrorData.DOMAIN_INVARIANT_VIOLATION.http_status_code
-

@@ -1,5 +1,4 @@
-from domain.exceptions.base import ApplicationError
-
+class ApplicationError: pass
 
 class CreateError(ApplicationError):
     """Ошибка создания нового объекта."""

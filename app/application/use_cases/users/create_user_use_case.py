@@ -26,7 +26,6 @@ from domain.services.entity_factories.user_entity_factory_service import (
 from domain.users.entities.user import UserEntity
 
 from domain.services.user_password_service import hash_password, UserPasswordService
-from domain.services.field_values_constraints import UserEntityBusinessRules
 
 
 logger = logging.getLogger(USERS_LOGGER)

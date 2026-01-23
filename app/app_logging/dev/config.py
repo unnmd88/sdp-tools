@@ -1,8 +1,15 @@
+import json
 import logging.config
+
+from pythonjsonlogger.json import JsonFormatter
 
 from core.config import BASE_DIR
 
-print(f"BASE_DIR: {BASE_DIR}")
+print(BASE_DIR)
+print(f"gg: {str(BASE_DIR)[1:].replace('/', '.')}.app_logging.dev.EnsureAsciiJsonFormatter")
+
+
+
 
 LOGGING_CONFIG = {
     "version": 1,
@@ -24,6 +31,12 @@ LOGGING_CONFIG = {
             "class": "logging.FileHandler",
             "filename": BASE_DIR / "app_logging/USERS_RUD.log",
             "formatter": "simple2",
+        },
+        "domain": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "app_logging/domain.log",
+            "formatter": "json",
         },
         "auth": {
             "level": "INFO",
@@ -64,12 +77,19 @@ LOGGING_CONFIG = {
             "handlers": ["USERS_RUD"],
             "propagate": True,
         },
+        "domain": {
+            "level": "INFO",
+            "handlers": ["domain"],
+            "propagate": False,
+        },
     },
     "formatters": {
-        # "verbose": {
-        #     "format": "{name} {levelname} {asctime} {module} {lineno} {funcName} {message} ",
-        #     "style": "{",
-        # },
+        "json": {
+            '()': "app.app_logging.formatters.EnsureAsciiJsonFormatter",  # "{ "app_logging/dev/EnsureAsciiJsonFormatter"}",
+            "format": "%(asctime)s %(levelname)s %(name)s %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            'ensure_ascii': False,
+        },
         "simple": {
             "format": "%(levelname)s %(message)s %(asctime)s %(filename)s %(lineno)s",
         },
@@ -81,6 +101,7 @@ LOGGING_CONFIG = {
 
 logging.config.dictConfig(LOGGING_CONFIG)
 
+DOMAIN = "domain"
 COMMON_LOGGER = "common"
 USERS_LOGGER = "users"
 JWT_LOGGER = "jwt"

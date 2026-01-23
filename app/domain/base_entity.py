@@ -7,7 +7,9 @@ from typing import Any
 from domain.contract2.contract_field import ContractField
 from domain.contract2.require import Require
 from domain.contracts.exc import ContractViolationInvariantError
-from domain.entities_public_attrs import PublicAttr, BASE_PUBLIC_ATTRS
+from domain.entities_public_attrs import BASE_PUBLIC_ATTRS
+from domain.enums.attrs_names import PublicAttrNamesEnum
+from domain.validators.datetime_validators import DatetimeValidators
 from domain.validators.general_purpose import GeneralPurposeValidator
 
 
@@ -20,24 +22,30 @@ class AbstractEntity(ABC):
         field_name="id",
         nullable=True,
         use_cache=False,
-        requires=[Require(handler=GeneralPurposeValidator.pk_id)]
+        requires=[Require(handler=GeneralPurposeValidator.pk_id)],
     )
-
-    # _contract_id = ContractIntegerField(
-    #     field_name="id",
-    #     nullable=True,
-    #     use_cache=True,
-    # )
-    # _contract_created_at = ContractDateTimeField(
-    #     field_name="created_at",
-    #     use_cache=False,
-    #     nullable=True,
-    # )
-    # _contract_updated_at = ContractDateTimeField(
-    #     field_name="updated_at",
-    #     use_cache=False,
-    #     nullable=True,
-    # )
+    created_at = ContractField(
+        field_name=str(PublicAttrNamesEnum.created_at),
+        use_cache=False,
+        requires=[
+            Require(
+                handler=DatetimeValidators(
+                    field_name=str(PublicAttrNamesEnum.created_at)
+                )
+            )
+        ],
+    )
+    updated_at = ContractField(
+        field_name=str(PublicAttrNamesEnum.updated_at),
+        use_cache=False,
+        requires=[
+            Require(
+                handler=DatetimeValidators(
+                    field_name=str(PublicAttrNamesEnum.updated_at)
+                )
+            )
+        ],
+    )
 
     def __init__(
         self,
@@ -58,8 +66,8 @@ class AbstractEntity(ABC):
         raise NotImplementedError
 
     def __iter__(self) -> Generator[Any, None, None]:
-        for attr in self.__public_attrs__:
-            yield attr.alias, getattr(self, attr.attr_name)
+        for public_attr in self.__public_attrs__:
+            yield public_attr.alias, getattr(self, public_attr.attr_name)
 
     def __str__(self):
         attrs = " ".join(
@@ -95,7 +103,7 @@ class AbstractEntity(ABC):
         indent: None | int | str = 2,
     ) -> str:
         return json.dumps(
-            self.to_dict(exclude=exclude, include=include),
+            self.to_dict(exclude=exclude, **(include or {})),
             ensure_ascii=ensure_ascii,
             indent=indent,
         )
@@ -103,14 +111,6 @@ class AbstractEntity(ABC):
     @property
     def built_at(self) -> datetime:
         return self._built_at
-
-    @property
-    def created_at(self) -> datetime | None:
-        return self._created_at
-
-    @property
-    def updated_at(self) -> datetime | None:
-        return self._updated_at
 
     def check_invariant_datetime(self) -> None:
         """Проверка инвариантов даты и времени."""

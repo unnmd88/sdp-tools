@@ -21,11 +21,13 @@ class BaseAppError(Exception):
         *,
         message: str | None = None,
         code: str | None = None,
+        subject: str | None = None,
         context: dict[str, Any] | None = None,
         **kwargs,
     ):
         self.message = message or self.message
         self.code = code or self.code
+        self.subject = subject
         self.context = (context or {}) | kwargs
         self.timestamp = datetime.now().isoformat()
         super().__init__(self.message)
@@ -35,18 +37,17 @@ class BaseAppError(Exception):
         return {
             "code": self.code,
             "message": self.message,
+            "subject": self.subject,
             "context": self.context,
             "timestamp": self.timestamp,
             "exception_type": self.__class__.__name__,
         }
 
     def __str__(self) -> str:
-        return f"[{self.code}] {self.message}"
+        return f"[{self.code}] subject={self.subject!r} {self.message}"
 
     def __repr__(self) -> str:
-        return (
-            f"{self.__class__.__name__}(code={self.code!r}, message={self.message!r})"
-        )
+        return f"{self.__class__.__name__}(code={self.code!r} subject={self.subject!r} message={self.message!r})"
 
 
 if __name__ == "__main__":
