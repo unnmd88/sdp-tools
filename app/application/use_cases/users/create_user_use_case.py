@@ -25,8 +25,7 @@ from domain.services.entity_factories.user_entity_factory_service import (
 )
 from domain.users.entities.user import UserEntity
 
-from domain.services.user_password_service import hash_password, UserPasswordService
-
+from application.services.password_service import UserPasswordService, hash_password
 
 logger = logging.getLogger(USERS_LOGGER)
 
@@ -46,6 +45,8 @@ class CreateUserUseCaseImpl:
             create_user_dto.customer,
             create_user_dto,
         )
+        #    and (self._username not in forbidden_patterns_in_username))
+        #    or self._role == Roles.director
         try:
             customer_entity: UserEntity = (
                 await self.get_user_use_case.get_active_user_or_raise(

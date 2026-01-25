@@ -1,7 +1,7 @@
 from enum import IntEnum, StrEnum
 
 
-class TokenFields(StrEnum):
+class JWTSchemaEnum(StrEnum):
     pk_id = "id"
     user_id = "user_id"
     username = "username"
@@ -15,14 +15,9 @@ class TokenFields(StrEnum):
     typ = "typ"
 
 
-class TokenTypes(StrEnum):
+class TokenTypesEnum(StrEnum):
     access = "access"
     refresh = "refresh"
-
-
-class EntityIdRange(IntEnum):
-    MIN_ID = 1
-    MAX_ID = 32000
 
 
 class Organizations(StrEnum):
@@ -30,6 +25,7 @@ class Organizations(StrEnum):
 
 
 class Roles(StrEnum):
+    director = "director"
     superuser = "superuser"
     admin = "admin"
     worker = "worker"

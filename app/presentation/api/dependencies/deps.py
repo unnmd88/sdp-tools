@@ -7,15 +7,11 @@ from application.interfaces.use_cases.create_user_use_case_interface import (
     CreateUserUseCaseProtocol,
 )
 from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
-from presentation.api.auth.use_cases.login_and_issue_jwt_use_case import (
-    LoginAndIssueJWTUseCaseIml,
-)
-from presentation.api.auth.jwt_helper import JWTHelper
-
+from application.use_cases.users.refresh_jwt_use_case import RefreshJWTUseCaseImpl
+from application.use_cases.users.user_login_and_issue_jwt_use_case import UserLoginAndIssueJWTUseCaseImpl
 
 from domain.tlo.services.main_tlo_service import TrafficLightObjectServiceImpl
 from domain.users.entities.user import UserEntity
-from presentation.api.auth.use_cases.refresh_jwt_use_case import RefreshJWTUseCaseImpl
 from presentation.api.dependencies.dependencies import (
     users_use_case,
     get_access_jwt_payload_schema,
@@ -43,10 +39,10 @@ def auth_form(
 AuthForm = Annotated[AuthSchema, Depends(auth_form)]
 # AccessAndRefreshJWT = Annotated[TokenInfo, Depends()]
 RefreshJWTUseCase = Annotated[RefreshJWTUseCaseImpl, Depends(get_refresh_jwt_use_case)]
-AuthAndJWTUseCase = Annotated[
-    LoginAndIssueJWTUseCaseIml, Depends(get_auth_and_jwt_use_case)
+LoginAndIssueJWTUseCase = Annotated[
+    UserLoginAndIssueJWTUseCaseImpl, Depends(get_auth_and_jwt_use_case)
 ]
-ManagerJWTDep = Annotated[JWTHelper, Depends(JWTHelper)]
+# ManagerJWTDep = Annotated[JWTHelper, Depends(JWTHelper)]
 PayloadAccessJWT = Annotated[
     PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)
 ]

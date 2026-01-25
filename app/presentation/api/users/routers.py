@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, HTTPException, Request
 
 from domain.dto.users import (
     CreateUserDTO,
@@ -35,14 +35,16 @@ router = APIRouter(
 @router.get(
     "/whoami/",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseUserSchema,
+    # response_model=ResponseUserSchema,
     summary="Данные о пользователе из access jwt",
     description=GET_whoami,
 )
 async def whoami(
-    payload_jwt: PayloadAccessJWT,
-    use_case: UsersUseCase,
+    # payload_jwt: PayloadAccessJWT,
+    request: Request,
+    # use_case: UsersUseCase,
 ):
+    return request.state.user
     user = await use_case.get_user_by_username_or_raise(username=payload_jwt.sub)
     return ResponseUserSchema.model_validate(user, from_attributes=True)
 

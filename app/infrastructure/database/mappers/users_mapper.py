@@ -21,26 +21,26 @@ class UserDBMapper(BaseDBMapperProtocol):
     @classmethod
     def to_entity(cls, model: UserModel) -> UserEntity:
         """ """
-        return UserEntityFactoryService.create_existing(
+        # return UserEntityFactoryService.create_existing(
+        #     id=model.id,
+        #     firstname=model.first_name,
+        #     lastname=model.last_name,
+        #     username=model.username,
+        #     organization=Organizations(model.organization),
+        #     email=model.email,
+        #     password=model.password,
+        #     is_active=model.is_active,
+        #     role=Roles(model.role),
+        #     phone_number=model.phone_number,
+        #     telegram=model.telegram,
+        #     description=model.description,
+        #     created_at=model.created_at,
+        #     updated_at=model.updated_at,
+        # )
+        return UserEntity(
             id=model.id,
             firstname=model.first_name,
             lastname=model.last_name,
-            username=model.username,
-            organization=Organizations(model.organization),
-            email=model.email,
-            password=model.password,
-            is_active=model.is_active,
-            role=Roles(model.role),
-            phone_number=model.phone_number,
-            telegram=model.telegram,
-            description=model.description,
-            created_at=model.created_at,
-            updated_at=model.updated_at,
-        )
-        return UserEntity(
-            id=model.id,
-            firstname=model.firstname,
-            lastname=model.lastname,
             username=model.username,
             organization=Organizations(model.organization),
             email=model.email,

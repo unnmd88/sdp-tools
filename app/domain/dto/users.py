@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import datetime
 
 from domain.enums.unsorted import Roles, Organizations
 
@@ -21,10 +22,33 @@ class GetUserFromRepoDTO:
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class UserDTO:
+    """DTO для существующего пользователя системы."""
+    id: int
     firstname: str | None
     lastname: str | None
     username: str
-    password: str | bytes = field(repr=False)
+    email: str | None
+    organization: Organizations
+    is_active: bool
+    role: Roles
+    is_superuser: bool
+    phone_number: str | None
+    telegram: str | None
+    description: str
+    created_at: str | None
+    updated_at: str | None
+    built_at: str | datetime
+
+
+@dataclass(slots=True, frozen=True, kw_only=True)
+class CreateUserDTO:
+    """DTO для создания нового пользователя системы."""
+
+    customer: str
+
+    firstname: str | None
+    lastname: str | None
+    username: str
     email: str | None
     organization: Organizations
     is_active: bool
@@ -32,13 +56,8 @@ class UserDTO:
     phone_number: str | None
     telegram: str | None
     description: str
+    password: str | bytes = field(repr=False)
 
-
-@dataclass(slots=True, frozen=True, kw_only=True)
-class CreateUserDTO(UserDTO):
-    """DTO для создания нового пользователя системы."""
-
-    customer: str
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)

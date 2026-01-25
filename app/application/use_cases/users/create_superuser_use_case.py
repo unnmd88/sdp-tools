@@ -10,7 +10,7 @@ from core.config import settings
 from domain.enums import Organizations, Roles
 from domain.users.entities.user import UserEntity
 from domain.exceptions.base import DomainValidationError
-from domain.services.user_password_service import hash_password
+from application.services.password_service import hash_password
 from infrastructure.database.api import db_api
 from infrastructure.database.user_reposirory import UsersRepositorySqlAlchemy
 

@@ -4,7 +4,7 @@ from typing import final
 from fastapi import HTTPException
 from starlette import status
 
-from domain.enums.unsorted import TokenTypes
+from domain.enums.unsorted import TokenTypesEnum
 
 
 class BaseAuthException(Exception):
@@ -30,8 +30,8 @@ class InactiveUserException(BaseAuthException):
 
 
 def get_invalid_type_jwt_exception(
-    current_token: TokenTypes = "",
-    expected_token: TokenTypes = "",
+    current_token: TokenTypesEnum = "",
+    expected_token: TokenTypesEnum = "",
 ) -> HTTPException:
     return HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

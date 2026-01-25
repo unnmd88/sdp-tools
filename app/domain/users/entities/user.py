@@ -150,13 +150,8 @@ class UserEntity(AbstractEntity):
         return self._role == Roles.superuser
 
     def invariant_names(self):
-        if (
-            (self._username != self._lastname)
-            and (self._username != self._firstname)
-            and (self._username not in forbidden_patterns_in_username)
-        ):
+        if (self._username != self._lastname) and (self._username != self._firstname):
             return
-
         if self._username == self._lastname:
             rule = ErrorMessages.cannot_be_equal.format(
                 repr(str(PublicAttrNamesEnum.username)),
@@ -166,10 +161,6 @@ class UserEntity(AbstractEntity):
             rule = ErrorMessages.cannot_be_equal.format(
                 repr(str(PublicAttrNamesEnum.username)),
                 repr(str(PublicAttrNamesEnum.firstname)),
-            )
-        elif self._username in forbidden_patterns_in_username:
-            rule = ErrorMessages.name_not_allowed.format(
-                repr(str(self.username)), self._username
             )
         else:
             raise DomainError

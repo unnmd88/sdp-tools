@@ -15,16 +15,14 @@ from application.interfaces.repositories.users_repo_interface import (
 from application.interfaces.use_cases.create_user_use_case_interface import (
     CreateUserUseCaseProtocol,
 )
-from application.interfaces.use_cases.user_login_use_case_interface import (
-    UserLoginUseCaseProtocol,
+from application.interfaces.use_cases.user_login_and_issue_jwt_use_case_interface import (
+    UserLoginAndIssueJWTUseCaseProtocol,
 )
 from application.use_cases.users.create_user_use_case import CreateUserUseCaseImpl
+from application.use_cases.users.refresh_jwt_use_case import RefreshJWTUseCaseImpl
 from core.config import settings
-from presentation.api.auth.use_cases.login_and_issue_jwt_use_case import (
-    LoginAndIssueJWTUseCaseIml,
-)
-from presentation.api.auth.jwt_helper import JWTHelper
-from application.use_cases.users.user_login_use_case import UserLoginUseCaseImpl
+
+from application.use_cases.users.user_login_and_issue_jwt_use_case import UserLoginAndIssueJWTUseCaseImpl
 from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
 
 from typing import Annotated
@@ -36,7 +34,7 @@ from starlette import status
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from domain.dto.users import GetUserFromRepoDTO
-from domain.enums.unsorted import Roles, TokenTypes
+from domain.enums.unsorted import Roles, TokenTypesEnum
 from infrastructure.database.api import db_api
 from infrastructure.database.passport_groups_repository import (
     PassportGroupsRepositorySqlAlchemy,
@@ -44,7 +42,7 @@ from infrastructure.database.passport_groups_repository import (
 from infrastructure.database.regions_repository import RegionsRepositorySqlAlchemy
 from infrastructure.database.tlo_repository import TrafficLightObjectSqlAlchemy
 from infrastructure.database.user_reposirory import UsersRepositorySqlAlchemy
-from presentation.api.auth.use_cases.refresh_jwt_use_case import RefreshJWTUseCaseImpl
+
 
 from presentation.schemas.jwt import PayloadAccessJWTSchema, PayloadRefreshJWTSchema
 
@@ -52,7 +50,6 @@ from presentation.schemas.jwt import PayloadAccessJWTSchema, PayloadRefreshJWTSc
 
 http_bearer = HTTPBearer()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=settings.login_url)
-jwt_helper = JWTHelper()
 db_session = Annotated[AsyncSession, Depends(db_api.session_getter)]
 
 
@@ -62,7 +59,7 @@ db_session = Annotated[AsyncSession, Depends(db_api.session_getter)]
 def get_jwt_payload_schema(
     # credentials: str,
     token: Annotated[str, Depends(oauth2_scheme)],
-    expected_token_type: TokenTypes,
+    expected_token_type: TokenTypesEnum,
 ) -> PayloadAccessJWTSchema | PayloadRefreshJWTSchema:
     try:
         print(f"TOKEN: {token}")
@@ -70,12 +67,12 @@ def get_jwt_payload_schema(
         payload = jwt_helper.decode_jwt(token)
         if (
             payload["typ"] == expected_token_type
-            and expected_token_type == TokenTypes.access
+            and expected_token_type == TokenTypesEnum.access
         ):
             return PayloadAccessJWTSchema(**payload)
         elif (
-            payload["typ"] == expected_token_type
-            and expected_token_type == TokenTypes.refresh
+                payload["typ"] == expected_token_type
+                and expected_token_type == TokenTypesEnum.refresh
         ):
             return PayloadRefreshJWTSchema(**payload)
         else:
@@ -100,7 +97,7 @@ def get_access_jwt_payload_schema(
     return get_jwt_payload_schema(
         # credentials=credentials.credentials,
         token=token,
-        expected_token_type=TokenTypes.access,
+        expected_token_type=TokenTypesEnum.access,
     )
 
 
@@ -109,7 +106,7 @@ def get_refresh_jwt_payload_schema(
 ) -> PayloadRefreshJWTSchema:
     return get_jwt_payload_schema(
         credentials=credentials.credentials,
-        expected_token_type=TokenTypes.refresh,
+        expected_token_type=TokenTypesEnum.refresh,
     )
 
 
@@ -182,22 +179,13 @@ def create_user_use_case(
     )
 
 
-def get_auth_use_case(
-    user_repository: Annotated[
-        UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
-    ],
-) -> UserLoginUseCaseProtocol:
-    return UserLoginUseCaseImpl(user_repository=user_repository)
-
-
 def get_auth_and_jwt_use_case(
     user_repository: Annotated[
         UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
     ],
-) -> LoginAndIssueJWTUseCaseIml:
-    user_login_use_case = UserLoginUseCaseImpl(user_repository=user_repository)
-    return LoginAndIssueJWTUseCaseIml(
-        user_login_use_case=user_login_use_case,
+) -> UserLoginAndIssueJWTUseCaseProtocol:
+    return UserLoginAndIssueJWTUseCaseImpl(
+        user_repository=user_repository,
     )
 
 
@@ -207,7 +195,7 @@ def get_refresh_jwt_use_case(
     ],
 ) -> RefreshJWTUseCaseImpl:
     return RefreshJWTUseCaseImpl(
-        users_use_case=GetUserUseCaseImpl(user_repository=user_repository)
+        user_repository=user_repository
     )
 
 

@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from core.config import settings
+from presentation.api.middlewares.decode_jwt_middleware import JWTMiddleware
 
 app = FastAPI(
     title="Api для работы с паспортами светофорного объекта.",
@@ -18,6 +19,11 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+app.add_middleware(
+    JWTMiddleware,
+    app,
 )
 
 
