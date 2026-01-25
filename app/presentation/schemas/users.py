@@ -13,7 +13,7 @@ from domain.enums.unsorted import Organizations, Roles
 
 
 class BaseUserSchema(BaseModel):
-    model_config = ConfigDict(use_enum_values=True, strict=True, extra="forbid")
+    model_config = ConfigDict(use_enum_values=True, strict=True, extra="ignore")
 
     firstname: Annotated[str | None, Field(examples=[None, "Иван"])]
     lastname: Annotated[str | None, Field(examples=[None, "Иванов"])]

@@ -2,7 +2,10 @@ from typing import Annotated
 
 from fastapi import Depends
 from fastapi.params import Form
-
+from fastapi.security import (
+HTTPAuthorizationCredentials,
+    OAuth2PasswordBearer,
+)
 from application.interfaces.use_cases.create_user_use_case_interface import (
     CreateUserUseCaseProtocol,
 )
@@ -21,7 +24,7 @@ from presentation.api.dependencies.dependencies import (
     get_refresh_jwt_payload_schema,
     get_auth_and_jwt_use_case,
     get_refresh_jwt_use_case,
-    create_user_use_case,
+    create_user_use_case, oauth2_scheme,
 )
 from presentation.api.dependencies.utils import get_filters_for_region_or_name_search
 from presentation.schemas.auth import AuthSchema
@@ -36,6 +39,7 @@ def auth_form(
 
 
 ## Auth and JWT
+BEARER_TOKEN = Annotated[str, Depends(oauth2_scheme)]
 AuthForm = Annotated[AuthSchema, Depends(auth_form)]
 # AccessAndRefreshJWT = Annotated[TokenInfo, Depends()]
 RefreshJWTUseCase = Annotated[RefreshJWTUseCaseImpl, Depends(get_refresh_jwt_use_case)]

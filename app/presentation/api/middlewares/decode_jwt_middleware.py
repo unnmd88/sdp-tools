@@ -10,7 +10,7 @@ import time
 from starlette import status
 
 from application.services.exceptions import InvalidTokenTypeError, UnauthorizedError
-from application.use_cases.users.decode_access_jwt_use_case import DecodeJWTUseCaseImpl
+from application.use_cases.users.decode_access_jwt_use_case import GetUserFromRepoByJWTUseCaseImpl
 
 
 class JWTMiddleware(BaseHTTPMiddleware):
@@ -35,7 +35,6 @@ class JWTMiddleware(BaseHTTPMiddleware):
         if any(path in request.url.path for path in self.public_paths):
             return  await call_next(request)
         if (auth_header := request.headers.get("Authorization")) is None:
-            print(f"auth_header: {auth_header}")
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 content={"detail": "Требуется авторизация"}
@@ -57,7 +56,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 content={"detail": "Требуется авторизация"}
             )
-        use_case = DecodeJWTUseCaseImpl()
+        use_case = GetUserFromRepoByJWTUseCaseImpl()
         try:
             request.state.user = use_case(access_token=token)
         except (InvalidTokenTypeError, UnauthorizedError) as e:

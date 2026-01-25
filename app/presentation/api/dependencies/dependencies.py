@@ -19,6 +19,7 @@ from application.interfaces.use_cases.user_login_and_issue_jwt_use_case_interfac
     UserLoginAndIssueJWTUseCaseProtocol,
 )
 from application.use_cases.users.create_user_use_case import CreateUserUseCaseImpl
+from application.use_cases.users.decode_access_jwt_use_case import GetUserFromRepoByJWTUseCaseImpl
 from application.use_cases.users.refresh_jwt_use_case import RefreshJWTUseCaseImpl
 from core.config import settings
 
@@ -27,6 +28,7 @@ from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
 
 from typing import Annotated
 
+from fastapi import Request
 from fastapi.params import Depends
 from fastapi.exceptions import HTTPException
 from starlette import status
@@ -35,6 +37,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from domain.dto.users import GetUserFromRepoDTO
 from domain.enums.unsorted import Roles, TokenTypesEnum
+from infrastructure.auth.jwt.decode_jwt_service import DecodeJWTService
 from infrastructure.database.api import db_api
 from infrastructure.database.passport_groups_repository import (
     PassportGroupsRepositorySqlAlchemy,
@@ -51,6 +54,7 @@ from presentation.schemas.jwt import PayloadAccessJWTSchema, PayloadRefreshJWTSc
 http_bearer = HTTPBearer()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=settings.login_url)
 db_session = Annotated[AsyncSession, Depends(db_api.session_getter)]
+
 
 
 # -- JWT, credentials and access-levels --
@@ -166,6 +170,27 @@ def users_use_case(
     ],
 ) -> GetUserUseCaseImpl:
     return GetUserUseCaseImpl(user_repository=user_repository)
+
+
+def get_user_from_jwt_use_case(
+    decode_jwt_service: Annotated[DecodeJWTService, Depends()],
+    get_user_use_case: Annotated[GetUserUseCaseImpl, Depends(users_use_case)],
+) -> GetUserFromRepoByJWTUseCaseImpl:
+    return GetUserFromRepoByJWTUseCaseImpl(
+        decode_service=decode_jwt_service,
+        get_user_use_case=get_user_use_case,
+    )
+
+
+async def load_user_to_request_from_jwt(
+    request: Request,
+    token: Annotated[str, Depends(oauth2_scheme)],
+    get_user_from_jwt_use_case_instance: Annotated[GetUserFromRepoByJWTUseCaseImpl, Depends(get_user_from_jwt_use_case)],
+):
+    request.state.user = await get_user_from_jwt_use_case_instance(token)
+    return
+
+
 
 
 def create_user_use_case(

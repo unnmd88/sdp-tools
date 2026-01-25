@@ -1,8 +1,7 @@
 import logging
 from dataclasses import dataclass
 
-from jwt import ExpiredSignatureError, DecodeError
-
+from jwt import ExpiredSignatureError
 
 from app_logging.dev.config import AUTH_LOGGER
 from application.interfaces.repositories.users_repo_interface import (
@@ -10,7 +9,7 @@ from application.interfaces.repositories.users_repo_interface import (
 )
 
 from application.services.exceptions import UnauthorizedError, ForbiddenError, InvalidTokenTypeError
-from application.services.jwt.jwt_service import BaseJWTService
+from infrastructure.auth.jwt.jwt_service import BaseJWTService
 
 from domain.dto.jwt_dto import TokenDataDTO
 from domain.dto.users import UserDTO

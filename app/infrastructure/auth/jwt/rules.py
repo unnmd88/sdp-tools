@@ -13,5 +13,5 @@ class JWTSecurityRules:
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class JWTExpireRules:
-    expire_minutes_access_token: int = 15
+    expire_minutes_access_token: int = 1440
     expire_days_refresh_token: int = 1

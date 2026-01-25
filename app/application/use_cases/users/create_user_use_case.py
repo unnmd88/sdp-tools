@@ -12,8 +12,8 @@ from application.interfaces.use_cases.get_user_use_case_interface import (
 from application.interfaces.services.entity_factories.base_entity_factory_interface import (
     EntityFactoryServiceProtocol,
 )
-from application.interfaces.services.user_password_service_interface import (
-    UserPasswordServiceProtocol,
+from application.interfaces.services.password_service_interface import (
+    PasswordServiceProtocol,
 )
 
 from domain.dto.users import CreateUserDTO
@@ -25,7 +25,7 @@ from domain.services.entity_factories.user_entity_factory_service import (
 )
 from domain.users.entities.user import UserEntity
 
-from application.services.password_service import UserPasswordService, hash_password
+from infrastructure.auth.password_service import BcryptPasswordService, hash_password
 
 logger = logging.getLogger(USERS_LOGGER)
 
@@ -37,7 +37,7 @@ class CreateUserUseCaseImpl:
     user_repository: UsersRepositoryProtocol
     get_user_use_case: GetUserUseCaseProtocol
     user_factory: type[EntityFactoryServiceProtocol] = UserEntityFactoryService
-    user_password_service: type[UserPasswordServiceProtocol] = UserPasswordService
+    user_password_service: type[PasswordServiceProtocol] = BcryptPasswordService
 
     async def __call__(self, create_user_dto: CreateUserDTO) -> UserEntity:
         logger.info(

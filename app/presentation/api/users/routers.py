@@ -1,4 +1,7 @@
+from typing import Annotated
+
 from fastapi import APIRouter, status, HTTPException, Request
+from fastapi.params import Depends
 
 from domain.dto.users import (
     CreateUserDTO,
@@ -7,15 +10,18 @@ from domain.dto.users import (
     SearchUsersDTO,
     ChangeUserPasswordDTO,
 )
+
 from domain.enums.unsorted import Roles
 
 from domain.exceptions.users import UserPermissionsError
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
+from presentation.api.dependencies.dependencies import oauth2_scheme
 from presentation.api.dependencies.deps import (
     UsersUseCase,
     PayloadAccessJWT,
-    IsSuperuser,
+    IsSuperuser, BEARER_TOKEN,
 )
+from presentation.custom_roters.jwt_require_router import JWTUserAPIRoute, jwt_route_class_factory
 
 from presentation.schemas.users import (
     CreateUserSchema,
@@ -32,24 +38,34 @@ router = APIRouter(
 )
 
 
-@router.get(
+# protected_router = APIRouter(
+#     prefix="/user",
+#     tags=["Users"],
+#     route_class=JWTUserAPIRoute,
+#     dependencies=[Depends(oauth2_scheme)],
+# )
+
+require_active_user_router = APIRouter(
+    prefix="/user",
+    tags=["Users"],
+    route_class=jwt_route_class_factory(active_user_require=True),
+    dependencies=[Depends(oauth2_scheme)],
+)
+
+
+@require_active_user_router.get(
     "/whoami/",
     status_code=status.HTTP_200_OK,
-    # response_model=ResponseUserSchema,
+    response_model=ResponseUserSchema,
     summary="Данные о пользователе из access jwt",
     description=GET_whoami,
+
 )
-async def whoami(
-    # payload_jwt: PayloadAccessJWT,
-    request: Request,
-    # use_case: UsersUseCase,
-):
+async def whoami(request: Request):
     return request.state.user
-    user = await use_case.get_user_by_username_or_raise(username=payload_jwt.sub)
-    return ResponseUserSchema.model_validate(user, from_attributes=True)
 
 
-@router.patch(
+@require_active_user_router.patch(
     "/",
     status_code=status.HTTP_200_OK,
     # response_model=UserSchema,
@@ -67,7 +83,7 @@ async def update_user(
     return await use_case.update(upd_user_dto)
 
 
-@router.patch(
+@require_active_user_router.patch(
     "/change-password/",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=ChangeUserPasswordResponse,

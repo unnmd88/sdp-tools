@@ -5,17 +5,17 @@ from app_logging.dev.config import AUTH_LOGGER
 from application.interfaces.repositories.users_repo_interface import (
     UsersRepositoryProtocol,
 )
-from application.interfaces.services.user_password_service_interface import (
-    UserPasswordServiceProtocol,
+from application.interfaces.services.password_service_interface import (
+    PasswordServiceProtocol,
 )
 from application.services.exceptions import UnauthorizedError, ForbiddenError
-from application.services.jwt.jwt_service import BaseJWTService
+from infrastructure.auth.jwt.jwt_service import BaseJWTService
 
 from domain.dto.auth import UserAuthDTO
 from domain.dto.jwt_dto import TokenDataDTO
 from domain.dto.users import UserDTO
 from domain.users.entities.user import UserEntity
-from application.services.password_service import UserPasswordService
+from infrastructure.auth.password_service import BcryptPasswordService
 
 logger = logging.getLogger(AUTH_LOGGER)
 
@@ -24,7 +24,7 @@ logger = logging.getLogger(AUTH_LOGGER)
 class UserLoginAndIssueJWTUseCaseImpl:
 
     user_repository: UsersRepositoryProtocol
-    user_password_service: type[UserPasswordServiceProtocol] = UserPasswordService
+    user_password_service: type[PasswordServiceProtocol] = BcryptPasswordService
     jwt_service: BaseJWTService = BaseJWTService
 
     async def __call__(self, auth_data: UserAuthDTO) -> TokenDataDTO:

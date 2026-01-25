@@ -5,7 +5,8 @@ from app_logging.dev.config import USERS_LOGGER
 from application.interfaces.repositories.users_repo_interface import (
     UsersRepositoryProtocol,
 )
-
+from domain.exceptions.entity_not_found_exc import DomainEntityNotFoundError
+from domain.exceptions.permissions_exc import DomainInactiveUserError
 
 from domain.users.entities.user import UserEntity
 
@@ -15,6 +16,7 @@ logger = logging.getLogger(USERS_LOGGER)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class GetUserUseCaseImpl:
+
     user_repository: UsersRepositoryProtocol
 
     async def get_user_by_username_or_none(self, username: str) -> UserEntity | None:
@@ -25,13 +27,13 @@ class GetUserUseCaseImpl:
             UserEntity | None
         ) = await self.user_repository.get_user_by_id_or_username_or_none(username)
         if user is None:
-            raise UserNotFoundError
+            raise DomainEntityNotFoundError(message=f"Пользователь {username!r} не найден.")
         return user
 
     async def get_active_user_or_raise(self, username: str) -> UserEntity:
         user = await self.get_user_by_username_or_raise(username)
         if not user.is_active:
-            raise InactiveUserError
+            raise DomainInactiveUserError(message=f"Пользователь {username!r} не активен.")
         return user
 
 

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from app_logging.dev.config import AUTH_LOGGER
 from application.services.exceptions import InvalidTokenTypeError, UnauthorizedError
-from application.services.jwt.jwt_service import BaseJWTService
+from infrastructure.auth.jwt.jwt_service import BaseJWTService
 from domain.dto.jwt_dto import AccessJWTPayloadDTO
 from domain.enums.unsorted import TokenTypesEnum
 from jwt import ExpiredSignatureError, DecodeError, InvalidTokenError

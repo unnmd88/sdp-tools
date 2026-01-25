@@ -13,7 +13,7 @@ from domain.dto.users import ChangeUserPasswordDTO
 
 from domain.users.entities.user import UserEntity
 
-from application.services.password_service import hash_password
+from infrastructure.auth.password_service import hash_password
 from domain.services.field_values_constraints import (
     password_validator,
 )

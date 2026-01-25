@@ -7,7 +7,7 @@ from typing import AnyStr
 
 import jwt
 
-from application.services.jwt.rules import JWTExpireRules, JWTSecurityRules
+from infrastructure.auth.jwt.rules import JWTExpireRules, JWTSecurityRules
 from domain.dto.jwt_dto import (
     TokenDataDTO,
     AccessJWTPayloadDTO,
