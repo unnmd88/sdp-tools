@@ -1,4 +1,6 @@
-class ApplicationError: pass
+class ApplicationError:
+    pass
+
 
 class CreateError(ApplicationError):
     """Ошибка создания нового объекта."""

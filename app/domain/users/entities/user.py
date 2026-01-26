@@ -1,9 +1,9 @@
+import json
 import logging
 import time
 from datetime import datetime
 
-from app_logging.dev.config import DOMAIN
-from core.error_data import ErrorData
+# from core.error_data import ErrorData
 from domain.base_entity import AbstractEntity
 from domain.contract2.contract_field import ContractField
 from domain.contract2.require import Require
@@ -14,11 +14,12 @@ from domain.enums.unsorted import Organizations, Roles
 
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.violations import Violations
-from domain.exceptions.base import DomainError
-from domain.exceptions.contract_violation_exc import (
-    DomainInvariantViolationBusinessRuleError,
-)
-from domain.users.business_rules import forbidden_patterns_in_username
+from domain.exceptions import DomainError
+# from domain._exceptions.base import DomainError
+# from domain._exceptions.contract_violation_exc import (
+#     DomainInvariantError,
+# )
+# from domain.users.business_rules import forbidden_patterns_in_username
 from domain.users.value_objects.password_vo import PasswordVO
 
 
@@ -30,9 +31,6 @@ from domain.validators import (
     EnumValidator,
     UserEntityValidator,
 )
-
-
-logger = logging.getLogger(DOMAIN)
 
 
 class UserEntity(AbstractEntity):
@@ -164,11 +162,11 @@ class UserEntity(AbstractEntity):
             )
         else:
             raise DomainError
-        raise DomainInvariantViolationBusinessRuleError(
+        raise DomainInvariantError(
             subject=self.__class__.__name__,
             field_name=str(PublicAttrNamesEnum.username),
             handler=repr(self.invariant_names.__name__),
-            contract_code=ErrorData.BUSINESS_RULE_VIOLATION.code,
+            contract_code="BUSINESS_RULE_VIOLATION",
             violation=Violations.invariant_violation,
             value=self._username,
             rule=rule,
@@ -181,6 +179,7 @@ if __name__ == "__main__":
 
     start_time = time.perf_counter()
     try:
+
         user = UserEntity(
             id="1",
             firstname="Junkers",
@@ -197,33 +196,12 @@ if __name__ == "__main__":
             updated_at=None,
             description="",
         )
-    except DomainError as domain_error:
-        logger.info(domain_error.to_dict())
-        raise domain_error
-    # try:
-    #     for _ in range(1000):
-    #         user = UserEntity(
-    #             id="1",
-    #             firstname="Junkers",
-    #             lastname="Junkers",
-    #             username="Junkers2",
-    #             created_at=datetime.now(),
-    #             organization=Organizations.SDP,
-    #             updated_at=None,
-    #             password=b"118",
-    #             is_active=True,
-    #             role=Roles.admin,
-    #             email=None,
-    #             phone_number=None,
-    #             telegram=None,
-    #             description="",
-    #         )
-    # except DomainError as e:
-    #     print(e.to_dict())
-    #     raise e
+    except DomainError as e:
+        print(e)
+        print(e.to_dict())
+        print(json.dumps(e.to_dict(), indent=2, ensure_ascii=False))
+
     print(f"Время выполнения с валидацией: {time.perf_counter() - start_time} секунд")
 
-    print(user.to_dict())
-    print(user.to_json())
 
     # print(user.to_json())

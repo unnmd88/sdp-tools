@@ -2,29 +2,30 @@ from typing import Annotated
 
 from fastapi import Depends
 from fastapi.params import Form
-from fastapi.security import (
-HTTPAuthorizationCredentials,
-    OAuth2PasswordBearer,
-)
+
 from application.interfaces.use_cases.create_user_use_case_interface import (
     CreateUserUseCaseProtocol,
 )
+from application.use_cases.users.get_user_from_repo_by_jwt_use_case import (
+    GetUserFromRepoByJWTUseCaseImpl,
+)
 from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
 from application.use_cases.users.refresh_jwt_use_case import RefreshJWTUseCaseImpl
-from application.use_cases.users.user_login_and_issue_jwt_use_case import UserLoginAndIssueJWTUseCaseImpl
+from application.use_cases.users.user_login_and_issue_jwt_use_case import (
+    UserLoginAndIssueJWTUseCaseImpl,
+)
 
-from domain.tlo.services.main_tlo_service import TrafficLightObjectServiceImpl
-from domain.users.entities.user import UserEntity
-from presentation.api.dependencies.dependencies import (
+from presentation.api.dependencies.di import (
     users_use_case,
     get_access_jwt_payload_schema,
     is_superuser,
     is_admin,
-    get_user_entity_by_id,
     get_refresh_jwt_payload_schema,
     get_auth_and_jwt_use_case,
     get_refresh_jwt_use_case,
-    create_user_use_case, oauth2_scheme,
+    create_user_use_case,
+    oauth2_scheme,
+    GetUserFromRepoByJWTDep,
 )
 from presentation.api.dependencies.utils import get_filters_for_region_or_name_search
 from presentation.schemas.auth import AuthSchema
@@ -61,7 +62,14 @@ IsAdmin = Depends(is_admin)
 ## Users
 UsersUseCase = Annotated[GetUserUseCaseImpl, Depends(users_use_case)]
 CreateUserUseCase = Annotated[CreateUserUseCaseProtocol, Depends(create_user_use_case)]
-UserEntityDep = Annotated[UserEntity, Depends(get_user_entity_by_id)]
+GetActiveUserFromRepoByJWTUseCase = Annotated[
+    GetUserFromRepoByJWTUseCaseImpl,
+    Depends(
+        GetUserFromRepoByJWTDep(
+            require_active=True,
+        )
+    ),
+]
 
 ## Regions
 

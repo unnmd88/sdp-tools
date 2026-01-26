@@ -1,18 +1,12 @@
 import datetime
-from datetime import (
-    datetime as dt,
-    timedelta as td
-)
+from datetime import datetime as dt, timedelta as td
 from typing import AnyStr
 
 import jwt
 
+from infrastructure.auth.exceptions import InvalidTokenTypeError, RottenTokenError
 from infrastructure.auth.jwt.rules import JWTExpireRules, JWTSecurityRules
-from domain.dto.jwt_dto import (
-    TokenDataDTO,
-    AccessJWTPayloadDTO,
-    RefreshJWTPayloadDTO
-)
+from domain.dto.jwt_dto import TokenDataDTO, AccessJWTPayloadDTO, RefreshJWTPayloadDTO
 from domain.dto.users import UserDTO
 from domain.enums.unsorted import TokenTypesEnum, Organizations, Roles
 
@@ -22,7 +16,6 @@ expire_rules = JWTExpireRules()
 
 
 class BaseJWTService:
-
     expire_minutes_access_token: int = expire_rules.expire_minutes_access_token
     expire_days_refresh_token: int = expire_rules.expire_days_refresh_token
     public_key = security_rules.public_key_path.read_text(encoding="utf-8")
@@ -50,7 +43,7 @@ class BaseJWTService:
                 role=user_dto.role,
                 organization=user_dto.organization,
                 email=user_dto.email,
-                **service_data
+                **service_data,
             )
             assert payload.typ == TokenTypesEnum.access, "Тип токена должен быть access"
         elif token_type == TokenTypesEnum.refresh:
@@ -59,9 +52,11 @@ class BaseJWTService:
                 sub=user_dto.username,
                 **service_data,
             )
-            assert payload.typ == TokenTypesEnum.refresh, "Тип токена должен быть refresh"
+            assert payload.typ == TokenTypesEnum.refresh, (
+                "Тип токена должен быть refresh"
+            )
         else:
-            #TODO: добавить логирование!
+            # TODO: добавить логирование!
             raise ValueError(f"Неизвестный тип токена: {token_type!r}.")
 
         return jwt.encode(
@@ -72,22 +67,25 @@ class BaseJWTService:
 
     @classmethod
     def decode_jwt(cls, token: AnyStr) -> AccessJWTPayloadDTO | RefreshJWTPayloadDTO:
-        decoded_jwt = jwt.decode(
-            jwt=token,
-            key=cls.public_key,
-            algorithms=[cls.algorithm],
-        )
+        try:
+            decoded_jwt = jwt.decode(
+                jwt=token,
+                key=cls.public_key,
+                algorithms=[cls.algorithm],
+            )
+        except jwt.PyJWTError:
+            raise RottenTokenError
         try:
             token_type = decoded_jwt["typ"]
         except KeyError:
-            #TODO: добавить логирование
+            # TODO: добавить логирование
             raise KeyError("Не найден тип токена в токене при декодировании!!")
         if token_type == TokenTypesEnum.access:
             dto = AccessJWTPayloadDTO
         elif token_type == TokenTypesEnum.refresh:
             dto = RefreshJWTPayloadDTO
         else:
-            #TODO: добавить логирование
+            # TODO: добавить логирование
             raise TypeError(f"Неизвестный тип токена: {token_type}")
         return dto(**decoded_jwt)
 
@@ -124,7 +122,9 @@ class BaseJWTService:
         expire_minutes_access: int = expire_rules.expire_minutes_access_token,
     ) -> TokenDataDTO:
         return TokenDataDTO(
-            access_token=cls.create_access_jwt(user_dto=user_dto, expire_minutes=expire_minutes_access),
+            access_token=cls.create_access_jwt(
+                user_dto=user_dto, expire_minutes=expire_minutes_access
+            ),
             refresh_token=None,
         )
 
@@ -136,12 +136,16 @@ class BaseJWTService:
         expire_days_refresh: int = expire_rules.expire_days_refresh_token,
     ) -> TokenDataDTO:
         return TokenDataDTO(
-            access_token=cls.create_access_jwt(user_dto=user_dto, expire_minutes=expire_minutes_access),
-            refresh_token=cls.create_refresh_jwt(user_dto=user_dto, expire_days=expire_days_refresh)
+            access_token=cls.create_access_jwt(
+                user_dto=user_dto, expire_minutes=expire_minutes_access
+            ),
+            refresh_token=cls.create_refresh_jwt(
+                user_dto=user_dto, expire_days=expire_days_refresh
+            ),
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     _user_dto = UserDTO(
         id=1,
         firstname="Junker",
@@ -170,4 +174,3 @@ if __name__ == '__main__':
     print(decoded_jwt)
 
     print(BaseJWTService.issue_pair(user_dto=_user_dto))
-

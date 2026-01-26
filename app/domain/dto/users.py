@@ -23,6 +23,7 @@ class GetUserFromRepoDTO:
 @dataclass(slots=True, frozen=True, kw_only=True)
 class UserDTO:
     """DTO для существующего пользователя системы."""
+
     id: int
     firstname: str | None
     lastname: str | None
@@ -57,7 +58,6 @@ class CreateUserDTO:
     telegram: str | None
     description: str
     password: str | bytes = field(repr=False)
-
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)

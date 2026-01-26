@@ -8,7 +8,6 @@ from domain.users.business_rules import MIN_LEN_PASSWORD, MAX_LEN_PASSWORD
 
 
 class BcryptPasswordService:
-
     @classmethod
     def hash_password(cls, password: str) -> bytes:
         return bcrypt.hashpw(
@@ -17,12 +16,7 @@ class BcryptPasswordService:
         )
 
     @classmethod
-    def verify_password(
-        cls,
-        *,
-        password: str,
-        hashed_password: bytes
-    ) -> bool:
+    def verify_password(cls, *, password: str, hashed_password: bytes) -> bool:
         return bcrypt.checkpw(
             password=password.encode("utf-8"),
             hashed_password=hashed_password,
@@ -37,8 +31,7 @@ class BcryptPasswordService:
     ) -> str:
         chars = string.ascii_letters + string.digits + string.punctuation
         return "".join(
-            secrets.choice(chars)
-            for _ in range(random.randint(min_length, max_length))
+            secrets.choice(chars) for _ in range(random.randint(min_length, max_length))
         )
 
 

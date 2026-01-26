@@ -3,14 +3,18 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException
 from starlette import status
 
-from application.services.exceptions import UnauthorizedError, ForbiddenError, InvalidTokenTypeError
+from application.services.exceptions import (
+    UnauthorizedError,
+    ForbiddenError,
+    InvalidTokenTypeError,
+)
 from domain.dto.auth import UserAuthDTO
 from presentation.api.api_v1.documentation.auth_and_jwt.endpoints import (
     POST_LOGIN_user,
     POST_REFRESH,
 )
-from presentation.api.dependencies.dependencies import oauth2_scheme
-from presentation.api.dependencies.deps import (
+from presentation.api.dependencies.di import oauth2_scheme
+from presentation.api.dependencies.ioc import (
     AuthForm,
     PayloadRefreshJWT,
     LoginAndIssueJWTUseCase,
@@ -69,6 +73,3 @@ async def issue_access_by_refresh_jwt(
             detail=e.message,
             status_code=e.http_status,
         )
-
-
-

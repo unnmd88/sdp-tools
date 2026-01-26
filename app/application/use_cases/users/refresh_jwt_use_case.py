@@ -8,7 +8,13 @@ from application.interfaces.repositories.users_repo_interface import (
     UsersRepositoryProtocol,
 )
 
-from application.services.exceptions import UnauthorizedError, ForbiddenError, InvalidTokenTypeError
+from application.services.exceptions import (
+    UnauthorizedError,
+    ForbiddenError,
+)
+from application.use_cases.exceptions import UseCaseError
+from domain.enums.validation_err_messages import ErrorMessages
+from infrastructure.auth.exceptions import InvalidTokenTypeError
 from infrastructure.auth.jwt.jwt_service import BaseJWTService
 
 from domain.dto.jwt_dto import TokenDataDTO
@@ -28,10 +34,19 @@ class RefreshJWTUseCaseImpl:
         try:
             decoded_jwt = self.jwt_service.decode_jwt(refresh_jwt)
             if decoded_jwt.typ != TokenTypesEnum.refresh:
-                logger.info("Неверный тип токена. Необходим refresh-токен. Payload: %r", decoded_jwt)
-                raise InvalidTokenTypeError(message="Неверный тип токена. Необходим refresh-токен")
-            user_entity: UserEntity = await self.user_repository.get_one_or_none_by_filters(
-                {"username": decoded_jwt.sub}
+                logger.info(
+                    "Неверный тип токена. Необходим refresh-токен. Payload: %r",
+                    decoded_jwt,
+                )
+                raise UseCaseError(
+                    message=ErrorMessages.invalid_token_type.format(
+                        str(TokenTypesEnum.refresh)
+                    )
+                )
+            user_entity: UserEntity = (
+                await self.user_repository.get_one_or_none_by_filters(
+                    {"username": decoded_jwt.sub}
+                )
             )
             if user_entity is None:
                 logger.info("Пользователь не найден. Payload: %r", decoded_jwt)

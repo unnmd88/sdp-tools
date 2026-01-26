@@ -1,4 +1,4 @@
-from domain.exceptions.contract_violation_exc import DomainValidationError
+from domain._exceptions.contract_violation_exc import DomainValidationError
 
 
 class TypeCheckerMixin:

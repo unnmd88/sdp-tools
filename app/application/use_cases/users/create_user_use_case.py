@@ -6,9 +6,7 @@ from app_logging.dev.config import USERS_LOGGER
 from application.interfaces.repositories.users_repo_interface import (
     UsersRepositoryProtocol,
 )
-from application.interfaces.use_cases.get_user_use_case_interface import (
-    GetUserUseCaseProtocol,
-)
+
 from application.interfaces.services.entity_factories.base_entity_factory_interface import (
     EntityFactoryServiceProtocol,
 )
@@ -19,7 +17,7 @@ from application.interfaces.services.password_service_interface import (
 from domain.dto.users import CreateUserDTO
 from domain.enums.unsorted import Organizations, Roles
 
-from domain.exceptions.users import UserPermissionsError
+from domain._exceptions.users import UserPermissionsError
 from domain.services.entity_factories.user_entity_factory_service import (
     UserEntityFactoryService,
 )
@@ -35,7 +33,7 @@ class CreateUserUseCaseImpl:
     """Класс для создания нового пользователя системы."""
 
     user_repository: UsersRepositoryProtocol
-    get_user_use_case: GetUserUseCaseProtocol
+    # get_user_use_case: GetUserUseCaseProtocol
     user_factory: type[EntityFactoryServiceProtocol] = UserEntityFactoryService
     user_password_service: type[PasswordServiceProtocol] = BcryptPasswordService
 

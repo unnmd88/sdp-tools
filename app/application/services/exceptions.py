@@ -8,12 +8,6 @@ class ServiceError(BaseAppError):
     http_status: int = ErrorData.APPLICATION_ERROR.http_status_code
 
 
-class InvalidTokenTypeError(ServiceError):
-    code: str = ErrorData.BAD_REQUEST.code
-    message: str = ErrorData.BAD_REQUEST.message
-    http_status: int = ErrorData.BAD_REQUEST.http_status_code
-
-
 class UnauthorizedError(BaseAppError):
     code: str = ErrorData.UNAUTHORIZED.code
     message: str = ErrorData.UNAUTHORIZED.message

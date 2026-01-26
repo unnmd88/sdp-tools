@@ -7,7 +7,7 @@ from core.error_data import ErrorData
 from domain.enums.attrs_names import PublicAttrNamesEnum
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.violations import Violations
-from domain.exceptions.contract_violation_exc import DomainValidationError
+from domain._exceptions.contract_violation_exc import DomainValidationError
 from domain.users.business_rules import EMAIL_PATTERN
 
 

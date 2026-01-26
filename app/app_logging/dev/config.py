@@ -6,9 +6,9 @@ from pythonjsonlogger.json import JsonFormatter
 from core.config import BASE_DIR
 
 print(BASE_DIR)
-print(f"gg: {str(BASE_DIR)[1:].replace('/', '.')}.app_logging.dev.EnsureAsciiJsonFormatter")
-
-
+print(
+    f"gg: {str(BASE_DIR)[1:].replace('/', '.')}.app_logging.dev.EnsureAsciiJsonFormatter"
+)
 
 
 LOGGING_CONFIG = {
@@ -85,10 +85,10 @@ LOGGING_CONFIG = {
     },
     "formatters": {
         "json": {
-            '()': "app.app_logging.formatters.EnsureAsciiJsonFormatter",  # "{ "app_logging/dev/EnsureAsciiJsonFormatter"}",
+            "()": "app.app_logging.formatters.EnsureAsciiJsonFormatter",  # "{ "app_logging/dev/EnsureAsciiJsonFormatter"}",
             "format": "%(asctime)s %(levelname)s %(name)s %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
-            'ensure_ascii': False,
+            "ensure_ascii": False,
         },
         "simple": {
             "format": "%(levelname)s %(message)s %(asctime)s %(filename)s %(lineno)s",

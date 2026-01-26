@@ -50,6 +50,11 @@ class ErrorMessages(StrEnum):
     bad_telegram_username = "Неверный формат @username для telegram-аккаунта."
     description_must_be_lt_255 = "'Описание' должно быть не более 255 символов."
 
+    user_not_found = "Пользователь с {}={} не найден."
+    account_is_blocked = "Аккаунт пользователя с {}={} заблокирован."
+    has_not_access = "У пользователя с {}={} нет прав доступа."
+
+    invalid_token_type = "Неверный тип токена. Ожидается: {}."
     # username_length_range = value_str_length_range.format(
     #     MIN_LEN_USERNAME, MAX_LEN_USERNAME
     # )

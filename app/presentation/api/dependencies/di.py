@@ -11,19 +11,28 @@ from application.interfaces.repositories.users_repo_interface import (
     UsersRepositoryProtocol,
 )
 
-
 from application.interfaces.use_cases.create_user_use_case_interface import (
     CreateUserUseCaseProtocol,
+)
+from application.interfaces.use_cases.get_user_from_repo_by_jwt_use_case_interface import (
+    GetUserFromRepoByJWTUseCaseProtocol,
 )
 from application.interfaces.use_cases.user_login_and_issue_jwt_use_case_interface import (
     UserLoginAndIssueJWTUseCaseProtocol,
 )
+from application.services.get_user_from_repo_by_jwt_service import (
+    GetUserFromRepoByJWTService,
+)
 from application.use_cases.users.create_user_use_case import CreateUserUseCaseImpl
-from application.use_cases.users.decode_access_jwt_use_case import GetUserFromRepoByJWTUseCaseImpl
+from application.use_cases.users.get_user_from_repo_by_jwt_use_case import (
+    GetUserFromRepoByJWTUseCaseImpl,
+)
 from application.use_cases.users.refresh_jwt_use_case import RefreshJWTUseCaseImpl
 from core.config import settings
 
-from application.use_cases.users.user_login_and_issue_jwt_use_case import UserLoginAndIssueJWTUseCaseImpl
+from application.use_cases.users.user_login_and_issue_jwt_use_case import (
+    UserLoginAndIssueJWTUseCaseImpl,
+)
 from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
 
 from typing import Annotated
@@ -35,9 +44,12 @@ from starlette import status
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from domain.dto.users import GetUserFromRepoDTO
+from domain.dto.users import GetUserFromRepoDTO, UserDTO
 from domain.enums.unsorted import Roles, TokenTypesEnum
+from domain._exceptions.entity_not_found_exc import DomainEntityNotFoundError
+from domain._exceptions.permissions_exc import DomainInactiveUserError
 from infrastructure.auth.jwt.decode_jwt_service import DecodeJWTService
+from infrastructure.auth.jwt.jwt_service import BaseJWTService
 from infrastructure.database.api import db_api
 from infrastructure.database.passport_groups_repository import (
     PassportGroupsRepositorySqlAlchemy,
@@ -54,7 +66,6 @@ from presentation.schemas.jwt import PayloadAccessJWTSchema, PayloadRefreshJWTSc
 http_bearer = HTTPBearer()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=settings.login_url)
 db_session = Annotated[AsyncSession, Depends(db_api.session_getter)]
-
 
 
 # -- JWT, credentials and access-levels --
@@ -75,8 +86,8 @@ def get_jwt_payload_schema(
         ):
             return PayloadAccessJWTSchema(**payload)
         elif (
-                payload["typ"] == expected_token_type
-                and expected_token_type == TokenTypesEnum.refresh
+            payload["typ"] == expected_token_type
+            and expected_token_type == TokenTypesEnum.refresh
         ):
             return PayloadRefreshJWTSchema(**payload)
         else:
@@ -164,33 +175,40 @@ def get_tlo_sqlalchemy_repository(
 # -- use-cases --
 
 
+class GetUserFromRepoByJWTDep:
+    def __init__(
+        self,
+        *,
+        jwt_service: BaseJWTService = BaseJWTService(),
+        require_active: bool = True,
+        require_role: Roles | None = None,
+    ):
+        self.jwt_service = jwt_service
+        self.require_active = require_active
+        self.require_role = require_role
+
+    def __call__(
+        self,
+        user_repository: Annotated[
+            UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
+        ],
+    ) -> GetUserFromRepoByJWTUseCaseProtocol:
+        return GetUserFromRepoByJWTUseCaseImpl(
+            service=GetUserFromRepoByJWTService(
+                user_repository=user_repository,
+                jwt_service=self.jwt_service,
+                require_active=self.require_active,
+                require_role=self.require_role,
+            )
+        )
+
+
 def users_use_case(
     user_repository: Annotated[
         UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
     ],
 ) -> GetUserUseCaseImpl:
     return GetUserUseCaseImpl(user_repository=user_repository)
-
-
-def get_user_from_jwt_use_case(
-    decode_jwt_service: Annotated[DecodeJWTService, Depends()],
-    get_user_use_case: Annotated[GetUserUseCaseImpl, Depends(users_use_case)],
-) -> GetUserFromRepoByJWTUseCaseImpl:
-    return GetUserFromRepoByJWTUseCaseImpl(
-        decode_service=decode_jwt_service,
-        get_user_use_case=get_user_use_case,
-    )
-
-
-async def load_user_to_request_from_jwt(
-    request: Request,
-    token: Annotated[str, Depends(oauth2_scheme)],
-    get_user_from_jwt_use_case_instance: Annotated[GetUserFromRepoByJWTUseCaseImpl, Depends(get_user_from_jwt_use_case)],
-):
-    request.state.user = await get_user_from_jwt_use_case_instance(token)
-    return
-
-
 
 
 def create_user_use_case(
@@ -219,21 +237,4 @@ def get_refresh_jwt_use_case(
         UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
     ],
 ) -> RefreshJWTUseCaseImpl:
-    return RefreshJWTUseCaseImpl(
-        user_repository=user_repository
-    )
-
-
-async def get_user_entity_by_id(
-    payload_jwt: Annotated[
-        PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)
-    ],
-    users_crud: Annotated[GetUserUseCaseImpl, Depends(users_use_case)],
-):
-    dto = GetUserFromRepoDTO(customer=payload_jwt.user_id, subject=payload_jwt.user_id)
-    if (user_entity := await users_crud.get_user_by_username_or_id(dto)) is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Пользователь с id={payload_jwt.user_id!r} не найден.",
-        )
-    return user_entity
+    return RefreshJWTUseCaseImpl(user_repository=user_repository)

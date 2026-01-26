@@ -1,5 +1,5 @@
 from core.error_data import ErrorData
-from domain.exceptions.base import DomainError
+from domain._exceptions.base import DomainError
 
 
 class DomainEntityNotFoundError(DomainError):

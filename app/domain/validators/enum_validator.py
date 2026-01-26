@@ -5,7 +5,7 @@ from typing import Any
 from core.error_data import ErrorData
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.violations import Violations
-from domain.exceptions.contract_violation_exc import DomainValidationError
+from domain._exceptions.contract_violation_exc import DomainValidationError
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)

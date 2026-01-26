@@ -2,12 +2,7 @@
 Модуль, содержащий базовые исключения.
 """
 
-from core.error_data import ErrorData
 from core.exceptions import BaseAppError
-
-#
-# class ApplicationError(Exception):
-#     """Ошибка приложения."""
 
 
 class DomainError(BaseAppError):
@@ -16,6 +11,5 @@ class DomainError(BaseAppError):
     Все доменные исключения должны наследоваться от него.
     """
 
-    code: str = ErrorData.DOMAIN_ERROR.code
-    message: str = ErrorData.DOMAIN_ERROR.message
-    http_status: int = ErrorData.DOMAIN_ERROR.http_status_code
+    DEFAULT_CODE = "DOMAIN_ERROR"
+    DEFAULT_MESSAGE = "Ошибка домена"

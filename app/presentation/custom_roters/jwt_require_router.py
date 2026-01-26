@@ -6,22 +6,24 @@ from fastapi import Request, HTTPException
 from fastapi.routing import APIRoute
 from fastapi.security import OAuth2PasswordBearer
 from starlette import status
-from application.use_cases.users.decode_access_jwt_use_case import GetUserFromRepoByJWTUseCaseImpl
+from application.use_cases.users.get_user_from_repo_by_jwt_use_case import (
+    GetUserFromRepoByJWTUseCaseImpl,
+)
 from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
 from core.config import settings
-from domain.exceptions.entity_not_found_exc import DomainEntityNotFoundError
-from domain.exceptions.permissions_exc import DomainInactiveUserError
+from domain._exceptions.entity_not_found_exc import DomainEntityNotFoundError
+from domain._exceptions.permissions_exc import DomainInactiveUserError
 from infrastructure.auth.jwt.decode_jwt_service import DecodeJWTService
 from infrastructure.database.api import db_api
 from infrastructure.database.user_reposirory import UsersRepositorySqlAlchemy
-from presentation.api.dependencies.dependencies import oauth2_scheme
+from presentation.api.dependencies.di import oauth2_scheme
 from utils.extract_token import extract_token
 
 
 class JWTUserAPIRoute(APIRoute):
     """
     APIRoute, который автоматически добавляет пользователя в Request
-    на основе JWT токена
+    на основе JWT токена.
     """
 
     def __init__(
@@ -45,7 +47,9 @@ class JWTUserAPIRoute(APIRoute):
             async with db_api.session_factory() as session:
                 print(f"2222222  {self.active_user_require=}")
                 get_active_user_from_repo_use_case = GetUserFromRepoByJWTUseCaseImpl(
-                    get_user_use_case=GetUserUseCaseImpl(user_repository=UsersRepositorySqlAlchemy(session=session)),
+                    get_user_use_case=GetUserUseCaseImpl(
+                        user_repository=UsersRepositorySqlAlchemy(session=session)
+                    ),
                     decode_service=DecodeJWTService(),
                     require_active_user=self.active_user_require,
                 )
@@ -59,11 +63,16 @@ class JWTUserAPIRoute(APIRoute):
             response = await original_route_handler(request)
 
             if hasattr(request.state, "start_time"):
-                response.headers["X-Process-Time"] = str(time.perf_counter() - request.state.start_time)
+                response.headers["X-Process-Time"] = str(
+                    time.perf_counter() - request.state.start_time
+                )
 
             if hasattr(request.state, "is_authenticated"):
-                response.headers["X-Authenticated"] = str(request.state.is_authenticated)
+                response.headers["X-Authenticated"] = str(
+                    request.state.is_authenticated
+                )
             return response
+
         return custom_route_handler
 
 
@@ -82,7 +91,8 @@ def jwt_route_class_factory(
             endpoint: Callable,
             **kwargs,
         ):
-            super().__init__(path, endpoint, active_user_require=active_user_require, **kwargs)
-            # self.active_user_require = active_user_require
+            super().__init__(
+                path, endpoint, active_user_require=active_user_require, **kwargs
+            )
 
     return DynamicJWTUserAPIRoute

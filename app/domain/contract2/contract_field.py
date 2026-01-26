@@ -1,10 +1,8 @@
 from typing import Callable, Sequence, Any
 
 from domain.contract2.require import Require
-from domain.exceptions.contract_violation_exc import (
-    DomainContractViolationError,
-    DomainValidationError,
-)
+from domain.exceptions import DomainContractViolationError, DomainValidationError
+from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
 
 
 class ContractField:
@@ -44,31 +42,34 @@ class ContractField:
         ):
             return setattr(instance, self.name, value)
 
-        try:
-            if value is None and not self._nullable:
-                raise DomainValidationError(
-                    field_name=self._field_name,
+        if value is None and not self._nullable:
+            current_error_context = ContractViolationContextVO(
+                subject=f"{instance.__class__.__name__}",
+                field_name=self._field_name,
+                contract_code="nullable",
+                violation="Значение не может быть None",
+                message=f"Значение {self._field_name!r} не может быть пустым",
+                handler="check_nullable",
+            )
+            raise DomainValidationError(
+                message=current_error_context.message,
+                context=current_error_context
+            )
+        value = self._preprocess(value)
+        for require in self._requires:
+            if not require.handler(value):
+                current_error_context = ContractViolationContextVO(
                     subject=f"{instance.__class__.__name__}",
-                    value=value,
-                    contract_code="nullable",
-                    violation="nullable is not allowed",
-                    message=f"Значение {self._field_name!r} не может быть пустым",
+                    field_name=self._field_name,
+                    handler=f"{require.handler.__name__}",
+                    contract_code=require.contract,
+                    violation=require.violation,
+                    message=require.message,
                 )
-            value = self._preprocess(value)
-            for require in self._requires:
-                if not require.handler(value):
-                    raise DomainContractViolationError(
-                        subject=f"{instance.__class__.__name__}",
-                        field_name=self._field_name,
-                        handler=f"{require.handler.__name__}",
-                        value=value,
-                        contract_code=require.contract,
-                        violation=require.violation,
-                        message=require.message,
-                    )
-        except DomainContractViolationError as e:
-            e.subject = f"{instance.__class__.__name__}"
-            raise e
+                raise DomainContractViolationError(
+                    message=current_error_context.message,
+                    context=current_error_context
+                )
         if self._use_cache:
             self._cache.add(value)
             assert value in self._cache

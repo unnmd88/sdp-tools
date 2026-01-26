@@ -20,7 +20,7 @@ from presentation.api.api_v1.passports.schemas import (
     UpdatePassport,
     UpdatePassportSchemaSaveToDatabase,
 )
-from presentation.api.dependencies.dependencies import (
+from presentation.api.dependencies.di import (
     get_access_jwt_payload_schema,
     db_session,
 )

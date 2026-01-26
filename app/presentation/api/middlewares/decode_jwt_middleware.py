@@ -10,11 +10,14 @@ import time
 from starlette import status
 
 from application.services.exceptions import InvalidTokenTypeError, UnauthorizedError
-from application.use_cases.users.decode_access_jwt_use_case import GetUserFromRepoByJWTUseCaseImpl
+from application.use_cases.users.get_user_from_repo_by_jwt_use_case import (
+    GetUserFromRepoByJWTUseCaseImpl,
+)
 
 
 class JWTMiddleware(BaseHTTPMiddleware):
     """Middleware для проверки JWT токенов"""
+
     public_paths: Sequence[str] = (
         "/health",
         "/docs",
@@ -23,6 +26,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
         "login",
         "auth",
     )
+
     def __init__(self, app, public_paths: Sequence[str] = None):
         super().__init__(app)
 
@@ -31,38 +35,37 @@ class JWTMiddleware(BaseHTTPMiddleware):
         request: Request,
         call_next: Callable,
     ):
-        #TODO: добавить кеширование
+        # TODO: добавить кеширование
         if any(path in request.url.path for path in self.public_paths):
-            return  await call_next(request)
+            return await call_next(request)
         if (auth_header := request.headers.get("Authorization")) is None:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                content={"detail": "Требуется авторизация"}
+                content={"detail": "Требуется авторизация"},
             )
         try:
             token_type, token = auth_header.split(" ")
         except Exception:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                content={"detail": "Требуется авторизация"}
+                content={"detail": "Требуется авторизация"},
             )
         if token_type != "Bearer":
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                content={"detail": "Требуется авторизация"}
+                content={"detail": "Требуется авторизация"},
             )
         if not token:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                content={"detail": "Требуется авторизация"}
+                content={"detail": "Требуется авторизация"},
             )
         use_case = GetUserFromRepoByJWTUseCaseImpl()
         try:
             request.state.user = use_case(access_token=token)
         except (InvalidTokenTypeError, UnauthorizedError) as e:
             return JSONResponse(
-                status_code=e.status_code,
-                content={"detail": e.message}
+                status_code=e.status_code, content={"detail": e.message}
             )
             # raise HTTPException(
             #     status_code=e.status_code,
@@ -98,6 +101,3 @@ class JWTMiddleware(BaseHTTPMiddleware):
     #         return token
     #
     #     return None
-
-
-

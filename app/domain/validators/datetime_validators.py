@@ -1,11 +1,15 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+from core.error_data import ErrorData
 from domain.enums.attrs_names import PublicAttrNamesEnum
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.violations import Violations
-from domain.exceptions.contract_violation_exc import DomainValidationError
+from domain.exceptions import DomainValidationError
 
+
+# from domain._exceptions.contract_violation_exc import DomainValidationError
+#
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DatetimeValidators:
@@ -13,7 +17,7 @@ class DatetimeValidators:
 
     def __call__(self, value: datetime) -> datetime:
         if isinstance(value, datetime):
-            return True
+            return value
         raise DomainValidationError(
             field_name=self.field_name,
             handler=repr(self.__class__.__name__),

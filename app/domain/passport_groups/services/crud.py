@@ -5,7 +5,7 @@ from application.interfaces.repositories.passport_groups import (
 )
 from domain.dto.passport_groups import CreatePassportGroupDTO, UpdatePassportGroupDTO
 from domain.enums import Permissions
-from domain.exceptions.crud import CreateError, UpdateError
+from domain._exceptions.crud import CreateError, UpdateError
 from domain.passport_groups.entities.passport_group import PassportGroupEntity
 from domain.utils import not_none_dataclass_instance_attrs_to_dict
 

@@ -10,8 +10,8 @@ from domain.dto.common import (
     ToUpdateRecordDTO,
 )
 from domain.enums import Permissions
-from domain.exceptions.base import DomainValidationError
-from domain.exceptions.crud import CreateError, CreateErrorAlreadyExists, UpdateError
+from domain._exceptions.base import DomainValidationError
+from domain._exceptions.crud import CreateError, CreateErrorAlreadyExists, UpdateError
 from domain.regions.entities.region import RegionEntity
 
 

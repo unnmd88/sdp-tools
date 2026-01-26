@@ -2,7 +2,7 @@ from typing import Protocol
 
 
 class PasswordServiceProtocol(Protocol):
-    """ Протокол сервиса для работы с паролями. """
+    """Протокол сервиса для работы с паролями."""
 
     @classmethod
     def hash_password(cls, password: str) -> bytes: ...

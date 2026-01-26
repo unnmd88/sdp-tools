@@ -4,8 +4,8 @@ from core.error_data import ErrorData
 from domain.enums.attrs_names import PrivateAttrNamesEnum
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.violations import Violations
-from domain.exceptions.base import DomainError
-from domain.exceptions.contract_violation_exc import (
+from domain._exceptions.base import DomainError
+from domain._exceptions.contract_violation_exc import (
     DomainValidationError,
     DomainBusinessRuleError,
 )

@@ -32,9 +32,6 @@ class RefreshJWTPayloadDTO:
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class AccessJWTPayloadDTO(RefreshJWTPayloadDTO):
-
     role: str | Roles
     organization: str | Organizations
     email: str | None
-
-

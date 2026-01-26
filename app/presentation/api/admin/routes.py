@@ -4,7 +4,7 @@ from domain.dto.users import CreateUserDTO, SearchUsersDTO
 
 
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
-from presentation.api.dependencies.deps import (
+from presentation.api.dependencies.ioc import (
     IsSuperuser,
     PayloadAccessJWT,
     UsersUseCase,

@@ -21,12 +21,16 @@ class DecodeJWTService:
         try:
             decoded_jwt = self.jwt_service.decode_jwt(access_token)
             if decoded_jwt.typ != TokenTypesEnum.access:
-                logger.info("Неверный тип токена. Необходим access-токен. Payload: %r", decoded_jwt)
-                raise InvalidTokenTypeError(message="Неверный тип токена. Необходим refresh-токен")
+                logger.info(
+                    "Неверный тип токена. Необходим access-токен. Payload: %r",
+                    decoded_jwt,
+                )
+                raise InvalidTokenTypeError(
+                    message="Неверный тип токена. Необходим refresh-токен"
+                )
             return decoded_jwt
         except ExpiredSignatureError:
             raise UnauthorizedError(message="Срок действия токена истек.")
         except (DecodeError, InvalidTokenError):
             logger.info("Неверный токен. Payload: %r", access_token)
             raise UnauthorizedError(message="Неверный токен.")
-

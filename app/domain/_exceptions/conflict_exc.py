@@ -1,6 +1,6 @@
 from core.http_codes import HTTP_409_CONFLICT
 from core.error_data import ErrorCodes
-from domain.exceptions.base import DomainError
+from domain._exceptions.base import DomainError
 
 
 class DomainConflictError(DomainError):

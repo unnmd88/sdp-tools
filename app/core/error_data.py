@@ -1,6 +1,6 @@
 from core.http_codes import *
 
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import NamedTuple
 
 
@@ -59,6 +59,12 @@ class ErrorData(Enum):
     DOMAIN_ERROR = Error(
         code="domain_error",
         message="Ошибка бизнес-логики",
+        http_status_code=HTTP_400_BAD_REQUEST,
+    )
+
+    DOMAIN_CONTRACT_VIOLATION = Error(
+        code="domain_contract_violation",
+        message="Нарушение контракта домена",
         http_status_code=HTTP_400_BAD_REQUEST,
     )
 
@@ -185,11 +191,23 @@ class ErrorData(Enum):
         http_status_code=HTTP_405_METHOD_NOT_ALLOWED,
     )
 
+    USER_CASE_ERROR = Error(
+        code="use_case_error",
+        message="Ошибка выполнения сценария",
+        http_status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+    )
+
     # ==================== ИНФРАСТРУКТУРНЫЕ ОШИБКИ ====================
     INFRASTRUCTURE_ERROR = Error(
         code="infrastructure_error",
         message="Ошибка инфраструктуры",
         http_status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+    )
+
+    TOKEN_ERROR = Error(
+        code="infrastructure_error",
+        message="Ошибка токена",
+        http_status_code=HTTP_401_UNAUTHORIZED,
     )
 
     DATABASE_ERROR = Error(
@@ -248,6 +266,12 @@ class ErrorData(Enum):
     INVALID_JSON = Error(
         code="invalid_json",
         message="Невалидный JSON",
+        http_status_code=HTTP_400_BAD_REQUEST,
+    )
+
+    INVALID_TOKEN_TYPE = Error(
+        code="invalid_token_type",
+        message="Неверный тип токена",
         http_status_code=HTTP_400_BAD_REQUEST,
     )
 

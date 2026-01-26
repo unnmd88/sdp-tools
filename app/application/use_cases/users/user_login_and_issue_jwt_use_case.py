@@ -22,7 +22,6 @@ logger = logging.getLogger(AUTH_LOGGER)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UserLoginAndIssueJWTUseCaseImpl:
-
     user_repository: UsersRepositoryProtocol
     user_password_service: type[PasswordServiceProtocol] = BcryptPasswordService
     jwt_service: BaseJWTService = BaseJWTService

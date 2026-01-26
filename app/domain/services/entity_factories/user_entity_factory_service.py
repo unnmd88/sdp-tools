@@ -25,7 +25,7 @@ from domain.enums.unsorted import (
     Roles,
 )
 from domain.enums.violations import Violations
-from domain.exceptions.contract_violation_exc import (
+from domain._exceptions.contract_violation_exc import (
     DomainValidationError,
     DomainContractViolationError,
     DomainBusinessRuleError,
