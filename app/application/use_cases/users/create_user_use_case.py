@@ -3,25 +3,15 @@ import logging
 from dataclasses import dataclass
 
 from app_logging.dev.config import USERS_LOGGER
-from application.interfaces.repositories.users_repo_interface import (
-    UsersRepositoryProtocol,
-)
+from application.dto.users import CreateUserDTO
 
-from application.interfaces.services.entity_factories.base_entity_factory_interface import (
-    EntityFactoryServiceProtocol,
-)
 from application.interfaces.services.password_service_interface import (
     PasswordServiceProtocol,
 )
-
-from domain.dto.users import CreateUserDTO
 from domain.enums.unsorted import Organizations, Roles
 
-from domain._exceptions.users import UserPermissionsError
-from domain.services.entity_factories.user_entity_factory_service import (
-    UserEntityFactoryService,
-)
-from domain.users.entities.user import UserEntity
+from domain.entities.user import UserEntity
+from domain.repositories.users_repo_interface import UsersRepositoryProtocol
 
 from infrastructure.auth.password_service import BcryptPasswordService, hash_password
 
@@ -34,7 +24,7 @@ class CreateUserUseCaseImpl:
 
     user_repository: UsersRepositoryProtocol
     # get_user_use_case: GetUserUseCaseProtocol
-    user_factory: type[EntityFactoryServiceProtocol] = UserEntityFactoryService
+    # user_factory: type[EntityFactoryServiceProtocol] = UserEntityFactoryService
     user_password_service: type[PasswordServiceProtocol] = BcryptPasswordService
 
     async def __call__(self, create_user_dto: CreateUserDTO) -> UserEntity:
@@ -76,7 +66,7 @@ class CreateUserUseCaseImpl:
             logger.info("%s: %r", e, create_user_dto.password)
             raise
         user_already_exists: UserEntity = (
-            await self.get_user_use_case.get_user_by_username_or_none(
+            await self.get_user_use_case.get_user_by_username(
                 create_user_dto.username
             )
         )

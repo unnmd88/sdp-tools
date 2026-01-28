@@ -1,8 +1,5 @@
 from fastapi import APIRouter, status, HTTPException
 
-from domain.dto.users import CreateUserDTO, SearchUsersDTO
-
-
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
 from presentation.api.dependencies.ioc import (
     IsSuperuser,
@@ -69,8 +66,8 @@ async def whoami(
 )
 async def create_user(
     jwt_payload: PayloadAccessJWT,
-    new_user: CreateUserSchema,
-    use_case: CreateUserUseCase,
+    # new_user: CreateUserSchema,
+    # use_case: CreateUserUseCase,
 ):
     create_model_fields = new_user.model_dump()
     create_model_fields.update(customer=jwt_payload.sub)

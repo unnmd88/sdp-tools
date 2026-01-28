@@ -3,12 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException
 from starlette import status
 
-from application.services.exceptions import (
-    UnauthorizedError,
-    ForbiddenError,
-    InvalidTokenTypeError,
-)
-from domain.dto.auth import UserAuthDTO
+from application.dto.auth import UserAuthDTO
+from application.exceptions import AuthenticationError
 from presentation.api.api_v1.documentation.auth_and_jwt.endpoints import (
     POST_LOGIN_user,
     POST_REFRESH,
@@ -16,14 +12,12 @@ from presentation.api.api_v1.documentation.auth_and_jwt.endpoints import (
 from presentation.api.dependencies.di import oauth2_scheme
 from presentation.api.dependencies.ioc import (
     AuthForm,
-    PayloadRefreshJWT,
     LoginAndIssueJWTUseCase,
     RefreshJWTUseCase,
     # RefreshJWTUseCase
 )
 from fastapi.params import Depends
 
-from presentation.api.exceptions import InactiveUserException
 from presentation.schemas.jwt import TokenInfo
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -45,14 +39,13 @@ async def login_and_issue_jwt(
         password=auth_schema.password,
     )
     try:
-        return await use_case(auth_data=auth_dto)
-    except UnauthorizedError:
+        return await use_case(auth_dto=auth_dto)
+    except AuthenticationError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Неверный логин или пароль.",
         )
-    except ForbiddenError:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
 
 
 @router.post(

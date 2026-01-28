@@ -5,11 +5,9 @@ import pytest
 from domain.enums import EntityIdRange
 from domain.enums import Organizations
 from domain.enums import Roles
-from domain.users.entities.user import UserEntity
+from domain.entities.user import UserEntity
 from domain._exceptions.base import DomainValidationError
 from tests.utils.create_user_entity import create_user_entity
-
-from contextlib import nullcontext
 
 
 class TestUserEntity:

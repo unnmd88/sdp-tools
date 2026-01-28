@@ -1,12 +1,6 @@
 from enum import StrEnum
 
-from domain.users.business_rules import (
-    MIN_LEN_USERNAME,
-    MAX_LEN_USERNAME,
-    MAX_LEN_FIRSTNAME,
-    MIN_LEN_LASTNAME,
-    MAX_LEN_LASTNAME,
-    MIN_LEN_FIRSTNAME,
+from domain.business_rules import (
     MIN_ID,
     MAX_ID,
     MIN_LEN_PASSWORD,
@@ -55,6 +49,10 @@ class ErrorMessages(StrEnum):
     has_not_access = "У пользователя с {}={} нет прав доступа."
 
     invalid_token_type = "Неверный тип токена. Ожидается: {}."
+    unknown_token_type = "Неизвестный тип токена: {}."
+
+    invalid_username_or_password = "Неверное имя пользователя или пароль."
+    inactive_user = "Пользователь неактивен."
     # username_length_range = value_str_length_range.format(
     #     MIN_LEN_USERNAME, MAX_LEN_USERNAME
     # )

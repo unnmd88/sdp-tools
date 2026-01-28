@@ -4,7 +4,7 @@ import string
 
 import bcrypt
 
-from domain.users.business_rules import MIN_LEN_PASSWORD, MAX_LEN_PASSWORD
+from domain.business_rules import MIN_LEN_PASSWORD, MAX_LEN_PASSWORD
 
 
 class BcryptPasswordService:

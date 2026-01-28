@@ -1,39 +1,15 @@
-from typing import Annotated
+from fastapi import APIRouter, status, HTTPException
 
-from fastapi import APIRouter, status, HTTPException, Request
-from fastapi.params import Depends
 
-from application.use_cases.exceptions import UseCaseError
-from domain.dto.users import (
-    CreateUserDTO,
-    UpdateUserDTO,
-    GetUserFromRepoDTO,
-    SearchUsersDTO,
-    ChangeUserPasswordDTO,
-)
-
-from domain.enums.unsorted import Roles
-
-from domain._exceptions.users import UserPermissionsError
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
-from presentation.api.dependencies.di import oauth2_scheme
 from presentation.api.dependencies.ioc import (
     UsersUseCase,
     PayloadAccessJWT,
-    IsSuperuser,
-    BEARER_TOKEN,
-    GetActiveUserFromRepoByJWTUseCase,
-)
-from presentation.custom_roters.jwt_require_router import (
-    JWTUserAPIRoute,
-    jwt_route_class_factory,
+    BEARER_TOKEN, access_jwt,
 )
 
 from presentation.schemas.users import (
-    CreateUserSchema,
     ResponseUserSchema,
-    UpdateUserSchema,
-    ChangeUserPasswordBaseSchema,
     ChangeUserPasswordResponse,
     ChangePasswordMyselfSchema,
 )
@@ -41,7 +17,7 @@ from presentation.schemas.users import (
 router = APIRouter(
     prefix="/user",
     tags=["Users"],
-    dependencies=[BEARER_TOKEN],
+    # dependencies=[BEARER_TOKEN],
 )
 
 # require_active_user_router = APIRouter(
@@ -55,25 +31,16 @@ router = APIRouter(
 @router.get(
     "/whoami/",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseUserSchema,
+    # response_model=ResponseUserSchema,
     summary="Данные о пользователе из access jwt",
     description=GET_whoami,
 )
-async def whoami(
-    token: BEARER_TOKEN,
-    use_case: GetActiveUserFromRepoByJWTUseCase,
-):
-    try:
-        user_dto = await use_case(access_token=token)
-        return ResponseUserSchema.model_validate(
-            user_dto,
-            from_attributes=True,
-        )
-    except UseCaseError as e:
-        raise HTTPException(
-            status_code=e.http_status,
-            detail=e.message,
-        )
+async def whoami(token_dto: access_jwt):
+    return token_dto
+    return ResponseUserSchema.model_validate(
+        token_dto,
+        from_attributes=True,
+    )
 
 
 @router.patch(
@@ -83,9 +50,9 @@ async def whoami(
     # dependencies=[IsSuperuser],
 )
 async def update_user(
-    payload_jwt: PayloadAccessJWT,
-    to_update: UpdateUserSchema,
-    use_case: UsersUseCase,
+    # payload_jwt: PayloadAccessJWT,
+    # to_update: UpdateUserSchema,
+    # use_case: UsersUseCase,
 ):
     upd_user_dto = UpdateUserDTO(
         **to_update.model_dump()

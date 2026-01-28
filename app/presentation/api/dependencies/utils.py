@@ -1,5 +1,5 @@
 # from domain.dto.filters import FiltersForSearchDTO
-from domain.dto.common import FiltersForSearchDTO
+from application.dto.common import FiltersForSearchDTO
 
 
 def get_filters_for_region_or_name_search(

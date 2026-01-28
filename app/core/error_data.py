@@ -141,6 +141,12 @@ class ErrorData(Enum):
         http_status_code=HTTP_422_UNPROCESSABLE_ENTITY,
     )
 
+    INACTIVE_ACCOUNT = Error(
+        code="inactive_account",
+        message="Аккаунт не активен",
+        http_status_code=HTTP_403_FORBIDDEN,
+    )
+
     UNAUTHORIZED = Error(
         code="unauthorized",
         message="Не авторизован",
@@ -148,7 +154,9 @@ class ErrorData(Enum):
     )
 
     FORBIDDEN = Error(
-        code="forbidden", message="Доступ запрещен", http_status_code=HTTP_403_FORBIDDEN
+        code="forbidden",
+        message="Доступ запрещен",
+        http_status_code=HTTP_403_FORBIDDEN,
     )
 
     NOT_FOUND = Error(
@@ -205,8 +213,14 @@ class ErrorData(Enum):
     )
 
     TOKEN_ERROR = Error(
-        code="infrastructure_error",
+        code="token_error",
         message="Ошибка токена",
+        http_status_code=HTTP_401_UNAUTHORIZED,
+    )
+
+    ROTTEN_TOKEN_ERROR = Error(
+        code="rotten_token_error",
+        message="Срок действия токена истек",
         http_status_code=HTTP_401_UNAUTHORIZED,
     )
 

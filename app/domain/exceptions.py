@@ -37,3 +37,10 @@ class DomainInvariantError(DomainContractViolationError):
 
     DEFAULT_CODE = ErrorData.DOMAIN_INVARIANT_VIOLATION.code
     DEFAULT_MESSAGE = ErrorData.DOMAIN_INVARIANT_VIOLATION.message
+
+
+class DomainEntityNotFoundError(DomainContractViolationError):
+    """ Сущность не найдена. """
+
+    DEFAULT_CODE = ErrorData.ENTITY_NOT_FOUND.code
+    DEFAULT_MESSAGE = ErrorData.ENTITY_NOT_FOUND.message

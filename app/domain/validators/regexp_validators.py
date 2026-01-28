@@ -4,12 +4,14 @@ from core.error_data import ErrorData
 from domain.enums.attrs_names import PublicAttrNamesEnum
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.violations import Violations
-from domain._exceptions.contract_violation_exc import DomainValidationError
-from domain.users.business_rules import (
+
+from domain.business_rules import (
     EMAIL_PATTERN,
     PHONE_NUMBER_PATTERN,
     TELEGRAM_PATTERN,
 )
+from domain.exceptions import DomainValidationError
+from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
 
 
 class RegexpValidator:
@@ -48,7 +50,7 @@ class RegexpValidator:
         else:
             violation = self._regexp_violation
             message = ErrorMessages.invalid_format.format(self._field_name, value)
-        raise DomainValidationError(
+        ctx = ContractViolationContextVO(
             field_name=self._field_name,
             handler=self.__class__.__name__,
             contract_code=self._regexp_contract_code,
@@ -56,6 +58,8 @@ class RegexpValidator:
             value=value,
             message=message,
         )
+        raise DomainValidationError(context=ctx)
+
 
     def __repr__(self) -> str:
         return (

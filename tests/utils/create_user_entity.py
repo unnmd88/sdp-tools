@@ -5,7 +5,7 @@ from domain.enums import (
     Organizations,
     Roles,
 )
-from domain.users.entities.user import UserEntity
+from domain.entities.user import UserEntity
 
 
 def create_user_entity(

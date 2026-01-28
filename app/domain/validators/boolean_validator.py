@@ -1,14 +1,12 @@
-import re
 from collections.abc import Container
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from core.error_data import ErrorData
-from domain.enums.attrs_names import PublicAttrNamesEnum
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.violations import Violations
-from domain._exceptions.contract_violation_exc import DomainValidationError
-from domain.users.business_rules import EMAIL_PATTERN
+from domain.exceptions import DomainValidationError
+from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)
@@ -20,11 +18,13 @@ class BooleanValidator:
         if isinstance(value, bool) or (value in self.allowed_like_bool):
             return bool(value)
         msg = ErrorMessages.expected_bool.format(self.field_name)
-        raise DomainValidationError(
+        ctx = ContractViolationContextVO(
             field_name=self.field_name,
-            handler=self.__class__.__name__,
+            handler=f"{self.__class__.__name__}:{self.__call__.__name__}",
             contract_code=ErrorData.DOMAIN_VALIDATION.code,
             violation=Violations.invalid_type,
             value=msg,
             message=msg,
         )
+        raise DomainValidationError(context=ctx)
+

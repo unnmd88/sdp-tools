@@ -2,14 +2,10 @@ import logging
 from dataclasses import dataclass
 
 from app_logging.dev.config import USERS_LOGGER
-from application.interfaces.repositories.users_repo_interface import (
-    UsersRepositoryProtocol,
-)
-from domain._exceptions.entity_not_found_exc import DomainEntityNotFoundError
-from domain._exceptions.permissions_exc import DomainInactiveUserError
 
-from domain.users.entities.user import UserEntity
-
+from domain.entities.user import UserEntity
+from domain.exceptions import DomainEntityNotFoundError
+from domain.repositories.users_repo_interface import UsersRepositoryProtocol
 
 logger = logging.getLogger(USERS_LOGGER)
 
@@ -19,12 +15,12 @@ class GetUserUseCaseImpl:
     user_repository: UsersRepositoryProtocol
 
     async def get_user_by_username_or_none(self, username: str) -> UserEntity | None:
-        return await self.user_repository.get_user_by_id_or_username_or_none(username)
+        return await self.user_repository.get_by_username(username)
 
     async def get_user_by_username_or_raise(self, username: str) -> UserEntity:
         user: (
             UserEntity | None
-        ) = await self.user_repository.get_user_by_id_or_username_or_none(username)
+        ) = await self.user_repository.get_by_username(username)
         if user is None:
             raise DomainEntityNotFoundError(
                 message=f"Пользователь {username!r} не найден."

@@ -2,8 +2,8 @@ import logging
 from collections.abc import Sequence
 
 from app_logging.dev.config import COMMON_LOGGER
-from application.interfaces.repositories.regions import RegionsRepositoryProtocol
-from domain.dto.common import (
+from domain.repositories import RegionsRepositoryProtocol
+from application.dto.common import (
     FiltersForSearchDTO,
     CreateRecordDTO,
     UpdatedRecordDTO,
@@ -23,7 +23,7 @@ class RegionsServiceImpl:
 
     async def get_region_by_id_or_none(self, _id: int) -> RegionEntity:
         self.user_entity.access_control_read_region()
-        return await self.repository.get_one_by_id_or_none(_id)
+        return await self.repository.get_by_id(_id)
 
     async def get_region_by_filters_or_none(
         self, filters_dto: FiltersForSearchDTO

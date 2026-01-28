@@ -19,7 +19,7 @@ from presentation.schemas.regions import (
     RegionSchemaResponse,
     RegionUpdate,
 )
-from domain.dto.common import FiltersForSearchDTO, ToUpdateRecordDTO, CreateRecordDTO
+from application.dto.common import FiltersForSearchDTO, ToUpdateRecordDTO, CreateRecordDTO
 
 router = APIRouter(
     prefix="/regions",

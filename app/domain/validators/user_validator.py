@@ -2,12 +2,8 @@ from core.error_data import ErrorData
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.attrs_names import PublicAttrNamesEnum
 from domain.enums.violations import Violations
-from domain._exceptions.base import DomainError
-from domain._exceptions.contract_violation_exc import (
-    DomainValidationError,
-    DomainBusinessRuleError,
-)
-from domain.users.business_rules import (
+
+from domain.business_rules import (
     MIN_LEN_FIRSTNAME,
     MAX_LEN_FIRSTNAME,
     MIN_LEN_USERNAME,
@@ -15,6 +11,8 @@ from domain.users.business_rules import (
     MIN_LEN_LASTNAME,
     MAX_LEN_LASTNAME,
 )
+from domain.exceptions import DomainError, DomainValidationError, DomainBusinessRuleError
+from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
 
 
 class UserEntityValidator:
@@ -54,15 +52,16 @@ class UserEntityValidator:
             if not rule
             else ErrorData.BUSINESS_RULE_VIOLATION.code
         )
-        raise exc(
+        ctx = ContractViolationContextVO(
             field_name=field_name,
-            handler=repr(cls.username.__name__),
+            handler=f"{cls.__name__}:{cls.username.__name__}",
             contract_code=contract_code,
             violation=violation,
             rule=rule,
             value=value,
             message=message,
         )
+        raise exc(context=ctx)
 
     @classmethod
     def first_name_or_lastname(
@@ -95,14 +94,15 @@ class UserEntityValidator:
             )
         else:
             raise DomainError
-        raise DomainValidationError(
+        ctx = ContractViolationContextVO(
             field_name=field_name,
-            handler=handler,
+            handler=f"{cls.__name__}:{handler}",
             contract_code=ErrorData.DOMAIN_VALIDATION.code,
             violation=violation,
             value=value,
             message=message,
         )
+        raise DomainValidationError(context=ctx)
 
     @classmethod
     def firstname(cls, value: str) -> bool:

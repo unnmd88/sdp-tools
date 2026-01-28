@@ -26,7 +26,7 @@ class GeneralPurposeValidator:
         context = ContractViolationContextVO(
             field_name=field_name,
             subject=subject,
-            handler=repr(cls.pk_id.__name__),
+            handler=f"{cls.__name__!r}:{cls.pk_id.__name__!r}",
             contract_code=ErrorData.DOMAIN_TYPE_VALIDATION.code,
             violation=violation,
             value=value,

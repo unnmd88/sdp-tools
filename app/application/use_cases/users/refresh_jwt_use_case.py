@@ -4,23 +4,14 @@ from dataclasses import dataclass
 from jwt import ExpiredSignatureError
 
 from app_logging.dev.config import AUTH_LOGGER
-from application.interfaces.repositories.users_repo_interface import (
-    UsersRepositoryProtocol,
-)
+from application.dto.jwt_dto import TokenDataDTO
 
-from application.services.exceptions import (
-    UnauthorizedError,
-    ForbiddenError,
-)
-from application.use_cases.exceptions import UseCaseError
 from domain.enums.validation_err_messages import ErrorMessages
-from infrastructure.auth.exceptions import InvalidTokenTypeError
-from infrastructure.auth.jwt.jwt_service import BaseJWTService
+from domain.repositories.users_repo_interface import UsersRepositoryProtocol
+from infrastructure.auth.jwt.jwt_service import JWTService
 
-from domain.dto.jwt_dto import TokenDataDTO
-from domain.dto.users import UserDTO
 from domain.enums.unsorted import TokenTypesEnum
-from domain.users.entities.user import UserEntity
+from domain.entities.user import UserEntity
 
 logger = logging.getLogger(AUTH_LOGGER)
 
@@ -28,7 +19,7 @@ logger = logging.getLogger(AUTH_LOGGER)
 @dataclass(frozen=True, slots=True, kw_only=True)
 class RefreshJWTUseCaseImpl:
     user_repository: UsersRepositoryProtocol
-    jwt_service: BaseJWTService = BaseJWTService
+    jwt_service: JWTService = JWTService
 
     async def __call__(self, refresh_jwt: bytes) -> TokenDataDTO:
         try:

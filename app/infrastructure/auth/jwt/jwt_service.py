@@ -1,41 +1,56 @@
 import datetime
+import logging
 from datetime import datetime as dt, timedelta as td
+from functools import lru_cache
+from pathlib import Path
 from typing import AnyStr
 
 import jwt
 
-from infrastructure.auth.exceptions import InvalidTokenTypeError, RottenTokenError
-from infrastructure.auth.jwt.rules import JWTExpireRules, JWTSecurityRules
-from domain.dto.jwt_dto import TokenDataDTO, AccessJWTPayloadDTO, RefreshJWTPayloadDTO
-from domain.dto.users import UserDTO
+from app_logging.dev.config import INFRASTRUCTURE
+from application.dto.jwt_dto import AccessJWTPayloadDTO, RefreshJWTPayloadDTO, TokenDataDTO
+from application.dto.users import UserDTO
+from domain.enums.validation_err_messages import ErrorMessages
+from domain.value_objects.token_error_context_vo import TokenErrorContextVO
+from infrastructure.auth.exceptions import  RottenTokenError
 from domain.enums.unsorted import TokenTypesEnum, Organizations, Roles
+from infrastructure.exceptions import TokenError
 
 
-security_rules = JWTSecurityRules()
-expire_rules = JWTExpireRules()
+logger = logging.getLogger(INFRASTRUCTURE)
 
 
-class BaseJWTService:
-    expire_minutes_access_token: int = expire_rules.expire_minutes_access_token
-    expire_days_refresh_token: int = expire_rules.expire_days_refresh_token
-    public_key = security_rules.public_key_path.read_text(encoding="utf-8")
-    algorithm = security_rules.algorithm
+class JWTService:
 
-    @classmethod
+    def __init__(
+        self,
+        *,
+        expire_minutes_access_token: int,
+        expire_days_refresh_token: int,
+        public_key: Path | str,
+        private_key: Path | str,
+        algorithm: str,
+    ):
+        self._public_key = self._load_key(public_key)
+        self._private_key = self._load_key(private_key)
+        self._expire_minutes_access_token = expire_minutes_access_token
+        self._expire_days_refresh_token = expire_days_refresh_token
+        self._algorithm = algorithm
+
+    @staticmethod
+    @lru_cache(maxsize=4)
+    def _load_key(key: Path | str) -> str:
+        if isinstance(key, Path):
+            return key.resolve().read_text(encoding="utf-8")
+        return key
+
     def encode_jwt(
-        cls,
+        self,
         *,
         user_dto: UserDTO,
         token_type: TokenTypesEnum,
-        expire_minutes: int = None,
-        expire_days: int | None = None,
     ) -> str:
         now = dt.now(datetime.UTC)
-        if expire_minutes is not None:
-            expire = now + td(minutes=expire_minutes)
-        else:
-            expire = now + td(days=expire_days)
-        service_data = {"exp": expire, "iat": now, "typ": token_type}
         if token_type == TokenTypesEnum.access:
             payload = AccessJWTPayloadDTO(
                 user_id=user_dto.id,
@@ -43,106 +58,131 @@ class BaseJWTService:
                 role=user_dto.role,
                 organization=user_dto.organization,
                 email=user_dto.email,
-                **service_data,
+                iat=now,
+                exp=now + td(minutes=self._expire_minutes_access_token),
+                typ=token_type,
             )
-            assert payload.typ == TokenTypesEnum.access, "Тип токена должен быть access"
         elif token_type == TokenTypesEnum.refresh:
             payload = RefreshJWTPayloadDTO(
                 user_id=user_dto.id,
                 sub=user_dto.username,
-                **service_data,
-            )
-            assert payload.typ == TokenTypesEnum.refresh, (
-                "Тип токена должен быть refresh"
+                iat=now,
+                exp=now + td(days=self._expire_days_refresh_token),
+                typ=token_type,
             )
         else:
-            # TODO: добавить логирование!
-            raise ValueError(f"Неизвестный тип токена: {token_type!r}.")
+            ctx = TokenErrorContextVO(
+                token_type=token_type,
+                subject=self.__class__.__name__,
+                handler=self.encode_jwt.__name__,
+                internal_message=ErrorMessages.unknown_token_type.format(token_type),
+                message=ErrorMessages.invalid_token_type.format(token_type),
+            )
+            exc = TokenError(
+                context=ctx,
+                message=ctx.message,
+            )
+            logger.warning(exc.to_dict())
+            raise exc
+        try:
+            return jwt.encode(
+                payload=payload.to_dict(),
+                key=self._private_key,
+                algorithm=self._algorithm,
+            )
+        except jwt.exceptions.PyJWTError as e:
+            ctx = TokenErrorContextVO(
+                token_type=token_type,
+                subject=self.__class__.__name__,
+                handler=self.encode_jwt.__name__,
+                internal_message=str(e),
+            )
+            exc = TokenError(
+                context=ctx,
+                message=ctx.message,
+            )
+            logger.error(exc.to_dict())
+            raise exc
 
-        return jwt.encode(
-            payload=payload.to_dict(),
-            key=security_rules.private_key_path.read_text(encoding="utf-8"),
-            algorithm=cls.algorithm,
-        )
-
-    @classmethod
-    def decode_jwt(cls, token: AnyStr) -> AccessJWTPayloadDTO | RefreshJWTPayloadDTO:
+    def decode_jwt(self, token: AnyStr) -> AccessJWTPayloadDTO | RefreshJWTPayloadDTO:
         try:
             decoded_jwt = jwt.decode(
                 jwt=token,
-                key=cls.public_key,
-                algorithms=[cls.algorithm],
+                key=self._public_key,
+                algorithms=[self._algorithm],
             )
-        except jwt.PyJWTError:
+        except jwt.ExpiredSignatureError:
             raise RottenTokenError
+        except jwt.PyJWTError as e:
+            ctx = TokenErrorContextVO(
+                token=token,
+                subject=self.__class__.__name__,
+                handler=self.decode_jwt.__name__,
+                internal_message=str(e),
+            )
+            exc = TokenError(context=ctx)
+            logger.error(exc.to_dict())
+            raise exc
         try:
             token_type = decoded_jwt["typ"]
         except KeyError:
-            # TODO: добавить логирование
-            raise KeyError("Не найден тип токена в токене при декодировании!!")
+            ctx = TokenErrorContextVO(
+                token=token,
+                subject=self.__class__.__name__,
+                handler=self.decode_jwt.__name__,
+                internal_message="Не найдено поле 'typ' в токене при декодировании",
+            )
+            exc = TokenError(context=ctx)
+            logger.error(exc.to_dict())
+            raise exc
         if token_type == TokenTypesEnum.access:
             dto = AccessJWTPayloadDTO
         elif token_type == TokenTypesEnum.refresh:
             dto = RefreshJWTPayloadDTO
         else:
-            # TODO: добавить логирование
-            raise TypeError(f"Неизвестный тип токена: {token_type}")
+            ctx = TokenErrorContextVO(
+                token=token,
+                token_type=token_type,
+                subject=self.__class__.__name__,
+                handler=self.decode_jwt.__name__,
+                internal_message=f"Недопустимый тип токена: {token_type!r}",
+            )
+            exc = TokenError(context=ctx)
+            logger.error(exc.to_dict())
+            raise exc
         return dto(**decoded_jwt)
 
-    @classmethod
-    def create_access_jwt(
-        cls,
-        *,
-        user_dto: UserDTO,
-        expire_minutes: int = expire_rules.expire_minutes_access_token,
-    ) -> str:
-        return cls.encode_jwt(
+    def create_access_jwt(self,user_dto: UserDTO) -> str:
+        return self.encode_jwt(
             user_dto=user_dto,
             token_type=TokenTypesEnum.access,
-            expire_minutes=expire_minutes,
         )
 
-    @classmethod
-    def create_refresh_jwt(
-        cls,
-        *,
-        user_dto: UserDTO,
-        expire_days: int = expire_rules.expire_days_refresh_token,
-    ) -> str:
-        return cls.encode_jwt(
+    def create_refresh_jwt(self,user_dto: UserDTO) -> str:
+        return self.encode_jwt(
             user_dto=user_dto,
             token_type=TokenTypesEnum.refresh,
-            expire_days=expire_days,
         )
 
-    @classmethod
-    def issue_access_jwt(
-        cls,
-        user_dto: UserDTO,
-        expire_minutes_access: int = expire_rules.expire_minutes_access_token,
-    ) -> TokenDataDTO:
+    def issue_access_jwt(self, user_dto: UserDTO) -> TokenDataDTO:
         return TokenDataDTO(
-            access_token=cls.create_access_jwt(
-                user_dto=user_dto, expire_minutes=expire_minutes_access
-            ),
+            access_token=self.create_access_jwt(user_dto=user_dto ),
             refresh_token=None,
         )
 
-    @classmethod
-    def issue_pair(
-        cls,
-        user_dto: UserDTO,
-        expire_minutes_access: int = expire_rules.expire_minutes_access_token,
-        expire_days_refresh: int = expire_rules.expire_days_refresh_token,
-    ) -> TokenDataDTO:
+    def issue_pair(self, user_dto: UserDTO) -> TokenDataDTO:
         return TokenDataDTO(
-            access_token=cls.create_access_jwt(
-                user_dto=user_dto, expire_minutes=expire_minutes_access
-            ),
-            refresh_token=cls.create_refresh_jwt(
-                user_dto=user_dto, expire_days=expire_days_refresh
-            ),
+            access_token=self.create_access_jwt(user_dto=user_dto),
+            refresh_token=self.create_refresh_jwt(user_dto=user_dto),
         )
+
+    def verify_token(self, token: str) -> bool:
+        """Проверить валидность токена"""
+        try:
+            self.decode_jwt(token)
+            return True
+        except (RottenTokenError, TokenError):
+            return False
 
 
 if __name__ == "__main__":
@@ -154,23 +194,35 @@ if __name__ == "__main__":
         role=Roles.superuser,
         organization=Organizations.SDP,
         email="test@test.com",
+        is_superuser=True,
         is_active=True,
         phone_number=None,
         telegram="test_telegram",
         description="test_description",
+        created_at=None,
+        updated_at=None,
+        built_at=datetime.datetime.now(),
     )
     print(_user_dto)
 
-    encoded_jwt = BaseJWTService.create_access_jwt(user_dto=_user_dto)
+    jwt_service = JWTService(
+        expire_minutes_access_token=expire_rules.expire_minutes_access_token,
+        expire_days_refresh_token=expire_rules.expire_days_refresh_token,
+        public_key=security_rules.public_key_path,
+        private_key=security_rules.private_key_path,
+        algorithm=security_rules.algorithm,
+    )
+
+    encoded_jwt = jwt_service.create_access_jwt(user_dto=_user_dto)
     print(encoded_jwt)
 
-    decoded_jwt = BaseJWTService.decode_jwt(token=encoded_jwt)
+    decoded_jwt = jwt_service.decode_jwt(token=encoded_jwt)
     print(decoded_jwt)
 
-    encoded_jwt = BaseJWTService.create_refresh_jwt(user_dto=_user_dto)
+    encoded_jwt = jwt_service.create_refresh_jwt(user_dto=_user_dto)
     print(encoded_jwt)
 
-    decoded_jwt = BaseJWTService.decode_jwt(token=encoded_jwt)
+    decoded_jwt = jwt_service.decode_jwt(token=encoded_jwt)
     print(decoded_jwt)
 
-    print(BaseJWTService.issue_pair(user_dto=_user_dto))
+    print(jwt_service.issue_pair(user_dto=_user_dto))

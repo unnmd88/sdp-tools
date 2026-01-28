@@ -38,6 +38,12 @@ LOGGING_CONFIG = {
             "filename": BASE_DIR / "app_logging/domain.log",
             "formatter": "json",
         },
+        "infrastructure": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "app_logging/infrastructure.log",
+            "formatter": "json",
+        },
         "auth": {
             "level": "INFO",
             "class": "logging.FileHandler",
@@ -82,6 +88,11 @@ LOGGING_CONFIG = {
             "handlers": ["domain"],
             "propagate": False,
         },
+        "infrastructure": {
+            "level": "INFO",
+            "handlers": ["infrastructure"],
+            "propagate": False,
+        },
     },
     "formatters": {
         "json": {
@@ -101,6 +112,8 @@ LOGGING_CONFIG = {
 
 logging.config.dictConfig(LOGGING_CONFIG)
 
+
+INFRASTRUCTURE = "infrastructure"
 DOMAIN = "domain"
 COMMON_LOGGER = "common"
 USERS_LOGGER = "users"

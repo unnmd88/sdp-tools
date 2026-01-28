@@ -10,12 +10,8 @@ from application.use_cases.users.get_user_from_repo_by_jwt_use_case import (
     GetUserFromRepoByJWTUseCaseImpl,
 )
 from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
-from core.config import settings
-from domain._exceptions.entity_not_found_exc import DomainEntityNotFoundError
-from domain._exceptions.permissions_exc import DomainInactiveUserError
-from infrastructure.auth.jwt.decode_jwt_service import DecodeJWTService
 from infrastructure.database.api import db_api
-from infrastructure.database.user_reposirory import UsersRepositorySqlAlchemy
+from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
 from presentation.api.dependencies.di import oauth2_scheme
 from utils.extract_token import extract_token
 
@@ -48,9 +44,9 @@ class JWTUserAPIRoute(APIRoute):
                 print(f"2222222  {self.active_user_require=}")
                 get_active_user_from_repo_use_case = GetUserFromRepoByJWTUseCaseImpl(
                     get_user_use_case=GetUserUseCaseImpl(
-                        user_repository=UsersRepositorySqlAlchemy(session=session)
+                        user_repository=UsersSqlAlchemyRepository(session=session)
                     ),
-                    decode_service=DecodeJWTService(),
+                    decode_service=DecodeAccessJWTService(),
                     require_active_user=self.active_user_require,
                 )
                 try:

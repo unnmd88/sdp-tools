@@ -27,7 +27,7 @@ class BaseAppError(Exception):
     def __init__(
         self,
         *,
-        message: str = None,
+        message: str | None = None,
         code: str | None = None,
         context: ErrorContextAsAnyDataclassProtocol | dict[str, Any] | None = None,
         **kwargs,
@@ -51,6 +51,12 @@ class BaseAppError(Exception):
             "exception_type": self.__class__.__name__,
             "extra": self.extra,
         }
+
+    def update_context(self, other: ErrorContextAsAnyDataclassProtocol | dict[str, Any]):
+        if is_dataclass(other):
+            self.context = other
+        elif isinstance(other, dict):
+            self.context |= other
 
     def __str__(self) -> str:
         return f"[{self.code}] {self.message}"

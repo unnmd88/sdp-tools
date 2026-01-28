@@ -1,12 +1,12 @@
 from sqlalchemy.sql.expression import select
 
 from domain.regions.entities.region import RegionEntity
-from infrastructure.database.base_repository import BaseSqlAlchemy
+from infrastructure.database.base_repository import BaseSqlAlchemyRepository
 from infrastructure.database.mappers.regions import RegionDBMapper
 from infrastructure.database.models import Region
 
 
-class RegionsRepositorySqlAlchemy(BaseSqlAlchemy):
+class RegionsRepositorySqlAlchemyRepository(BaseSqlAlchemyRepository):
     model = Region
     mapper = RegionDBMapper
 

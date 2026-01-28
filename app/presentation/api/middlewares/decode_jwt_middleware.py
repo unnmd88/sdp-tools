@@ -9,11 +9,6 @@ import time
 
 from starlette import status
 
-from application.services.exceptions import InvalidTokenTypeError, UnauthorizedError
-from application.use_cases.users.get_user_from_repo_by_jwt_use_case import (
-    GetUserFromRepoByJWTUseCaseImpl,
-)
-
 
 class JWTMiddleware(BaseHTTPMiddleware):
     """Middleware для проверки JWT токенов"""

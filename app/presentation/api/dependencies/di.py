@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from fastapi.security import (
     HTTPBearer,
     HTTPAuthorizationCredentials,
@@ -5,28 +7,10 @@ from fastapi.security import (
 )
 from jwt import ExpiredSignatureError, DecodeError
 
-from application.interfaces.repositories.regions import RegionsRepositoryProtocol
-from application.interfaces.repositories.tlo import TrafficLightObjectRepositoryProtocol
-from application.interfaces.repositories.users_repo_interface import (
-    UsersRepositoryProtocol,
-)
+from application.services.auth_service import AuthenticationService
 
-from application.interfaces.use_cases.create_user_use_case_interface import (
-    CreateUserUseCaseProtocol,
-)
-from application.interfaces.use_cases.get_user_from_repo_by_jwt_use_case_interface import (
-    GetUserFromRepoByJWTUseCaseProtocol,
-)
-from application.interfaces.use_cases.user_login_and_issue_jwt_use_case_interface import (
-    UserLoginAndIssueJWTUseCaseProtocol,
-)
-from application.services.get_user_from_repo_by_jwt_service import (
-    GetUserFromRepoByJWTService,
-)
 from application.use_cases.users.create_user_use_case import CreateUserUseCaseImpl
-from application.use_cases.users.get_user_from_repo_by_jwt_use_case import (
-    GetUserFromRepoByJWTUseCaseImpl,
-)
+
 from application.use_cases.users.refresh_jwt_use_case import RefreshJWTUseCaseImpl
 from core.config import settings
 
@@ -35,29 +19,29 @@ from application.use_cases.users.user_login_and_issue_jwt_use_case import (
 )
 from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
 
-from typing import Annotated
+from typing import Annotated, Literal
 
-from fastapi import Request
 from fastapi.params import Depends
 from fastapi.exceptions import HTTPException
 from starlette import status
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from domain.dto.users import GetUserFromRepoDTO, UserDTO
+
 from domain.enums.unsorted import Roles, TokenTypesEnum
-from domain._exceptions.entity_not_found_exc import DomainEntityNotFoundError
-from domain._exceptions.permissions_exc import DomainInactiveUserError
-from infrastructure.auth.jwt.decode_jwt_service import DecodeJWTService
-from infrastructure.auth.jwt.jwt_service import BaseJWTService
+from domain.repositories.users_repo_interface import UsersRepositoryProtocol
+
+from infrastructure.auth.jwt.jwt_service import JWTService
+from infrastructure.auth.jwt.rules import JWTSecurityRules, JWTExpireRules, SettingsJWT
+from infrastructure.auth.password_service import BcryptPasswordService
 from infrastructure.database.api import db_api
 from infrastructure.database.passport_groups_repository import (
-    PassportGroupsRepositorySqlAlchemy,
+    PassportGroupsRepositorySqlAlchemyRepository,
 )
-from infrastructure.database.regions_repository import RegionsRepositorySqlAlchemy
-from infrastructure.database.tlo_repository import TrafficLightObjectSqlAlchemy
-from infrastructure.database.user_reposirory import UsersRepositorySqlAlchemy
-
+from infrastructure.database.regions_repository import RegionsRepositorySqlAlchemyRepository
+from infrastructure.database.tlo_repository import TrafficLightObjectSqlAlchemyRepository
+from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
+from infrastructure.exceptions import RottenTokenError, TokenError
 
 from presentation.schemas.jwt import PayloadAccessJWTSchema, PayloadRefreshJWTSchema
 
@@ -146,61 +130,57 @@ def is_superuser(
 #  -- sql-alchemy repo --
 
 
-def get_users_sqlalchemy_repository(session: db_session) -> UsersRepositorySqlAlchemy:
-    return UsersRepositorySqlAlchemy(session=session)
-
-
-def get_regions_sqlalchemy_repository(session: db_session) -> RegionsRepositoryProtocol:
-    return RegionsRepositorySqlAlchemy(session=session)
-
-
-def get_passport_groups_sqlalchemy_repository(
-    session: db_session,
-) -> RegionsRepositoryProtocol:
-    return PassportGroupsRepositorySqlAlchemy(session=session)
-
-
-def get_tlo_sqlalchemy_repository(
-    session: db_session,
-) -> TrafficLightObjectRepositoryProtocol:
-    return TrafficLightObjectSqlAlchemy(session=session)
-
-
-#  -- cache --
-
+def get_users_sqlalchemy_repository(session: db_session) -> UsersSqlAlchemyRepository:
+    return UsersSqlAlchemyRepository(session=session)
 
 # -- services --
 
 
-# -- use-cases --
+# -- auth and jwt --
 
 
-class GetUserFromRepoByJWTDep:
+class ExtractPayloadFromJWT:
     def __init__(
         self,
         *,
-        jwt_service: BaseJWTService = BaseJWTService(),
-        require_active: bool = True,
-        require_role: Roles | None = None,
-    ):
-        self.jwt_service = jwt_service
-        self.require_active = require_active
-        self.require_role = require_role
+        token_type: TokenTypesEnum,
+        token_settings: SettingsJWT = SettingsJWT(),
 
-    def __call__(
-        self,
-        user_repository: Annotated[
-            UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
-        ],
-    ) -> GetUserFromRepoByJWTUseCaseProtocol:
-        return GetUserFromRepoByJWTUseCaseImpl(
-            service=GetUserFromRepoByJWTService(
-                user_repository=user_repository,
-                jwt_service=self.jwt_service,
-                require_active=self.require_active,
-                require_role=self.require_role,
-            )
+    ):
+        self.token_settings = token_settings
+        self.token_type = token_type
+        self.jwt_service = JWTService(
+            expire_minutes_access_token=self.token_settings.expire_minutes_access_token,
+            expire_days_refresh_token=self.token_settings.expire_days_refresh_token,
+            public_key=self.token_settings.public_key_path.resolve().read_text("utf-8"),
+            private_key=self.token_settings.private_key_path.resolve().read_text("utf-8"),
+            algorithm=self.token_settings.algorithm,
         )
+
+    async def __call__(self,token: Annotated[str, Depends(oauth2_scheme)]):
+        try:
+            token_dto = self.jwt_service.decode_jwt(token)
+        except RottenTokenError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Требуется аутентификация.",
+            )
+        except TokenError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Некорректный токен.",
+            )
+        if token_dto.typ != self.token_type:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Некорректный тип токена. Ожидаемый тип: {str(self.token_type)}.",
+            )
+        return token_dto
+
+
+
+
+# -- use-cases --
 
 
 def users_use_case(
@@ -211,24 +191,38 @@ def users_use_case(
     return GetUserUseCaseImpl(user_repository=user_repository)
 
 
-def create_user_use_case(
-    user_repository: Annotated[
-        UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
-    ],
-) -> CreateUserUseCaseProtocol:
-    return CreateUserUseCaseImpl(
-        user_repository=user_repository,
-        get_user_use_case=GetUserUseCaseImpl(user_repository=user_repository),
-    )
+# def create_user_use_case(
+#     user_repository: Annotated[
+#         UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
+#     ],
+# ) -> CreateUserUseCaseProtocol:
+#     return CreateUserUseCaseImpl(
+#         user_repository=user_repository,
+#         get_user_use_case=GetUserUseCaseImpl(user_repository=user_repository),
+#     )
 
 
 def get_auth_and_jwt_use_case(
     user_repository: Annotated[
         UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
     ],
-) -> UserLoginAndIssueJWTUseCaseProtocol:
-    return UserLoginAndIssueJWTUseCaseImpl(
+) -> UserLoginAndIssueJWTUseCaseImpl:
+    auth_service = AuthenticationService(
         user_repository=user_repository,
+        password_service=BcryptPasswordService(),
+    )
+    security_rules = JWTSecurityRules()
+    expire_rules = JWTExpireRules()
+    jwt_service = JWTService(
+        expire_minutes_access_token=expire_rules.expire_minutes_access_token,
+        expire_days_refresh_token=expire_rules.expire_days_refresh_token,
+        public_key=security_rules.public_key_path,
+        private_key=security_rules.private_key_path,
+        algorithm=security_rules.algorithm,
+    )
+    return UserLoginAndIssueJWTUseCaseImpl(
+        auth_service=auth_service,
+        jwt_service=jwt_service,
     )
 
 

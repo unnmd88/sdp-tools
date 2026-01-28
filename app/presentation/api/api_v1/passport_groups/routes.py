@@ -5,11 +5,10 @@ from fastapi import APIRouter
 from fastapi.exceptions import HTTPException
 from starlette import status
 
-from domain.dto.passport_groups import (
-    CreatePassportGroupDTO,
-    UpdatePassportGroupDTO,
-)
-from domain.passport_groups.entities.passport_group import PassportGroupEntity
+# from application.dto import (
+#     CreatePassportGroupDTO,
+#     UpdatePassportGroupDTO,
+# )
 from presentation.schemas.passport_groups import (
     PassportGroupsSchema,
     PassportGroupsCreate,

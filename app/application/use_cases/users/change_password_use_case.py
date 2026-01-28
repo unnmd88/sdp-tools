@@ -2,16 +2,16 @@ import logging
 from dataclasses import dataclass
 
 from app_logging.dev.config import USERS_LOGGER
-from application.interfaces.repositories.users_repo_interface import (
+from domain.repositories import (
     UsersRepositoryProtocol,
 )
-from application.interfaces.services.get_user_from_repo_by_jwt_service_interface import (
+from application.interfaces.services import (
     GetUserUseCaseProtocol,
 )
-from domain.dto.common import ToUpdateRecordDTO
-from domain.dto.users import ChangeUserPasswordDTO
+from application.dto.common import ToUpdateRecordDTO
+from application.dto import ChangeUserPasswordDTO
 
-from domain.users.entities.user import UserEntity
+from domain.entities.user import UserEntity
 
 from infrastructure.auth.password_service import hash_password
 from domain.services.field_values_constraints import (

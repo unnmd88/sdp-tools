@@ -8,11 +8,11 @@ from app_logging.dev.config import USERS_LOGGER
 from core.config import settings
 
 from domain.enums import Organizations, Roles
-from domain.users.entities.user import UserEntity
+from domain.entities.user import UserEntity
 from domain._exceptions.base import DomainValidationError
 from infrastructure.auth.password_service import hash_password
 from infrastructure.database.api import db_api
-from infrastructure.database.user_reposirory import UsersRepositorySqlAlchemy
+from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
 
 
 logger = logging.getLogger(USERS_LOGGER)
@@ -63,7 +63,7 @@ async def create_user_root(
         return result
 
     async with db_api.session_factory() as session:
-        user_repo = UsersRepositorySqlAlchemy(session=session)
+        user_repo = UsersSqlAlchemyRepository(session=session)
         try:
             root_already_exists: UserEntity = (
                 await user_repo.get_user_by_id_or_username_or_none(username_root)
