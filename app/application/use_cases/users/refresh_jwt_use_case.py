@@ -8,7 +8,7 @@ from application.dto.jwt_dto import TokenDataDTO
 
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.repositories.users_repo_interface import UsersRepositoryProtocol
-from infrastructure.auth.jwt.jwt_service import JWTService
+from infrastructure.auth.jwt.jwt_service import DecodeJWTService
 
 from domain.enums.unsorted import TokenTypesEnum
 from domain.entities.user import UserEntity
@@ -19,7 +19,7 @@ logger = logging.getLogger(AUTH_LOGGER)
 @dataclass(frozen=True, slots=True, kw_only=True)
 class RefreshJWTUseCaseImpl:
     user_repository: UsersRepositoryProtocol
-    jwt_service: JWTService = JWTService
+    jwt_service: DecodeJWTService = DecodeJWTService
 
     async def __call__(self, refresh_jwt: bytes) -> TokenDataDTO:
         try:

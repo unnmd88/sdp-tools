@@ -23,8 +23,6 @@ class CreateUserUseCaseImpl:
     """Класс для создания нового пользователя системы."""
 
     user_repository: UsersRepositoryProtocol
-    # get_user_use_case: GetUserUseCaseProtocol
-    # user_factory: type[EntityFactoryServiceProtocol] = UserEntityFactoryService
     user_password_service: type[PasswordServiceProtocol] = BcryptPasswordService
 
     async def __call__(self, create_user_dto: CreateUserDTO) -> UserEntity:
@@ -33,8 +31,6 @@ class CreateUserUseCaseImpl:
             create_user_dto.customer,
             create_user_dto,
         )
-        #    and (self._username not in forbidden_patterns_in_username))
-        #    or self._role == Roles.director
         try:
             customer_entity: UserEntity = (
                 await self.get_user_use_case.get_active_user_or_raise(

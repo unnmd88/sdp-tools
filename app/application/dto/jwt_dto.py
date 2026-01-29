@@ -13,13 +13,6 @@ class TokenDataDTO:
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)
-class IssueJWTDTO:
-    user_entity: UserEntity
-    access_token: bool = True
-    refresh_token: bool = False
-
-
-@dataclass(slots=True, frozen=True, kw_only=True)
 class RefreshJWTPayloadDTO:
     user_id: int
     sub: str
@@ -33,6 +26,16 @@ class RefreshJWTPayloadDTO:
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class AccessJWTPayloadDTO(RefreshJWTPayloadDTO):
-    role: str | Roles
-    organization: str | Organizations
+    role: str
+    organization: str
     email: str | None
+
+
+@dataclass(slots=True, frozen=True, kw_only=True)
+class PayloadJWTDTO:
+    user_id: int
+    sub: str
+    email: str | None = None
+    role: Roles | None = None
+    organization: Organizations | None = None
+

@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 from fastapi.params import Form
 
+from application.dto.jwt_dto import AccessJWTPayloadDTO, RefreshJWTPayloadDTO
 from application.use_cases.users import create_user_use_case
 from application.use_cases.users.create_user_use_case import CreateUserUseCaseImpl
 from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
@@ -37,8 +38,6 @@ def auth_form(
 
 
 ## Auth and JWT
-access_jwt = Annotated[ExtractPayloadFromJWT, Depends(ExtractPayloadFromJWT(token_type=TokenTypesEnum.access))]
-refresh_jwt = Annotated[ExtractPayloadFromJWT, Depends(ExtractPayloadFromJWT(token_type=TokenTypesEnum.refresh))]
 
 BEARER_TOKEN = Annotated[str, Depends(oauth2_scheme)]
 AuthForm = Annotated[AuthSchema, Depends(auth_form)]

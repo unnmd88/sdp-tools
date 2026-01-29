@@ -1,24 +1,32 @@
 from dataclasses import dataclass
 
-from application.dto.jwt_dto import TokenDataDTO
+from application.dto.jwt_dto import TokenDataDTO, PayloadJWTDTO
 from application.dto.users import UserDTO
 
 
 from application.dto.auth import UserAuthDTO
-from application.interfaces import AuthServiceProtocol, JWTServiceProtocol
+from application.interfaces import AuthServiceProtocol
+from application.interfaces.services.issue_jwt_service_interface import IssueJWTServiceProtocol
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UserLoginAndIssueJWTUseCaseImpl:
     auth_service: AuthServiceProtocol
-    jwt_service: JWTServiceProtocol
+    jwt_service: IssueJWTServiceProtocol
 
     async def __call__(self, auth_dto: UserAuthDTO) -> TokenDataDTO:
 
         user_dto: UserDTO = await self.auth_service.authenticate(auth_dto)
         # token_data = self.jwt_service.issue_pair(user_dto=user_dto)
         # logger.info("Выпущены JWT: %r", token_data)
-        return self.jwt_service.issue_pair(user_dto=user_dto)
+        payload = PayloadJWTDTO(
+            user_id=user_dto.id,
+            sub=user_dto.username,
+            role=user_dto.role,
+            organization=user_dto.organization,
+            email=user_dto.email,
+        )
+        return self.jwt_service.issue_pair(payload_dto=payload)
 
 
 

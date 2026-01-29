@@ -7,9 +7,11 @@ from fastapi.security import (
 )
 from jwt import ExpiredSignatureError, DecodeError
 
+from application.dto.jwt_dto import AccessJWTPayloadDTO, RefreshJWTPayloadDTO
 from application.services.auth_service import AuthenticationService
 
 from application.use_cases.users.create_user_use_case import CreateUserUseCaseImpl
+from application.use_cases.users.get_active_user_from_repo_use_case import GetActiveUserFromRepoUseCase
 
 from application.use_cases.users.refresh_jwt_use_case import RefreshJWTUseCaseImpl
 from core.config import settings
@@ -31,8 +33,9 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from domain.enums.unsorted import Roles, TokenTypesEnum
 from domain.repositories.users_repo_interface import UsersRepositoryProtocol
 
-from infrastructure.auth.jwt.jwt_service import JWTService
-from infrastructure.auth.jwt.rules import JWTSecurityRules, JWTExpireRules, SettingsJWT
+from infrastructure.auth.jwt.jwt_service import DecodeJWTService, IssueJWTService
+from infrastructure.auth.jwt.rules import DecodeJWTSettings, IssueJWTSettings
+
 from infrastructure.auth.password_service import BcryptPasswordService
 from infrastructure.database.api import db_api
 from infrastructure.database.passport_groups_repository import (
@@ -136,6 +139,9 @@ def get_users_sqlalchemy_repository(session: db_session) -> UsersSqlAlchemyRepos
 # -- services --
 
 
+
+
+
 # -- auth and jwt --
 
 
@@ -143,40 +149,66 @@ class ExtractPayloadFromJWT:
     def __init__(
         self,
         *,
-        token_type: TokenTypesEnum,
-        token_settings: SettingsJWT = SettingsJWT(),
-
+        expected_token_type: TokenTypesEnum,
+        decode_jwt_settings: DecodeJWTSettings = DecodeJWTSettings(),
     ):
-        self.token_settings = token_settings
-        self.token_type = token_type
-        self.jwt_service = JWTService(
-            expire_minutes_access_token=self.token_settings.expire_minutes_access_token,
-            expire_days_refresh_token=self.token_settings.expire_days_refresh_token,
-            public_key=self.token_settings.public_key_path.resolve().read_text("utf-8"),
-            private_key=self.token_settings.private_key_path.resolve().read_text("utf-8"),
-            algorithm=self.token_settings.algorithm,
+        self._expected_token_type = expected_token_type
+        self._decode_jwt_settings = decode_jwt_settings
+        self._token_type = expected_token_type
+        self._jwt_service = DecodeJWTService(
+            public_key=self._decode_jwt_settings.public_key_path.resolve().read_text("utf-8"),
+            algorithm=self._decode_jwt_settings.algorithm,
+            expected_type=self._expected_token_type,
         )
-
-    async def __call__(self,token: Annotated[str, Depends(oauth2_scheme)]):
+    async def __call__(self, token: str) ->  AccessJWTPayloadDTO | RefreshJWTPayloadDTO:
         try:
-            token_dto = self.jwt_service.decode_jwt(token)
+            token_dto = self._jwt_service.decode_jwt(token)
         except RottenTokenError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"Требуется аутентификация.",
             )
-        except TokenError:
+        except TokenError as e:
+            print(e.context)
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Некорректный токен.",
+                detail=f"Некорректный токен",
             )
-        if token_dto.typ != self.token_type:
+        if token_dto.typ != self._token_type:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Некорректный тип токена. Ожидаемый тип: {str(self.token_type)}.",
+                detail=f"Некорректный тип токена. Ожидаемый тип: {str(self._token_type)}.",
             )
         return token_dto
 
+
+access_jwt_decoder_jwt = ExtractPayloadFromJWT(expected_token_type=TokenTypesEnum.access)
+refresh_jwt_decoder_jwt = ExtractPayloadFromJWT(expected_token_type=TokenTypesEnum.refresh)
+
+
+async def get_decoded_jwt_from_access_token(
+    token: Annotated[str, Depends(oauth2_scheme)],
+) -> AccessJWTPayloadDTO:
+    return await access_jwt_decoder_jwt(token)
+
+
+async def get_decoded_jwt_from_refresh_token(
+    token: Annotated[str, Depends(oauth2_scheme)],
+) -> RefreshJWTPayloadDTO:
+    return await refresh_jwt_decoder_jwt(token)
+
+
+class IssueJWTServiceDep:
+    def __init__(self, decode_jwt_settings: IssueJWTSettings = IssueJWTSettings()):
+        self._decode_jwt_settings = decode_jwt_settings
+        self._jwt_service = IssueJWTService(
+            private_key=self._decode_jwt_settings.private_key_path.resolve().read_text("utf-8"),
+            algorithm=self._decode_jwt_settings.algorithm,
+            expire_minutes_access_token=self._decode_jwt_settings.expire_minutes_access_token,
+            expire_days_refresh_token=self._decode_jwt_settings.expire_days_refresh_token,
+        )
+    async def __call__(self) -> IssueJWTService:
+        return self._jwt_service
 
 
 
@@ -201,8 +233,15 @@ def users_use_case(
 #         get_user_use_case=GetUserUseCaseImpl(user_repository=user_repository),
 #     )
 
+def get_active_user_use_case(
+    repository: Annotated[
+        UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
+    ],
+) -> GetActiveUserFromRepoUseCase:
+    return GetActiveUserFromRepoUseCase(user_repository=repository)
 
 def get_auth_and_jwt_use_case(
+    jwt_service: Annotated[IssueJWTServiceDep, Depends(IssueJWTServiceDep())],
     user_repository: Annotated[
         UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
     ],
@@ -210,15 +249,6 @@ def get_auth_and_jwt_use_case(
     auth_service = AuthenticationService(
         user_repository=user_repository,
         password_service=BcryptPasswordService(),
-    )
-    security_rules = JWTSecurityRules()
-    expire_rules = JWTExpireRules()
-    jwt_service = JWTService(
-        expire_minutes_access_token=expire_rules.expire_minutes_access_token,
-        expire_days_refresh_token=expire_rules.expire_days_refresh_token,
-        public_key=security_rules.public_key_path,
-        private_key=security_rules.private_key_path,
-        algorithm=security_rules.algorithm,
     )
     return UserLoginAndIssueJWTUseCaseImpl(
         auth_service=auth_service,

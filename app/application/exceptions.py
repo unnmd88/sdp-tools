@@ -12,6 +12,12 @@ class ApplicationLayerError(BaseAppError):
     DEFAULT_MESSAGE = ErrorData.APPLICATION_ERROR.message
 
 
+class NotFoundError(ApplicationLayerError):
+
+    DEFAULT_CODE = ErrorData.NOT_FOUND.code
+    DEFAULT_MESSAGE = ErrorData.NOT_FOUND.message
+
+
 class AuthenticationError(ApplicationLayerError):
 
     DEFAULT_CODE = ErrorData.UNAUTHORIZED.code
