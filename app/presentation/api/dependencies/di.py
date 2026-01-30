@@ -151,7 +151,12 @@ class JWTDecoder:
         *,
         jwt_service: DecodeJWTService,
         token_type: TokenTypesEnum,
+        specific_field: Literal["user_id", "username"] = None,
     ):
+        if specific_field == "username":
+            self._specific_field = "sub"
+        else:
+            self._specific_field = specific_field
         self._jwt_service = jwt_service
         self._token_type = token_type
         if self._token_type == TokenTypesEnum.access:
@@ -163,7 +168,10 @@ class JWTDecoder:
 
     async def __call__(self, token: Annotated[str, Depends(oauth2_scheme)]):
         try:
-            return self._method(token)
+            decoded_token = self._method(token)
+            if self._specific_field is None:
+                return decoded_token
+            return getattr(decoded_token, self._specific_field, decoded_token)
         except RottenTokenError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -184,12 +192,13 @@ def jwt_decoder_factory(
     *,
     token_type: TokenTypesEnum,
     decode_jwt_settings: DecodeJWTSettings = DecodeJWTSettings(),
+    specific_field: Literal["user_id", "username"] = None,
 ):
     jwt_service = DecodeJWTService(
         public_key=decode_jwt_settings.public_key_path.resolve().read_text("utf-8"),
         algorithm=decode_jwt_settings.algorithm,
     )
-    return JWTDecoder(jwt_service=jwt_service, token_type=token_type)
+    return JWTDecoder(jwt_service=jwt_service, token_type=token_type, specific_field=specific_field)
 
 
 class IssueJWTServiceDep:

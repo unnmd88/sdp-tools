@@ -6,7 +6,7 @@ from typing import NamedTuple, Any
 
 from application.exceptions import AuthenticationError, InactiveAccountError
 from starlette import status
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
@@ -113,3 +113,4 @@ class HTTPExceptionContext(BaseModel):
             detail=self.model_dump(exclude_none=True),
             headers=headers,
         )
+
