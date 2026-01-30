@@ -23,7 +23,7 @@ class RefreshJWTUseCaseImpl:
 
     async def __call__(self, refresh_jwt: bytes) -> TokenDataDTO:
         try:
-            decoded_jwt = self.jwt_service.decode_jwt(refresh_jwt)
+            decoded_jwt = self.jwt_service.decode_and_validate_type_jwt(refresh_jwt)
             if decoded_jwt.typ != TokenTypesEnum.refresh:
                 logger.info(
                     "Неверный тип токена. Необходим refresh-токен. Payload: %r",

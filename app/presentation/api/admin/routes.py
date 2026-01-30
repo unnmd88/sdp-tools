@@ -4,7 +4,7 @@ from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
 from presentation.api.dependencies.ioc import (
     IsSuperuser,
     PayloadAccessJWT,
-    UsersUseCase,
+    # UsersUseCase,
     CreateUserUseCase,
 )
 from presentation.schemas.users import CreateUserSchema, ResponseUserSchema
@@ -25,7 +25,7 @@ router = APIRouter(
 )
 async def whoami(
     payload_jwt: PayloadAccessJWT,
-    use_case: UsersUseCase,
+    # use_case: UsersUseCase,
 ):
     user = await use_case.get_user_by_username_or_raise(username=payload_jwt.sub)
     return ResponseUserSchema.model_validate(user, from_attributes=True)
@@ -100,7 +100,7 @@ async def create_user(
 async def change_user_password(
     payload_jwt: PayloadAccessJWT,
     # change_password: ChangeUserPasswordBaseSchema,
-    use_case: UsersUseCase,
+    # use_case: UsersUseCase,
 ):
     change_password_dto = ChangeUserPasswordDTO(
         customer=payload_jwt.sub,

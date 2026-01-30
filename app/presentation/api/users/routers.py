@@ -4,13 +4,14 @@ from fastapi import APIRouter, status, HTTPException, Depends
 
 from application.exceptions import NotFoundError, InactiveAccountError
 from application.use_cases.users.get_active_user_from_repo_use_case import GetActiveUserFromRepoUseCase
+from domain.enums.unsorted import TokenTypesEnum
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
 from presentation.api.dependencies.di import (
-    get_decoded_jwt_from_access_token,
-    get_active_user_use_case
+    get_active_user_use_case,
+    jwt_decoder_factory
 )
 from presentation.api.dependencies.ioc import (
-    UsersUseCase,
+    # UsersUseCase,
     PayloadAccessJWT,
     BEARER_TOKEN,
 )
@@ -41,9 +42,10 @@ router = APIRouter(
     response_model=ResponseUserSchema,
     summary="Данные о пользователе из access jwt",
     description=GET_whoami,
+
 )
 async def whoami(
-    token_dto: Annotated[PayloadAccessJWT, Depends(get_decoded_jwt_from_access_token)],
+    token_dto: Annotated[PayloadAccessJWT, Depends(jwt_decoder_factory(token_type=TokenTypesEnum.access))],
     use_case: Annotated[GetActiveUserFromRepoUseCase, Depends(get_active_user_use_case)],
 ):
     try:
@@ -91,7 +93,7 @@ async def update_user(
 async def change_user_password(
     payload_jwt: PayloadAccessJWT,
     change_password: ChangePasswordMyselfSchema,
-    use_case: UsersUseCase,
+    # use_case: UsersUseCase,
 ):
     change_password_dto = ChangeUserPasswordDTO(
         customer=payload_jwt.sub,

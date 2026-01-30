@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from starlette import status
 
 from application.dto.auth import UserAuthDTO
-from application.exceptions import AuthenticationError
+from application.exceptions import AuthenticationError, InactiveAccountError
 from presentation.api.api_v1.documentation.auth_and_jwt.endpoints import (
     POST_LOGIN_user,
     POST_REFRESH,
@@ -18,17 +18,76 @@ from presentation.api.dependencies.ioc import (
 )
 from fastapi.params import Depends
 
+from presentation.api.response_detail import HTTPExceptionContext, Codes, ErrorMessages
 from presentation.schemas.jwt import TokenInfo
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
+
+AUTH_RESPONSES = {
+    status.HTTP_200_OK: {
+        "model": TokenInfo,
+    },
+    status.HTTP_401_UNAUTHORIZED: {
+        "model": HTTPExceptionContext,
+        "description": "Неверный логин или пароль",
+        "content": {
+            "application/json": {
+                "example": {
+                    "detail":
+                        HTTPExceptionContext(
+                            code=Codes.UNAUTHORIZED,
+                            message=ErrorMessages.invalid_login_or_password,
+                            user_message=ErrorMessages.invalid_login_or_password
+                        ).model_dump()
+                }
+            }
+        }
+    },
+    status.HTTP_403_FORBIDDEN: {
+        "model": HTTPExceptionContext,
+        "description": "Пользователь неактивен.",
+        "content": {
+            "application/json": {
+                "example": {
+                    "detail":
+                        HTTPExceptionContext(
+                            code=Codes.FORBIDDEN,
+                            message=ErrorMessages.account_inactive,
+                            user_message=ErrorMessages.account_inactive
+                        ).model_dump(),
+                },
+            },
+        },
+    },
+    status.HTTP_500_INTERNAL_SERVER_ERROR: {
+        "model": HTTPExceptionContext,
+        "description": "Внутренняя ошибка сервера",
+        "content": {
+            "application/json": {
+                "example": {
+                    "detail":
+                        HTTPExceptionContext(
+                            code=Codes.REQUEST_ERROR,
+                            message=ErrorMessages.error_request,
+                            user_message=ErrorMessages.error_request
+                        ).model_dump()
+
+                }
+            }
+        }
+    }
+}
+
+
 @router.post(
     "/login/",
-    response_model=TokenInfo,
+    # response_model=TokenInfo,
     response_model_exclude_none=True,
     summary="Аутентификация пользователя и выпуск jwt",
     description=POST_LOGIN_user,
+    responses=AUTH_RESPONSES,
 )
 async def login_and_issue_jwt(
     auth_schema: AuthForm,
@@ -41,10 +100,25 @@ async def login_and_issue_jwt(
     try:
         return await use_case(auth_dto=auth_dto)
     except AuthenticationError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Неверный логин или пароль.",
+        e = HTTPExceptionContext(
+            code=Codes.UNAUTHORIZED,
+            message=ErrorMessages.invalid_login_or_password,
+            user_message=ErrorMessages.invalid_login_or_password,
         )
+    except InactiveAccountError:
+        e = HTTPExceptionContext(
+            code=Codes.FORBIDDEN,
+            message=ErrorMessages.account_inactive,
+            user_message=ErrorMessages.account_inactive
+        )
+    except Exception:
+        e = HTTPExceptionContext(
+            code=Codes.REQUEST_ERROR,
+            message=ErrorMessages.error_request,
+            user_message=ErrorMessages.error_request
+        )
+    return e.to_json_response()
+
 
 
 

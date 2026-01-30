@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pathlib import Path
 
 from fastapi.security import (
     HTTPBearer,
@@ -19,7 +20,6 @@ from core.config import settings
 from application.use_cases.users.user_login_and_issue_jwt_use_case import (
     UserLoginAndIssueJWTUseCaseImpl,
 )
-from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
 
 from typing import Annotated, Literal
 
@@ -44,7 +44,7 @@ from infrastructure.database.passport_groups_repository import (
 from infrastructure.database.regions_repository import RegionsRepositorySqlAlchemyRepository
 from infrastructure.database.tlo_repository import TrafficLightObjectSqlAlchemyRepository
 from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
-from infrastructure.exceptions import RottenTokenError, TokenError
+from infrastructure.exceptions import RottenTokenError, TokenError, InvalidTokenTypeError
 
 from presentation.schemas.jwt import PayloadAccessJWTSchema, PayloadRefreshJWTSchema
 
@@ -66,7 +66,7 @@ def get_jwt_payload_schema(
     try:
         print(f"TOKEN: {token}")
         # payload = jwt_helper.decode_jwt(credentials)
-        payload = jwt_helper.decode_jwt(token)
+        payload = jwt_helper.decode_and_validate_type_jwt(token)
         if (
             payload["typ"] == expected_token_type
             and expected_token_type == TokenTypesEnum.access
@@ -145,57 +145,51 @@ def get_users_sqlalchemy_repository(session: db_session) -> UsersSqlAlchemyRepos
 # -- auth and jwt --
 
 
-class ExtractPayloadFromJWT:
+class JWTDecoder:
     def __init__(
         self,
         *,
-        expected_token_type: TokenTypesEnum,
-        decode_jwt_settings: DecodeJWTSettings = DecodeJWTSettings(),
+        jwt_service: DecodeJWTService,
+        token_type: TokenTypesEnum,
     ):
-        self._expected_token_type = expected_token_type
-        self._decode_jwt_settings = decode_jwt_settings
-        self._token_type = expected_token_type
-        self._jwt_service = DecodeJWTService(
-            public_key=self._decode_jwt_settings.public_key_path.resolve().read_text("utf-8"),
-            algorithm=self._decode_jwt_settings.algorithm,
-            expected_type=self._expected_token_type,
-        )
-    async def __call__(self, token: str) ->  AccessJWTPayloadDTO | RefreshJWTPayloadDTO:
+        self._jwt_service = jwt_service
+        self._token_type = token_type
+        if self._token_type == TokenTypesEnum.access:
+            self._method = self._jwt_service.decode_access_jwt
+        elif token_type == TokenTypesEnum.refresh:
+            self._method = self._jwt_service.decode_refresh_jwt
+        else:
+            raise ValueError("Некорректный тип токена.")
+
+    async def __call__(self, token: Annotated[str, Depends(oauth2_scheme)]):
         try:
-            token_dto = self._jwt_service.decode_jwt(token)
+            return self._method(token)
         except RottenTokenError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Требуется аутентификация.",
+                detail="Требуется аутентификация.",
             )
-        except TokenError as e:
-            print(e.context)
+        except InvalidTokenTypeError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Некорректный токен",
+                detail=f"Некорректный тип токена. Ожидаемый тип: {self._token_type}.",
             )
-        if token_dto.typ != self._token_type:
+        except TokenError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Некорректный тип токена. Ожидаемый тип: {str(self._token_type)}.",
+                detail="Некорректный токен",
             )
-        return token_dto
 
-
-access_jwt_decoder_jwt = ExtractPayloadFromJWT(expected_token_type=TokenTypesEnum.access)
-refresh_jwt_decoder_jwt = ExtractPayloadFromJWT(expected_token_type=TokenTypesEnum.refresh)
-
-
-async def get_decoded_jwt_from_access_token(
-    token: Annotated[str, Depends(oauth2_scheme)],
-) -> AccessJWTPayloadDTO:
-    return await access_jwt_decoder_jwt(token)
-
-
-async def get_decoded_jwt_from_refresh_token(
-    token: Annotated[str, Depends(oauth2_scheme)],
-) -> RefreshJWTPayloadDTO:
-    return await refresh_jwt_decoder_jwt(token)
+def jwt_decoder_factory(
+    *,
+    token_type: TokenTypesEnum,
+    decode_jwt_settings: DecodeJWTSettings = DecodeJWTSettings(),
+):
+    jwt_service = DecodeJWTService(
+        public_key=decode_jwt_settings.public_key_path.resolve().read_text("utf-8"),
+        algorithm=decode_jwt_settings.algorithm,
+    )
+    return JWTDecoder(jwt_service=jwt_service, token_type=token_type)
 
 
 class IssueJWTServiceDep:
@@ -212,15 +206,16 @@ class IssueJWTServiceDep:
 
 
 
+
 # -- use-cases --
 
 
-def users_use_case(
-    user_repository: Annotated[
-        UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
-    ],
-) -> GetUserUseCaseImpl:
-    return GetUserUseCaseImpl(user_repository=user_repository)
+# def users_use_case(
+#     user_repository: Annotated[
+#         UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
+#     ],
+# ) -> GetUserUseCaseImpl:
+#     return GetUserUseCaseImpl(user_repository=user_repository)
 
 
 # def create_user_use_case(

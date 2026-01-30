@@ -6,7 +6,6 @@ from fastapi.params import Form
 from application.dto.jwt_dto import AccessJWTPayloadDTO, RefreshJWTPayloadDTO
 from application.use_cases.users import create_user_use_case
 from application.use_cases.users.create_user_use_case import CreateUserUseCaseImpl
-from application.use_cases.users.get_user_use_case import GetUserUseCaseImpl
 from application.use_cases.users.refresh_jwt_use_case import RefreshJWTUseCaseImpl
 from application.use_cases.users.user_login_and_issue_jwt_use_case import (
     UserLoginAndIssueJWTUseCaseImpl,
@@ -14,7 +13,6 @@ from application.use_cases.users.user_login_and_issue_jwt_use_case import (
 from domain.enums.unsorted import TokenTypesEnum
 
 from presentation.api.dependencies.di import (
-    users_use_case,
     get_access_jwt_payload_schema,
     is_superuser,
     is_admin,
@@ -22,7 +20,7 @@ from presentation.api.dependencies.di import (
     get_auth_and_jwt_use_case,
     get_refresh_jwt_use_case,
     # create_user_use_case,
-    oauth2_scheme, ExtractPayloadFromJWT,
+    oauth2_scheme,
 
 )
 from presentation.api.dependencies.utils import get_filters_for_region_or_name_search
@@ -57,7 +55,7 @@ IsAdmin = Depends(is_admin)
 
 
 ## Users
-UsersUseCase = Annotated[GetUserUseCaseImpl, Depends(users_use_case)]
+# UsersUseCase = Annotated[GetUserUseCaseImpl, Depends(users_use_case)]
 CreateUserUseCase = Annotated[CreateUserUseCaseImpl, Depends(create_user_use_case)]
 
 ## Regions

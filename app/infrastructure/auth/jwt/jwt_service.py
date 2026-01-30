@@ -190,11 +190,11 @@ class DecodeJWTService:
         *,
         public_key: str,
         algorithm: str,
-        expected_type: TokenTypesEnum,
+        # expected_type: TokenTypesEnum,
     ):
         self._public_key = public_key
         self._algorithm = algorithm
-        self._expected_type = expected_type
+        # self._expected_type = expected_type
 
 
     # @staticmethod
@@ -203,11 +203,10 @@ class DecodeJWTService:
     #     if isinstance(key, Path):
     #         return key.resolve().read_text(encoding="utf-8")
     #     return key
-
-
-    def decode_jwt(self, token: str) -> AccessJWTPayloadDTO | RefreshJWTPayloadDTO:
+    
+    def _decode_jwt(self, token: str,):
         try:
-            decoded_jwt = jwt.decode(
+            return jwt.decode(
                 jwt=token,
                 key=self._public_key,
                 algorithms=[self._algorithm],
@@ -218,32 +217,54 @@ class DecodeJWTService:
             ctx = TokenErrorContextVO(
                 token=token,
                 subject=self.__class__.__name__,
-                handler=self.decode_jwt.__name__,
+                handler=self._decode_jwt.__name__,
                 internal_message=str(e),
             )
             exc = TokenError(context=ctx)
             logger.error(exc.to_dict())
             raise exc
-        if (current_token_type := decoded_jwt.get("typ")) is None:
+    
+    def _validate_token_type(
+        self,
+        *,
+        raw_token: str,
+        decoded_token: dict[str, AnyStr],
+        expected_type: TokenTypesEnum,
+    ) -> TokenTypesEnum:
+        if (current_token_type := decoded_token.get("typ")) is None:
             ctx = TokenErrorContextVO(
-                token=token,
+                token=raw_token,
                 subject=self.__class__.__name__,
-                handler=self.decode_jwt.__name__,
+                handler=self._validate_token_type.__name__,
                 internal_message="Не найдено поле 'typ' в токене при декодировании",
             )
             exc = TokenError(context=ctx)
             logger.critical(exc.to_dict())
             raise exc
-        if current_token_type != self._expected_type:
+        if current_token_type != expected_type:
             ctx = TokenErrorContextVO(
-                token=token,
-                expected_token_type=self._expected_type,
+                token=raw_token,
+                expected_token_type=expected_type,
                 subject=self.__class__.__name__,
-                handler=self.decode_jwt.__name__,
-                message=ErrorMessages.invalid_token_type.format(self._expected_type),
+                handler=self._validate_token_type.__name__,
+                message=ErrorMessages.invalid_token_type.format(expected_type),
             )
             exc = InvalidTokenTypeError(context=ctx)
             logger.warning(exc.to_dict())
+        return current_token_type
+    
+    def decode_and_validate_type_jwt(
+        self,
+        *,
+        token: str,
+        expected_type: TokenTypesEnum,
+    ) -> AccessJWTPayloadDTO | RefreshJWTPayloadDTO:
+        decoded_jwt = self._decode_jwt(token)      
+        current_token_type = self._validate_token_type(
+            raw_token=token,
+            decoded_token=decoded_jwt,
+            expected_type=expected_type,
+        )
         if current_token_type == TokenTypesEnum.access:
             dto = AccessJWTPayloadDTO
         elif current_token_type == TokenTypesEnum.refresh:
@@ -253,18 +274,24 @@ class DecodeJWTService:
                 token=token,
                 token_type=current_token_type,
                 subject=self.__class__.__name__,
-                handler=self.decode_jwt.__name__,
+                handler=self.decode_and_validate_type_jwt.__name__,
                 internal_message=f"Недопустимый тип токена: {current_token_type!r}",
             )
             exc = TokenError(context=ctx)
             logger.error(exc.to_dict())
             raise exc
         return dto(**decoded_jwt)
-
+    
+    def decode_access_jwt(self, token: str) -> AccessJWTPayloadDTO:
+        return self.decode_and_validate_type_jwt(token=token, expected_type=TokenTypesEnum.access)
+    
+    def decode_refresh_jwt(self, token: str) -> AccessJWTPayloadDTO:
+        return self.decode_and_validate_type_jwt(token=token, expected_type=TokenTypesEnum.refresh)
+    
     def verify_token(self, token: str) -> bool:
         """Проверить валидность токена"""
         try:
-            self.decode_jwt(token)
+            self.decode_and_validate_type_jwt(token)
             return True
         except (RottenTokenError, TokenError):
             return False
@@ -388,13 +415,13 @@ if __name__ == "__main__":
     encoded_jwt = jwt_service.create_access_jwt(user_dto=_user_dto)
     print(encoded_jwt)
 
-    decoded_jwt = jwt_service.decode_jwt(token=encoded_jwt)
+    decoded_jwt = jwt_service.decode_and_validate_type_jwt(token=encoded_jwt)
     print(decoded_jwt)
 
     encoded_jwt = jwt_service.create_refresh_jwt(user_dto=_user_dto)
     print(encoded_jwt)
 
-    decoded_jwt = jwt_service.decode_jwt(token=encoded_jwt)
+    decoded_jwt = jwt_service.decode_and_validate_type_jwt(token=encoded_jwt)
     print(decoded_jwt)
 
     print(jwt_service.issue_pair(user_dto=_user_dto))
