@@ -20,3 +20,5 @@ class UsersSqlAlchemyRepository:
     async def get_by_id(self, _id: int) -> UserEntity | None:
         return await self._repo.get_by_id(_id)
 
+    async def add(self, user: UserEntity) -> UserEntity:
+        return await self._repo.add(user)

@@ -1,5 +1,3 @@
-__all__ = (
-    "UserEntity",
-)
+__all__ = ("UserEntity",)
 
 from domain.entities.user import UserEntity

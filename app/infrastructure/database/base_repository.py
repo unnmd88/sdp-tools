@@ -10,7 +10,6 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from application.interfaces.mappers.db import BaseDBMapperProtocol
 
 
-
 EntityType = TypeVar("EntityType")
 ModelType = TypeVar("ModelType")
 CreateDTOType = TypeVar("CreateDTOType")
@@ -153,7 +152,7 @@ CreateDTOType = TypeVar("CreateDTOType")
 
 
 class BaseSqlAlchemyRepository[ModelType, EntityType, CreateDTOType]:
-    """ Базовый репозиторий для работы с базой данных через sqlalchemy. """
+    """Базовый репозиторий для работы с базой данных через sqlalchemy."""
 
     def __init__(
         self,
@@ -190,26 +189,39 @@ class BaseSqlAlchemyRepository[ModelType, EntityType, CreateDTOType]:
     #     result = await self.session.execute(stmt)
     #     return [self.mapper.to_entity(model) for model in result.scalars().all()]
 
-    async def add(self, create_record_dto: EntityType) -> EntityType | None:
-        search_filters = (
-            create_record_dto.check_exists_search_filters or create_record_dto.fields
-        )
-        stmt = select(self._model).filter_by(**search_filters)
-        result: Result = await self._session.execute(stmt)
-        if result.scalars().one_or_none() is not None:
-            raise CreateErrorAlreadyExists
-        new_instance = self.mapper.to_model(entity)
-
-        self.session.add(new_instance)
+    async def add(self, entity: EntityType) -> EntityType | None:
+        instance = self._mapper.to_model(entity)
+        self._session.add(instance)
         try:
-            await self.session.commit()
-            return self.mapper.to_entity(new_instance)
+            await self._session.commit()
+            return entity
         except IntegrityError:
-            await self.session.rollback()
-            raise CreateErrorAlreadyExists
+            await self._session.rollback()
         except SQLAlchemyError as e:
-            await self.session.rollback()
+            await self._session.rollback()
             raise e
+
+
+    # async def add(self, create_record_dto: EntityType) -> EntityType | None:
+    #     search_filters = (
+    #         create_record_dto.check_exists_search_filters or create_record_dto.fields
+    #     )
+    #     stmt = select(self._model).filter_by(**search_filters)
+    #     result: Result = await self._session.execute(stmt)
+    #     if result.scalars().one_or_none() is not None:
+    #         raise CreateErrorAlreadyExists
+    #     new_instance = self.mapper.to_model(entity)
+    #
+    #     self.session.add(new_instance)
+    #     try:
+    #         await self.session.commit()
+    #         return self.mapper.to_entity(new_instance)
+    #     except IntegrityError:
+    #         await self.session.rollback()
+    #         raise CreateErrorAlreadyExists
+    #     except SQLAlchemyError as e:
+    #         await self.session.rollback()
+    #         raise e
 
     # async def update_one(
     #     self,

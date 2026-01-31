@@ -4,12 +4,14 @@ from fastapi import APIRouter, status, HTTPException, Depends
 
 from application.dto.jwt_dto import AccessJWTPayloadDTO
 from application.exceptions import NotFoundError, InactiveAccountError
-from application.use_cases.users.get_active_user_from_repo_use_case import GetActiveUserFromRepoUseCase
+from application.use_cases.users.get_active_user_from_repo_use_case import (
+    GetActiveUserFromRepoUseCase,
+)
 from domain.enums.unsorted import TokenTypesEnum
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
 from presentation.api.dependencies.di import (
     get_active_user_use_case,
-    jwt_decoder_factory
+    jwt_decoder_factory,
 )
 from presentation.api.dependencies.ioc import (
     # UsersUseCase,
@@ -43,11 +45,15 @@ router = APIRouter(
     response_model=ResponseUserSchema,
     summary="Данные о пользователе из access jwt",
     description=GET_whoami,
-
 )
 async def whoami(
-    token_dto: Annotated[AccessJWTPayloadDTO, Depends(jwt_decoder_factory(token_type=TokenTypesEnum.access))],
-    use_case: Annotated[GetActiveUserFromRepoUseCase, Depends(get_active_user_use_case)],
+    token_dto: Annotated[
+        AccessJWTPayloadDTO,
+        Depends(jwt_decoder_factory(token_type=TokenTypesEnum.access)),
+    ],
+    use_case: Annotated[
+        GetActiveUserFromRepoUseCase, Depends(get_active_user_use_case)
+    ],
 ):
     try:
         return ResponseUserSchema.model_validate(
@@ -64,8 +70,6 @@ async def whoami(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Пользователь с id {token_dto.user_id} не активен.",
         )
-
-
 
 
 @router.patch(

@@ -2,7 +2,9 @@ from typing import Callable, Sequence, Any
 
 from domain.contract2.require import Require
 from domain.exceptions import DomainContractViolationError, DomainValidationError
-from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
+from domain.value_objects.contract_violation_context_vo import (
+    ContractViolationContextVO,
+)
 
 
 class ContractField:
@@ -59,8 +61,7 @@ class ContractField:
                     handler="check_nullable",
                 )
                 raise DomainValidationError(
-                    message=current_error_context.message,
-                    context=current_error_context
+                    message=current_error_context.message, context=current_error_context
                 )
             value = self._preprocess(value)
             for require in self._requires:
@@ -73,10 +74,12 @@ class ContractField:
                     )
                     raise DomainContractViolationError(
                         message=current_error_context.message,
-                        context=current_error_context
+                        context=current_error_context,
                     )
         except DomainContractViolationError as e:
-            cur_ctx: ContractViolationContextVO = e.context or ContractViolationContextVO()
+            cur_ctx: ContractViolationContextVO = (
+                e.context or ContractViolationContextVO()
+            )
             updated_context = ContractViolationContextVO(
                 subject=cur_ctx.subject or f"{instance.__class__.__name__}",
                 field_name=cur_ctx.field_name or self._field_name,
@@ -84,7 +87,7 @@ class ContractField:
                 violation=cur_ctx.violation,
                 handler=cur_ctx.handler,
                 message=cur_ctx.message,
-                value=cur_ctx.value or value
+                value=cur_ctx.value or value,
             )
             e.update_context(updated_context)
             raise e

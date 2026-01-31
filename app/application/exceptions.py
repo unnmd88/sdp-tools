@@ -1,4 +1,4 @@
-from core.error_data import ErrorData
+from core.error_codes import ErrorCodes
 from core.exceptions import BaseAppError
 
 
@@ -8,23 +8,20 @@ class ApplicationLayerError(BaseAppError):
     Все исключения слоя приложения должны наследоваться от него.
     """
 
-    DEFAULT_CODE = ErrorData.APPLICATION_ERROR.code
-    DEFAULT_MESSAGE = ErrorData.APPLICATION_ERROR.message
+    DEFAULT_CODE = ErrorCodes.APPLICATION_ERROR.code
+    DEFAULT_MESSAGE = ErrorCodes.APPLICATION_ERROR.message
 
 
 class NotFoundError(ApplicationLayerError):
-
-    DEFAULT_CODE = ErrorData.NOT_FOUND.code
-    DEFAULT_MESSAGE = ErrorData.NOT_FOUND.message
+    DEFAULT_CODE = ErrorCodes.NOT_FOUND.code
+    DEFAULT_MESSAGE = ErrorCodes.NOT_FOUND.message
 
 
 class AuthenticationError(ApplicationLayerError):
-
-    DEFAULT_CODE = ErrorData.UNAUTHORIZED.code
-    DEFAULT_MESSAGE = ErrorData.UNAUTHORIZED.message
+    DEFAULT_CODE = ErrorCodes.UNAUTHORIZED.code
+    DEFAULT_MESSAGE = ErrorCodes.UNAUTHORIZED.message
 
 
 class InactiveAccountError(ApplicationLayerError):
-
-    DEFAULT_CODE = ErrorData.INACTIVE_ACCOUNT.code
-    DEFAULT_MESSAGE = ErrorData.INACTIVE_ACCOUNT.message
+    DEFAULT_CODE = ErrorCodes.INACTIVE_ACCOUNT.code
+    DEFAULT_MESSAGE = ErrorCodes.INACTIVE_ACCOUNT.message

@@ -15,5 +15,3 @@ class ContractViolationContextVO:
     rule: str | None = None
     message: str | None = None
     expected_type: type | UnionType | tuple[type] = None
-
-

@@ -5,7 +5,7 @@ from typing import Any, Protocol, runtime_checkable, ClassVar
 from typing import dataclass_transform
 
 # from .error_codes import ErrorData
-from core.error_data import ErrorData
+from core.error_codes import ErrorCodes
 
 
 class ErrorContextAsAnyDataclassProtocol(Protocol):
@@ -21,8 +21,8 @@ class BaseAppError(Exception):
     Все доменные исключения должны наследоваться от него.
     """
 
-    DEFAULT_CODE: str = ErrorData.INTERNAL_ERROR.code
-    DEFAULT_MESSAGE: str = ErrorData.INTERNAL_ERROR.message
+    DEFAULT_CODE: str = ErrorCodes.INTERNAL_ERROR.code
+    DEFAULT_MESSAGE: str = ErrorCodes.INTERNAL_ERROR.message
 
     def __init__(
         self,
@@ -52,7 +52,9 @@ class BaseAppError(Exception):
             "extra": self.extra,
         }
 
-    def update_context(self, other: ErrorContextAsAnyDataclassProtocol | dict[str, Any]):
+    def update_context(
+        self, other: ErrorContextAsAnyDataclassProtocol | dict[str, Any]
+    ):
         if is_dataclass(other):
             self.context = other
         elif isinstance(other, dict):
@@ -65,10 +67,7 @@ class BaseAppError(Exception):
         return f"{self.__class__.__name__}(code={self.code!r} message={self.message!r})"
 
 
-
-
-
 if __name__ == "__main__":
-    print(ErrorData.INTERNAL_ERROR.code)
-    print(ErrorData.INTERNAL_ERROR.message)
-    print(ErrorData.INTERNAL_ERROR.http_status_code)
+    print(ErrorCodes.INTERNAL_ERROR.code)
+    print(ErrorCodes.INTERNAL_ERROR.message)
+    print(ErrorCodes.INTERNAL_ERROR.http_status_code)

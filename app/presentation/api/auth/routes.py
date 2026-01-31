@@ -24,7 +24,6 @@ from presentation.schemas.jwt import TokenInfo
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-
 AUTH_RESPONSES = {
     status.HTTP_200_OK: {
         "model": TokenInfo,
@@ -35,15 +34,14 @@ AUTH_RESPONSES = {
         "content": {
             "application/json": {
                 "example": {
-                    "detail":
-                        HTTPExceptionContext(
-                            code=Codes.UNAUTHORIZED,
-                            message=ErrorMessages.invalid_login_or_password,
-                            user_message=ErrorMessages.invalid_login_or_password
-                        ).model_dump()
+                    "detail": HTTPExceptionContext(
+                        code=Codes.UNAUTHORIZED,
+                        message=ErrorMessages.invalid_login_or_password,
+                        user_message=ErrorMessages.invalid_login_or_password,
+                    ).model_dump()
                 }
             }
-        }
+        },
     },
     status.HTTP_403_FORBIDDEN: {
         "model": HTTPExceptionContext,
@@ -51,12 +49,11 @@ AUTH_RESPONSES = {
         "content": {
             "application/json": {
                 "example": {
-                    "detail":
-                        HTTPExceptionContext(
-                            code=Codes.FORBIDDEN,
-                            message=ErrorMessages.account_inactive,
-                            user_message=ErrorMessages.account_inactive
-                        ).model_dump(),
+                    "detail": HTTPExceptionContext(
+                        code=Codes.FORBIDDEN,
+                        message=ErrorMessages.account_inactive,
+                        user_message=ErrorMessages.account_inactive,
+                    ).model_dump(),
                 },
             },
         },
@@ -67,17 +64,15 @@ AUTH_RESPONSES = {
         "content": {
             "application/json": {
                 "example": {
-                    "detail":
-                        HTTPExceptionContext(
-                            code=Codes.REQUEST_ERROR,
-                            message=ErrorMessages.error_request,
-                            user_message=ErrorMessages.error_request
-                        ).model_dump()
-
+                    "detail": HTTPExceptionContext(
+                        code=Codes.REQUEST_ERROR,
+                        message=ErrorMessages.error_request,
+                        user_message=ErrorMessages.error_request,
+                    ).model_dump()
                 }
             }
-        }
-    }
+        },
+    },
 }
 
 
@@ -109,17 +104,15 @@ async def login_and_issue_jwt(
         e = HTTPExceptionContext(
             code=Codes.FORBIDDEN,
             message=ErrorMessages.account_inactive,
-            user_message=ErrorMessages.account_inactive
+            user_message=ErrorMessages.account_inactive,
         )
     except Exception:
         e = HTTPExceptionContext(
             code=Codes.REQUEST_ERROR,
             message=ErrorMessages.error_request,
-            user_message=ErrorMessages.error_request
+            user_message=ErrorMessages.error_request,
         )
     raise e.to_http_exception()
-
-
 
 
 @router.post(

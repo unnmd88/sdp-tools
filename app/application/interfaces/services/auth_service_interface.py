@@ -5,6 +5,4 @@ from application.dto.users import UserDTO
 
 
 class AuthServiceProtocol(Protocol):
-
     async def authenticate(self, auth_dto: UserAuthDTO) -> UserDTO | None: ...
-

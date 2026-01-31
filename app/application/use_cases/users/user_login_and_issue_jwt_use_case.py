@@ -9,7 +9,9 @@ from application.dto.users import UserDTO
 from application.dto.auth import UserAuthDTO
 from application.exceptions import AuthenticationError
 from application.interfaces import AuthServiceProtocol
-from application.interfaces.services.issue_jwt_service_interface import IssueJWTServiceProtocol
+from application.interfaces.services.issue_jwt_service_interface import (
+    IssueJWTServiceProtocol,
+)
 
 
 logger = logging.getLogger(AUTH_LOGGER)
@@ -31,7 +33,12 @@ class UserLoginAndIssueJWTUseCaseImpl:
         )
         try:
             token_pair = self.jwt_service.issue_pair(payload_dto=payload)
-            logger.info("Пользователю %r(id=%r) выпущены JWT: %r", user_dto.username, user_dto.id, token_pair)
+            logger.info(
+                "Пользователю %r(id=%r) выпущены JWT: %r",
+                user_dto.username,
+                user_dto.id,
+                token_pair,
+            )
             return self.jwt_service.issue_pair(payload_dto=payload)
         except Exception as e:
             logger.error("Программная ошибка выпуска JWT: %r", str(e))

@@ -1,15 +1,18 @@
-from core.error_data import ErrorData
+from core.error_codes import ErrorCodes
 from domain.enums.attrs_names import PublicAttrNamesEnum
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.violations import Violations
 from domain.exceptions import DomainError, DomainValidationError
-from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
+from domain.value_objects.contract_violation_context_vo import (
+    ContractViolationContextVO,
+)
 
 
 class GeneralPurposeValidator:
     @classmethod
     def pk_id(
-        cls, value: str,
+        cls,
+        value: str,
         subject: str | None = None,
     ) -> bool:
         if isinstance(value, int) and value > 0 and value:
@@ -27,7 +30,7 @@ class GeneralPurposeValidator:
             field_name=field_name,
             subject=subject,
             handler=f"{cls.__name__!r}:{cls.pk_id.__name__!r}",
-            contract_code=ErrorData.DOMAIN_TYPE_VALIDATION.code,
+            contract_code=ErrorCodes.DOMAIN_TYPE_VALIDATION.code,
             violation=violation,
             value=value,
             expected_type=int.__name__,

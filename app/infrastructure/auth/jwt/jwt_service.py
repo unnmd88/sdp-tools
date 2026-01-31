@@ -8,11 +8,16 @@ from typing import AnyStr
 import jwt
 
 from app_logging.dev.config import INFRASTRUCTURE
-from application.dto.jwt_dto import AccessJWTPayloadDTO, RefreshJWTPayloadDTO, TokenDataDTO, PayloadJWTDTO
+from application.dto.jwt_dto import (
+    AccessJWTPayloadDTO,
+    RefreshJWTPayloadDTO,
+    TokenDataDTO,
+    PayloadJWTDTO,
+)
 from application.dto.users import UserDTO
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.value_objects.token_error_context_vo import TokenErrorContextVO
-from infrastructure.auth.exceptions import  RottenTokenError
+from infrastructure.auth.exceptions import RottenTokenError
 from domain.enums.unsorted import TokenTypesEnum, Organizations, Roles
 from infrastructure.exceptions import TokenError, InvalidTokenTypeError
 
@@ -194,7 +199,10 @@ class DecodeJWTService:
         self._public_key = public_key
         self._algorithm = algorithm
 
-    def _decode_jwt(self, token: str,):
+    def _decode_jwt(
+        self,
+        token: str,
+    ):
         try:
             return jwt.decode(
                 jwt=token,
@@ -213,7 +221,7 @@ class DecodeJWTService:
             exc = TokenError(context=ctx)
             logger.error(exc.to_dict())
             raise exc
-    
+
     def _validate_token_type(
         self,
         *,
@@ -242,14 +250,14 @@ class DecodeJWTService:
             exc = InvalidTokenTypeError(context=ctx)
             logger.warning(exc.to_dict())
         return current_token_type
-    
+
     def decode_and_validate_type_jwt(
         self,
         *,
         token: str,
         expected_type: TokenTypesEnum,
     ) -> AccessJWTPayloadDTO | RefreshJWTPayloadDTO:
-        decoded_jwt = self._decode_jwt(token)      
+        decoded_jwt = self._decode_jwt(token)
         current_token_type = self._validate_token_type(
             raw_token=token,
             decoded_token=decoded_jwt,
@@ -271,13 +279,17 @@ class DecodeJWTService:
             logger.error(exc.to_dict())
             raise exc
         return dto(**decoded_jwt)
-    
+
     def decode_access_jwt(self, token: str) -> AccessJWTPayloadDTO:
-        return self.decode_and_validate_type_jwt(token=token, expected_type=TokenTypesEnum.access)
-    
+        return self.decode_and_validate_type_jwt(
+            token=token, expected_type=TokenTypesEnum.access
+        )
+
     def decode_refresh_jwt(self, token: str) -> AccessJWTPayloadDTO:
-        return self.decode_and_validate_type_jwt(token=token, expected_type=TokenTypesEnum.refresh)
-    
+        return self.decode_and_validate_type_jwt(
+            token=token, expected_type=TokenTypesEnum.refresh
+        )
+
     def verify_token(self, token: str) -> bool:
         """Проверить валидность токена"""
         try:
@@ -363,14 +375,20 @@ class IssueJWTService:
 
     def issue_access_jwt(self, payload_dto: PayloadJWTDTO) -> TokenDataDTO:
         return TokenDataDTO(
-            access_token=self._encode_jwt(payload_dto=payload_dto, token_type=TokenTypesEnum.access),
+            access_token=self._encode_jwt(
+                payload_dto=payload_dto, token_type=TokenTypesEnum.access
+            ),
             refresh_token=None,
         )
 
     def issue_pair(self, payload_dto: PayloadJWTDTO) -> TokenDataDTO:
         return TokenDataDTO(
-            access_token=self._encode_jwt(payload_dto=payload_dto, token_type=TokenTypesEnum.access),
-            refresh_token=self._encode_jwt(payload_dto=payload_dto, token_type=TokenTypesEnum.refresh),
+            access_token=self._encode_jwt(
+                payload_dto=payload_dto, token_type=TokenTypesEnum.access
+            ),
+            refresh_token=self._encode_jwt(
+                payload_dto=payload_dto, token_type=TokenTypesEnum.refresh
+            ),
         )
 
 

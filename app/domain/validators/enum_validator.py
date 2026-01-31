@@ -2,11 +2,13 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
-from core.error_data import ErrorData
+from core.error_codes import ErrorCodes
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.violations import Violations
 from domain.exceptions import DomainValidationError
-from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
+from domain.value_objects.contract_violation_context_vo import (
+    ContractViolationContextVO,
+)
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)
@@ -21,7 +23,7 @@ class EnumValidator:
             ctx = ContractViolationContextVO(
                 field_name=self.field_name,
                 handler=EnumValidator.__name__,
-                contract_code=ErrorData.DOMAIN_VALIDATION.code,
+                contract_code=ErrorCodes.DOMAIN_VALIDATION.code,
                 violation=Violations.invalid_enum_value,
                 value=value,
                 message=ErrorMessages.invalid_enum_value.format(

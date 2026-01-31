@@ -8,7 +8,9 @@ from domain.enums.unsorted import TokenTypesEnum
 class DecodeJWTServiceProtocol(Protocol):
     """Протокол для сервиса работы с JWT токенами"""
 
-    def decode_jwt(self, token: str, expected_token_type: TokenTypesEnum) -> AccessJWTPayloadDTO | RefreshJWTPayloadDTO:
+    def decode_jwt(
+        self, token: str, expected_token_type: TokenTypesEnum
+    ) -> AccessJWTPayloadDTO | RefreshJWTPayloadDTO:
         """Декодировать и верифицировать токен"""
         ...
 

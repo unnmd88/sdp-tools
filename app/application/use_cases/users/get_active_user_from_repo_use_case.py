@@ -11,7 +11,6 @@ logger = logging.getLogger(DOMAIN)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class GetActiveUserFromRepoUseCase:
-
     user_repository: UsersRepositoryProtocol
 
     async def __call__(self, _id: int) -> UserDTO:

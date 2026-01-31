@@ -1,4 +1,4 @@
-from core.error_data import ErrorData
+from core.error_codes import ErrorCodes
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.attrs_names import PublicAttrNamesEnum
 from domain.enums.violations import Violations
@@ -11,8 +11,14 @@ from domain.business_rules import (
     MIN_LEN_LASTNAME,
     MAX_LEN_LASTNAME,
 )
-from domain.exceptions import DomainError, DomainValidationError, DomainBusinessRuleError
-from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
+from domain.exceptions import (
+    DomainError,
+    DomainValidationError,
+    DomainBusinessRuleError,
+)
+from domain.value_objects.contract_violation_context_vo import (
+    ContractViolationContextVO,
+)
 
 
 class UserEntityValidator:
@@ -48,9 +54,9 @@ class UserEntityValidator:
             raise DomainError
         exc = DomainValidationError if not rule else DomainBusinessRuleError
         contract_code = (
-            ErrorData.DOMAIN_VALIDATION.code
+            ErrorCodes.DOMAIN_VALIDATION.code
             if not rule
-            else ErrorData.BUSINESS_RULE_VIOLATION.code
+            else ErrorCodes.BUSINESS_RULE_VIOLATION.code
         )
         ctx = ContractViolationContextVO(
             field_name=field_name,
@@ -97,7 +103,7 @@ class UserEntityValidator:
         ctx = ContractViolationContextVO(
             field_name=field_name,
             handler=f"{cls.__name__}:{handler}",
-            contract_code=ErrorData.DOMAIN_VALIDATION.code,
+            contract_code=ErrorCodes.DOMAIN_VALIDATION.code,
             violation=violation,
             value=value,
             message=message,

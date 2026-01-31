@@ -12,7 +12,6 @@ from fastapi.responses import JSONResponse
 
 
 class Codes(StrEnum):
-
     REQUEST_ERROR = "REQUEST_ERROR"
     NOT_FOUND_ERROR = "NOT_FOUND_ERROR"
     CONFLICT_ERROR = "CONFLICT_ERROR"
@@ -22,7 +21,6 @@ class Codes(StrEnum):
 
 
 class ErrorMessages(StrEnum):
-
     invalid_login_or_password = "Неверный логин или пароль"
     error_request = "Ошибка выполнения запроса"
     account_inactive = "Аккаунт не активен"
@@ -30,25 +28,24 @@ class ErrorMessages(StrEnum):
 
 
 class HTTPExceptionContext(BaseModel):
-
     code: Codes = Field(
         default=Codes.REQUEST_ERROR,
         description="Код ошибки",
-        examples=[Codes.REQUEST_ERROR, Codes.VALIDATION_ERROR]
+        examples=[Codes.REQUEST_ERROR, Codes.VALIDATION_ERROR],
     )
     message: ErrorMessages = Field(
-            default=ErrorMessages.error_request,
-            description="Сообщение об ошибке",
-            examples=[ErrorMessages.error_request, ErrorMessages.validation_error]
+        default=ErrorMessages.error_request,
+        description="Сообщение об ошибке",
+        examples=[ErrorMessages.error_request, ErrorMessages.validation_error],
     )
     user_message: ErrorMessages = Field(
         default=ErrorMessages.error_request,
         description="Сообщение для пользователя",
-        examples=[ErrorMessages.validation_error]
+        examples=[ErrorMessages.validation_error],
     )
     timestamp: str = Field(
         description="Время возникновения ошибки",
-        default_factory=lambda: datetime.now().isoformat()
+        default_factory=lambda: datetime.now().isoformat(),
     )
 
     @cached_property
@@ -73,7 +70,7 @@ class HTTPExceptionContext(BaseModel):
                 "user_message": ErrorMessages.validation_error,
                 "timestamp": "2024-01-15T10:30:00.000Z",
             }
-        }
+        },
     )
 
     def to_json_response(
@@ -113,4 +110,3 @@ class HTTPExceptionContext(BaseModel):
             detail=self.model_dump(exclude_none=True),
             headers=headers,
         )
-

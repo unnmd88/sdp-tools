@@ -6,7 +6,6 @@ TE = TypeVar("TE")
 
 
 class BaseDBMapperProtocol(Protocol):
-
     @classmethod
     def to_entity(cls, db_model: TM) -> TE: ...
 

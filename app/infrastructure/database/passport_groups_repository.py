@@ -1,4 +1,5 @@
 from infrastructure.database.base_repository import BaseSqlAlchemyRepository
+
 # from infrastructure.database.mappers.passport_groups import PassportGroupsDBMapper
 from infrastructure.database.models import PassportGroup as PassportGroupModel
 

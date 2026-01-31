@@ -33,8 +33,8 @@ class Password(BaseModel):
 
 
 class DefaultSuperuserCreds(BaseModel):
-    name: str
-    password: str
+    director_username: str
+    director_password: str
 
 
 class AuthJWT(BaseModel):
@@ -74,7 +74,11 @@ class Settings(BaseSettings):
     api: ApiPrefix = ApiPrefix()
     db: DatabaseConfig
     auth_jwt: AuthJWT = AuthJWT()
-    default_superuser_creds: DefaultSuperuserCreds
+    # default_superuser_creds: DefaultSuperuserCreds
+    director_username: str
+    director_password: str
+    secret_key_to_create_director: str
+
 
     @property
     def base_url(self) -> str:

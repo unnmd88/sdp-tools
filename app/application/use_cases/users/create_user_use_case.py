@@ -62,9 +62,7 @@ class CreateUserUseCaseImpl:
             logger.info("%s: %r", e, create_user_dto.password)
             raise
         user_already_exists: UserEntity = (
-            await self.get_user_use_case.get_user_by_username(
-                create_user_dto.username
-            )
+            await self.get_user_use_case.get_user_by_username(create_user_dto.username)
         )
         if user_already_exists:
             msg = f"Пользователь с username={user_already_exists.username}(id={user_already_exists.id}) существует."

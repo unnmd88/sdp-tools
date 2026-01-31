@@ -53,6 +53,7 @@ class ErrorMessages(StrEnum):
 
     invalid_username_or_password = "Неверное имя пользователя или пароль."
     inactive_user = "Пользователь неактивен."
+    already_exists = "{} с {}={} уже существует."
     # username_length_range = value_str_length_range.format(
     #     MIN_LEN_USERNAME, MAX_LEN_USERNAME
     # )

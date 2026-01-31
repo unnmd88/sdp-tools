@@ -2,7 +2,7 @@ import json
 import time
 from datetime import datetime
 
-from core.error_data import ErrorData
+from core.error_codes import ErrorCodes
 from domain.entities.base_entity import AbstractEntity
 from domain.contract2.contract_field import ContractField
 from domain.contract2.require import Require
@@ -25,7 +25,9 @@ from domain.validators import (
     EnumValidator,
     UserEntityValidator,
 )
-from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
+from domain.value_objects.contract_violation_context_vo import (
+    ContractViolationContextVO,
+)
 
 
 class UserEntity(AbstractEntity):
@@ -97,6 +99,11 @@ class UserEntity(AbstractEntity):
             TelegramRegexpValidator(field_name=str(PublicAttrNamesEnum.telegram))
         ],
     )
+    description = ContractField(
+        field_name=str(PublicAttrNamesEnum.description),
+        nullable=False,
+        use_cache=True,
+    )
 
     def __init__(
         self,
@@ -112,8 +119,8 @@ class UserEntity(AbstractEntity):
         phone_number: str | None,
         telegram: str | None,
         description: str,
-        created_at: datetime | None,
-        updated_at: datetime | None,
+        created_at: datetime | None = None,
+        updated_at: datetime | None = None,
     ):
         super().__init__(id=id, created_at=created_at, updated_at=updated_at)
         self.username = username
@@ -126,7 +133,7 @@ class UserEntity(AbstractEntity):
         self.role = role
         self.phone_number = phone_number
         self.telegram = telegram
-        self._description = description
+        self.description = description
         self.invariant_names()
 
     def __eq__(self, other):
@@ -161,7 +168,7 @@ class UserEntity(AbstractEntity):
             subject=self.__class__.__name__,
             field_name=str(PublicAttrNamesEnum.username),
             handler=f"{self.__class__.__name__}:{self.invariant_names.__name__}",
-            contract_code=ErrorData.BUSINESS_RULE_VIOLATION.code,
+            contract_code=ErrorCodes.BUSINESS_RULE_VIOLATION.code,
             violation=Violations.invariant_violation,
             value=self._username,
             rule=rule,
@@ -178,7 +185,6 @@ if __name__ == "__main__":
 
     start_time = time.perf_counter()
     try:
-
         user = UserEntity(
             id=1,
             firstname="Junkers",
@@ -201,6 +207,5 @@ if __name__ == "__main__":
         print(json.dumps(e.to_dict(), indent=2, ensure_ascii=False))
 
     print(f"Время выполнения с валидацией: {time.perf_counter() - start_time} секунд")
-
 
     # print(user.to_json())

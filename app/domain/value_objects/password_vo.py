@@ -1,11 +1,17 @@
 from dataclasses import dataclass, field
 
-from core.error_data import ErrorData
+from core.error_codes import ErrorCodes
 from domain.enums.attrs_names import PrivateAttrNamesEnum
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.violations import Violations
-from domain.exceptions import DomainError, DomainBusinessRuleError, DomainValidationError
-from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
+from domain.exceptions import (
+    DomainError,
+    DomainBusinessRuleError,
+    DomainValidationError,
+)
+from domain.value_objects.contract_violation_context_vo import (
+    ContractViolationContextVO,
+)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True, repr=False)
@@ -30,9 +36,9 @@ class PasswordVO:
             raise DomainError
         exc = DomainValidationError if not rule else DomainBusinessRuleError
         contract_code = (
-            ErrorData.DOMAIN_VALIDATION.code
+            ErrorCodes.DOMAIN_VALIDATION.code
             if not rule
-            else ErrorData.BUSINESS_RULE_VIOLATION.code
+            else ErrorCodes.BUSINESS_RULE_VIOLATION.code
         )
         ctx = ContractViolationContextVO(
             subject=self.subject,

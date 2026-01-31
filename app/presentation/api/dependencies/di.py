@@ -12,7 +12,9 @@ from application.dto.jwt_dto import AccessJWTPayloadDTO, RefreshJWTPayloadDTO
 from application.services.auth_service import AuthenticationService
 
 from application.use_cases.users.create_user_use_case import CreateUserUseCaseImpl
-from application.use_cases.users.get_active_user_from_repo_use_case import GetActiveUserFromRepoUseCase
+from application.use_cases.users.get_active_user_from_repo_use_case import (
+    GetActiveUserFromRepoUseCase,
+)
 
 from application.use_cases.users.refresh_jwt_use_case import RefreshJWTUseCaseImpl
 from core.config import settings
@@ -41,10 +43,18 @@ from infrastructure.database.api import db_api
 from infrastructure.database.passport_groups_repository import (
     PassportGroupsRepositorySqlAlchemyRepository,
 )
-from infrastructure.database.regions_repository import RegionsRepositorySqlAlchemyRepository
-from infrastructure.database.tlo_repository import TrafficLightObjectSqlAlchemyRepository
+from infrastructure.database.regions_repository import (
+    RegionsRepositorySqlAlchemyRepository,
+)
+from infrastructure.database.tlo_repository import (
+    TrafficLightObjectSqlAlchemyRepository,
+)
 from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
-from infrastructure.exceptions import RottenTokenError, TokenError, InvalidTokenTypeError
+from infrastructure.exceptions import (
+    RottenTokenError,
+    TokenError,
+    InvalidTokenTypeError,
+)
 
 from presentation.schemas.jwt import PayloadAccessJWTSchema, PayloadRefreshJWTSchema
 
@@ -55,18 +65,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=settings.login_url)
 db_session = Annotated[AsyncSession, Depends(db_api.session_getter)]
 
 
-
-
-
 #  -- sql-alchemy repo --
 
 
 def get_users_sqlalchemy_repository(session: db_session) -> UsersSqlAlchemyRepository:
     return UsersSqlAlchemyRepository(session=session)
 
+
 # -- services --
-
-
 
 
 # -- JWT, credentials and access-levels --
@@ -115,6 +121,7 @@ class JWTDecoder:
                 detail="Некорректный токен",
             )
 
+
 def jwt_decoder_factory(
     *,
     token_type: TokenTypesEnum,
@@ -125,22 +132,25 @@ def jwt_decoder_factory(
         public_key=decode_jwt_settings.public_key_path.resolve().read_text("utf-8"),
         algorithm=decode_jwt_settings.algorithm,
     )
-    return JWTDecoder(jwt_service=jwt_service, token_type=token_type, specific_field=specific_field)
+    return JWTDecoder(
+        jwt_service=jwt_service, token_type=token_type, specific_field=specific_field
+    )
 
 
 class IssueJWTServiceDep:
     def __init__(self, decode_jwt_settings: IssueJWTSettings = IssueJWTSettings()):
         self._decode_jwt_settings = decode_jwt_settings
         self._jwt_service = IssueJWTService(
-            private_key=self._decode_jwt_settings.private_key_path.resolve().read_text("utf-8"),
+            private_key=self._decode_jwt_settings.private_key_path.resolve().read_text(
+                "utf-8"
+            ),
             algorithm=self._decode_jwt_settings.algorithm,
             expire_minutes_access_token=self._decode_jwt_settings.expire_minutes_access_token,
             expire_days_refresh_token=self._decode_jwt_settings.expire_days_refresh_token,
         )
+
     async def __call__(self) -> IssueJWTService:
         return self._jwt_service
-
-
 
 
 # -- use-cases --
@@ -164,12 +174,14 @@ class IssueJWTServiceDep:
 #         get_user_use_case=GetUserUseCaseImpl(user_repository=user_repository),
 #     )
 
+
 def get_active_user_use_case(
     repository: Annotated[
         UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
     ],
 ) -> GetActiveUserFromRepoUseCase:
     return GetActiveUserFromRepoUseCase(user_repository=repository)
+
 
 def get_auth_and_jwt_use_case(
     jwt_service: Annotated[IssueJWTServiceDep, Depends(IssueJWTServiceDep())],

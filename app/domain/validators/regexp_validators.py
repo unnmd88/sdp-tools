@@ -1,6 +1,6 @@
 import re
 
-from core.error_data import ErrorData
+from core.error_codes import ErrorCodes
 from domain.enums.attrs_names import PublicAttrNamesEnum
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.violations import Violations
@@ -11,11 +11,13 @@ from domain.business_rules import (
     TELEGRAM_PATTERN,
 )
 from domain.exceptions import DomainValidationError
-from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
+from domain.value_objects.contract_violation_context_vo import (
+    ContractViolationContextVO,
+)
 
 
 class RegexpValidator:
-    regexp_contract_code: str = ErrorData.DOMAIN_VALIDATION.code
+    regexp_contract_code: str = ErrorCodes.DOMAIN_VALIDATION.code
     regexp_violation: Violations = Violations.does_not_match_regexp
     pattern = None
     field_name = None
@@ -59,7 +61,6 @@ class RegexpValidator:
             message=message,
         )
         raise DomainValidationError(context=ctx)
-
 
     def __repr__(self) -> str:
         return (

@@ -13,4 +13,3 @@ class ApplicationErrorContextVO:
     rule: str | None = None
     internal_message: str | None = None
     message: str | None = None
-
