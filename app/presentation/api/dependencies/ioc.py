@@ -10,18 +10,11 @@ from application.use_cases.users.refresh_jwt_use_case import RefreshJWTUseCaseIm
 from application.use_cases.users.user_login_and_issue_jwt_use_case import (
     UserLoginAndIssueJWTUseCaseImpl,
 )
-from domain.enums.unsorted import TokenTypesEnum
 
 from presentation.api.dependencies.di import (
-    get_access_jwt_payload_schema,
-    is_superuser,
-    is_admin,
-    get_refresh_jwt_payload_schema,
     get_auth_and_jwt_use_case,
     get_refresh_jwt_use_case,
-    # create_user_use_case,
     oauth2_scheme,
-
 )
 from presentation.api.dependencies.utils import get_filters_for_region_or_name_search
 from presentation.schemas.auth import AuthSchema
@@ -43,14 +36,14 @@ RefreshJWTUseCase = Annotated[RefreshJWTUseCaseImpl, Depends(get_refresh_jwt_use
 LoginAndIssueJWTUseCase = Annotated[
     UserLoginAndIssueJWTUseCaseImpl, Depends(get_auth_and_jwt_use_case)
 ]
-PayloadAccessJWT = Annotated[
-    PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)
-]
-PayloadRefreshJWT = Annotated[
-    PayloadRefreshJWTSchema, Depends(get_refresh_jwt_payload_schema)
-]
-IsSuperuser = Depends(is_superuser)
-IsAdmin = Depends(is_admin)
+# PayloadAccessJWT = Annotated[
+#     PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)
+# ]
+# PayloadRefreshJWT = Annotated[
+#     PayloadRefreshJWTSchema, Depends(get_refresh_jwt_payload_schema)
+# ]
+# IsSuperuser = Depends(is_superuser)
+# IsAdmin = Depends(is_admin)
 # TO DO  AccessFromRefreshJWT = Annotated[TokenInfo, Depends(auth_user_and_issue_access_and_refresh_jwt)]
 
 

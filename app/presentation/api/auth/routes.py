@@ -117,7 +117,7 @@ async def login_and_issue_jwt(
             message=ErrorMessages.error_request,
             user_message=ErrorMessages.error_request
         )
-    return e.to_json_response()
+    raise e.to_http_exception()
 
 
 

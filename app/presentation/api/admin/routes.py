@@ -2,8 +2,8 @@ from fastapi import APIRouter, status, HTTPException
 
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
 from presentation.api.dependencies.ioc import (
-    IsSuperuser,
-    PayloadAccessJWT,
+    # IsSuperuser,
+    # PayloadAccessJWT,
     # UsersUseCase,
     CreateUserUseCase,
 )
@@ -17,14 +17,14 @@ router = APIRouter(
 
 @router.get(
     "/whoami/",
-    dependencies=[IsSuperuser],
+    # dependencies=[IsSuperuser],
     status_code=status.HTTP_200_OK,
     response_model=ResponseUserSchema,
     summary="Данные о пользователе из access jwt",
     description=GET_whoami,
 )
 async def whoami(
-    payload_jwt: PayloadAccessJWT,
+    # payload_jwt: PayloadAccessJWT,
     # use_case: UsersUseCase,
 ):
     user = await use_case.get_user_by_username_or_raise(username=payload_jwt.sub)
@@ -61,11 +61,11 @@ async def whoami(
     "/create-user/",
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseUserSchema,
-    dependencies=[IsSuperuser],
+    # dependencies=[IsSuperuser],
     summary="Создать нового пользователя системы",
 )
 async def create_user(
-    jwt_payload: PayloadAccessJWT,
+    # jwt_payload: PayloadAccessJWT,
     # new_user: CreateUserSchema,
     # use_case: CreateUserUseCase,
 ):
@@ -98,7 +98,7 @@ async def create_user(
     # response_model=ChangeUserPasswordResponse,
 )
 async def change_user_password(
-    payload_jwt: PayloadAccessJWT,
+    # payload_jwt: PayloadAccessJWT,
     # change_password: ChangeUserPasswordBaseSchema,
     # use_case: UsersUseCase,
 ):

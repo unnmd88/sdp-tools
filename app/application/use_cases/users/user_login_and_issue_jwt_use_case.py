@@ -1,12 +1,18 @@
+import logging
 from dataclasses import dataclass
 
+from app_logging.dev.config import AUTH_LOGGER
 from application.dto.jwt_dto import TokenDataDTO, PayloadJWTDTO
 from application.dto.users import UserDTO
 
 
 from application.dto.auth import UserAuthDTO
+from application.exceptions import AuthenticationError
 from application.interfaces import AuthServiceProtocol
 from application.interfaces.services.issue_jwt_service_interface import IssueJWTServiceProtocol
+
+
+logger = logging.getLogger(AUTH_LOGGER)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -15,10 +21,7 @@ class UserLoginAndIssueJWTUseCaseImpl:
     jwt_service: IssueJWTServiceProtocol
 
     async def __call__(self, auth_dto: UserAuthDTO) -> TokenDataDTO:
-
         user_dto: UserDTO = await self.auth_service.authenticate(auth_dto)
-        # token_data = self.jwt_service.issue_pair(user_dto=user_dto)
-        # logger.info("Выпущены JWT: %r", token_data)
         payload = PayloadJWTDTO(
             user_id=user_dto.id,
             sub=user_dto.username,
@@ -26,8 +29,13 @@ class UserLoginAndIssueJWTUseCaseImpl:
             organization=user_dto.organization,
             email=user_dto.email,
         )
-        return self.jwt_service.issue_pair(payload_dto=payload)
-
+        try:
+            token_pair = self.jwt_service.issue_pair(payload_dto=payload)
+            logger.info("Пользователю %r(id=%r) выпущены JWT: %r", user_dto.username, user_dto.id, token_pair)
+            return self.jwt_service.issue_pair(payload_dto=payload)
+        except Exception as e:
+            logger.error("Программная ошибка выпуска JWT: %r", str(e))
+            raise AuthenticationError
 
 
 # @dataclass(frozen=True, slots=True, kw_only=True)

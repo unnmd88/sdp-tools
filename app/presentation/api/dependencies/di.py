@@ -55,79 +55,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=settings.login_url)
 db_session = Annotated[AsyncSession, Depends(db_api.session_getter)]
 
 
-# -- JWT, credentials and access-levels --
 
-
-def get_jwt_payload_schema(
-    # credentials: str,
-    token: Annotated[str, Depends(oauth2_scheme)],
-    expected_token_type: TokenTypesEnum,
-) -> PayloadAccessJWTSchema | PayloadRefreshJWTSchema:
-    try:
-        print(f"TOKEN: {token}")
-        # payload = jwt_helper.decode_jwt(credentials)
-        payload = jwt_helper.decode_and_validate_type_jwt(token)
-        if (
-            payload["typ"] == expected_token_type
-            and expected_token_type == TokenTypesEnum.access
-        ):
-            return PayloadAccessJWTSchema(**payload)
-        elif (
-            payload["typ"] == expected_token_type
-            and expected_token_type == TokenTypesEnum.refresh
-        ):
-            return PayloadRefreshJWTSchema(**payload)
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail=f"Некорректный тип токена. Ожидаемый тип: {str(expected_token_type)}.",
-            )
-    except ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Срок действия токена истёк.",
-        )
-    except DecodeError:
-        # TODO Залоггировать!
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-
-def get_access_jwt_payload_schema(
-    # credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
-    token: Annotated[str, Depends(oauth2_scheme)],
-) -> PayloadAccessJWTSchema:
-    return get_jwt_payload_schema(
-        # credentials=credentials.credentials,
-        token=token,
-        expected_token_type=TokenTypesEnum.access,
-    )
-
-
-def get_refresh_jwt_payload_schema(
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
-) -> PayloadRefreshJWTSchema:
-    return get_jwt_payload_schema(
-        credentials=credentials.credentials,
-        expected_token_type=TokenTypesEnum.refresh,
-    )
-
-
-def is_admin(
-    payload: Annotated[PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)],
-):
-    if not payload.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен"
-        )
-
-
-def is_superuser(
-    payload: Annotated[PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)],
-):
-    if payload.role != Roles.superuser:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Доступ запрещен."
-        )
 
 
 #  -- sql-alchemy repo --
@@ -141,8 +69,7 @@ def get_users_sqlalchemy_repository(session: db_session) -> UsersSqlAlchemyRepos
 
 
 
-
-# -- auth and jwt --
+# -- JWT, credentials and access-levels --
 
 
 class JWTDecoder:
@@ -171,7 +98,7 @@ class JWTDecoder:
             decoded_token = self._method(token)
             if self._specific_field is None:
                 return decoded_token
-            return getattr(decoded_token, self._specific_field, decoded_token)
+            return getattr(decoded_token, self._specific_field)
         except RottenTokenError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

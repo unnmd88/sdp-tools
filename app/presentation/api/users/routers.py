@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, status, HTTPException, Depends
 
+from application.dto.jwt_dto import AccessJWTPayloadDTO
 from application.exceptions import NotFoundError, InactiveAccountError
 from application.use_cases.users.get_active_user_from_repo_use_case import GetActiveUserFromRepoUseCase
 from domain.enums.unsorted import TokenTypesEnum
@@ -12,7 +13,7 @@ from presentation.api.dependencies.di import (
 )
 from presentation.api.dependencies.ioc import (
     # UsersUseCase,
-    PayloadAccessJWT,
+    # PayloadAccessJWT,
     BEARER_TOKEN,
 )
 
@@ -45,7 +46,7 @@ router = APIRouter(
 
 )
 async def whoami(
-    token_dto: Annotated[PayloadAccessJWT, Depends(jwt_decoder_factory(token_type=TokenTypesEnum.access))],
+    token_dto: Annotated[AccessJWTPayloadDTO, Depends(jwt_decoder_factory(token_type=TokenTypesEnum.access))],
     use_case: Annotated[GetActiveUserFromRepoUseCase, Depends(get_active_user_use_case)],
 ):
     try:
@@ -91,7 +92,7 @@ async def update_user(
     response_model=ChangeUserPasswordResponse,
 )
 async def change_user_password(
-    payload_jwt: PayloadAccessJWT,
+    # payload_jwt: PayloadAccessJWT,
     change_password: ChangePasswordMyselfSchema,
     # use_case: UsersUseCase,
 ):

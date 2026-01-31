@@ -23,7 +23,7 @@ class AuthenticationService:
         """Аутентификация пользователя"""
         logger.info("Аутентификация пользователя %r", auth_dto.username)
         if (user := await self.user_repository.get_by_username(auth_dto.username)) is None:
-            logger.info("Пользователь %r не найден.", auth_dto.username)
+            logger.info("Пользователь %r не найден в репозитории.", auth_dto.username)
             raise AuthenticationError(message=ErrorMessages.invalid_username_or_password)
         if not self.password_service.verify_password(
             password=auth_dto.password, hashed_password=user.password,

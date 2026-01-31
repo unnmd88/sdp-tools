@@ -190,20 +190,10 @@ class DecodeJWTService:
         *,
         public_key: str,
         algorithm: str,
-        # expected_type: TokenTypesEnum,
     ):
         self._public_key = public_key
         self._algorithm = algorithm
-        # self._expected_type = expected_type
 
-
-    # @staticmethod
-    # @lru_cache(maxsize=4)
-    # def _load_key(key: Path | str) -> str:
-    #     if isinstance(key, Path):
-    #         return key.resolve().read_text(encoding="utf-8")
-    #     return key
-    
     def _decode_jwt(self, token: str,):
         try:
             return jwt.decode(
@@ -291,9 +281,9 @@ class DecodeJWTService:
     def verify_token(self, token: str) -> bool:
         """Проверить валидность токена"""
         try:
-            self.decode_and_validate_type_jwt(token)
+            self._decode_jwt(token)
             return True
-        except (RottenTokenError, TokenError):
+        except jwt.PyJWTError:
             return False
 
 
