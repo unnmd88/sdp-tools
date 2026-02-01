@@ -1,6 +1,7 @@
 from typing import Callable, Sequence, Any
 
 from domain.contract2.require import Require
+from domain.enums.violations import Violations
 from domain.exceptions import DomainContractViolationError, DomainValidationError
 from domain.value_objects.contract_violation_context_vo import (
     ContractViolationContextVO,
@@ -12,7 +13,7 @@ class ContractField:
         self,
         *,
         field_name: str,
-        nullable=False,
+        nullable: bool = False,
         preprocess_value: Callable[[Any], Any] = None,
         requires: Sequence[Require | Callable[[Any], bool]] = None,
         postprocess_value: Callable[[Any], Any] = None,
@@ -56,12 +57,13 @@ class ContractField:
             if value is None and not self._nullable:
                 current_error_context = ContractViolationContextVO(
                     contract_code="nullable",
-                    violation="Значение не может быть None",
-                    message=f"Значение {self._field_name!r} не может быть пустым",
+                    violation=Violations.nullable_false,
+                    message=f"Значение {self._field_name!r} не может быть None",
                     handler="check_nullable",
                 )
                 raise DomainValidationError(
-                    message=current_error_context.message, context=current_error_context
+                    message=current_error_context.message,
+                    context=current_error_context,
                 )
             value = self._preprocess(value)
             for require in self._requires:

@@ -6,6 +6,7 @@ class Violations(StrEnum):
     invalid_type = "invalid_type"
     invalid_ = "invalid_type"
     does_not_match_regexp = "does_not_match_regexp"
+    nullable_false = "nullable_false"
     cannot_be_empty = "cannot_be_empty"
     must_be_positive_integer = "must_be_positive_integer"
     string_must_be_alpha = "string_must_be_alpha"
