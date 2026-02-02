@@ -201,6 +201,11 @@ class ErrorCodes(Enum):
         message="Ошибка репозитория",
     )
 
+    CORRUPTED_DATA_ERROR = Error(
+        code="corrupted_data_error",
+        message="Данные невалидны или повреждены",
+    )
+
     EXTERNAL_SERVICE_ERROR = Error(
         code="external_service_error",
         message="Ошибка внешнего сервиса",

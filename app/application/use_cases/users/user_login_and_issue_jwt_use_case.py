@@ -12,7 +12,7 @@ from application.interfaces import AuthServiceProtocol
 from application.interfaces.services.issue_jwt_service_interface import (
     IssueJWTServiceProtocol,
 )
-
+from domain.entities import UserEntity
 
 logger = logging.getLogger(AUTH_LOGGER)
 
@@ -23,7 +23,7 @@ class UserLoginAndIssueJWTUseCaseImpl:
     jwt_service: IssueJWTServiceProtocol
 
     async def __call__(self, auth_dto: UserAuthDTO) -> TokenDataDTO:
-        user_dto: UserDTO = await self.auth_service.authenticate(auth_dto)
+        user_dto: UserEntity = await self.auth_service.authenticate(auth_dto)
         payload = PayloadJWTDTO(
             user_id=user_dto.id,
             sub=user_dto.username,
@@ -39,7 +39,7 @@ class UserLoginAndIssueJWTUseCaseImpl:
                 user_dto.id,
                 token_pair,
             )
-            return self.jwt_service.issue_pair(payload_dto=payload)
+            return token_pair
         except Exception as e:
             logger.error("Программная ошибка выпуска JWT: %r", str(e))
             raise AuthenticationError

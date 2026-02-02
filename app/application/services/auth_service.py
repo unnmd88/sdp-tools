@@ -22,6 +22,7 @@ class AuthenticationService:
     async def authenticate(self, auth_dto: UserAuthDTO) -> UserDTO | None:
         """Аутентификация пользователя"""
         logger.info("Аутентификация пользователя %r", auth_dto.username)
+
         if (
             user := await self.user_repository.get_by_username(auth_dto.username)
         ) is None:
@@ -41,4 +42,5 @@ class AuthenticationService:
             logger.info("Запрещено: пользователь %r не активен.", auth_dto.username)
             raise InactiveAccountError(message=ErrorMessages.inactive_user)
         logger.info("Аутентификация успешна для пользователя %r", auth_dto.username)
+
         return UserDTO.from_entity(user)

@@ -12,6 +12,13 @@ class InfrastructureError(BaseAppError):
     DEFAULT_MESSAGE = ErrorCodes.INFRASTRUCTURE_ERROR.message
 
 
+class RepositoryError(InfrastructureError):
+    """ Базовое исключение репозитория. """
+
+    DEFAULT_CODE = ErrorCodes.REPOSITORY_ERROR.code
+    DEFAULT_MESSAGE = ErrorCodes.REPOSITORY_ERROR.message
+
+
 class TokenError(InfrastructureError):
     DEFAULT_CODE = ErrorCodes.TOKEN_ERROR.code
     DEFAULT_MESSAGE = ErrorCodes.TOKEN_ERROR.message

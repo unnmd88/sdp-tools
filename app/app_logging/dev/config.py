@@ -10,6 +10,7 @@ print(
     f"gg: {str(BASE_DIR)[1:].replace('/', '.')}.app_logging.dev.EnsureAsciiJsonFormatter"
 )
 
+LOGGING_DIR = BASE_DIR / "app_logging"
 
 LOGGING_CONFIG = {
     "version": 1,
@@ -41,7 +42,7 @@ LOGGING_CONFIG = {
         "infrastructure": {
             "level": "INFO",
             "class": "logging.FileHandler",
-            "filename": BASE_DIR / "app_logging/infrastructure.log",
+            "filename": LOGGING_DIR / "infrastructure.log",
             "formatter": "json",
         },
         "auth": {
