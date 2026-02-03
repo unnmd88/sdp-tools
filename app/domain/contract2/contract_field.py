@@ -24,7 +24,6 @@ class ContractField:
         self._preprocess = (
             preprocess_value if preprocess_value is not None else lambda x: x
         )  # Identity по умолчанию
-        # self._requires = tuple(requires or ())
         self._requires = []
         for r in requires or ():
             if isinstance(r, Require):
@@ -62,7 +61,8 @@ class ContractField:
                     handler="check_nullable",
                 )
                 raise DomainValidationError(
-                    message=current_error_context.message,
+                    private_message=current_error_context.message,
+                    public_message=f"Значение не должно быть пустым.",
                     context=current_error_context,
                 )
             value = self._preprocess(value)
@@ -72,16 +72,15 @@ class ContractField:
                         handler=f"{require.handler.__name__}",
                         contract_code=require.contract,
                         violation=require.violation,
-                        message=require.message,
+                        message=require._private_message,
                     )
                     raise DomainContractViolationError(
-                        message=current_error_context.message,
+                        private_message=current_error_context.message,
+                        public_message=f"Ошибка валидации. Проверьте корректность значения поля {self._field_name!r}",
                         context=current_error_context,
                     )
         except DomainContractViolationError as e:
-            cur_ctx: ContractViolationContextVO = (
-                e.context or ContractViolationContextVO()
-            )
+            cur_ctx = e.context or ContractViolationContextVO()
             updated_context = ContractViolationContextVO(
                 subject=cur_ctx.subject or f"{instance.__class__.__name__}",
                 field_name=cur_ctx.field_name or self._field_name,

@@ -60,7 +60,10 @@ class RegexpValidator:
             value=value,
             message=message,
         )
-        raise DomainValidationError(context=ctx)
+        raise DomainValidationError(
+            context=ctx,
+            public_message=f"Некорректный формат данных для поля {self.field_name!r}.",
+        )
 
     def __repr__(self) -> str:
         return (

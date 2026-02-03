@@ -19,7 +19,7 @@ def handle_db_errors(logger: Logger = None):
             except SQLAlchemyError as exc:
                 if logger:
                     logger.error(f"Read failed in {func.__name__}: {exc}")
-                raise RepositoryError(message=f"Operation failed: {func.__name__}") from exc
+                raise RepositoryError(private_message=f"Operation failed: {func.__name__}") from exc
         return async_wrapper
     return decorator
 
@@ -34,5 +34,5 @@ class HandleErrorsWrapper:
         except SQLAlchemyError as exc:
             if self._logger:
                 self._logger.error(f"Read failed in {coro.__name__}: {exc}")
-            raise RepositoryError(message=f"Read operation failed") from exc
+            raise RepositoryError(private_message=f"Read operation failed") from exc
 

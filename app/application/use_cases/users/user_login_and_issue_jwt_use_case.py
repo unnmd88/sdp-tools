@@ -7,12 +7,13 @@ from application.dto.users import UserDTO
 
 
 from application.dto.auth import UserAuthDTO
-from application.exceptions import AuthenticationError
-from application.interfaces import AuthServiceProtocol
+from application.exceptions import AuthenticationError, ApplicationLayerError
+from application.interfaces import AuthServiceProtocol, UserServiceProtocol
 from application.interfaces.services.issue_jwt_service_interface import (
     IssueJWTServiceProtocol,
 )
 from domain.entities import UserEntity
+from domain.exceptions import DomainEntityNotFoundError
 
 logger = logging.getLogger(AUTH_LOGGER)
 
@@ -23,26 +24,23 @@ class UserLoginAndIssueJWTUseCaseImpl:
     jwt_service: IssueJWTServiceProtocol
 
     async def __call__(self, auth_dto: UserAuthDTO) -> TokenDataDTO:
-        user_dto: UserEntity = await self.auth_service.authenticate(auth_dto)
+
+        user: UserEntity = await self.auth_service.authenticate(auth_dto)
         payload = PayloadJWTDTO(
-            user_id=user_dto.id,
-            sub=user_dto.username,
-            role=user_dto.role,
-            organization=user_dto.organization,
-            email=user_dto.email,
+            user_id=user.id,
+            sub=user.username,
+            role=user.role,
+            organization=user.organization,
+            email=user.email,
         )
-        try:
-            token_pair = self.jwt_service.issue_pair(payload_dto=payload)
-            logger.info(
-                "Пользователю %r(id=%r) выпущены JWT: %r",
-                user_dto.username,
-                user_dto.id,
-                token_pair,
-            )
-            return token_pair
-        except Exception as e:
-            logger.error("Программная ошибка выпуска JWT: %r", str(e))
-            raise AuthenticationError
+        token_pair = self.jwt_service.issue_pair(payload_dto=payload)
+        logger.debug(
+            "Пользователю %r(id=%r) выпущены JWT: %r",
+            user.username,
+            user.id,
+            token_pair,
+        )
+        return token_pair
 
 
 # @dataclass(frozen=True, slots=True, kw_only=True)

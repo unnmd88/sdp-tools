@@ -54,7 +54,7 @@ class JWTUserAPIRoute(APIRoute):
                 except (DomainInactiveUserError, DomainEntityNotFoundError) as e:
                     raise HTTPException(
                         status_code=e.http_status,
-                        detail=e.message,
+                        detail=e._private_message,
                     )
             response = await original_route_handler(request)
 

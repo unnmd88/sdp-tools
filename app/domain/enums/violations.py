@@ -2,6 +2,7 @@ from enum import StrEnum
 
 
 class Violations(StrEnum):
+    corrupted_data_in_repository = "corrupted_data_in_repository"
     value_length = "value_length"
     invalid_type = "invalid_type"
     invalid_ = "invalid_type"

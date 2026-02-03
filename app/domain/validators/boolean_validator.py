@@ -28,4 +28,7 @@ class BooleanValidator:
             value=msg,
             message=msg,
         )
-        raise DomainValidationError(context=ctx)
+        raise DomainValidationError(
+            context=ctx,
+            public_message=ErrorMessages.must_be_bool.format(repr(self.field_name)),
+        )

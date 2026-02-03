@@ -18,7 +18,7 @@ from presentation.api.dependencies.ioc import (
 )
 from fastapi.params import Depends
 
-from presentation.api.response_detail import HTTPExceptionContext, Codes, ErrorMessages
+from presentation.api.error_handling import HTTPExceptionContext, Codes, ErrorMessages
 from presentation.schemas.jwt import TokenInfo
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -33,13 +33,11 @@ AUTH_RESPONSES = {
         "description": "Неверный логин или пароль",
         "content": {
             "application/json": {
-                "example": {
-                    "detail": HTTPExceptionContext(
+                "example": HTTPExceptionContext(
+                        http_status=status.HTTP_401_UNAUTHORIZED,
                         code=Codes.UNAUTHORIZED,
                         message=ErrorMessages.invalid_login_or_password,
-                        user_message=ErrorMessages.invalid_login_or_password,
                     ).model_dump()
-                }
             }
         },
     },
@@ -48,29 +46,12 @@ AUTH_RESPONSES = {
         "description": "Пользователь неактивен.",
         "content": {
             "application/json": {
-                "example": {
-                    "detail": HTTPExceptionContext(
+                "example": HTTPExceptionContext(
+                        http_status=status.HTTP_403_FORBIDDEN,
                         code=Codes.FORBIDDEN,
                         message=ErrorMessages.account_inactive,
-                        user_message=ErrorMessages.account_inactive,
                     ).model_dump(),
-                },
             },
-        },
-    },
-    status.HTTP_500_INTERNAL_SERVER_ERROR: {
-        "model": HTTPExceptionContext,
-        "description": "Внутренняя ошибка сервера",
-        "content": {
-            "application/json": {
-                "example": {
-                    "detail": HTTPExceptionContext(
-                        code=Codes.REQUEST_ERROR,
-                        message=ErrorMessages.error_request,
-                        user_message=ErrorMessages.error_request,
-                    ).model_dump()
-                }
-            }
         },
     },
 }
@@ -92,6 +73,7 @@ async def login_and_issue_jwt(
         username=auth_schema.username,
         password=auth_schema.password,
     )
+    return await use_case(auth_dto=auth_dto)
     try:
         return await use_case(auth_dto=auth_dto)
     except AuthenticationError:
@@ -106,6 +88,12 @@ async def login_and_issue_jwt(
             message=ErrorMessages.account_inactive,
             user_message=ErrorMessages.account_inactive,
         )
+    except RepositoryCorruptedError:
+        e = HTTPExceptionContext(
+            code=Codes.INTERNAL_SERVER_ERROR,
+            message=ErrorMessages.error_request,
+            user_message=ErrorMessages.error_request,
+            )
     except Exception:
         e = HTTPExceptionContext(
             code=Codes.REQUEST_ERROR,
@@ -130,6 +118,6 @@ async def issue_access_by_refresh_jwt(
         return await use_case(refresh_jwt=token)
     except (UnauthorizedError, ForbiddenError, InvalidTokenTypeError) as e:
         raise HTTPException(
-            detail=e.message,
+            detail=e._private_message,
             status_code=e.http_status,
         )

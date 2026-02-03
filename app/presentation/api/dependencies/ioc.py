@@ -36,19 +36,9 @@ RefreshJWTUseCase = Annotated[RefreshJWTUseCaseImpl, Depends(get_refresh_jwt_use
 LoginAndIssueJWTUseCase = Annotated[
     UserLoginAndIssueJWTUseCaseImpl, Depends(get_auth_and_jwt_use_case)
 ]
-# PayloadAccessJWT = Annotated[
-#     PayloadAccessJWTSchema, Depends(get_access_jwt_payload_schema)
-# ]
-# PayloadRefreshJWT = Annotated[
-#     PayloadRefreshJWTSchema, Depends(get_refresh_jwt_payload_schema)
-# ]
-# IsSuperuser = Depends(is_superuser)
-# IsAdmin = Depends(is_admin)
-# TO DO  AccessFromRefreshJWT = Annotated[TokenInfo, Depends(auth_user_and_issue_access_and_refresh_jwt)]
-
 
 ## Users
-# UsersUseCase = Annotated[GetUserUseCaseImpl, Depends(users_use_case)]
+
 CreateUserUseCase = Annotated[CreateUserUseCaseImpl, Depends(create_user_use_case)]
 
 ## Regions

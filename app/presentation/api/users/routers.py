@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, status, HTTPException, Depends
 
 from application.dto.jwt_dto import AccessJWTPayloadDTO
-from application.exceptions import NotFoundError, InactiveAccountError
+from application.exceptions import InactiveAccountError
 from application.use_cases.users.get_active_user_from_repo_use_case import (
     GetActiveUserFromRepoUseCase,
 )

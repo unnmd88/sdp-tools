@@ -111,11 +111,11 @@ class UserEntity(AbstractEntity):
         username: str,
         firstname: str,
         lastname: str,
-        organization: Organizations,
+        organization: str,
         email: str | None,
         password: str | bytes,
         is_active: bool,
-        role: Roles,
+        role: str,
         phone_number: str | None,
         telegram: str | None,
         description: str,
@@ -126,11 +126,11 @@ class UserEntity(AbstractEntity):
         self.username = username
         self.firstname = firstname
         self.lastname = lastname
-        self.organization = organization
+        self.organization: Organizations = organization
         self.email = email
         self._password = PasswordVO(password=password, subject=self.__class__.__name__)
         self.is_active = is_active
-        self.role = role
+        self.role: Roles = role
         self.phone_number = phone_number
         self.telegram = telegram
         self.description = description
@@ -175,7 +175,7 @@ class UserEntity(AbstractEntity):
             message=rule,
         )
         raise DomainInvariantError(
-            message=ctx.message,
+            private_message=ctx.message,
             context=ctx,
         )
 

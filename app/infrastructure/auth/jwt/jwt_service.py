@@ -17,9 +17,8 @@ from application.dto.jwt_dto import (
 from application.dto.users import UserDTO
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.value_objects.token_error_context_vo import TokenErrorContextVO
-from infrastructure.auth.exceptions import RottenTokenError
 from domain.enums.unsorted import TokenTypesEnum, Organizations, Roles
-from infrastructure.exceptions import TokenError, InvalidTokenTypeError
+from infrastructure.exceptions import TokenError, InvalidTokenTypeError, TokenExpiredError
 
 logger = logging.getLogger(INFRASTRUCTURE)
 
@@ -210,7 +209,7 @@ class DecodeJWTService:
                 algorithms=[self._algorithm],
             )
         except jwt.ExpiredSignatureError:
-            raise RottenTokenError
+            raise TokenExpiredError
         except jwt.PyJWTError as e:
             ctx = TokenErrorContextVO(
                 token=token,
@@ -218,7 +217,10 @@ class DecodeJWTService:
                 handler=self._decode_jwt.__name__,
                 internal_message=str(e),
             )
-            exc = TokenError(context=ctx)
+            exc = TokenError(
+                context=ctx,
+                public_message=ErrorMessages.required_login,
+            )
             logger.error(exc.to_dict())
             raise exc
 
@@ -236,7 +238,10 @@ class DecodeJWTService:
                 handler=self._validate_token_type.__name__,
                 internal_message="Не найдено поле 'typ' в токене при декодировании",
             )
-            exc = TokenError(context=ctx)
+            exc = TokenError(
+                context=ctx,
+                public_message=ErrorMessages.required_login,
+            )
             logger.critical(exc.to_dict())
             raise exc
         if current_token_type != expected_type:
@@ -247,7 +252,10 @@ class DecodeJWTService:
                 handler=self._validate_token_type.__name__,
                 message=ErrorMessages.invalid_token_type.format(expected_type),
             )
-            exc = InvalidTokenTypeError(context=ctx)
+            exc = InvalidTokenTypeError(
+                context=ctx,
+                public_message=ErrorMessages.required_login,
+            )
             logger.warning(exc.to_dict())
         return current_token_type
 
@@ -275,7 +283,10 @@ class DecodeJWTService:
                 handler=self.decode_and_validate_type_jwt.__name__,
                 internal_message=f"Недопустимый тип токена: {current_token_type!r}",
             )
-            exc = TokenError(context=ctx)
+            exc = TokenError(
+                context=ctx,
+                public_message=ErrorMessages.required_login,
+            )
             logger.error(exc.to_dict())
             raise exc
         return dto(**decoded_jwt)
@@ -349,7 +360,7 @@ class IssueJWTService:
             )
             exc = TokenError(
                 context=ctx,
-                message=ctx.message,
+                private_message=ctx.message,
             )
             logger.warning(exc.to_dict())
             raise exc
@@ -368,7 +379,7 @@ class IssueJWTService:
             )
             exc = TokenError(
                 context=ctx,
-                message=ctx.message,
+                private_message=ctx.message,
             )
             logger.error(exc.to_dict())
             raise exc

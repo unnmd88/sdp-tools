@@ -67,7 +67,10 @@ class UserEntityValidator:
             value=value,
             message=message,
         )
-        raise exc(context=ctx)
+        raise exc(
+            context=ctx,
+            public_message=str(rule),
+        )
 
     @classmethod
     def first_name_or_lastname(

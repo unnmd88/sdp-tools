@@ -40,17 +40,18 @@ class CreateDirectorUseCase:
 
         if (secret_key_from_env := os.getenv("SECRET_KEY_TO_CREATE_DIRECTOR")) is None:
             logger.warning("SECRET_KEY_TO_CREATE_DIRECTOR не найден в переменных окружения")
-            raise DomainError(message="SECRET_KEY_TO_CREATE_DIRECTOR не найден в переменных окружения")
+            raise DomainError(private_message="SECRET_KEY_TO_CREATE_DIRECTOR не найден в переменных окружения")
         if not isinstance(secret_key, str):
             logger.warning("Неверный тип секретного ключа. Ожидается строка. Передано: %r", type(secret_key))
-            raise DomainError(message=f"Неверный тип секретного ключа. Ожидается строка. Передано: {type(secret_key)}")
+            raise DomainError(
+                private_message=f"Неверный тип секретного ключа. Ожидается строка. Передано: {type(secret_key)}")
         if secret_key != secret_key_from_env:
-            raise AuthenticationError(message="Неверный секретный ключ")
+            raise AuthenticationError(private_message="Неверный секретный ключ")
 
         already_exist = await self.user_repository.get_by_username(username)
         if already_exist:
             raise DomainEntityAlreadyExistsError(
-                message=ErrorMessages.already_exists.format(
+                private_message=ErrorMessages.already_exists.format(
                     "Пользователь",
                     str(PublicAttrNamesEnum.username),
                     username,

@@ -29,7 +29,7 @@ class ErrorMessages(StrEnum):
     must_be_from_to_chars = "{} Должно содержать от {} до {} символов."
     cannot_be_equal = "Значение {} не может быть совпадать с {}."
 
-    id_isinstance = "'id' должен быть числом"
+    id_must_be_int = "id должен быть типа 'int'. Передано: {}."
     id_range = f"'id' должен быть числом в диапазоне от {MIN_ID} до {MAX_ID}."
     created_at_isinstance = "'created_at' должен быть типом 'datetime'"
     updated_at_isinstance = "'updated_at' должен быть типом 'datetime'"
@@ -43,6 +43,7 @@ class ErrorMessages(StrEnum):
     bad_phone_number = "Неверный формат номера телефона."
     bad_telegram_username = "Неверный формат @username для telegram-аккаунта."
     description_must_be_lt_255 = "'Описание' должно быть не более 255 символов."
+    required_login = "Требуется вход в систему."
 
     user_not_found = "Пользователь с {}={} не найден."
     account_is_blocked = "Аккаунт пользователя с {}={} заблокирован."
@@ -54,6 +55,9 @@ class ErrorMessages(StrEnum):
     invalid_username_or_password = "Неверное имя пользователя или пароль."
     inactive_user = "Пользователь неактивен."
     already_exists = "{} с {}={} уже существует."
+    must_be_bool = "Поле {} должно быть булевым значением"
+    must_be_member_of_enum = "Значение {} должно быть одним из: {}."
+
     # username_length_range = value_str_length_range.format(
     #     MIN_LEN_USERNAME, MAX_LEN_USERNAME
     # )

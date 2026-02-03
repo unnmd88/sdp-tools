@@ -10,6 +10,7 @@ from jwt import ExpiredSignatureError, DecodeError
 
 from application.dto.jwt_dto import AccessJWTPayloadDTO, RefreshJWTPayloadDTO
 from application.services.auth_service import AuthenticationService
+from application.services.user_service import UserServiceImpl
 
 from application.use_cases.users.create_user_use_case import CreateUserUseCaseImpl
 from application.use_cases.users.get_active_user_from_repo_use_case import (
@@ -51,7 +52,7 @@ from infrastructure.database.tlo_repository import (
 )
 from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
 from infrastructure.exceptions import (
-    RottenTokenError,
+    TokenExpiredError,
     TokenError,
     InvalidTokenTypeError,
 )
@@ -105,7 +106,7 @@ class JWTDecoder:
             if self._specific_field is None:
                 return decoded_token
             return getattr(decoded_token, self._specific_field)
-        except RottenTokenError:
+        except TokenExpiredError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Требуется аутентификация.",
@@ -190,7 +191,7 @@ def get_auth_and_jwt_use_case(
     ],
 ) -> UserLoginAndIssueJWTUseCaseImpl:
     auth_service = AuthenticationService(
-        user_repository=user_repository,
+        user_service=UserServiceImpl(user_repository=user_repository),
         password_service=BcryptPasswordService(),
     )
     return UserLoginAndIssueJWTUseCaseImpl(

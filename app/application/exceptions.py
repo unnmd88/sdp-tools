@@ -9,19 +9,17 @@ class ApplicationLayerError(BaseAppError):
     """
 
     DEFAULT_CODE = ErrorCodes.APPLICATION_ERROR.code
-    DEFAULT_MESSAGE = ErrorCodes.APPLICATION_ERROR.message
-
-
-class NotFoundError(ApplicationLayerError):
-    DEFAULT_CODE = ErrorCodes.NOT_FOUND.code
-    DEFAULT_MESSAGE = ErrorCodes.NOT_FOUND.message
+    DEFAULT_PRIVATE_MESSAGE = ErrorCodes.APPLICATION_ERROR.private_message
+    DEFAULT_PUBLIC_MESSAGE = ErrorCodes.APPLICATION_ERROR.public_message
 
 
 class AuthenticationError(ApplicationLayerError):
-    DEFAULT_CODE = ErrorCodes.UNAUTHORIZED.code
-    DEFAULT_MESSAGE = ErrorCodes.UNAUTHORIZED.message
+    DEFAULT_CODE = ErrorCodes.AUTHENTICATION_FAILED.code
+    DEFAULT_PRIVATE_MESSAGE = ErrorCodes.AUTHENTICATION_FAILED.private_message
+    DEFAULT_PUBLIC_MESSAGE = ErrorCodes.AUTHENTICATION_FAILED.public_message
 
 
 class InactiveAccountError(ApplicationLayerError):
     DEFAULT_CODE = ErrorCodes.INACTIVE_ACCOUNT.code
-    DEFAULT_MESSAGE = ErrorCodes.INACTIVE_ACCOUNT.message
+    DEFAULT_PRIVATE_MESSAGE = ErrorCodes.INACTIVE_ACCOUNT.private_message
+    DEFAULT_PUBLIC_MESSAGE = ErrorCodes.INACTIVE_ACCOUNT.public_message
