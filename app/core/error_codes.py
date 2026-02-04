@@ -117,6 +117,7 @@ class ErrorCodes(Enum):
         public_message="Требуется вход в систему.",
     )
 
+
     FORBIDDEN = Error(
         code="forbidden",
         private_message="Доступ запрещен",
@@ -177,6 +178,12 @@ class ErrorCodes(Enum):
     REPOSITORY_ERROR = Error(
         code="repository_error",
         private_message="Ошибка репозитория",
+        public_message="Ошибка запроса. Попробуйте позже.",
+    )
+
+    REPOSITORY_UPDATE_ERROR = Error(
+        code="repository_update_error",
+        private_message="Ошибка обновления данных репозитория",
         public_message="Ошибка запроса. Попробуйте позже.",
     )
 

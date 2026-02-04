@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 
 from core.error_codes import ErrorCodes
+from domain.contract2.contract_field_enum import ContractFieldEnum
 from domain.entities.base_entity import AbstractEntity
 from domain.contract2.contract_field import ContractField
 from domain.contract2.require import Require
@@ -53,14 +54,21 @@ class UserEntity(AbstractEntity):
         # preprocess_value=UserEntityValidator.repair_firstname_or_lastname,
         requires=[Require(handler=UserEntityValidator.lastname)],
     )
-    organization = ContractField(
+
+    organization = ContractFieldEnum(
+        enum=Organizations,
         field_name=str(PublicAttrNamesEnum.organization),
         nullable=False,
         use_cache=True,
-        preprocess_value=EnumValidator(
-            field_name=str(PublicAttrNamesEnum.organization), enum_class=Organizations
-        ),
     )
+    # organization = ContractField(
+    #     field_name=str(PublicAttrNamesEnum.organization),
+    #     nullable=False,
+    #     use_cache=True,
+    #     preprocess_value=EnumValidator(
+    #         field_name=str(PublicAttrNamesEnum.organization), enum_class=Organizations
+    #     ),
+    # )
     email = ContractField(
         field_name=str(PublicAttrNamesEnum.email),
         nullable=True,
@@ -75,14 +83,21 @@ class UserEntity(AbstractEntity):
             field_name=str(PublicAttrNamesEnum.is_active), allowed_like_bool={1, 0}
         ),
     )
-    role = ContractField(
+    role = ContractFieldEnum(
+        enum=Roles,
         field_name=str(PublicAttrNamesEnum.organization),
         nullable=False,
         use_cache=True,
-        preprocess_value=EnumValidator(
-            field_name=str(PublicAttrNamesEnum.role), enum_class=Roles
-        ),
     )
+
+    # role = ContractField(
+    #     field_name=str(PublicAttrNamesEnum.organization),
+    #     nullable=False,
+    #     use_cache=True,
+    #     preprocess_value=EnumValidator(
+    #         field_name=str(PublicAttrNamesEnum.role), enum_class=Roles
+    #     ),
+    # )
     phone_number = ContractField(
         field_name=str(PublicAttrNamesEnum.phone_number),
         nullable=True,

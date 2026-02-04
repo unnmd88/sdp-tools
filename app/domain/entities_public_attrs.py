@@ -13,7 +13,7 @@ class PublicAttr:
 
 
 BASE_PUBLIC_ATTRS = (
-    PublicAttr(attr_name="_id", alias=str(PublicAttrNamesEnum.id)),
+    PublicAttr(attr_name="id", alias=str(PublicAttrNamesEnum.id)),
     PublicAttr(attr_name="_built_at", alias=str(PublicAttrNamesEnum.built_at)),
     PublicAttr(attr_name="_updated_at", alias=str(PublicAttrNamesEnum.updated_at)),
     PublicAttr(attr_name="_created_at", alias=str(PublicAttrNamesEnum.created_at)),

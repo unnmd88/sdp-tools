@@ -21,6 +21,13 @@ class RepositoryError(InfrastructureError):
     DEFAULT_PUBLIC_MESSAGE = ErrorCodes.REPOSITORY_ERROR.public_message
 
 
+class RepositoryUpdateError(InfrastructureError):
+
+    DEFAULT_CODE = ErrorCodes.REPOSITORY_UPDATE_ERROR.code
+    DEFAULT_PRIVATE_MESSAGE = ErrorCodes.REPOSITORY_UPDATE_ERROR.private_message
+    DEFAULT_PUBLIC_MESSAGE = ErrorCodes.REPOSITORY_UPDATE_ERROR.public_message
+
+
 class RepositoryCorruptedError(InfrastructureError):
     """ Базовое исключение репозитория. """
 

@@ -13,7 +13,7 @@ from domain.enums.unsorted import Organizations, Roles
 
 
 class BaseUserSchema(BaseModel):
-    model_config = ConfigDict(use_enum_values=True, strict=True, extra="ignore")
+    model_config = ConfigDict(use_enum_values=True, extra="ignore")
 
     firstname: Annotated[str | None, Field(examples=[None, "Иван"])]
     lastname: Annotated[str | None, Field(examples=[None, "Иванов"])]
@@ -42,18 +42,6 @@ class CreateUserSchema(BaseUserSchema):
     organization: Annotated[
         Organizations, BeforeValidator(lambda val: Organizations(val))
     ]
-
-    # @field_validator('username')
-    # def username_alphanumeric(cls, v):
-    #     assert v.isalnum(), 'username должен содержать буквы и цифры'
-    #     return v
-    #
-    # @field_validator('password')
-    # def check_password(cls, v, info: FieldValidationInfo):
-    #     assert v != info.data['username'], 'username и пароль не должны совпадать'
-    #     if not check_password_to_set_constraints(v):
-    #         raise ValueError('Недопустимый пароль')
-    #     return v
 
 
 class UpdateUserSchema(BaseModel):
@@ -90,25 +78,13 @@ class UpdateUserSchema(BaseModel):
 class ChangeUserPasswordBaseSchema(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid")
 
+    old_password: str
     new_password: str
 
-    @field_validator("new_password")
-    def check_password(cls, v, info: FieldValidationInfo):
-        has_old_password_attr = info.data.get("old_password")
-        if has_old_password_attr is not None and v == has_old_password_attr:
-            raise ValueError("Пароли не должны совпадать")
-        if not password_validator:
-            raise ValueError("Недопустимый пароль")
-        return v
 
 
-class ChangePasswordMyselfSchema(ChangeUserPasswordBaseSchema):
-    old_password: str
+class UpdatedPasswordByAdminResponse(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
 
-
-class ChangeAnyUserPasswordSchema(ChangeUserPasswordBaseSchema):
-    pass
-
-
-class ChangeUserPasswordResponse(ChangeUserPasswordBaseSchema):
-    subject: str
+    username: str
+    new_password: str

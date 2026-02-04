@@ -4,6 +4,7 @@ from enum import StrEnum
 class Violations(StrEnum):
     corrupted_data_in_repository = "corrupted_data_in_repository"
     value_length = "value_length"
+    invalid_password_to_set = "invalid_password_to_set"
     invalid_type = "invalid_type"
     invalid_ = "invalid_type"
     does_not_match_regexp = "does_not_match_regexp"

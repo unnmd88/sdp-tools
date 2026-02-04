@@ -1,6 +1,7 @@
 import logging
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.expression import update
 
 from app_logging.dev.config import INFRASTRUCTURE
 from domain.entities.user import UserEntity
@@ -19,6 +20,7 @@ class UsersSqlAlchemyRepository:
             model=UserModel,
             mapper=UserDBMapper(),
         )
+        self._session = session
 
     @handle_db_errors(logger=logger)
     async def get_by_username(self, username: str) -> UserEntity | None:
@@ -31,3 +33,7 @@ class UsersSqlAlchemyRepository:
     @handle_db_errors(logger=logger)
     async def add(self, user: UserEntity) -> UserEntity:
         return await self._repo.add(user)
+
+    @handle_db_errors(logger=logger)
+    async def change_password(self, user_id: int, hashed_password: bytes) -> UserEntity | None:
+        return await self._repo.update(id=user_id, password=hashed_password)

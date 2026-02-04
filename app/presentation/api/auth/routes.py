@@ -4,17 +4,18 @@ from fastapi import APIRouter, HTTPException
 from starlette import status
 
 from application.dto.auth import UserAuthDTO
+from application.dto.jwt_dto import RefreshJWTPayloadDTO
 from application.exceptions import AuthenticationError, InactiveAccountError
+from domain.enums.unsorted import TokenTypesEnum
 from presentation.api.api_v1.documentation.auth_and_jwt.endpoints import (
     POST_LOGIN_user,
     POST_REFRESH,
 )
-from presentation.api.dependencies.di import oauth2_scheme
+from presentation.api.dependencies.di import oauth2_scheme, jwt_decoder_factory
 from presentation.api.dependencies.ioc import (
     AuthForm,
     LoginAndIssueJWTUseCase,
     RefreshJWTUseCase,
-    # RefreshJWTUseCase
 )
 from fastapi.params import Depends
 
@@ -59,7 +60,7 @@ AUTH_RESPONSES = {
 
 @router.post(
     "/login/",
-    # response_model=TokenInfo,
+    response_model=TokenInfo,
     response_model_exclude_none=True,
     summary="Аутентификация пользователя и выпуск jwt",
     description=POST_LOGIN_user,
@@ -73,35 +74,8 @@ async def login_and_issue_jwt(
         username=auth_schema.username,
         password=auth_schema.password,
     )
-    return await use_case(auth_dto=auth_dto)
-    try:
-        return await use_case(auth_dto=auth_dto)
-    except AuthenticationError:
-        e = HTTPExceptionContext(
-            code=Codes.UNAUTHORIZED,
-            message=ErrorMessages.invalid_login_or_password,
-            user_message=ErrorMessages.invalid_login_or_password,
-        )
-    except InactiveAccountError:
-        e = HTTPExceptionContext(
-            code=Codes.FORBIDDEN,
-            message=ErrorMessages.account_inactive,
-            user_message=ErrorMessages.account_inactive,
-        )
-    except RepositoryCorruptedError:
-        e = HTTPExceptionContext(
-            code=Codes.INTERNAL_SERVER_ERROR,
-            message=ErrorMessages.error_request,
-            user_message=ErrorMessages.error_request,
-            )
-    except Exception:
-        e = HTTPExceptionContext(
-            code=Codes.REQUEST_ERROR,
-            message=ErrorMessages.error_request,
-            user_message=ErrorMessages.error_request,
-        )
-    raise e.to_http_exception()
-
+    issued_jwt = await use_case(auth_dto=auth_dto)
+    return TokenInfo.model_validate(issued_jwt, from_attributes=True)
 
 @router.post(
     "/refresh/",
@@ -111,13 +85,10 @@ async def login_and_issue_jwt(
     description=POST_REFRESH,
 )
 async def issue_access_by_refresh_jwt(
-    token: Annotated[str | bytes, Depends(oauth2_scheme)],
+    token_dto: Annotated[
+        RefreshJWTPayloadDTO,
+        Depends(jwt_decoder_factory(token_type=TokenTypesEnum.refresh)),
+    ],
     use_case: RefreshJWTUseCase,
 ):
-    try:
-        return await use_case(refresh_jwt=token)
-    except (UnauthorizedError, ForbiddenError, InvalidTokenTypeError) as e:
-        raise HTTPException(
-            detail=e._private_message,
-            status_code=e.http_status,
-        )
+    return await use_case(user_id=token_dto.user_id)

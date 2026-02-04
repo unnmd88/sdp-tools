@@ -1,18 +1,13 @@
-from functools import lru_cache
-from pathlib import Path
-
 from fastapi.security import (
     HTTPBearer,
-    HTTPAuthorizationCredentials,
     OAuth2PasswordBearer,
 )
-from jwt import ExpiredSignatureError, DecodeError
 
-from application.dto.jwt_dto import AccessJWTPayloadDTO, RefreshJWTPayloadDTO
 from application.services.auth_service import AuthenticationService
 from application.services.user_service import UserServiceImpl
+from application.use_cases.admin.change_password_use_case import ResetUserPasswordByAdminUseCaseImpl
+from application.use_cases.users.change_password_use_case import ChangeUserPasswordUseCaseImpl
 
-from application.use_cases.users.create_user_use_case import CreateUserUseCaseImpl
 from application.use_cases.users.get_active_user_from_repo_use_case import (
     GetActiveUserFromRepoUseCase,
 )
@@ -32,7 +27,6 @@ from starlette import status
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-
 from domain.enums.unsorted import Roles, TokenTypesEnum
 from domain.repositories.users_repo_interface import UsersRepositoryProtocol
 
@@ -41,30 +35,16 @@ from infrastructure.auth.jwt.rules import DecodeJWTSettings, IssueJWTSettings
 
 from infrastructure.auth.password_service import BcryptPasswordService
 from infrastructure.database.api import db_api
-from infrastructure.database.passport_groups_repository import (
-    PassportGroupsRepositorySqlAlchemyRepository,
-)
-from infrastructure.database.regions_repository import (
-    RegionsRepositorySqlAlchemyRepository,
-)
-from infrastructure.database.tlo_repository import (
-    TrafficLightObjectSqlAlchemyRepository,
-)
-from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
-from infrastructure.exceptions import (
-    TokenExpiredError,
-    TokenError,
-    InvalidTokenTypeError,
-)
 
-from presentation.schemas.jwt import PayloadAccessJWTSchema, PayloadRefreshJWTSchema
+from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
+
 
 #  -- extras --
 
 http_bearer = HTTPBearer()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=settings.login_url)
 db_session = Annotated[AsyncSession, Depends(db_api.session_getter)]
-
+BEARER_TOKEN = Annotated[str, Depends(oauth2_scheme)]
 
 #  -- sql-alchemy repo --
 
@@ -74,6 +54,13 @@ def get_users_sqlalchemy_repository(session: db_session) -> UsersSqlAlchemyRepos
 
 
 # -- services --
+
+def get_user_service(
+    user_repository: Annotated[
+        UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository),
+    ]
+) -> UserServiceImpl:
+    return UserServiceImpl(user_repository=user_repository)
 
 
 # -- JWT, credentials and access-levels --
@@ -100,27 +87,11 @@ class JWTDecoder:
         else:
             raise ValueError("Некорректный тип токена.")
 
-    async def __call__(self, token: Annotated[str, Depends(oauth2_scheme)]):
-        try:
-            decoded_token = self._method(token)
-            if self._specific_field is None:
-                return decoded_token
-            return getattr(decoded_token, self._specific_field)
-        except TokenExpiredError:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Требуется аутентификация.",
-            )
-        except InvalidTokenTypeError:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Некорректный тип токена. Ожидаемый тип: {self._token_type}.",
-            )
-        except TokenError:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Некорректный токен",
-            )
+    async def __call__(self, token: BEARER_TOKEN):
+        decoded_token = self._method(token)
+        if self._specific_field is None:
+            return decoded_token
+        return getattr(decoded_token, self._specific_field)
 
 
 def jwt_decoder_factory(
@@ -157,25 +128,6 @@ class IssueJWTServiceDep:
 # -- use-cases --
 
 
-# def users_use_case(
-#     user_repository: Annotated[
-#         UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
-#     ],
-# ) -> GetUserUseCaseImpl:
-#     return GetUserUseCaseImpl(user_repository=user_repository)
-
-
-# def create_user_use_case(
-#     user_repository: Annotated[
-#         UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
-#     ],
-# ) -> CreateUserUseCaseProtocol:
-#     return CreateUserUseCaseImpl(
-#         user_repository=user_repository,
-#         get_user_use_case=GetUserUseCaseImpl(user_repository=user_repository),
-#     )
-
-
 def get_active_user_use_case(
     repository: Annotated[
         UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
@@ -201,8 +153,34 @@ def get_auth_and_jwt_use_case(
 
 
 def get_refresh_jwt_use_case(
+    jwt_service: Annotated[IssueJWTServiceDep, Depends(IssueJWTServiceDep())],
     user_repository: Annotated[
         UsersRepositoryProtocol, Depends(get_users_sqlalchemy_repository)
     ],
 ) -> RefreshJWTUseCaseImpl:
-    return RefreshJWTUseCaseImpl(user_repository=user_repository)
+    return RefreshJWTUseCaseImpl(
+        jwt_service=jwt_service,
+        user_service=UserServiceImpl(user_repository=user_repository),
+    )
+
+
+def get_change_password_use_case(
+    user_service: Annotated[UserServiceImpl, Depends(get_user_service)],
+    password_service: Annotated[BcryptPasswordService, Depends(BcryptPasswordService)],
+) -> ChangeUserPasswordUseCaseImpl:
+    return ChangeUserPasswordUseCaseImpl(
+        user_service=user_service,
+        password_service=password_service
+    )
+
+
+# -- ADMIN SECTION  --
+
+def get_reset_password_by_admin_use_case(
+    user_service: Annotated[UserServiceImpl, Depends(get_user_service)],
+    password_service: Annotated[BcryptPasswordService, Depends(BcryptPasswordService)],
+) -> ResetUserPasswordByAdminUseCaseImpl:
+    return ResetUserPasswordByAdminUseCaseImpl(
+        user_service=user_service,
+        password_service=password_service
+    )

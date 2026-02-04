@@ -23,3 +23,9 @@ class InactiveAccountError(ApplicationLayerError):
     DEFAULT_CODE = ErrorCodes.INACTIVE_ACCOUNT.code
     DEFAULT_PRIVATE_MESSAGE = ErrorCodes.INACTIVE_ACCOUNT.private_message
     DEFAULT_PUBLIC_MESSAGE = ErrorCodes.INACTIVE_ACCOUNT.public_message
+
+
+class PermissionDeniedError(ApplicationLayerError):
+    DEFAULT_CODE = ErrorCodes.FORBIDDEN.code
+    DEFAULT_PRIVATE_MESSAGE = ErrorCodes.FORBIDDEN.private_message
+    DEFAULT_PUBLIC_MESSAGE = ErrorCodes.FORBIDDEN.public_message

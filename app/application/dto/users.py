@@ -69,8 +69,22 @@ class CreateUserDTO:
 class ChangeUserPasswordDTO:
     """DTO для изменения пароля существующего пользователя системы."""
 
-    subject: str
     old_password: str = field(repr=False)
+    new_password: str = field(repr=False)
+
+
+@dataclass(slots=True, frozen=True, kw_only=True)
+class ChangeUserPasswordByAdminDTO:
+    """DTO для изменения пароля существующего пользователя системы."""
+
+    customer_id: int
+    subject_username: str
+
+
+@dataclass(slots=True, frozen=True, kw_only=True)
+class ChangedUserPasswordByAdminDTO:
+
+    username: str
     new_password: str = field(repr=False)
 
 
@@ -85,11 +99,12 @@ class UpdateUserDTO:
     last_name: str | None = None
     username: str | None = None
     email: str | None = None
-    organization: Organizations | None = None
-    is_active: bool | None = None
-    is_admin: bool | None = None
-    is_superuser: bool | None = None
-    role: Roles | None = None
+
+    # organization: Organizations | None = None
+    # is_active: bool | None = None
+    # is_admin: bool | None = None
+    # is_superuser: bool | None = None
+    # role: Roles | None = None
     phone_number: str | None = None
     telegram: str | None = None
-    description: str | None = None
+    # description: str | None = None

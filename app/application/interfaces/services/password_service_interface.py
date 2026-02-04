@@ -9,6 +9,3 @@ class PasswordServiceProtocol(Protocol):
 
     @classmethod
     def verify_password(cls, *, password: str, hashed_password: bytes) -> bool: ...
-
-    @classmethod
-    def generate_password(cls, min_length: int, max_length: int) -> str: ...

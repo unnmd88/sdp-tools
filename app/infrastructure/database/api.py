@@ -65,20 +65,21 @@ class DatabaseAPI:
         async with self.session_factory() as session:
             yield session
 
-    async def session_getter_commit(self) -> AsyncGenerator[AsyncSession, None]:
-        async with self.session_factory() as session:
-            yield session
-            await session.commit()
-
-    async def session_getter_commit_and_rollback_if_err(
-        self,
-    ) -> AsyncGenerator[AsyncSession, None]:
+    async def transaction_getter(self) -> AsyncGenerator[AsyncSession, None]:
         async with self.session_factory() as session:
             try:
                 yield session
                 await session.commit()
             except Exception:  # todo logging
                 await session.rollback()
+            finally:
+                await session.close()
+
+    async def session_getter_commit(self) -> AsyncGenerator[AsyncSession, None]:
+        async with self.session_factory() as session:
+            yield session
+            await session.commit()
+
 
 
 db_api = DatabaseAPI(

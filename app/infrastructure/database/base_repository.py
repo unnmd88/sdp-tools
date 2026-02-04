@@ -6,9 +6,10 @@ from sqlalchemy import select, delete
 from sqlalchemy.engine.result import Result
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy.sql.expression import update
 
 from application.interfaces.mappers.db import BaseDBMapperProtocol
-
+from infrastructure.exceptions import RepositoryError, RepositoryUpdateError
 
 EntityType = TypeVar("EntityType")
 ModelType = TypeVar("ModelType")
@@ -193,3 +194,23 @@ class BaseSqlAlchemyRepository[ModelType, EntityType, CreateDTOType]:
         except SQLAlchemyError:
             await self._session.rollback()
             raise
+
+    async def update(self, id: int, **fields) -> EntityType | None:
+        try:
+            stmt = (
+                update(self._model)
+                .where(self._model.id == id)
+                .values(**fields)
+                .returning(self._model)
+            )
+            result = await self._session.execute(stmt)
+            model = result.scalar_one_or_none()
+            await self._session.commit()
+            if model is not None:
+                return self._mapper.to_entity(model)
+            return None
+        except SQLAlchemyError:
+            await self._session.rollback()
+            raise RepositoryUpdateError(
+                public_message="Ошибка при обновлении записи в базе данных."
+            )

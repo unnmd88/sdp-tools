@@ -3,22 +3,24 @@ from typing import Annotated
 from fastapi import Depends
 from fastapi.params import Form
 
-from application.dto.jwt_dto import AccessJWTPayloadDTO, RefreshJWTPayloadDTO
-from application.use_cases.users import create_user_use_case
-from application.use_cases.users.create_user_use_case import CreateUserUseCaseImpl
+from application.dto.jwt_dto import AccessJWTPayloadDTO
+from application.use_cases.admin import create_user_use_case
+from application.use_cases.admin.change_password_use_case import ResetUserPasswordByAdminUseCaseImpl
+from application.use_cases.users.change_password_use_case import ChangeUserPasswordUseCaseImpl
+from application.use_cases.admin.create_user_use_case import CreateUserUseCaseImpl
 from application.use_cases.users.refresh_jwt_use_case import RefreshJWTUseCaseImpl
 from application.use_cases.users.user_login_and_issue_jwt_use_case import (
     UserLoginAndIssueJWTUseCaseImpl,
 )
+from domain.enums.unsorted import TokenTypesEnum
 
 from presentation.api.dependencies.di import (
     get_auth_and_jwt_use_case,
     get_refresh_jwt_use_case,
-    oauth2_scheme,
+    get_change_password_use_case, jwt_decoder_factory, get_reset_password_by_admin_use_case,
 )
 from presentation.api.dependencies.utils import get_filters_for_region_or_name_search
 from presentation.schemas.auth import AuthSchema
-from presentation.schemas.jwt import PayloadAccessJWTSchema, PayloadRefreshJWTSchema
 
 
 def auth_form(
@@ -30,15 +32,21 @@ def auth_form(
 
 ## Auth and JWT
 
-BEARER_TOKEN = Annotated[str, Depends(oauth2_scheme)]
 AuthForm = Annotated[AuthSchema, Depends(auth_form)]
-RefreshJWTUseCase = Annotated[RefreshJWTUseCaseImpl, Depends(get_refresh_jwt_use_case)]
+AccessTokenDep = Annotated[
+    AccessJWTPayloadDTO,
+    Depends(jwt_decoder_factory(token_type=TokenTypesEnum.access)),
+]
 LoginAndIssueJWTUseCase = Annotated[
     UserLoginAndIssueJWTUseCaseImpl, Depends(get_auth_and_jwt_use_case)
 ]
+RefreshJWTUseCase = Annotated[RefreshJWTUseCaseImpl, Depends(get_refresh_jwt_use_case)]
+
+## Admin Section
+ResetPasswordUseCase = Annotated[ResetUserPasswordByAdminUseCaseImpl, Depends(get_reset_password_by_admin_use_case)]
 
 ## Users
-
+ChangePasswordUseCase = Annotated[ChangeUserPasswordUseCaseImpl, Depends(get_change_password_use_case)]
 CreateUserUseCase = Annotated[CreateUserUseCaseImpl, Depends(create_user_use_case)]
 
 ## Regions
