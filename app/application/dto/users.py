@@ -50,10 +50,10 @@ class UserDTO:
 class CreateUserDTO:
     """DTO для создания нового пользователя системы."""
 
-    customer: str
+    customer_id: int
 
-    firstname: str | None
-    lastname: str | None
+    firstname: str
+    lastname: str
     username: str
     email: str | None
     organization: Organizations
@@ -62,7 +62,7 @@ class CreateUserDTO:
     phone_number: str | None
     telegram: str | None
     description: str
-    password: str | bytes = field(repr=False)
+    password: str = field(repr=False)
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)

@@ -4,7 +4,7 @@ from datetime import datetime
 
 from core.error_codes import ErrorCodes
 from domain.contract2.contract_field_enum import ContractFieldEnum
-from domain.entities.base_entity import AbstractEntity
+from domain.entities.base_entity import Entity
 from domain.contract2.contract_field import ContractField
 from domain.contract2.require import Require
 from domain.entities_public_attrs import USER_PUBLIC_ATTRS
@@ -17,21 +17,17 @@ from domain.enums.violations import Violations
 from domain.exceptions import DomainError, DomainInvariantError
 from domain.value_objects.password_vo import PasswordVO
 
-
 from domain.validators import (
     BooleanValidator,
     EmailRegexpValidator,
     PhoneNumberRegexpValidator,
     TelegramRegexpValidator,
-    EnumValidator,
     UserEntityValidator,
 )
-from domain.value_objects.contract_violation_context_vo import (
-    ContractViolationContextVO,
-)
+from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
 
 
-class UserEntity(AbstractEntity):
+class UserEntity(Entity):
     __public_attrs__ = USER_PUBLIC_ATTRS
 
     username = ContractField(
@@ -44,14 +40,12 @@ class UserEntity(AbstractEntity):
         field_name=str(PublicAttrNamesEnum.firstname),
         nullable=False,
         use_cache=True,
-        # preprocess_value=UserEntityValidator.repair_firstname_or_lastname,
         requires=[Require(handler=UserEntityValidator.firstname)],
     )
     lastname = ContractField(
         field_name=str(PublicAttrNamesEnum.firstname),
         nullable=False,
         use_cache=True,
-        # preprocess_value=UserEntityValidator.repair_firstname_or_lastname,
         requires=[Require(handler=UserEntityValidator.lastname)],
     )
 
@@ -61,14 +55,6 @@ class UserEntity(AbstractEntity):
         nullable=False,
         use_cache=True,
     )
-    # organization = ContractField(
-    #     field_name=str(PublicAttrNamesEnum.organization),
-    #     nullable=False,
-    #     use_cache=True,
-    #     preprocess_value=EnumValidator(
-    #         field_name=str(PublicAttrNamesEnum.organization), enum_class=Organizations
-    #     ),
-    # )
     email = ContractField(
         field_name=str(PublicAttrNamesEnum.email),
         nullable=True,
@@ -89,15 +75,6 @@ class UserEntity(AbstractEntity):
         nullable=False,
         use_cache=True,
     )
-
-    # role = ContractField(
-    #     field_name=str(PublicAttrNamesEnum.organization),
-    #     nullable=False,
-    #     use_cache=True,
-    #     preprocess_value=EnumValidator(
-    #         field_name=str(PublicAttrNamesEnum.role), enum_class=Roles
-    #     ),
-    # )
     phone_number = ContractField(
         field_name=str(PublicAttrNamesEnum.phone_number),
         nullable=True,
@@ -194,6 +171,36 @@ class UserEntity(AbstractEntity):
             context=ctx,
         )
 
+    @classmethod
+    def create_new_user(
+        cls,
+        *,
+        username: str,
+        firstname: str,
+        lastname: str,
+        organization: str,
+        email: str | None,
+        password: bytes,
+        is_active: bool,
+        role: str,
+        phone_number: str | None,
+        telegram: str | None,
+        description: str,
+    ) -> "UserEntity":
+        return cls(
+            id=None,
+            username=username,
+            firstname=firstname,
+            lastname=lastname,
+            organization=organization,
+            email=email,
+            password=password,
+            is_active=is_active,
+            role=role,
+            phone_number=phone_number,
+            telegram=telegram,
+            description=description,
+        )
 
 if __name__ == "__main__":
     pass

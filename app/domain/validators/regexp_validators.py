@@ -62,6 +62,7 @@ class RegexpValidator:
         )
         raise DomainValidationError(
             context=ctx,
+            private_message=f"Входные данные не соответствуют шаблону регулярного выражения поля {self.field_name!r}.",
             public_message=f"Некорректный формат данных для поля {self.field_name!r}.",
         )
 

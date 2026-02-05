@@ -18,6 +18,8 @@ class PublicAttrNamesEnum(StrEnum):
     phone_number = "phone_number"
     telegram = "telegram"
     description = "description"
+    code = "code"
+    name = "name"
 
 
 class PrivateAttrNamesEnum(StrEnum):

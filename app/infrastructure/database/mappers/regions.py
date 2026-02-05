@@ -2,14 +2,13 @@ from dataclasses import dataclass
 from typing import final
 
 from application.interfaces.mappers.db import BaseDBMapperProtocol
-from domain.regions.entities.region import RegionEntity
+from domain.entities.region_entity import RegionEntity
 from infrastructure.database.models import Region as RegionModel
 
 
 @final
 @dataclass(frozen=True, slots=True)
 class RegionDBMapper(BaseDBMapperProtocol):
-    entity = RegionEntity
 
     @classmethod
     def to_entity(cls, model: RegionModel) -> RegionEntity:
@@ -25,13 +24,7 @@ class RegionDBMapper(BaseDBMapperProtocol):
     @classmethod
     def to_model(cls, entity: RegionEntity) -> RegionModel:
         """ """
-        if entity.id is None:
-            return RegionModel(
-                code=entity.code,
-                name=entity.name,
-            )
         return RegionModel(
-            id=entity.id,
             code=entity.code,
             name=entity.name,
         )

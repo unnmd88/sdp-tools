@@ -31,17 +31,12 @@ class BaseUserSchema(BaseModel):
 
 
 class ResponseUserSchema(BaseUserSchema):
-    model_config = ConfigDict(strict=True, extra="ignore")
-
     id: int
 
 
 class CreateUserSchema(BaseUserSchema):
+
     password: str
-    role: Annotated[Roles, BeforeValidator(lambda val: Roles(val))]
-    organization: Annotated[
-        Organizations, BeforeValidator(lambda val: Organizations(val))
-    ]
 
 
 class UpdateUserSchema(BaseModel):
@@ -80,7 +75,6 @@ class ChangeUserPasswordBaseSchema(BaseModel):
 
     old_password: str
     new_password: str
-
 
 
 class UpdatedPasswordByAdminResponse(BaseModel):

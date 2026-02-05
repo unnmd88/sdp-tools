@@ -27,6 +27,14 @@ class UsersSqlAlchemyRepository:
         return await self._repo.get_one_or_none_by_filters(username=username)
 
     @handle_db_errors(logger=logger)
+    async def get_by_username(self, username: str) -> UserEntity | None:
+        return await self._repo.get_one_or_none_by_filters(username=username)
+
+    @handle_db_errors(logger=logger)
+    async def get_user_by_filters(self, **filters) -> UserEntity | None:
+        return await self._repo.get_one_or_none_by_filters(**filters)
+
+    @handle_db_errors(logger=logger)
     async def get_by_id(self, _id: int) -> UserEntity | None:
         return await self._repo.get_by_id(_id)
 

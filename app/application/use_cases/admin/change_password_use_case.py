@@ -8,7 +8,6 @@ from application.exceptions import AuthenticationError, ApplicationLayerError, P
 from application.interfaces import UserServiceProtocol, PasswordServiceProtocol
 from domain.entities import UserEntity
 from domain.enums.unsorted import Roles
-from domain.enums.validation_err_messages import ErrorMessages
 from domain.exceptions import DomainEntityNotFoundError
 from domain.value_objects.set_password_vo import SetPasswordVO
 

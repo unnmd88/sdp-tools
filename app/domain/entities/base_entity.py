@@ -13,7 +13,7 @@ from domain.validators.datetime_validators import DatetimeValidators
 from domain.value_objects.pk_id_vo import PkIdVO
 
 
-class AbstractEntity(ABC):
+class Entity(ABC):
     time_format = "%Y-%m-%d %H:%M:%S"
 
     __public_attrs__ = BASE_PUBLIC_ATTRS
@@ -94,7 +94,7 @@ class AbstractEntity(ABC):
         *,
         exclude: set[str] = None,
         include: dict = None,
-        ensure_ascii: bool = True,
+        ensure_ascii: bool = False,
         indent: None | int | str = 2,
     ) -> str:
         return json.dumps(

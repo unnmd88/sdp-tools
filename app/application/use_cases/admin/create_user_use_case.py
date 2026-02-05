@@ -1,19 +1,20 @@
 import logging
 
 from dataclasses import dataclass
+from typing import ClassVar
 
 from app_logging.dev.config import USERS_LOGGER
-from application.dto.users import CreateUserDTO
+from application.dto.users import CreateUserDTO, UserDTO
+from application.exceptions import PermissionDeniedError
+from application.interfaces import UserServiceProtocol
 
-from application.interfaces.services.password_service_interface import (
-    PasswordServiceProtocol,
-)
-from domain.enums.unsorted import Organizations, Roles
+from application.interfaces.services.password_service_interface import PasswordServiceProtocol
+from domain.enums.unsorted import Roles
 
 from domain.entities.user import UserEntity
-from domain.repositories.users_repo_interface import UsersRepositoryProtocol
+from domain.exceptions import DomainEntityAlreadyExistsError
+from domain.value_objects.set_password_vo import SetPasswordVO
 
-from infrastructure.auth.password_service import BcryptPasswordService, hash_password
 
 logger = logging.getLogger(USERS_LOGGER)
 
@@ -22,74 +23,65 @@ logger = logging.getLogger(USERS_LOGGER)
 class CreateUserUseCaseImpl:
     """Класс для создания нового пользователя системы."""
 
-    user_repository: UsersRepositoryProtocol
-    user_password_service: type[PasswordServiceProtocol] = BcryptPasswordService
+    require_roles: ClassVar[frozenset[Roles]] = frozenset([Roles.admin, Roles.superuser, Roles.director])
+    user_service: UserServiceProtocol
+    password_service: PasswordServiceProtocol
 
-    async def __call__(self, create_user_dto: CreateUserDTO) -> UserEntity:
+    async def __call__(self, create_user_dto: CreateUserDTO) -> UserDTO:
         logger.info(
-            "Запрос на создание нового пользователя от инициатора=%r: %r",
-            create_user_dto.customer,
-            create_user_dto,
+            "Запрос на создание нового пользователя системы. Заказчик(id)=%r",
+            create_user_dto.customer_id,
         )
-        try:
-            customer_entity: UserEntity = (
-                await self.get_user_use_case.get_active_user_or_raise(
-                    create_user_dto.customer
-                )
+        customer = await self.user_service.get_user_by_id_or_raise(create_user_dto.customer_id)
+        logger.info("Заказчик c username=%r найден.", customer.username)
+        if customer.role not in self.require_roles:
+            logger.warning(
+                "Ошибка доступа для пользователя %r. "
+                "Текущая роль: %s. Требуется: %s",
+                customer.username, customer.role, self.require_roles
             )
-            logger.info("Инициатор=%r найден", customer_entity.username)
-        except UserNotFoundError:
-            msg = f"Ошибка: {create_user_dto.customer!r} не найден."
-            logger.info(msg)
-            raise UserNotFoundError(msg)
-        except InactiveUserError:
-            msg = f"Ошибка: {create_user_dto.customer!r} не активен."
-            logger.info(msg)
-            raise InactiveUserError(msg)
-        except ApplicationError as e:
-            logger.critical("Ошибка логики создания нового пользователя: %r", e)
-            raise
-        if not customer_entity.is_superuser:
-            msg = f"У {customer_entity.username!r} нет прав для создания пользователей."
-            logger.warning(msg)
-            raise UserPermissionsError(msg)
-        try:
-            UserEntityBusinessRules.check_username_and_password(
-                username=create_user_dto.username,
-                password=create_user_dto.password,
-            )
-        except InvalidValueToSetError as e:
-            logger.info("%s: %r", e, create_user_dto.password)
-            raise
-        user_already_exists: UserEntity = (
-            await self.get_user_use_case.get_user_by_username(create_user_dto.username)
-        )
-        if user_already_exists:
-            msg = f"Пользователь с username={user_already_exists.username}(id={user_already_exists.id}) существует."
-            logger.warning(msg)
-            raise UserAlreadyExistsError(msg)
+            raise PermissionDeniedError
+        logger.debug("Право на создание пользователя у заказчика(%r) подтверждено.", customer.username)
+        logger.debug("Данные нового пользователя: %r", create_user_dto)
 
-        entity: UserEntity = self.user_factory.create_new(
+        existing_user = await self.user_service.get_user_by_username(create_user_dto.username)
+        if existing_user is not None:
+            logger.warning("Ошибка: пользователь с username=%r существует.", create_user_dto.username)
+            raise DomainEntityAlreadyExistsError(
+                public_message=f"Пользователь с username={create_user_dto.username} уже существует."
+            )
+        logger.debug("Право на создание пользователя с username=%r подтверждено.", create_user_dto.username)
+        if create_user_dto.email is not None:
+            if await self.user_service.get_user_by_filters(email=create_user_dto.email) is not None:
+                logger.warning("Ошибка: пользователь с email=%r существует.", create_user_dto.email)
+                raise DomainEntityAlreadyExistsError(
+                    public_message=f"Пользователь с email={create_user_dto.email} уже существует."
+                )
+            logger.debug("Право на создание пользователя с email=%r подтверждено.", create_user_dto.email)
+        validated_password = SetPasswordVO(
+            subject=UserEntity.__class__.__name__,
+            password=create_user_dto.password
+        ).password
+        hashed_password = self.password_service.hash_password(validated_password)
+        logger.debug("Право на создание пользователя с указанным паролем подтверждено.")
+        user_to_create = UserEntity.create_new_user(
             firstname=create_user_dto.firstname,
             lastname=create_user_dto.lastname,
             username=create_user_dto.username,
-            password=hash_password(create_user_dto.password),
+            password=hashed_password,
             email=create_user_dto.email,
-            organization=Organizations(create_user_dto.organization),
+            organization=create_user_dto.organization,
             is_active=create_user_dto.is_active,
-            role=Roles(create_user_dto.role),
+            role=create_user_dto.role,
             phone_number=create_user_dto.phone_number,
             telegram=create_user_dto.telegram,
             description=create_user_dto.description,
         )
-
-        logger.warning(entity)
-        try:
-            new_user_entity = await self.user_repository.add_user(entity)
-            assert new_user_entity == entity
-        except Exception as e:
-            msg = f"Ошибка логики приложения при добавлении пользователя в репозиторий: {e}"
-            logger.critical(msg)
-            raise ApplicationError(msg)
-        logger.info("Успешно создан новый пользователь: %r", new_user_entity)
-        return new_user_entity
+        logger.debug("Валидация данных пользователя завершена. Сохранение в репозиторий...")
+        new_user = await self.user_service.add_new_user(user_to_create)
+        logger.info(
+            "Пользователь c id=%r и username=%r успешно сохранен в репозиторий.",
+            new_user.id,
+            new_user.username
+        )
+        return UserDTO.from_entity(new_user)

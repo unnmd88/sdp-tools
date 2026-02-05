@@ -1,29 +1,21 @@
 from dataclasses import dataclass, field
-
-from domain.enums import RegionCodes, RegionNames
+from datetime import datetime
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class RegionDTO:
     """DTO для экземпляра существующего региона."""
 
+    id: int
     code: int
     name: str
+    built_at: str | datetime
+    created_at: str | None
+    updated_at: str | None
 
-
-# @dataclass(slots=True, frozen=True, kw_only=True)
-# class RegionFiltersForSearchDTO:
-#     """ DTO для экземпляра существующего региона. """
-#     # code: int | None = None
-#     # name: str | None = None
-#     filters_for_search: dict = field(default_factory=dict)
-#
-#
-#     @classmethod
-#     def get_dto_instance(cls, code_or_name: str | int):
-#         code = int(code_or_name) if code_or_name.isdigit() else None
-#         name = None if code else code_or_name
-#         return RegionFiltersForSearchDTO(code=code, name=name,)
+    @classmethod
+    def from_entity(cls, entity):
+        return cls(**entity.to_dict())
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)

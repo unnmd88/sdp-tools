@@ -2,7 +2,7 @@ import random
 import string
 
 from domain.enums import RegionNames, RegionCodes
-from domain.regions.entities.region import RegionEntity
+from domain.entities.region_entity import RegionEntity
 import pytest
 
 

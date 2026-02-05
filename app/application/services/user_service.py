@@ -7,7 +7,6 @@ from application.utils import async_handle_corrupted_data_in_repo
 from domain.entities import UserEntity
 from domain.exceptions import DomainEntityNotFoundError
 from domain.repositories.users_repo_interface import UsersRepositoryProtocol
-from infrastructure.exceptions import RepositoryCorruptedError
 
 logger = logging.getLogger(DOMAIN)
 
@@ -39,3 +38,11 @@ class UserServiceImpl:
 
     async def change_password(self, user_id: int, hashed_password: bytes) -> UserEntity | None:
         return await self.user_repository.change_password(user_id, hashed_password)
+
+    async def add_new_user(self, user_data: UserEntity) -> UserEntity:
+        return await self.user_repository.add(user_data)
+
+    @async_handle_corrupted_data_in_repo(logger=logger)
+    async def get_user_by_filters(self, **filters) -> UserEntity | None:
+        return await self.user_repository.get_user_by_filters(**filters)
+

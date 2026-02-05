@@ -29,13 +29,6 @@ router = APIRouter(
     # dependencies=[BEARER_TOKEN],
 )
 
-# require_active_user_router = APIRouter(
-#     prefix="/user",
-#     tags=["Users"],
-#     # route_class=jwt_route_class_factory(active_user_require=True),
-#     dependencies=[Depends(load_active_user_to_request_from_jwt)],
-# )
-
 
 @router.get(
     "/whoami/",

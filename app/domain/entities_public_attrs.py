@@ -32,3 +32,8 @@ USER_PUBLIC_ATTRS = BASE_PUBLIC_ATTRS + (
     PublicAttr(attr_name="_telegram", alias=str(PublicAttrNamesEnum.telegram)),
     PublicAttr(attr_name="_description", alias="description"),
 )
+
+REGIONS_PUBLIC_ATTRS = BASE_PUBLIC_ATTRS + (
+    PublicAttr(attr_name="_name", alias=str(PublicAttrNamesEnum.name)),
+    PublicAttr(attr_name="_code", alias=str(PublicAttrNamesEnum.code)),
+)

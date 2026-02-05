@@ -27,7 +27,7 @@ class ContractField:
         self._requires = []
         for r in requires or ():
             if isinstance(r, Require):
-                pass
+                self._requires.append(r)
             elif callable(r):
                 self._requires.append(Require(handler=r))
             else:

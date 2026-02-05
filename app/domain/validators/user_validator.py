@@ -45,7 +45,7 @@ class UserEntityValidator:
             rule = ErrorMessages.cant_start_with_numeric.format(field_name, value)
             message = rule
         elif not (MIN_LEN_USERNAME <= len(value) <= MAX_LEN_USERNAME):
-            violation = Violations.value_length
+            violation = Violations.invalid_length
             rule = ErrorMessages.value_str_length_range.format(
                 field_name, len(value), MIN_LEN_USERNAME, MAX_LEN_USERNAME
             )
@@ -94,7 +94,7 @@ class UserEntityValidator:
             violation = Violations.string_cant_be_numeric
             message = ErrorMessages.must_be_isalpha.format(value)
         elif min_len <= len(value) <= max_len:
-            violation = Violations.value_length
+            violation = Violations.invalid_length
             message = ErrorMessages.value_str_length_range.format(
                 field_name,
                 len(value),

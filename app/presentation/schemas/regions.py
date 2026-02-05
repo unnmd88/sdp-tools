@@ -4,9 +4,7 @@ from typing import Annotated
 from annotated_types import MinLen, MaxLen
 
 
-from pydantic import BaseModel, ConfigDict, model_validator, Field, computed_field
-
-from presentation.schemas.mixins import IdSchemaMixin, DateTimeSchemaMixin
+from pydantic import BaseModel, ConfigDict, model_validator, Field
 
 
 class RegionCreateSchema(BaseModel):
@@ -15,15 +13,11 @@ class RegionCreateSchema(BaseModel):
     code: Annotated[int, Field(gt=0), Field(lt=65535)]
     name: Annotated[str, MinLen(3), MaxLen(32)]
 
-    # @model_validator(mode='after')
-    # def check_allowed_pair_name_region(self):
-    #     if (self.name, self.code) not in ALLOWED_REGIONS:
-    #         raise ValueError('Некорректная пара имя-регион')
-    #     return self
 
-
-class RegionSchemaResponse(IdSchemaMixin, DateTimeSchemaMixin, RegionCreateSchema):
+class RegionSchemaResponse(RegionCreateSchema):
     model_config = ConfigDict(extra="ignore")
+
+    id: int
 
 
 class RegionUpdate(BaseModel):

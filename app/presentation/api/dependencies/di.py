@@ -4,8 +4,11 @@ from fastapi.security import (
 )
 
 from application.services.auth_service import AuthenticationService
+from application.services.regions_service import RegionsServiceImpl
 from application.services.user_service import UserServiceImpl
 from application.use_cases.admin.change_password_use_case import ResetUserPasswordByAdminUseCaseImpl
+from application.use_cases.admin.create_user_use_case import CreateUserUseCaseImpl
+from application.use_cases.regions.read_region_use_case import ReadRegionUseCaseImpl
 from application.use_cases.users.change_password_use_case import ChangeUserPasswordUseCaseImpl
 
 from application.use_cases.users.get_active_user_from_repo_use_case import (
@@ -28,6 +31,7 @@ from starlette import status
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from domain.enums.unsorted import Roles, TokenTypesEnum
+from domain.repositories.regions_repo_interface import RegionsRepositoryProtocol
 from domain.repositories.users_repo_interface import UsersRepositoryProtocol
 
 from infrastructure.auth.jwt.jwt_service import DecodeJWTService, IssueJWTService
@@ -35,6 +39,7 @@ from infrastructure.auth.jwt.rules import DecodeJWTSettings, IssueJWTSettings
 
 from infrastructure.auth.password_service import BcryptPasswordService
 from infrastructure.database.api import db_api
+from infrastructure.database.regions_repository import RegionsSqlAlchemyRepository
 
 from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
 
@@ -53,7 +58,11 @@ def get_users_sqlalchemy_repository(session: db_session) -> UsersSqlAlchemyRepos
     return UsersSqlAlchemyRepository(session=session)
 
 
+def get_regions_sqlalchemy_repository(session: db_session) -> RegionsSqlAlchemyRepository:
+    return RegionsSqlAlchemyRepository(session=session)
+
 # -- services --
+
 
 def get_user_service(
     user_repository: Annotated[
@@ -61,6 +70,14 @@ def get_user_service(
     ]
 ) -> UserServiceImpl:
     return UserServiceImpl(user_repository=user_repository)
+
+
+def get_regions_service(
+    regions_repository: Annotated[
+        RegionsRepositoryProtocol, Depends(get_regions_sqlalchemy_repository),
+    ]
+) -> RegionsServiceImpl:
+    return RegionsServiceImpl(regions_repository=regions_repository)
 
 
 # -- JWT, credentials and access-levels --
@@ -173,8 +190,23 @@ def get_change_password_use_case(
         password_service=password_service
     )
 
+def get_read_region_use_case(
+    regions_service: Annotated[RegionsServiceImpl, Depends(get_regions_service)],
+) -> ReadRegionUseCaseImpl:
+    return ReadRegionUseCaseImpl(regions_service=regions_service)
+
 
 # -- ADMIN SECTION  --
+
+def get_create_user_use_case(
+    user_service: Annotated[UserServiceImpl, Depends(get_user_service)],
+    password_service: Annotated[BcryptPasswordService, Depends(BcryptPasswordService)],
+) -> CreateUserUseCaseImpl:
+    return CreateUserUseCaseImpl(
+        user_service=user_service,
+        password_service=password_service
+    )
+
 
 def get_reset_password_by_admin_use_case(
     user_service: Annotated[UserServiceImpl, Depends(get_user_service)],

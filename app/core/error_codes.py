@@ -181,6 +181,18 @@ class ErrorCodes(Enum):
         public_message="Ошибка запроса. Попробуйте позже.",
     )
 
+    REPOSITORY_CONNECTION_ERROR = Error(
+        code="repository_connection_error",
+        private_message="Ошибка соединения с репозиторием",
+        public_message="Сервис временно недоступен. Попробуйте позже.",
+    )
+
+    REPOSITORY_INTEGRITY_ERROR = Error(
+        code="repository_integrity_error",
+        private_message="Нарушение целостности репозитория",
+        public_message="Ошибка запроса. Попробуйте позже.",
+    )
+
     REPOSITORY_UPDATE_ERROR = Error(
         code="repository_update_error",
         private_message="Ошибка обновления данных репозитория",
