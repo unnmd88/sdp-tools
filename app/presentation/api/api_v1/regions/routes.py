@@ -67,10 +67,10 @@ async def get_region_by_id(
     "/",
     response_model=list[RegionSchemaResponse],
     status_code=status.HTTP_200_OK,
-    summary="Список всех имеющихся регионов светофорного объекта",
+    summary="Список регионов светофорного объекта",
     description=GET_all_regions_description,
 )
-async def get_all_regions(read_region_use_case: ReadRegionUseCase):
+async def get_regions(read_region_use_case: ReadRegionUseCase):
     return [
         RegionSchemaResponse.model_validate(r, from_attributes=True)
         for r in await read_region_use_case.get_many()
