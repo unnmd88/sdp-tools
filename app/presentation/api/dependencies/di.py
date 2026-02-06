@@ -9,6 +9,7 @@ from application.services.user_service import UserServiceImpl
 from application.use_cases.admin.change_password_use_case import ResetUserPasswordByAdminUseCaseImpl
 from application.use_cases.admin.create_user_use_case import CreateUserUseCaseImpl
 from application.use_cases.regions.read_region_use_case import ReadRegionUseCaseImpl
+from application.use_cases.regions.update_regions_use_case import UpdateRegionUseCaseImpl
 from application.use_cases.users.change_password_use_case import ChangeUserPasswordUseCaseImpl
 
 from application.use_cases.users.get_active_user_from_repo_use_case import (
@@ -38,8 +39,9 @@ from infrastructure.auth.jwt.jwt_service import DecodeJWTService, IssueJWTServic
 from infrastructure.auth.jwt.rules import DecodeJWTSettings, IssueJWTSettings
 
 from infrastructure.auth.password_service import BcryptPasswordService
-from infrastructure.database.api import db_api
+from infrastructure.database.api import DatabaseAPI
 from infrastructure.database.regions_repository import RegionsSqlAlchemyRepository
+from infrastructure.database.uow import SQLAlchemyUnitOfWork
 
 from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
 
@@ -48,10 +50,18 @@ from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
 
 http_bearer = HTTPBearer()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=settings.login_url)
-db_session = Annotated[AsyncSession, Depends(db_api.session_getter)]
 BEARER_TOKEN = Annotated[str, Depends(oauth2_scheme)]
 
-#  -- sql-alchemy repo --
+#  -- sql-alchemy/repo/database --
+
+db_api = DatabaseAPI(
+    url=str(settings.db.url),
+    echo=settings.db.echo,
+    echo_pool=settings.db.echo_pool,
+    pool_size=settings.db.pool_size,
+    max_overflow=settings.db.max_overflow,
+)
+db_session = Annotated[AsyncSession, Depends(db_api.session_getter)]
 
 
 def get_users_sqlalchemy_repository(session: db_session) -> UsersSqlAlchemyRepository:
@@ -194,6 +204,21 @@ def get_read_region_use_case(
     regions_service: Annotated[RegionsServiceImpl, Depends(get_regions_service)],
 ) -> ReadRegionUseCaseImpl:
     return ReadRegionUseCaseImpl(regions_service=regions_service)
+
+
+def get_update_region_use_case(
+    session: db_session,
+) -> UpdateRegionUseCaseImpl:
+    uow = SQLAlchemyUnitOfWork(session=session)
+    regions_repository = RegionsSqlAlchemyRepository(session=session)
+    user_repository = UsersSqlAlchemyRepository(session=session)
+    user_service = UserServiceImpl(user_repository=user_repository)
+    regions_service = RegionsServiceImpl(regions_repository=regions_repository)
+    return UpdateRegionUseCaseImpl(
+        uow=uow,
+        regions_service=regions_service,
+        user_service=user_service,
+    )
 
 
 # -- ADMIN SECTION  --

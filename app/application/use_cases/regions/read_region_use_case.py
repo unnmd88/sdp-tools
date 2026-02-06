@@ -41,3 +41,5 @@ class ReadRegionUseCaseImpl:
             RegionDTO.from_entity(region)
             for region in await self.regions_service.get_many(skip=skip, limit=limit, order_by=order_by)
         ]
+
+

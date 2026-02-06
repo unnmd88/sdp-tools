@@ -174,6 +174,10 @@ class BaseSqlAlchemyRepository[ModelType, EntityType, CreateDTOType]:
         self._mapper = mapper
         self._default_filters = default_filters or {}
 
+    @property
+    def mapper(self) -> BaseDBMapperProtocol:
+        return self._mapper
+
     async def get_by_id(self, _id: int) -> EntityType | None:
         if (model := await self._session.get(self._model, _id)) is not None:
             return self._mapper.to_entity(model)
@@ -262,25 +266,3 @@ class BaseSqlAlchemyRepository[ModelType, EntityType, CreateDTOType]:
         except Exception:  # todo logging
             raise RepositoryError(private_message="Ошибка при работе с базой данных")
 
-    # async def update(self, id: int, **fields) -> EntityType | None:
-    #     try:
-    #         stmt = (
-    #             update(self._model)
-    #             .where(self._model.id == id)
-    #             .values(**fields)
-    #             .returning(self._model)
-    #         )
-    #         result = await self._session.execute(stmt)
-    #         model = result.scalar_one_or_none()
-    #         await self._session.commit()
-    #         if model is not None:
-    #             return self._mapper.to_entity(model)
-    #         return None
-    #     except IntegrityError as e:
-    #         raise RepositoryIntegrityError(original_error=e)
-    #     except (OperationalError, DBAPIError) as e:
-    #         raise RepositoryConnectionError(private_message=e)
-    #     except SQLAlchemyError as e:
-    #         raise RepositoryError(private_message="Ошибка при работе с базой данных")
-    #     except Exception:  # todo logging
-    #         raise RepositoryError(private_message="Ошибка при работе с базой данных")

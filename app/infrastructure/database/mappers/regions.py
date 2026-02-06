@@ -8,7 +8,7 @@ from infrastructure.database.models import Region as RegionModel
 
 @final
 @dataclass(frozen=True, slots=True)
-class RegionDBMapper(BaseDBMapperProtocol):
+class RegionDBMapper(BaseDBMapperProtocol[RegionModel, RegionEntity]):
 
     @classmethod
     def to_entity(cls, model: RegionModel) -> RegionEntity:
@@ -28,3 +28,16 @@ class RegionDBMapper(BaseDBMapperProtocol):
             code=entity.code,
             name=entity.name,
         )
+
+    @classmethod
+    def update_model(
+        cls,
+        *,
+        model: RegionModel,
+        entity: RegionEntity,
+    ) -> RegionModel:
+        """ """
+        model.code = entity.code
+        model.name = entity.name
+        return model
+

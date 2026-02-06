@@ -16,7 +16,7 @@ from presentation.api.dependencies.di import (
     jwt_decoder_factory,
     get_user_service,
 )
-from presentation.api.dependencies.ioc import ChangePasswordUseCase
+from presentation.api.dependencies.ioc import ChangePasswordUseCase, AccessTokenDep
 
 from presentation.schemas.users import (
     ResponseUserSchema,
@@ -38,10 +38,7 @@ router = APIRouter(
     description=GET_whoami,
 )
 async def whoami(
-    token_dto: Annotated[
-        AccessJWTPayloadDTO,
-        Depends(jwt_decoder_factory(token_type=TokenTypesEnum.access)),
-    ],
+    token_dto: AccessTokenDep,
     user_service: Annotated[UserServiceImpl, Depends(get_user_service)],
 ):
     return ResponseUserSchema.model_validate(

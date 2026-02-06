@@ -1,20 +1,21 @@
-from datetime import datetime, timedelta
-from typing import Annotated
-
-from annotated_types import MinLen, MaxLen
+from pydantic import BaseModel, ConfigDict, Field
 
 
-from pydantic import BaseModel, ConfigDict, model_validator, Field
-
-
-class RegionCreateSchema(BaseModel):
+class RegionCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    code: Annotated[int, Field(gt=0), Field(lt=65535)]
-    name: Annotated[str, MinLen(3), MaxLen(32)]
+    code: int = Field(
+        gt=0,
+        lt=65535
+    )
+
+    name: str = Field(
+        min_length=2,
+        max_length=32
+    )
 
 
-class RegionSchemaResponse(RegionCreateSchema):
+class RegionResponse(RegionCreate):
     model_config = ConfigDict(extra="ignore")
 
     id: int
@@ -23,13 +24,14 @@ class RegionSchemaResponse(RegionCreateSchema):
 class RegionUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    # code_or_name: int | str
+    new_name: str | None = Field(
+        default=None,
+        min_length=3,
+        max_length=32
+    )
 
-    name: Annotated[str | None, MinLen(3), MaxLen(32), Field(default=None)]
-    code: Annotated[int | None, Field(gt=0), Field(lt=65535), Field(default=None)]
-
-    @model_validator(mode="after")
-    def check_has_data_for_update(self):
-        if self.name is None and self.code is None:
-            raise ValueError("Нет данных для обновления")
-        return self
+    new_code:  int | None = Field(
+        default=None,
+        gt=0,
+        lt=65535
+    )

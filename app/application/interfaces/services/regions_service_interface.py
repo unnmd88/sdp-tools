@@ -1,5 +1,6 @@
 from typing import Protocol, Any
 
+from domain.cqrs.region_commands import UpdateRegionCommand
 from domain.entities.region_entity import RegionEntity
 
 
@@ -17,7 +18,7 @@ class RegionsReadServiceProtocol(Protocol):
     ) -> list[RegionEntity]: ...
 
 class RegionsWriteServiceProtocol(Protocol):
-    async def update_region(self, user_id: int, update_data) -> RegionEntity: ...
+    async def update_region(self, command: UpdateRegionCommand) -> RegionEntity: ...
     async def add_new_region(self, user_data: RegionEntity) -> RegionEntity: ...
 
 

@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import TypedDict
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)
@@ -16,6 +17,12 @@ class RegionDTO:
     @classmethod
     def from_entity(cls, entity):
         return cls(**entity.to_dict())
+
+
+class UpdateRegionDTO(TypedDict):
+    """ DTO для обновления существующего региона. """
+    name: str
+    code: int
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)

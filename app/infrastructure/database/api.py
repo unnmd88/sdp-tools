@@ -1,5 +1,7 @@
 import functools
+import sys
 from collections.abc import AsyncGenerator, Callable
+from contextlib import asynccontextmanager
 from typing import Any
 
 from sqlalchemy.ext.asyncio import (
@@ -8,7 +10,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from core.config import settings
+from infrastructure.database.uow import SQLAlchemyUnitOfWork
 
 
 class DatabaseAPI:
@@ -40,21 +42,7 @@ class DatabaseAPI:
 
     async def session_getter(self) -> AsyncGenerator[AsyncSession, None]:
         async with self.session_factory() as session:
-            try:
-                yield session
-                await session.commit()
-            except Exception:
-                await session.rollback()
-                raise
-
-
-db_api = DatabaseAPI(
-    url=str(settings.db.url),
-    echo=settings.db.echo,
-    echo_pool=settings.db.echo_pool,
-    pool_size=settings.db.pool_size,
-    max_overflow=settings.db.max_overflow,
-)
+            yield session
 
 
 def async_session_factory(commit: bool = True, rollback: bool = True):

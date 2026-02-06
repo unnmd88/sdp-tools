@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from fastapi import HTTPException, FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from application.exceptions import AuthenticationError, InactiveAccountError
+from application.exceptions import AuthenticationError, InactiveAccountError, PermissionDeniedError
 from core.exceptions import BaseAppError
 from domain.exceptions import DomainContractViolationError, DomainEntityNotFoundError, DomainEntityAlreadyExistsError
 from infrastructure.exceptions import RepositoryCorruptedError, TokenExpiredError, InvalidTokenTypeError, TokenError, \
@@ -118,6 +118,7 @@ status_map = {
     RepositoryIntegrityError: CodeMapping(code=Codes.CONFLICT_ERROR, http_status=status.HTTP_409_CONFLICT),
     RepositoryConnectionError: CodeMapping(code=Codes.REQUEST_ERROR, http_status=status.HTTP_500_INTERNAL_SERVER_ERROR),
     RepositoryUpdateError: CodeMapping(code=Codes.DATA_UPDATE_ERROR, http_status=status.HTTP_400_BAD_REQUEST),
+    PermissionDeniedError: CodeMapping(code=Codes.FORBIDDEN, http_status=status.HTTP_403_FORBIDDEN),
 }
 
 def setup_exception_handlers(app: FastAPI) -> None:

@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from fastapi.exceptions import HTTPException
 from starlette import status
 
+from domain.cqrs.region_commands import UpdateRegionCommand
 from presentation.api.api_v1.documentation.regions.endpoints import (
     PATCH_region_by_code_description,
     GET_region_by_code_description,
@@ -11,12 +12,12 @@ from presentation.api.api_v1.documentation.regions.endpoints import (
     GET_region_by_id_description,
     GET_all_regions_description,
 )
-from presentation.api.dependencies.ioc import ReadRegionUseCase
+from presentation.api.dependencies.ioc import ReadRegionUseCase, UpdateRegionUseCase, AccessTokenDep
 
 from presentation.schemas.update import UpdatedRecordSchemaResponse
 from presentation.schemas.regions import (
-    RegionCreateSchema,
-    RegionSchemaResponse,
+    RegionCreate,
+    RegionResponse,
     RegionUpdate,
 )
 from application.dto.common import (
@@ -32,47 +33,47 @@ router = APIRouter(
 
 
 @router.get(
-    '/code-or-name/{code-or-name}',
-    response_model=RegionSchemaResponse,
+    '/{code-or-name}',
+    response_model=RegionResponse,
     status_code=status.HTTP_200_OK,
 )
 async def get_region_by_code_or_name(
     code_or_name: str | int,
     read_region_use_case: ReadRegionUseCase,
-) -> RegionSchemaResponse:
-    return RegionSchemaResponse.model_validate(
+) -> RegionResponse:
+    return RegionResponse.model_validate(
         await read_region_use_case.by_code_or_name(code_or_name),
         from_attributes=True,
     )
 
 
-@router.get(
-    "/{id}",
-    response_model=RegionSchemaResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Получить данные региона светофорного объекта по id",
-    description=GET_region_by_id_description,
-)
-async def get_region_by_id(
-    id: int,
-    read_region_use_case: ReadRegionUseCase,
-) -> RegionSchemaResponse:
-    return RegionSchemaResponse.model_validate(
-        await read_region_use_case.by_id(id),
-        from_attributes=True,
-    )
+# @router.get(
+#     "/{id}",
+#     response_model=RegionSchemaResponse,
+#     status_code=status.HTTP_200_OK,
+#     summary="Получить данные региона светофорного объекта по id",
+#     description=GET_region_by_id_description,
+# )
+# async def get_region_by_id(
+#     id: int,
+#     read_region_use_case: ReadRegionUseCase,
+# ) -> RegionSchemaResponse:
+#     return RegionSchemaResponse.model_validate(
+#         await read_region_use_case.by_id(id),
+#         from_attributes=True,
+#     )
 
 
 @router.get(
     "/",
-    response_model=list[RegionSchemaResponse],
+    response_model=list[RegionResponse],
     status_code=status.HTTP_200_OK,
     summary="Список регионов светофорного объекта",
     description=GET_all_regions_description,
 )
 async def get_regions(read_region_use_case: ReadRegionUseCase):
     return [
-        RegionSchemaResponse.model_validate(r, from_attributes=True)
+        RegionResponse.model_validate(r, from_attributes=True)
         for r in await read_region_use_case.get_many()
     ]
 #
@@ -102,30 +103,31 @@ async def get_regions(read_region_use_case: ReadRegionUseCase):
 #     )
 #
 #
-# @router.patch(
-#     "/{code}",
-#     status_code=status.HTTP_202_ACCEPTED,
-#     response_model=UpdatedRecordSchemaResponse,
-#     summary="Обновить данные существующего региона.",
-#     description=PATCH_region_by_code_description,
-# )
-# async def update_region(
-#     region_code: int,
-#     update_data: RegionUpdate,
-#     # use_case: RegionsCrudUseCase,
-# ):
-#     dto = ToUpdateRecordDTO(
-#         search_criteria=FiltersFactory.get_filters_dict(code=region_code),
-#         fields=update_data.model_dump(exclude_unset=True, exclude_none=True),
-#     )
-#     try:
-#         result = await use_case.update_region(dto)
-#     except EntityNotFoundError:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail=f"Регион {region_code!r} не найден.",
-#         )
-#     return result
+@router.patch(
+    "/{code-or-name}",
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=RegionResponse,
+    summary="Обновить данные существующего региона.",
+    description=PATCH_region_by_code_description,
+)
+async def update_region(
+    token_dto: AccessTokenDep,
+    code_or_name: str | int,
+    update_data: RegionUpdate,
+    use_case: UpdateRegionUseCase,
+) -> RegionResponse:
+    command = UpdateRegionCommand(
+        user_id=token_dto.user_id,
+        code_or_name=code_or_name,
+        **update_data.model_dump(exclude_unset=True),
+        # new_name=update_data.name
+    )
+    print(f"command: {command}")
+    return RegionResponse.model_validate(
+        await use_case(command), from_attributes=True,
+    )
+
+
 #
 #
 # @router.delete(
