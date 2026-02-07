@@ -50,10 +50,10 @@ class UserDTO:
 class CreateUserDTO:
     """DTO для создания нового пользователя системы."""
 
-    customer: str
+    customer_id: int
 
-    firstname: str | None
-    lastname: str | None
+    firstname: str
+    lastname: str
     username: str
     email: str | None
     organization: Organizations
@@ -62,15 +62,28 @@ class CreateUserDTO:
     phone_number: str | None
     telegram: str | None
     description: str
-    password: str | bytes = field(repr=False)
+    password: str = field(repr=False)
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class ChangeUserPasswordDTO:
     """DTO для изменения пароля существующего пользователя системы."""
 
-    subject: str
     old_password: str = field(repr=False)
+    new_password: str = field(repr=False)
+
+
+@dataclass(slots=True, frozen=True, kw_only=True)
+class ChangeUserPasswordByAdminDTO:
+    """DTO для изменения пароля существующего пользователя системы."""
+
+    customer_id: int
+    subject_username: str
+
+
+@dataclass(slots=True, frozen=True, kw_only=True)
+class ChangedUserPasswordByAdminDTO:
+    username: str
     new_password: str = field(repr=False)
 
 
@@ -85,11 +98,12 @@ class UpdateUserDTO:
     last_name: str | None = None
     username: str | None = None
     email: str | None = None
-    organization: Organizations | None = None
-    is_active: bool | None = None
-    is_admin: bool | None = None
-    is_superuser: bool | None = None
-    role: Roles | None = None
+
+    # organization: Organizations | None = None
+    # is_active: bool | None = None
+    # is_admin: bool | None = None
+    # is_superuser: bool | None = None
+    # role: Roles | None = None
     phone_number: str | None = None
     telegram: str | None = None
-    description: str | None = None
+    # description: str | None = None

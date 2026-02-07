@@ -21,6 +21,7 @@ logger = logging.getLogger(USERS_LOGGER)
 @dataclass(slots=True, kw_only=True)
 class CreateUserRootResultDTO:
     username: str
+    password: str = None
     id: int | None = None
     success: bool = False
     errors: list[str] = field(default_factory=list)

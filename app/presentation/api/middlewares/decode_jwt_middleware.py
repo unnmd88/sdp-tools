@@ -60,7 +60,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
             request.state.user = use_case(access_token=token)
         except (InvalidTokenTypeError, UnauthorizedError) as e:
             return JSONResponse(
-                status_code=e.status_code, content={"detail": e.message}
+                status_code=e.status_code, content={"detail": e._private_message}
             )
             # raise HTTPException(
             #     status_code=e.status_code,

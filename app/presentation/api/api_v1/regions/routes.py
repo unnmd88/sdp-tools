@@ -1,25 +1,25 @@
 from fastapi import APIRouter
 
-from fastapi.exceptions import HTTPException
 from starlette import status
 
+from application.use_cases.regions.create_region_use_case import CreateRegionUseCaseImpl
+from application.use_cases.regions.read_region_use_case import ReadRegionUseCaseImpl
+from application.use_cases.regions.update_regions_use_case import (
+    UpdateRegionUseCaseImpl,
+)
+from domain.cqrs.region_commands import UpdateRegionCommand, CreateRegionCommand
 from presentation.api.api_v1.documentation.regions.endpoints import (
     PATCH_region_by_code_description,
-    GET_region_by_code_description,
-    DELETE_region_by_code_description,
-    POST_region_description,
-    GET_region_by_id_description,
     GET_all_regions_description,
 )
+from presentation.api.fastapi_dependencies import AccessTokenDep
 
-from presentation.api.api_v1.regions.utils import FiltersFactory
-from presentation.schemas.update import UpdatedRecordSchemaResponse
 from presentation.schemas.regions import (
-    RegionCreateSchema,
-    RegionSchemaResponse,
-    RegionUpdate,
+    RegionResponse,
+    RegionUpdate, RegionCreate,
 )
-from application.dto.common import FiltersForSearchDTO, ToUpdateRecordDTO, CreateRecordDTO
+from dishka.integrations.fastapi import FromDishka, inject
+
 
 router = APIRouter(
     prefix="/regions",
@@ -27,87 +27,80 @@ router = APIRouter(
 )
 
 
-# @router.get(
-#     '/{code-or-name}',
-#     response_model=RegionSchema,
-#     status_code=status.HTTP_200_OK,
-# )
-# async def get_region_by_code_or_name(
-#     code_or_name: str,
-#     use_case: RegionsCrudUseCase,
-# ):
-#     filters_for_search_dto = get_filters_for_region_or_name_search(code_or_name)
-#     if (region := await use_case.get_region_by_filters(filters_for_search_dto)) is None:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail=f'Регион {code_or_name!r} не найден.'
-#         )
-#     return RegionSchema.model_validate(region, from_attributes=True)
-
-
 @router.get(
-    "/{code}",
-    response_model=RegionSchemaResponse,
+    "/{code-or-name}",
+    response_model=RegionResponse,
     status_code=status.HTTP_200_OK,
-    summary="Получить данные существующего региона по его коду.",
-    description=GET_region_by_code_description,
 )
-async def get_region_by_code(
-    region_code: int,
-    # use_case: RegionsCrudUseCase,
-):
-    filters_for_search_dto = FiltersForSearchDTO(
-        search_filters=FiltersFactory.get_filters_dict(code=region_code)
+@inject
+async def get_region_by_code_or_name(
+    code_or_name: str | int, read_region_use_case: FromDishka[ReadRegionUseCaseImpl]
+) -> RegionResponse:
+    return RegionResponse.model_validate(
+        await read_region_use_case.by_code_or_name(code_or_name),
+        from_attributes=True,
     )
-    if (region := await use_case.get_region_by_filters(filters_for_search_dto)) is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Регион {region_code!r} не найден.",
-        )
-    return RegionSchemaResponse.model_validate(region, from_attributes=True)
 
 
-@router.get(
-    "/id/{id}",
-    response_model=RegionSchemaResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Получить данные региона светофорного объекта по id",
-    description=GET_region_by_id_description,
-)
-async def get_region_by_id(
-    region_id: int,
-    # use_case: RegionsCrudUseCase,
-):
-    if (region := await use_case.get_region_by_id(region_id)) is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Регион с id={region_id} не найден.",
-        )
-    return RegionSchemaResponse.model_validate(region, from_attributes=True)
+# @router.get(
+#     "/{id}",
+#     response_model=RegionSchemaResponse,
+#     status_code=status.HTTP_200_OK,
+#     summary="Получить данные региона светофорного объекта по id",
+#     description=GET_region_by_id_description,
+# )
+# async def get_region_by_id(
+#     id: int,
+#     read_region_use_case: ReadRegionUseCase,
+# ) -> RegionSchemaResponse:
+#     return RegionSchemaResponse.model_validate(
+#         await read_region_use_case.by_id(id),
+#         from_attributes=True,
+#     )
 
 
 @router.get(
     "/",
-    response_model=list[RegionSchemaResponse],
+    response_model=list[RegionResponse],
     status_code=status.HTTP_200_OK,
-    summary="Список всех имеющихся регионов светофорного объекта",
+    summary="Список регионов светофорного объекта",
     description=GET_all_regions_description,
 )
-async def get_all_regions(use_case):
-    return await use_case.get_all_regions()
+@inject
+async def get_regions(
+    read_region_use_case: FromDishka[ReadRegionUseCaseImpl],
+):
+    return [
+        RegionResponse.model_validate(r, from_attributes=True)
+        for r in await read_region_use_case.get_many()
+    ]
 
 
 @router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
-    response_model=RegionSchemaResponse,
+    response_model=RegionResponse,
     summary="Создать новый регион светофорного объекта",
-    description=POST_region_description,
+    # description=POST_region_description,
 )
+@inject
 async def create_region(
-    region: RegionCreateSchema,
+    token_dto: AccessTokenDep,
+    new_region_schema: RegionCreate,
+    use_case: FromDishka[CreateRegionUseCaseImpl],
     # use_case: RegionsCrudUseCase,
-) -> RegionSchemaResponse:
+) -> RegionResponse:
+    command = CreateRegionCommand(
+        customer_id=token_dto.user_id,
+        **new_region_schema.model_dump()
+    )
+    return RegionResponse.model_validate(
+        await use_case(command),
+        from_attributes=True,
+    )
+
+
+    return command
     create_model_fields = region.model_dump(exclude_defaults=True, exclude_none=True)
     dto = CreateRecordDTO(fields=create_model_fields)
     try:
@@ -123,53 +116,54 @@ async def create_region(
 
 
 @router.patch(
-    "/{code}",
+    "/{code-or-name}",
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=UpdatedRecordSchemaResponse,
+    response_model=RegionResponse,
     summary="Обновить данные существующего региона.",
     description=PATCH_region_by_code_description,
 )
+@inject
 async def update_region(
-    region_code: int,
+    token_dto: AccessTokenDep,
+    code_or_name: str | int,
     update_data: RegionUpdate,
-    # use_case: RegionsCrudUseCase,
-):
-    dto = ToUpdateRecordDTO(
-        search_criteria=FiltersFactory.get_filters_dict(code=region_code),
-        fields=update_data.model_dump(exclude_unset=True, exclude_none=True),
+    use_case: FromDishka[UpdateRegionUseCaseImpl],
+) -> RegionResponse:
+    command = UpdateRegionCommand(
+        user_id=token_dto.user_id,
+        code_or_name=code_or_name,
+        **update_data.model_dump(exclude_unset=True),
     )
-    try:
-        result = await use_case.update_region(dto)
-    except EntityNotFoundError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Регион {region_code!r} не найден.",
-        )
-    return result
-
-
-@router.delete(
-    "/{code}",
-    status_code=status.HTTP_202_ACCEPTED,
-    response_model=RegionSchemaResponse,
-    summary="Удалить существующий регион.",
-    description=DELETE_region_by_code_description,
-)
-async def delete_region(
-    region_code: int,
-    # use_case: RegionsCrudUseCase,
-):
-    filters_for_search_dto = FiltersForSearchDTO(
-        search_filters=FiltersFactory.get_filters_dict(code=region_code)
-    )
-    try:
-        result = await use_case.delete_region(filters_for_search_dto)
-    except EntityNotFoundError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Регион {region_code} не найден.",
-        )
-    return RegionSchemaResponse.model_validate(
-        result,
+    return RegionResponse.model_validate(
+        await use_case(command),
         from_attributes=True,
     )
+
+
+#
+#
+# @router.delete(
+#     "/{code}",
+#     status_code=status.HTTP_202_ACCEPTED,
+#     response_model=RegionSchemaResponse,
+#     summary="Удалить существующий регион.",
+#     description=DELETE_region_by_code_description,
+# )
+# async def delete_region(
+#     region_code: int,
+#     # use_case: RegionsCrudUseCase,
+# ):
+#     filters_for_search_dto = FiltersForSearchDTO(
+#         search_filters=FiltersFactory.get_filters_dict(code=region_code)
+#     )
+#     try:
+#         result = await use_case.delete_region(filters_for_search_dto)
+#     except EntityNotFoundError:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail=f"Регион {region_code} не найден.",
+#         )
+#     return RegionSchemaResponse.model_validate(
+#         result,
+#         from_attributes=True,
+#     )

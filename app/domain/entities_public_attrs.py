@@ -13,7 +13,7 @@ class PublicAttr:
 
 
 BASE_PUBLIC_ATTRS = (
-    PublicAttr(attr_name="_id", alias=str(PublicAttrNamesEnum.id)),
+    PublicAttr(attr_name="id", alias=str(PublicAttrNamesEnum.id)),
     PublicAttr(attr_name="_built_at", alias=str(PublicAttrNamesEnum.built_at)),
     PublicAttr(attr_name="_updated_at", alias=str(PublicAttrNamesEnum.updated_at)),
     PublicAttr(attr_name="_created_at", alias=str(PublicAttrNamesEnum.created_at)),
@@ -31,4 +31,9 @@ USER_PUBLIC_ATTRS = BASE_PUBLIC_ATTRS + (
     PublicAttr(attr_name="_phone_number", alias=str(PublicAttrNamesEnum.phone_number)),
     PublicAttr(attr_name="_telegram", alias=str(PublicAttrNamesEnum.telegram)),
     PublicAttr(attr_name="_description", alias="description"),
+)
+
+REGIONS_PUBLIC_ATTRS = BASE_PUBLIC_ATTRS + (
+    PublicAttr(attr_name="_name", alias=str(PublicAttrNamesEnum.name)),
+    PublicAttr(attr_name="_code", alias=str(PublicAttrNamesEnum.code)),
 )

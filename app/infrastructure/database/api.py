@@ -1,5 +1,7 @@
 import functools
+import sys
 from collections.abc import AsyncGenerator, Callable
+from contextlib import asynccontextmanager
 from typing import Any
 
 from sqlalchemy.ext.asyncio import (
@@ -8,7 +10,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from core.config import settings
+from infrastructure.database.uow import SQLAlchemyUnitOfWork
 
 
 class DatabaseAPI:
@@ -38,56 +40,9 @@ class DatabaseAPI:
         await self.engine.dispose()
         # log.info("Database engine disposed")
 
-    def base_session_getter(
-        self,
-        commit: bool = False,
-        rollback: bool = False,
-    ):
-        async def wrapper():
-            async with self.session_factory() as session:
-                try:
-                    print("BEFORE yield session!" * 100)
-                    yield session
-                    if commit:
-                        await session.commit()
-                    print("AFTER yield session!" * 100)
-                except Exception:  # todo logging
-                    if rollback:
-                        await session.rollback()
-                finally:
-                    await session.close()
-                    with open("lllog.log", "a+") as f:
-                        f.write("NEW GEN!" * 100)
-
-        return wrapper
-
     async def session_getter(self) -> AsyncGenerator[AsyncSession, None]:
         async with self.session_factory() as session:
             yield session
-
-    async def session_getter_commit(self) -> AsyncGenerator[AsyncSession, None]:
-        async with self.session_factory() as session:
-            yield session
-            await session.commit()
-
-    async def session_getter_commit_and_rollback_if_err(
-        self,
-    ) -> AsyncGenerator[AsyncSession, None]:
-        async with self.session_factory() as session:
-            try:
-                yield session
-                await session.commit()
-            except Exception:  # todo logging
-                await session.rollback()
-
-
-db_api = DatabaseAPI(
-    url=str(settings.db.url),
-    echo=settings.db.echo,
-    echo_pool=settings.db.echo_pool,
-    pool_size=settings.db.pool_size,
-    max_overflow=settings.db.max_overflow,
-)
 
 
 def async_session_factory(commit: bool = True, rollback: bool = True):

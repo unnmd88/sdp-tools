@@ -1,9 +1,10 @@
-from infrastructure.database.base_repository import BaseSqlAlchemyRepository
+from infrastructure.database.base_repository import BaseSqlAlchemyRepositoryAdapter
+
 # from infrastructure.database.mappers.passport_groups import PassportGroupsDBMapper
 from infrastructure.database.models import PassportGroup as PassportGroupModel
 
 
-class PassportGroupsRepositorySqlAlchemyRepository(BaseSqlAlchemyRepository):
+class PassportGroupsRepositorySqlAlchemyRepository(BaseSqlAlchemyRepositoryAdapter):
     model = PassportGroupModel
     # mapper = PassportGroupsDBMapper
 

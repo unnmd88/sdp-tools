@@ -1,4 +1,4 @@
-from core.error_data import ErrorData
+from core.error_codes import ErrorCodes
 from core.exceptions import BaseAppError
 
 
@@ -8,23 +8,24 @@ class ApplicationLayerError(BaseAppError):
     Все исключения слоя приложения должны наследоваться от него.
     """
 
-    DEFAULT_CODE = ErrorData.APPLICATION_ERROR.code
-    DEFAULT_MESSAGE = ErrorData.APPLICATION_ERROR.message
-
-
-class NotFoundError(ApplicationLayerError):
-
-    DEFAULT_CODE = ErrorData.NOT_FOUND.code
-    DEFAULT_MESSAGE = ErrorData.NOT_FOUND.message
+    DEFAULT_CODE = ErrorCodes.APPLICATION_ERROR.code
+    DEFAULT_PRIVATE_MESSAGE = ErrorCodes.APPLICATION_ERROR.private_message
+    DEFAULT_PUBLIC_MESSAGE = ErrorCodes.APPLICATION_ERROR.public_message
 
 
 class AuthenticationError(ApplicationLayerError):
-
-    DEFAULT_CODE = ErrorData.UNAUTHORIZED.code
-    DEFAULT_MESSAGE = ErrorData.UNAUTHORIZED.message
+    DEFAULT_CODE = ErrorCodes.AUTHENTICATION_FAILED.code
+    DEFAULT_PRIVATE_MESSAGE = ErrorCodes.AUTHENTICATION_FAILED.private_message
+    DEFAULT_PUBLIC_MESSAGE = ErrorCodes.AUTHENTICATION_FAILED.public_message
 
 
 class InactiveAccountError(ApplicationLayerError):
+    DEFAULT_CODE = ErrorCodes.INACTIVE_ACCOUNT.code
+    DEFAULT_PRIVATE_MESSAGE = ErrorCodes.INACTIVE_ACCOUNT.private_message
+    DEFAULT_PUBLIC_MESSAGE = ErrorCodes.INACTIVE_ACCOUNT.public_message
 
-    DEFAULT_CODE = ErrorData.INACTIVE_ACCOUNT.code
-    DEFAULT_MESSAGE = ErrorData.INACTIVE_ACCOUNT.message
+
+class PermissionDeniedError(ApplicationLayerError):
+    DEFAULT_CODE = ErrorCodes.FORBIDDEN.code
+    DEFAULT_PRIVATE_MESSAGE = ErrorCodes.FORBIDDEN.private_message
+    DEFAULT_PUBLIC_MESSAGE = ErrorCodes.FORBIDDEN.public_message

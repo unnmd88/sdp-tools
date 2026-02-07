@@ -7,10 +7,10 @@ from infrastructure.database.models import (
     User as UserModel,
     PassportGroup as PassportGroupModel,
 )
-from infrastructure.database.base_repository import BaseSqlAlchemyRepository
+from infrastructure.database.base_repository import BaseSqlAlchemyRepositoryAdapter
 
 
-class TrafficLightObjectSqlAlchemyRepository(BaseSqlAlchemyRepository):
+class TrafficLightObjectSqlAlchemyRepository(BaseSqlAlchemyRepositoryAdapter):
     model = TrafficLightModel
     # mapper = TrafficLightObjectDBMapper
 

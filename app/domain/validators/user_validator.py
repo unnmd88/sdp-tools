@@ -1,4 +1,4 @@
-from core.error_data import ErrorData
+from core.error_codes import ErrorCodes
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.attrs_names import PublicAttrNamesEnum
 from domain.enums.violations import Violations
@@ -11,8 +11,14 @@ from domain.business_rules import (
     MIN_LEN_LASTNAME,
     MAX_LEN_LASTNAME,
 )
-from domain.exceptions import DomainError, DomainValidationError, DomainBusinessRuleError
-from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
+from domain.exceptions import (
+    DomainError,
+    DomainValidationError,
+    DomainBusinessRuleError,
+)
+from domain.value_objects.contract_violation_context_vo import (
+    ContractViolationContextVO,
+)
 
 
 class UserEntityValidator:
@@ -39,7 +45,7 @@ class UserEntityValidator:
             rule = ErrorMessages.cant_start_with_numeric.format(field_name, value)
             message = rule
         elif not (MIN_LEN_USERNAME <= len(value) <= MAX_LEN_USERNAME):
-            violation = Violations.value_length
+            violation = Violations.invalid_length
             rule = ErrorMessages.value_str_length_range.format(
                 field_name, len(value), MIN_LEN_USERNAME, MAX_LEN_USERNAME
             )
@@ -48,9 +54,9 @@ class UserEntityValidator:
             raise DomainError
         exc = DomainValidationError if not rule else DomainBusinessRuleError
         contract_code = (
-            ErrorData.DOMAIN_VALIDATION.code
+            ErrorCodes.DOMAIN_VALIDATION.code
             if not rule
-            else ErrorData.BUSINESS_RULE_VIOLATION.code
+            else ErrorCodes.BUSINESS_RULE_VIOLATION.code
         )
         ctx = ContractViolationContextVO(
             field_name=field_name,
@@ -61,7 +67,10 @@ class UserEntityValidator:
             value=value,
             message=message,
         )
-        raise exc(context=ctx)
+        raise exc(
+            context=ctx,
+            public_message=str(rule),
+        )
 
     @classmethod
     def first_name_or_lastname(
@@ -85,7 +94,7 @@ class UserEntityValidator:
             violation = Violations.string_cant_be_numeric
             message = ErrorMessages.must_be_isalpha.format(value)
         elif min_len <= len(value) <= max_len:
-            violation = Violations.value_length
+            violation = Violations.invalid_length
             message = ErrorMessages.value_str_length_range.format(
                 field_name,
                 len(value),
@@ -97,7 +106,7 @@ class UserEntityValidator:
         ctx = ContractViolationContextVO(
             field_name=field_name,
             handler=f"{cls.__name__}:{handler}",
-            contract_code=ErrorData.DOMAIN_VALIDATION.code,
+            contract_code=ErrorCodes.DOMAIN_VALIDATION.code,
             violation=violation,
             value=value,
             message=message,

@@ -1,10 +1,4 @@
-import random
-import secrets
-import string
-
 import bcrypt
-
-from domain.business_rules import MIN_LEN_PASSWORD, MAX_LEN_PASSWORD
 
 
 class BcryptPasswordService:
@@ -22,18 +16,6 @@ class BcryptPasswordService:
             hashed_password=hashed_password,
         )
 
-    @classmethod
-    def generate_password(
-        cls,
-        *,
-        min_length: int = MIN_LEN_PASSWORD,
-        max_length: int = MAX_LEN_PASSWORD,
-    ) -> str:
-        chars = string.ascii_letters + string.digits + string.punctuation
-        return "".join(
-            secrets.choice(chars) for _ in range(random.randint(min_length, max_length))
-        )
-
 
 def hash_password(
     password: str,
@@ -41,24 +23,4 @@ def hash_password(
     return bcrypt.hashpw(
         password.encode("utf-8"),
         bcrypt.gensalt(),
-    )
-
-
-def validate_password(
-    password: str,
-    hashed_password: bytes,
-) -> bool:
-    return bcrypt.checkpw(
-        password=password.encode("utf-8"),
-        hashed_password=hashed_password,
-    )
-
-
-def gen_password(
-    min_length: int = 3,
-    max_length: int = 20,
-) -> str:
-    chars = string.ascii_letters + string.digits + string.punctuation
-    return "".join(
-        secrets.choice(chars) for _ in range(random.randint(min_length, max_length))
     )

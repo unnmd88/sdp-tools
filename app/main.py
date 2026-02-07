@@ -4,7 +4,9 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from core.config import settings
-from presentation.api.middlewares.decode_jwt_middleware import JWTMiddleware
+from presentation.api.error_handling import setup_exception_handlers
+from dishka.integrations.fastapi import setup_dishka
+from infrastructure.di.container import create_container
 
 app = FastAPI(
     title="Api для работы с паспортами светофорного объекта.",
@@ -20,12 +22,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+container = create_container()
+setup_dishka(container, app)
 
 # app.add_middleware(
 #     JWTMiddleware,
 #     app,
 # )
 
+setup_exception_handlers(app)
 
 if __name__ == "__main__":
     uvicorn.run(

@@ -38,4 +38,3 @@ class PayloadJWTDTO:
     email: str | None = None
     role: Roles | None = None
     organization: Organizations | None = None
-

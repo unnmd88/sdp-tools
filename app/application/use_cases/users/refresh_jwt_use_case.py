@@ -1,50 +1,55 @@
 import logging
 from dataclasses import dataclass
 
-from jwt import ExpiredSignatureError
-
 from app_logging.dev.config import AUTH_LOGGER
-from application.dto.jwt_dto import TokenDataDTO
+from application.dto.jwt_dto import TokenDataDTO, PayloadJWTDTO
+from application.interfaces import UserServiceProtocol
+from application.interfaces.services.issue_jwt_service_interface import (
+    IssueJWTServiceProtocol,
+)
 
 from domain.enums.validation_err_messages import ErrorMessages
-from domain.repositories.users_repo_interface import UsersRepositoryProtocol
-from infrastructure.auth.jwt.jwt_service import DecodeJWTService
+from domain.exceptions import DomainEntityNotFoundError
 
-from domain.enums.unsorted import TokenTypesEnum
-from domain.entities.user import UserEntity
 
 logger = logging.getLogger(AUTH_LOGGER)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class RefreshJWTUseCaseImpl:
-    user_repository: UsersRepositoryProtocol
-    jwt_service: DecodeJWTService = DecodeJWTService
+    user_service: UserServiceProtocol
+    jwt_service: IssueJWTServiceProtocol
 
-    async def __call__(self, refresh_jwt: bytes) -> TokenDataDTO:
-        try:
-            decoded_jwt = self.jwt_service.decode_jwt(refresh_jwt)
-            if decoded_jwt.typ != TokenTypesEnum.refresh:
-                logger.info(
-                    "Неверный тип токена. Необходим refresh-токен. Payload: %r",
-                    decoded_jwt,
-                )
-                raise UseCaseError(
-                    message=ErrorMessages.invalid_token_type.format(
-                        str(TokenTypesEnum.refresh)
-                    )
-                )
-            user_entity: UserEntity = (
-                await self.user_repository.get_one_or_none_by_filters(
-                    {"username": decoded_jwt.sub}
-                )
+    async def __call__(self, user_id: int) -> TokenDataDTO:
+        user = await self.user_service.get_user_by_id(user_id)
+        if user is None:
+            exc = DomainEntityNotFoundError(
+                message=f"Пользователь c id={user_id} не найден. В токене указан неверный id пользователя.",
+                public_message=ErrorMessages.service_unavailable,
+                context={"use_case:": f"{self.__class__.__name__}"},
             )
-            if user_entity is None:
-                logger.info("Пользователь не найден. Payload: %r", decoded_jwt)
-                raise UnauthorizedError(message="Пользователь не найден.")
-            if not user_entity.is_active:
-                raise ForbiddenError(message="Пользователь заблокирован.")
-
-            return self.jwt_service.issue_access_jwt(UserDTO(**user_entity.to_dict()))
-        except ExpiredSignatureError:
-            raise UnauthorizedError(message="Срок действия токена истек.")
+            logger.critical(exc.to_dict())
+            raise exc
+        if not user.is_active:
+            exc = DomainEntityNotFoundError(
+                message=f"Пользователь c id={user_id} активен. Выпуск токена запрещен.",
+                public_message=ErrorMessages.account_is_blocked,
+                context={"use_case:": f"{self.__class__.__name__}"},
+            )
+            logger.warning(exc.to_dict())
+            raise exc
+        payload = PayloadJWTDTO(
+            user_id=user.id,
+            sub=user.username,
+            role=user.role,
+            organization=user.organization,
+            email=user.email,
+        )
+        token_access = self.jwt_service.issue_access_jwt(payload_dto=payload)
+        logger.info(
+            "Пользователю %r(id=%r) выпущен access через refresh JWT: %r",
+            user.username,
+            user.id,
+            token_access,
+        )
+        return token_access

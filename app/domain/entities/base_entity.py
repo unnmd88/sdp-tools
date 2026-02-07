@@ -10,20 +10,15 @@ from domain.entities_public_attrs import BASE_PUBLIC_ATTRS
 from domain.enums.attrs_names import PublicAttrNamesEnum
 from domain.exceptions import DomainInvariantError
 from domain.validators.datetime_validators import DatetimeValidators
-from domain.validators.general_purpose import GeneralPurposeValidator
+from domain.value_objects.pk_id_vo import PkIdVO
 
 
-class AbstractEntity(ABC):
+class Entity(ABC):
     time_format = "%Y-%m-%d %H:%M:%S"
 
     __public_attrs__ = BASE_PUBLIC_ATTRS
 
-    id = ContractField(
-        field_name="id",
-        nullable=True,
-        use_cache=False,
-        requires=[Require(handler=GeneralPurposeValidator.pk_id)],
-    )
+    # TODO: Реализовать create_at и updated_at как value-object
     created_at = ContractField(
         field_name=str(PublicAttrNamesEnum.created_at),
         use_cache=False,
@@ -55,7 +50,7 @@ class AbstractEntity(ABC):
         updated_at: datetime | None,
     ):
         self._built_at = datetime.now()
-        self.id = id
+        self._id = PkIdVO(subject=self.__class__, value=id)
         self._created_at = created_at
         self._updated_at = updated_at
         self.check_invariant_datetime()
@@ -99,7 +94,7 @@ class AbstractEntity(ABC):
         *,
         exclude: set[str] = None,
         include: dict = None,
-        ensure_ascii: bool = True,
+        ensure_ascii: bool = False,
         indent: None | int | str = 2,
     ) -> str:
         return json.dumps(
@@ -107,6 +102,10 @@ class AbstractEntity(ABC):
             ensure_ascii=ensure_ascii,
             indent=indent,
         )
+
+    @property
+    def id(self) -> int | None:
+        return self._id.value
 
     @property
     def built_at(self) -> datetime:

@@ -2,8 +2,9 @@ import json
 import time
 from datetime import datetime
 
-from core.error_data import ErrorData
-from domain.entities.base_entity import AbstractEntity
+from core.error_codes import ErrorCodes
+from domain.contract2.contract_field_enum import ContractFieldEnum
+from domain.entities.base_entity import Entity
 from domain.contract2.contract_field import ContractField
 from domain.contract2.require import Require
 from domain.entities_public_attrs import USER_PUBLIC_ATTRS
@@ -16,19 +17,19 @@ from domain.enums.violations import Violations
 from domain.exceptions import DomainError, DomainInvariantError
 from domain.value_objects.password_vo import PasswordVO
 
-
 from domain.validators import (
     BooleanValidator,
     EmailRegexpValidator,
     PhoneNumberRegexpValidator,
     TelegramRegexpValidator,
-    EnumValidator,
     UserEntityValidator,
 )
-from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
+from domain.value_objects.contract_violation_context_vo import (
+    ContractViolationContextVO,
+)
 
 
-class UserEntity(AbstractEntity):
+class UserEntity(Entity):
     __public_attrs__ = USER_PUBLIC_ATTRS
 
     username = ContractField(
@@ -41,23 +42,20 @@ class UserEntity(AbstractEntity):
         field_name=str(PublicAttrNamesEnum.firstname),
         nullable=False,
         use_cache=True,
-        # preprocess_value=UserEntityValidator.repair_firstname_or_lastname,
         requires=[Require(handler=UserEntityValidator.firstname)],
     )
     lastname = ContractField(
         field_name=str(PublicAttrNamesEnum.firstname),
         nullable=False,
         use_cache=True,
-        # preprocess_value=UserEntityValidator.repair_firstname_or_lastname,
         requires=[Require(handler=UserEntityValidator.lastname)],
     )
-    organization = ContractField(
+
+    organization = ContractFieldEnum(
+        enum=Organizations,
         field_name=str(PublicAttrNamesEnum.organization),
         nullable=False,
         use_cache=True,
-        preprocess_value=EnumValidator(
-            field_name=str(PublicAttrNamesEnum.organization), enum_class=Organizations
-        ),
     )
     email = ContractField(
         field_name=str(PublicAttrNamesEnum.email),
@@ -73,13 +71,11 @@ class UserEntity(AbstractEntity):
             field_name=str(PublicAttrNamesEnum.is_active), allowed_like_bool={1, 0}
         ),
     )
-    role = ContractField(
+    role = ContractFieldEnum(
+        enum=Roles,
         field_name=str(PublicAttrNamesEnum.organization),
         nullable=False,
         use_cache=True,
-        preprocess_value=EnumValidator(
-            field_name=str(PublicAttrNamesEnum.role), enum_class=Roles
-        ),
     )
     phone_number = ContractField(
         field_name=str(PublicAttrNamesEnum.phone_number),
@@ -97,6 +93,11 @@ class UserEntity(AbstractEntity):
             TelegramRegexpValidator(field_name=str(PublicAttrNamesEnum.telegram))
         ],
     )
+    description = ContractField(
+        field_name=str(PublicAttrNamesEnum.description),
+        nullable=False,
+        use_cache=True,
+    )
 
     def __init__(
         self,
@@ -104,29 +105,29 @@ class UserEntity(AbstractEntity):
         username: str,
         firstname: str,
         lastname: str,
-        organization: Organizations,
+        organization: str,
         email: str | None,
         password: str | bytes,
         is_active: bool,
-        role: Roles,
+        role: str,
         phone_number: str | None,
         telegram: str | None,
         description: str,
-        created_at: datetime | None,
-        updated_at: datetime | None,
+        created_at: datetime | None = None,
+        updated_at: datetime | None = None,
     ):
         super().__init__(id=id, created_at=created_at, updated_at=updated_at)
         self.username = username
         self.firstname = firstname
         self.lastname = lastname
-        self.organization = organization
+        self.organization: Organizations = organization
         self.email = email
         self._password = PasswordVO(password=password, subject=self.__class__.__name__)
         self.is_active = is_active
-        self.role = role
+        self.role: Roles = role
         self.phone_number = phone_number
         self.telegram = telegram
-        self._description = description
+        self.description = description
         self.invariant_names()
 
     def __eq__(self, other):
@@ -161,15 +162,46 @@ class UserEntity(AbstractEntity):
             subject=self.__class__.__name__,
             field_name=str(PublicAttrNamesEnum.username),
             handler=f"{self.__class__.__name__}:{self.invariant_names.__name__}",
-            contract_code=ErrorData.BUSINESS_RULE_VIOLATION.code,
+            contract_code=ErrorCodes.BUSINESS_RULE_VIOLATION.code,
             violation=Violations.invariant_violation,
             value=self._username,
             rule=rule,
             message=rule,
         )
         raise DomainInvariantError(
-            message=ctx.message,
+            private_message=ctx.message,
             context=ctx,
+        )
+
+    @classmethod
+    def create_new_user(
+        cls,
+        *,
+        username: str,
+        firstname: str,
+        lastname: str,
+        organization: str,
+        email: str | None,
+        password: bytes,
+        is_active: bool,
+        role: str,
+        phone_number: str | None,
+        telegram: str | None,
+        description: str,
+    ) -> "UserEntity":
+        return cls(
+            id=None,
+            username=username,
+            firstname=firstname,
+            lastname=lastname,
+            organization=organization,
+            email=email,
+            password=password,
+            is_active=is_active,
+            role=role,
+            phone_number=phone_number,
+            telegram=telegram,
+            description=description,
         )
 
 
@@ -178,7 +210,6 @@ if __name__ == "__main__":
 
     start_time = time.perf_counter()
     try:
-
         user = UserEntity(
             id=1,
             firstname="Junkers",
@@ -201,6 +232,5 @@ if __name__ == "__main__":
         print(json.dumps(e.to_dict(), indent=2, ensure_ascii=False))
 
     print(f"Время выполнения с валидацией: {time.perf_counter() - start_time} секунд")
-
 
     # print(user.to_json())

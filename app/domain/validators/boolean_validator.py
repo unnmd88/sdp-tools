@@ -2,11 +2,13 @@ from collections.abc import Container
 from dataclasses import dataclass
 from typing import Any
 
-from core.error_data import ErrorData
+from core.error_codes import ErrorCodes
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.violations import Violations
 from domain.exceptions import DomainValidationError
-from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
+from domain.value_objects.contract_violation_context_vo import (
+    ContractViolationContextVO,
+)
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)
@@ -21,10 +23,12 @@ class BooleanValidator:
         ctx = ContractViolationContextVO(
             field_name=self.field_name,
             handler=f"{self.__class__.__name__}:{self.__call__.__name__}",
-            contract_code=ErrorData.DOMAIN_VALIDATION.code,
+            contract_code=ErrorCodes.DOMAIN_VALIDATION.code,
             violation=Violations.invalid_type,
             value=msg,
             message=msg,
         )
-        raise DomainValidationError(context=ctx)
-
+        raise DomainValidationError(
+            context=ctx,
+            public_message=ErrorMessages.must_be_bool.format(repr(self.field_name)),
+        )
