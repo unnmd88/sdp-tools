@@ -75,11 +75,14 @@ class CreateUserUseCaseImpl:
             )
             if create_user_dto.email is not None:
                 if (
-                    await self.user_service.get_user_by_filters(email=create_user_dto.email)
+                    await self.user_service.get_user_by_filters(
+                        email=create_user_dto.email
+                    )
                     is not None
                 ):
                     logger.warning(
-                        "Ошибка: пользователь с email=%r существует.", create_user_dto.email
+                        "Ошибка: пользователь с email=%r существует.",
+                        create_user_dto.email,
                     )
                     raise DomainEntityAlreadyExistsError(
                         public_message=f"Пользователь с email={create_user_dto.email} уже существует."
@@ -92,7 +95,9 @@ class CreateUserUseCaseImpl:
                 subject=UserEntity.__class__.__name__, password=create_user_dto.password
             ).password
             hashed_password = self.password_service.hash_password(validated_password)
-            logger.debug("Право на создание пользователя с указанным паролем подтверждено.")
+            logger.debug(
+                "Право на создание пользователя с указанным паролем подтверждено."
+            )
             user_to_create = UserEntity.create_new_user(
                 firstname=create_user_dto.firstname,
                 lastname=create_user_dto.lastname,

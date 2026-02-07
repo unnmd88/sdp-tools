@@ -15,7 +15,9 @@ logger = logging.getLogger(INFRASTRUCTURE)
 
 class UsersSqlAlchemyRepository:
     def __init__(self, session: AsyncSession):
-        self._repo = BaseSqlAlchemyRepositoryAdapter[UserModel, UserEntity, UserDBMapper](
+        self._repo = BaseSqlAlchemyRepositoryAdapter[
+            UserModel, UserEntity, UserDBMapper
+        ](
             session=session,
             model=UserModel,
             mapper=UserDBMapper(),

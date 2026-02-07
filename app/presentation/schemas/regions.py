@@ -19,4 +19,3 @@ class RegionUpdate(BaseModel):
 
     new_name: str | None = Field(default=None, min_length=3, max_length=32)
     new_code: int | None = Field(default=None, gt=0, lt=65535)
-

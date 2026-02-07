@@ -97,7 +97,5 @@ async def issue_access_by_refresh_jwt(
     use_case: FromDishka[RefreshJWTUseCaseImpl],
 ):
     return TokenInfo.model_validate(
-        await use_case(user_id=token_dto.user_id),
-        from_attributes=True
+        await use_case(user_id=token_dto.user_id), from_attributes=True
     )
-

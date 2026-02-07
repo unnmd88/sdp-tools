@@ -142,6 +142,7 @@ class AdminUseCasesProvider(Provider):
             user_service=user_service,
             password_service=password_service,
         )
+
     # TODO: Проверить, что это работает
     @provide(scope=Scope.REQUEST)
     def get_reset_password_admin_use_case(
@@ -161,6 +162,7 @@ class UseCaseProvider(Provider):
         self, users_repo: UsersSqlAlchemyRepository
     ) -> GetActiveUserFromRepoUseCase:
         return GetActiveUserFromRepoUseCase(user_repository=users_repo)
+
     # +
     @provide(scope=Scope.REQUEST)
     def get_login_and_jwt_use_case(
@@ -172,6 +174,7 @@ class UseCaseProvider(Provider):
             auth_service=auth_service,
             jwt_service=jwt_service,
         )
+
     # +
     @provide(scope=Scope.REQUEST)
     def get_refresh_jwt_use_case(
@@ -183,6 +186,7 @@ class UseCaseProvider(Provider):
             jwt_service=jwt_service,
             user_service=user_service,
         )
+
     # +
     @provide(scope=Scope.REQUEST)
     def get_change_password_use_case(
@@ -192,10 +196,9 @@ class UseCaseProvider(Provider):
         password_service: BcryptPasswordService,
     ) -> ChangeUserPasswordUseCaseImpl:
         return ChangeUserPasswordUseCaseImpl(
-            uow=uow,
-            user_service=user_service,
-            password_service=password_service
+            uow=uow, user_service=user_service, password_service=password_service
         )
+
     # Regions section
     @provide(scope=Scope.REQUEST)
     def get_read_region_use_case(

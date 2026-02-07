@@ -15,7 +15,6 @@ logger = logging.getLogger(USERS_LOGGER)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ChangeUserPasswordUseCaseImpl:
-
     uow: UnitOfWorkProtocol
     user_service: UserServiceProtocol
     password_service: PasswordServiceProtocol
@@ -37,7 +36,8 @@ class ChangeUserPasswordUseCaseImpl:
                 )
             hashed_password = self.password_service.hash_password(
                 SetPasswordVO(
-                    subject=UserEntity.__name__, password=change_password_dto.new_password
+                    subject=UserEntity.__name__,
+                    password=change_password_dto.new_password,
                 ).password
             )
             await self.user_service.change_password(

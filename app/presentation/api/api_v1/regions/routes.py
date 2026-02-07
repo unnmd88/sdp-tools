@@ -8,7 +8,11 @@ from application.use_cases.regions.read_region_use_case import ReadRegionUseCase
 from application.use_cases.regions.update_regions_use_case import (
     UpdateRegionUseCaseImpl,
 )
-from domain.cqrs.region_commands import UpdateRegionCommand, CreateRegionCommand, DeleteRegionCommand
+from domain.cqrs.region_commands import (
+    UpdateRegionCommand,
+    CreateRegionCommand,
+    DeleteRegionCommand,
+)
 from presentation.api.api_v1.documentation.regions.endpoints import (
     PATCH_region_by_code_description,
     GET_all_regions_description,
@@ -17,7 +21,8 @@ from presentation.api.fastapi_dependencies import AccessTokenDep
 
 from presentation.schemas.regions import (
     RegionResponse,
-    RegionUpdate, RegionCreate,
+    RegionUpdate,
+    RegionCreate,
 )
 from dishka.integrations.fastapi import FromDishka, inject
 
@@ -89,30 +94,13 @@ async def create_region(
     token_dto: AccessTokenDep,
     new_region_schema: RegionCreate,
     use_case: FromDishka[CreateRegionUseCaseImpl],
-    # use_case: RegionsCrudUseCase,
 ) -> RegionResponse:
     command = CreateRegionCommand(
-        customer_id=token_dto.user_id,
-        **new_region_schema.model_dump()
+        customer_id=token_dto.user_id, **new_region_schema.model_dump()
     )
     return RegionResponse.model_validate(
         await use_case(command),
         from_attributes=True,
-    )
-
-
-    return command
-    create_model_fields = region.model_dump(exclude_defaults=True, exclude_none=True)
-    dto = CreateRecordDTO(fields=create_model_fields)
-    try:
-        db_region = await use_case.create_region(dto)
-    except (CreateError, CreateErrorAlreadyExists):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Регион с таким названием/кодом уже существует.",
-        )
-    return RegionSchemaResponse.model_validate(
-        db_region, extra="ignore", from_attributes=True
     )
 
 
@@ -139,8 +127,6 @@ async def update_region(
         await use_case(command),
         from_attributes=True,
     )
-
-
 
 
 @router.delete(

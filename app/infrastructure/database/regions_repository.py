@@ -35,11 +35,15 @@ class RegionsSqlAlchemyRepository:
 
     @handle_db_errors(logger=logger)
     async def get_by_code(self, region_code: int) -> RegionEntity | None:
-        return await self._base_repo_adapter.get_one_or_none_by_filters(code=region_code)
+        return await self._base_repo_adapter.get_one_or_none_by_filters(
+            code=region_code
+        )
 
     @handle_db_errors(logger=logger)
     async def get_by_name(self, region_name: str) -> RegionEntity | None:
-        return await self._base_repo_adapter.get_one_or_none_by_filters(name=region_name)
+        return await self._base_repo_adapter.get_one_or_none_by_filters(
+            name=region_name
+        )
 
     @handle_db_errors(logger=logger)
     async def get_many(
@@ -64,7 +68,9 @@ class RegionsSqlAlchemyRepository:
             )
             logger.critical(exc.to_dict())
             raise exc
-        updated_model = self._base_repo_adapter.mapper.update_model(model=model, entity=entity)
+        updated_model = self._base_repo_adapter.mapper.update_model(
+            model=model, entity=entity
+        )
         await self._session.flush()
         await self._session.refresh(updated_model)
         return self._base_repo_adapter.mapper.to_entity(updated_model)

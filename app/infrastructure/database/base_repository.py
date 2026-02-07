@@ -3,12 +3,7 @@ from typing import TypeVar, Type
 
 from sqlalchemy import select
 
-from sqlalchemy.exc import (
-    IntegrityError,
-    SQLAlchemyError,
-    OperationalError,
-    DBAPIError
-)
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError, OperationalError, DBAPIError
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 
@@ -23,7 +18,6 @@ from infrastructure.exceptions import (
 EntityType = TypeVar("EntityType")
 ModelType = TypeVar("ModelType")
 CreateDTOType = TypeVar("CreateDTOType")
-
 
 
 logger = logging.getLogger(INFRASTRUCTURE)

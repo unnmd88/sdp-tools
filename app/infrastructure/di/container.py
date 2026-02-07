@@ -18,6 +18,6 @@ def create_container():
         ServiceProvider(),
         JWTProvider(),
         UseCaseProvider(),
-        AdminUseCasesProvider()
+        AdminUseCasesProvider(),
     )
     return container

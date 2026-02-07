@@ -8,13 +8,15 @@ from application.interfaces.services.regions_service_interface import (
     RegionsServiceProtocol,
 )
 from application.interfaces.uow_interface import UnitOfWorkProtocol
-from domain.cqrs.region_commands import  DeleteRegionCommand
+from domain.cqrs.region_commands import DeleteRegionCommand
 from domain.enums.unsorted import Roles
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DeleteRegionUseCaseImpl:
-    require_roles: ClassVar[Container[Roles]] = frozenset([Roles.superuser, Roles.director])
+    require_roles: ClassVar[Container[Roles]] = frozenset(
+        [Roles.superuser, Roles.director]
+    )
 
     uow: UnitOfWorkProtocol
     user_service: UserServiceProtocol

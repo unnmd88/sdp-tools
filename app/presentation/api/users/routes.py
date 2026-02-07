@@ -6,7 +6,9 @@ from fastapi import (
 
 from application.dto.users import UserDTO, ChangeUserPasswordDTO
 from application.services.user_service import UserServiceImpl
-from application.use_cases.users.change_password_use_case import ChangeUserPasswordUseCaseImpl
+from application.use_cases.users.change_password_use_case import (
+    ChangeUserPasswordUseCaseImpl,
+)
 
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
 

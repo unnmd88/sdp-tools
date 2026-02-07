@@ -4,7 +4,9 @@ from typing import ClassVar, Container
 from application.dto.regions import RegionDTO
 from application.exceptions import PermissionDeniedError
 from application.interfaces import UserServiceProtocol
-from application.interfaces.services.regions_service_interface import RegionsServiceProtocol
+from application.interfaces.services.regions_service_interface import (
+    RegionsServiceProtocol,
+)
 from application.interfaces.uow_interface import UnitOfWorkProtocol
 from domain.cqrs.region_commands import CreateRegionCommand
 from domain.enums.unsorted import Roles
