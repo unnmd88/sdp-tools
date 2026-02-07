@@ -3,11 +3,12 @@ from fastapi import APIRouter
 from starlette import status
 
 from application.use_cases.regions.create_region_use_case import CreateRegionUseCaseImpl
+from application.use_cases.regions.delete_region_use_case import DeleteRegionUseCaseImpl
 from application.use_cases.regions.read_region_use_case import ReadRegionUseCaseImpl
 from application.use_cases.regions.update_regions_use_case import (
     UpdateRegionUseCaseImpl,
 )
-from domain.cqrs.region_commands import UpdateRegionCommand, CreateRegionCommand
+from domain.cqrs.region_commands import UpdateRegionCommand, CreateRegionCommand, DeleteRegionCommand
 from presentation.api.api_v1.documentation.regions.endpoints import (
     PATCH_region_by_code_description,
     GET_all_regions_description,
@@ -140,30 +141,26 @@ async def update_region(
     )
 
 
-#
-#
-# @router.delete(
-#     "/{code}",
-#     status_code=status.HTTP_202_ACCEPTED,
-#     response_model=RegionSchemaResponse,
-#     summary="Удалить существующий регион.",
-#     description=DELETE_region_by_code_description,
-# )
-# async def delete_region(
-#     region_code: int,
-#     # use_case: RegionsCrudUseCase,
-# ):
-#     filters_for_search_dto = FiltersForSearchDTO(
-#         search_filters=FiltersFactory.get_filters_dict(code=region_code)
-#     )
-#     try:
-#         result = await use_case.delete_region(filters_for_search_dto)
-#     except EntityNotFoundError:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail=f"Регион {region_code} не найден.",
-#         )
-#     return RegionSchemaResponse.model_validate(
-#         result,
-#         from_attributes=True,
-#     )
+
+
+@router.delete(
+    "/{code-or-name}",
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=RegionResponse,
+    summary="Удалить существующий регион.",
+    # description=DELETE_region_by_code_description,
+)
+@inject
+async def delete_region(
+    token_dto: AccessTokenDep,
+    code_or_name: str | int,
+    use_case: FromDishka[DeleteRegionUseCaseImpl],
+):
+    command = DeleteRegionCommand(
+        customer_id=token_dto.user_id,
+        code_or_name=code_or_name,
+    )
+    return RegionResponse.model_validate(
+        await use_case(command),
+        from_attributes=True,
+    )

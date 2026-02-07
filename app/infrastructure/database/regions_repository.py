@@ -71,3 +71,6 @@ class RegionsSqlAlchemyRepository:
 
     async def add(self, entity: RegionEntity) -> RegionEntity:
         return await self._base_repo_adapter.add(entity)
+
+    async def delete(self, _id: int) -> RegionEntity | None:
+        return await self._base_repo_adapter.delete(_id)

@@ -15,6 +15,7 @@ from application.use_cases.admin.change_password_use_case import (
 )
 from application.use_cases.admin.create_user_use_case import CreateUserUseCaseImpl
 from application.use_cases.regions.create_region_use_case import CreateRegionUseCaseImpl
+from application.use_cases.regions.delete_region_use_case import DeleteRegionUseCaseImpl
 from application.use_cases.regions.read_region_use_case import ReadRegionUseCaseImpl
 from application.use_cases.regions.update_regions_use_case import (
     UpdateRegionUseCaseImpl,
@@ -223,6 +224,19 @@ class UseCaseProvider(Provider):
         regions_service: RegionsServiceImpl,
     ) -> CreateRegionUseCaseImpl:
         return CreateRegionUseCaseImpl(
+            uow=uow,
+            regions_service=regions_service,
+            user_service=user_service,
+        )
+
+    @provide(scope=Scope.REQUEST)
+    def delete_region_use_case(
+        self,
+        uow: SQLAlchemyUnitOfWork,
+        user_service: UserServiceImpl,
+        regions_service: RegionsServiceImpl,
+    ) -> DeleteRegionUseCaseImpl:
+        return DeleteRegionUseCaseImpl(
             uow=uow,
             regions_service=regions_service,
             user_service=user_service,
