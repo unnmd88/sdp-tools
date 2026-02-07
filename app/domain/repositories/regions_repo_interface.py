@@ -1,5 +1,4 @@
-from collections.abc import Mapping
-from typing import Protocol, Any
+from typing import Protocol
 
 from domain.entities.region_entity import RegionEntity
 

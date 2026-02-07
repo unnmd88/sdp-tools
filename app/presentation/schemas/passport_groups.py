@@ -9,18 +9,16 @@ class PassportGroupsBase(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    group_name: PassportGroups
+    name: PassportGroups
     description: Annotated[str, Field(default="")]
 
 
-class PassportGroupsSchema(PassportGroupsBase):
+class PassportGroupResponse(PassportGroupsBase):
     id: Annotated[int, Field(ge=1)]
 
 
 class PassportGroupsCreate(PassportGroupsBase):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
+    """Create passport group"""
 
 
 class PassportGroupsUpdate(BaseModel):

@@ -6,7 +6,7 @@ from application.interfaces.mappers.db import BaseDBMapperProtocol
 
 
 from domain.enums.unsorted import Roles, Organizations
-from domain.entities.user import UserEntity
+from domain.entities.user_entity import UserEntity
 from infrastructure.database.models import User as UserModel
 
 

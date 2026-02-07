@@ -2,7 +2,7 @@ from dataclasses import dataclass, asdict
 from datetime import timedelta, datetime
 
 from domain.enums.unsorted import Roles, Organizations
-from domain.entities.user import UserEntity
+from domain.entities.user_entity import UserEntity
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)

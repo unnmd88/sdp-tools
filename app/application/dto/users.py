@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from domain.entities.user import UserEntity
+from domain.entities.user_entity import UserEntity
 from domain.enums.unsorted import Roles, Organizations
 
 

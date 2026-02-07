@@ -8,7 +8,7 @@ from app_logging.dev.config import USERS_LOGGER
 from core.config import settings
 
 from domain.enums import Organizations, Roles
-from domain.entities.user import UserEntity
+from domain.entities.user_entity import UserEntity
 from domain._exceptions.base import DomainValidationError
 from infrastructure.auth.password_service import hash_password
 from infrastructure.database.api import db_api

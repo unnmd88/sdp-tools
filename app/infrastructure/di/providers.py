@@ -8,12 +8,15 @@ from sqlalchemy.ext.asyncio.engine import AsyncEngine
 
 from app_logging.dev.config import INFRASTRUCTURE
 from application.services.auth_service import AuthenticationService
+from application.services.passport_group_service import PassportGroupServiceImpl
 from application.services.regions_service import RegionsServiceImpl
 from application.services.user_service import UserServiceImpl
 from application.use_cases.admin.change_password_use_case import (
     ResetUserPasswordByAdminUseCaseImpl,
 )
 from application.use_cases.admin.create_user_use_case import CreateUserUseCaseImpl
+from application.use_cases.passport_groups.create_passport_group_use_case import CreatePassportGroupUseCaseImpl
+from application.use_cases.passport_groups.read_passport_group_use_case import ReadPassportGroupUseCaseImpl
 from application.use_cases.regions.create_region_use_case import CreateRegionUseCaseImpl
 from application.use_cases.regions.delete_region_use_case import DeleteRegionUseCaseImpl
 from application.use_cases.regions.read_region_use_case import ReadRegionUseCaseImpl
@@ -34,6 +37,7 @@ from infrastructure.auth.jwt.jwt_service import IssueJWTService, DecodeJWTServic
 from infrastructure.auth.jwt.rules import IssueJWTSettings, DecodeJWTSettings
 from infrastructure.auth.password_service import BcryptPasswordService
 from infrastructure.database.api import DatabaseAPI
+from infrastructure.database.passport_groups_repository import PassportGroupsSqlAlchemyRepository
 from infrastructure.database.regions_repository import RegionsSqlAlchemyRepository
 from infrastructure.database.uow import SQLAlchemyUnitOfWork
 from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
@@ -83,6 +87,12 @@ class RepositoryProvider(Provider):
     ) -> RegionsSqlAlchemyRepository:
         return RegionsSqlAlchemyRepository(session=session)
 
+    @provide(scope=Scope.REQUEST)
+    def passport_groups_repository(
+        self, session: AsyncSession
+    ) -> PassportGroupsSqlAlchemyRepository:
+        return PassportGroupsSqlAlchemyRepository(session=session)
+
 
 class JWTProvider(Provider):
     """Только создание JWT сервисов, без логики получения токенов"""
@@ -126,6 +136,13 @@ class ServiceProvider(Provider):
         self, regions_repo: RegionsSqlAlchemyRepository
     ) -> RegionsServiceImpl:
         return RegionsServiceImpl(regions_repository=regions_repo)
+
+    # Passport-groups section
+    @provide(scope=Scope.REQUEST)
+    def passport_groups_service(
+        self, passport_groups_repo: PassportGroupsSqlAlchemyRepository
+    ) -> PassportGroupServiceImpl:
+        return PassportGroupServiceImpl(passport_group_repository=passport_groups_repo)
 
 
 class AdminUseCasesProvider(Provider):
@@ -242,5 +259,25 @@ class UseCaseProvider(Provider):
         return DeleteRegionUseCaseImpl(
             uow=uow,
             regions_service=regions_service,
+            user_service=user_service,
+        )
+
+    # Passport-groups section
+    @provide(scope=Scope.REQUEST)
+    def read_passport_groups_use_case(
+        self, passport_groups_service: PassportGroupServiceImpl
+    ) -> ReadPassportGroupUseCaseImpl:
+        return ReadPassportGroupUseCaseImpl(passport_groups_service=passport_groups_service)
+
+    @provide(scope=Scope.REQUEST)
+    def create_passport_group_use_case(
+        self,
+        uow: SQLAlchemyUnitOfWork,
+        user_service: UserServiceImpl,
+        passport_groups_service: PassportGroupServiceImpl,
+    ) -> CreatePassportGroupUseCaseImpl:
+        return CreatePassportGroupUseCaseImpl(
+            uow=uow,
+            passport_groups_service=passport_groups_service,
             user_service=user_service,
         )

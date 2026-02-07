@@ -58,11 +58,6 @@ class RegionEntity(Entity):
         self.code = code
         self.name = name
 
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            raise NotImplementedError
-        return self.code == other.code and self.name == other.name
-
 
 if __name__ == "__main__":
     r = RegionEntity.create_new_region(code=1, name="Москва")

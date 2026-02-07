@@ -1,23 +1,18 @@
 from dataclasses import dataclass
+from datetime import datetime
 
-from domain.enums.unsorted import PassportGroups
 
-
-@dataclass(kw_only=True)
+@dataclass(slots=True, frozen=True, kw_only=True)
 class PassportGroupDTO:
-    group_name: PassportGroups
+
+    id: int
+    name: str
     description: str
+    built_at: str | datetime
+    created_at: str | None | datetime
+    updated_at: str | None | datetime
 
+    @classmethod
+    def from_entity(cls, entity):
+        return cls(**entity.to_dict())
 
-@dataclass(kw_only=True)
-class UpdatePassportGroupDTO:
-    group_name_to_update: PassportGroups
-
-    group_name: PassportGroups | None = None
-    description: str | None = None
-
-
-@dataclass(kw_only=True)
-class CreatePassportGroupDTO:
-    group_name: PassportGroups
-    description: str | None = ""

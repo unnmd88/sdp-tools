@@ -14,7 +14,7 @@ from application.interfaces.services.password_service_interface import (
 from application.interfaces.uow_interface import UnitOfWorkProtocol
 from domain.enums.unsorted import Roles
 
-from domain.entities.user import UserEntity
+from domain.entities.user_entity import UserEntity
 from domain.exceptions import DomainEntityAlreadyExistsError
 from domain.value_objects.set_password_vo import SetPasswordVO
 

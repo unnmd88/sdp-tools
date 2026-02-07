@@ -37,3 +37,8 @@ REGIONS_PUBLIC_ATTRS = BASE_PUBLIC_ATTRS + (
     PublicAttr(attr_name="_name", alias=str(PublicAttrNamesEnum.name)),
     PublicAttr(attr_name="_code", alias=str(PublicAttrNamesEnum.code)),
 )
+
+PASSPORT_GROUPS_PUBLIC_ATTRS = BASE_PUBLIC_ATTRS + (
+    PublicAttr(attr_name="_name", alias=str(PublicAttrNamesEnum.name)),
+    PublicAttr(attr_name="_description", alias=str(PublicAttrNamesEnum.description)),
+)

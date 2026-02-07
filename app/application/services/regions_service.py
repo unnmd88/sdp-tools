@@ -53,10 +53,6 @@ class RegionsServiceImpl:
                 private_message=f"Неверный тип данных для поиска региона. code_or_name={code_or_name}",
                 public_message=f"Неверный тип данных для поиска региона. Ожидается строка или число.",
             )
-        # if isinstance(code_or_name, int):
-        #     region = await self.get_region_by_and_filters({"code": code_or_name})
-        # else:
-        #     region = await self.get_region_by_and_filters({"name": code_or_name})
         if region is None and raise_if_not_found:
             if isinstance(code_or_name, int):
                 message = f"Регион с кодом={code_or_name} не найден."
@@ -90,17 +86,6 @@ class RegionsServiceImpl:
             raise DomainEntityAlreadyExistsError(
                 public_message=f"Регион с кодом={command.code} уже существует."
             )
-
-        # exists_region = await self.get_region_by_and_filters({"name": command.name, })
-        # if exists_region:
-        #     raise DomainEntityAlreadyExistsError(
-        #         public_message=f"Регион с именем={command.name} уже существует."
-        #     )
-        # exists_region = await self.get_region_by_and_filters({"code": command.code})
-        # if exists_region:
-        #     raise DomainEntityAlreadyExistsError(
-        #         public_message=f"Регион с кодом={command.code} уже существует."
-        #     )
         region = RegionEntity(
             id=None,
             code=command.code,

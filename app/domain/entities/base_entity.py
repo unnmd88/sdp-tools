@@ -56,9 +56,9 @@ class Entity(ABC):
         self.check_invariant_datetime()
 
     def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self._id == other.id
-        raise NotImplementedError
+        if not isinstance(other, self.__class__):
+            raise NotImplementedError
+        return self.id == other.id
 
     def __iter__(self) -> Generator[Any, None, None]:
         for public_attr in self.__public_attrs__:
