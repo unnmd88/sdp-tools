@@ -12,7 +12,8 @@ from domain.enums.violations import Violations
 from domain.exceptions import (
     DomainError,
     DomainBusinessRuleError,
-    DomainValidationError, DomainContractViolationError,
+    DomainValidationError,
+    DomainContractViolationError,
 )
 from domain.value_objects.contract_violation_context_vo import (
     ContractViolationContextVO,
@@ -21,7 +22,6 @@ from domain.value_objects.contract_violation_context_vo import (
 
 @dataclass(frozen=True, slots=True, kw_only=True, repr=False)
 class SetPasswordVO:
-
     MIN_LEN_PASSWORD: ClassVar[int] = 4
     MAX_LEN_PASSWORD: ClassVar[int] = 32
     CHARS: ClassVar[str] = string.ascii_letters + string.digits + "$#%*"
@@ -31,7 +31,6 @@ class SetPasswordVO:
     password: str
 
     def __post_init__(self):
-
         if not isinstance(self.password, str):
             ctx = ContractViolationContextVO(
                 subject=self.subject,
@@ -51,7 +50,11 @@ class SetPasswordVO:
                 public_message="Некорректный тип данных. Для пароля ожидается строка.",
             )
 
-        elif len(self.password) < self.MIN_LEN_PASSWORD or len(self.password) > self.MAX_LEN_PASSWORD or self.PASSWORD_PATTERN.match(self.password) is None:
+        elif (
+            len(self.password) < self.MIN_LEN_PASSWORD
+            or len(self.password) > self.MAX_LEN_PASSWORD
+            or self.PASSWORD_PATTERN.match(self.password) is None
+        ):
             rule = (
                 "Недопустимый пароль. "
                 "Пароль должен быть не менее 4 и не более 32 символов и "
@@ -76,10 +79,10 @@ class SetPasswordVO:
     @classmethod
     def from_generated_password(cls, subject: str = None) -> "SetPasswordVO":
         generated_password = "".join(
-            secrets.choice(cls.CHARS) for _ in range(random.randint(cls.MIN_LEN_PASSWORD, cls.MAX_LEN_PASSWORD))
+            secrets.choice(cls.CHARS)
+            for _ in range(random.randint(cls.MIN_LEN_PASSWORD, cls.MAX_LEN_PASSWORD))
         )
         return cls(subject=subject, password=generated_password)
-
 
     def __repr__(self):
         return f"{self.__class__.__name__}(password=******)"

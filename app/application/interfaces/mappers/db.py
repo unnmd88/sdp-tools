@@ -13,10 +13,4 @@ class BaseDBMapperProtocol(Protocol[TM, TE]):
     def to_model(cls, entity: TE) -> TM: ...
 
     @classmethod
-    def update_model(
-        cls,
-        *,
-        model: TM,
-        entity: TE
-    ) -> TM:
-        ...
+    def update_model(cls, *, model: TM, entity: TE) -> TM: ...

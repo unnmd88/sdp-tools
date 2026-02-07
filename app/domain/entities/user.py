@@ -24,7 +24,9 @@ from domain.validators import (
     TelegramRegexpValidator,
     UserEntityValidator,
 )
-from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
+from domain.value_objects.contract_violation_context_vo import (
+    ContractViolationContextVO,
+)
 
 
 class UserEntity(Entity):
@@ -201,6 +203,7 @@ class UserEntity(Entity):
             telegram=telegram,
             description=description,
         )
+
 
 if __name__ == "__main__":
     pass

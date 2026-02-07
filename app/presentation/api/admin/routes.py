@@ -1,14 +1,17 @@
 from fastapi import APIRouter, status, Depends
 
 from application.dto.users import ChangeUserPasswordByAdminDTO, CreateUserDTO
+from application.use_cases.admin.create_user_use_case import CreateUserUseCaseImpl
 
-from presentation.api.dependencies.ioc import (
-    CreateUserUseCase,
-    AccessTokenDep,
-    ResetPasswordUseCase,
+from presentation.api.fastapi_dependencies import AccessTokenDep
+from presentation.schemas.users import (
+    CreateUserSchema,
+    ResponseUserSchema,
+    ChangeUserPasswordBaseSchema,
+    UpdatedPasswordByAdminResponse,
 )
-from presentation.schemas.users import CreateUserSchema, ResponseUserSchema, ChangeUserPasswordBaseSchema, \
- UpdatedPasswordByAdminResponse
+from dishka.integrations.fastapi import FromDishka, inject
+
 
 router = APIRouter(
     prefix="/admin",
@@ -49,10 +52,11 @@ router = APIRouter(
     # dependencies=[IsSuperuser],
     summary="Создать нового пользователя системы",
 )
+@inject
 async def create_user(
     token_dto: AccessTokenDep,
     new_user: CreateUserSchema,
-    use_case: CreateUserUseCase,
+    use_case: FromDishka[CreateUserUseCaseImpl],
 ) -> ResponseUserSchema:
     user_dto = CreateUserDTO(
         customer_id=token_dto.user_id,
@@ -63,7 +67,7 @@ async def create_user(
         from_attributes=True,
     )
 
-
+#TODO!!
 @router.patch(
     "/reset-user-password/{username}",
     status_code=status.HTTP_202_ACCEPTED,
@@ -72,9 +76,11 @@ async def create_user(
 async def change_user_password(
     username: str,
     token_dto: AccessTokenDep,
-    use_case: ResetPasswordUseCase,
+    # use_case: ResetPasswordUseCase,
 ) -> UpdatedPasswordByAdminResponse:
-    dto = ChangeUserPasswordByAdminDTO(customer_id=token_dto.user_id, subject_username=username)
+    dto = ChangeUserPasswordByAdminDTO(
+        customer_id=token_dto.user_id, subject_username=username
+    )
     return UpdatedPasswordByAdminResponse.model_validate(
         await use_case(dto),
         from_attributes=True,

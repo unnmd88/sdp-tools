@@ -5,12 +5,13 @@ from domain.enums.attrs_names import PrivateAttrNamesEnum
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.enums.violations import Violations
 from domain.exceptions import DomainValidationError
-from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
+from domain.value_objects.contract_violation_context_vo import (
+    ContractViolationContextVO,
+)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True, repr=False)
 class PasswordVO:
-
     password: bytes
     subject: str
 

@@ -22,7 +22,6 @@ class UserLoginAndIssueJWTUseCaseImpl:
     jwt_service: IssueJWTServiceProtocol
 
     async def __call__(self, auth_dto: UserAuthDTO) -> TokenDataDTO:
-
         user: UserEntity = await self.auth_service.authenticate(auth_dto)
         payload = PayloadJWTDTO(
             user_id=user.id,
@@ -39,4 +38,3 @@ class UserLoginAndIssueJWTUseCaseImpl:
             token_pair,
         )
         return token_pair
-

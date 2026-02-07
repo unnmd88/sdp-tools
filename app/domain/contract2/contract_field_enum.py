@@ -35,7 +35,6 @@ class ContractFieldEnum:
         return getattr(obj, self.name)
 
     def __set__(self, instance, value):
-
         if (value is None and self._nullable) or (
             self._use_cache and value in self._cache
         ):
@@ -75,7 +74,9 @@ class ContractFieldEnum:
                 )
                 raise DomainValidationError(
                     context=ctx,
-                    public_message=ErrorMessages.must_be_member_of_enum.format(self._field_name, list(self._enum)),
+                    public_message=ErrorMessages.must_be_member_of_enum.format(
+                        self._field_name, list(self._enum)
+                    ),
                 )
         except DomainContractViolationError as e:
             cur_ctx = e.context or ContractViolationContextVO()

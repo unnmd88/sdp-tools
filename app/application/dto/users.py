@@ -83,7 +83,6 @@ class ChangeUserPasswordByAdminDTO:
 
 @dataclass(slots=True, frozen=True, kw_only=True)
 class ChangedUserPasswordByAdminDTO:
-
     username: str
     new_password: str = field(repr=False)
 

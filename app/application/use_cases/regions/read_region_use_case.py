@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 
 from application.dto.regions import RegionDTO
-from application.interfaces.services.regions_service_interface import RegionsServiceProtocol
+from application.interfaces.services.regions_service_interface import (
+    RegionsServiceProtocol,
+)
 
 from domain.exceptions import DomainEntityNotFoundError
 
@@ -18,17 +20,10 @@ class ReadRegionUseCaseImpl:
             return RegionDTO.from_entity(region)
 
     async def by_code_or_name(self, region_code_or_name: int | str) -> RegionDTO:
-        region_code_or_name = int(region_code_or_name) if region_code_or_name.isdigit() else region_code_or_name
-        if isinstance(region_code_or_name, int):
-            region = await self.regions_service.get_region_by_code(region_code_or_name)
-        else:
-            region = await self.regions_service.get_region_by_name(region_code_or_name)
-        if region is None:
-            if isinstance(region_code_or_name, int):
-                message = f"Регион с кодом={region_code_or_name} не найден."
-            else:
-                message = f"Регион с именем={region_code_or_name} не найден."
-            raise DomainEntityNotFoundError(public_message=message)
+        region = await self.regions_service.get_region_by_code_or_name(
+            code_or_name=region_code_or_name,
+            raise_if_not_found=True,
+        )
         return RegionDTO.from_entity(region)
 
     async def get_many(
@@ -39,7 +34,7 @@ class ReadRegionUseCaseImpl:
     ) -> list[RegionDTO]:
         return [
             RegionDTO.from_entity(region)
-            for region in await self.regions_service.get_many(skip=skip, limit=limit, order_by=order_by)
+            for region in await self.regions_service.get_many(
+                skip=skip, limit=limit, order_by=order_by
+            )
         ]
-
-

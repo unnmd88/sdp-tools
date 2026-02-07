@@ -79,7 +79,6 @@ class Settings(BaseSettings):
     director_password: str
     secret_key_to_create_director: str
 
-
     @property
     def base_url(self) -> str:
         return f"{self.run.protocol}://{self.run.host}:{self.run.port}"

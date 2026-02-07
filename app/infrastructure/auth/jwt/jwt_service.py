@@ -18,7 +18,11 @@ from application.dto.users import UserDTO
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.value_objects.token_error_context_vo import TokenErrorContextVO
 from domain.enums.unsorted import TokenTypesEnum, Organizations, Roles
-from infrastructure.exceptions import TokenError, InvalidTokenTypeError, TokenExpiredError
+from infrastructure.exceptions import (
+    TokenError,
+    InvalidTokenTypeError,
+    TokenExpiredError,
+)
 
 logger = logging.getLogger(INFRASTRUCTURE)
 
@@ -44,7 +48,9 @@ class DecodeJWTService:
                 algorithms=[self._algorithm],
             )
         except jwt.ExpiredSignatureError:
-            raise TokenExpiredError(public_message=ErrorMessages.token_expired_please_login)
+            raise TokenExpiredError(
+                public_message=ErrorMessages.token_expired_please_login
+            )
         except jwt.PyJWTError as e:
             ctx = TokenErrorContextVO(
                 token=token,
@@ -85,11 +91,15 @@ class DecodeJWTService:
                 expected_token_type=expected_type,
                 subject=self.__class__.__name__,
                 handler=self._validate_token_type.__name__,
-                message=ErrorMessages.invalid_token_type.format(current_token_type, expected_type),
+                message=ErrorMessages.invalid_token_type.format(
+                    current_token_type, expected_type
+                ),
             )
             exc = InvalidTokenTypeError(
                 context=ctx,
-                public_message=ErrorMessages.invalid_token_type.format(current_token_type, expected_type),
+                public_message=ErrorMessages.invalid_token_type.format(
+                    current_token_type, expected_type
+                ),
             )
             logger.critical(exc.to_dict())
             raise exc

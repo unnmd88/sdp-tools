@@ -14,7 +14,7 @@ class InfrastructureError(BaseAppError):
 
 
 class RepositoryError(InfrastructureError):
-    """ Базовое исключение репозитория. """
+    """Базовое исключение репозитория."""
 
     DEFAULT_CODE = ErrorCodes.REPOSITORY_ERROR.code
     DEFAULT_PRIVATE_MESSAGE = ErrorCodes.REPOSITORY_ERROR.private_message
@@ -34,14 +34,12 @@ class RepositoryIntegrityError(RepositoryError):
 
 
 class RepositoryUpdateError(RepositoryError):
-
     DEFAULT_CODE = ErrorCodes.REPOSITORY_UPDATE_ERROR.code
     DEFAULT_PRIVATE_MESSAGE = ErrorCodes.REPOSITORY_UPDATE_ERROR.private_message
     DEFAULT_PUBLIC_MESSAGE = ErrorCodes.REPOSITORY_UPDATE_ERROR.public_message
 
 
 class RepositoryCorruptedError(RepositoryError):
-
     DEFAULT_CODE = ErrorCodes.CORRUPTED_DATA_ERROR.code
     DEFAULT_PRIVATE_MESSAGE = ErrorCodes.CORRUPTED_DATA_ERROR.private_message
     DEFAULT_PUBLIC_MESSAGE = ErrorCodes.CORRUPTED_DATA_ERROR.public_message

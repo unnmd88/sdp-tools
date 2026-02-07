@@ -64,5 +64,5 @@ class RegionEntity(Entity):
         return self.code == other.code and self.name == other.name
 
 
-if __name__ == '__main__':
-    r = RegionEntity.create_new_region(code=1, name='Москва')
+if __name__ == "__main__":
+    r = RegionEntity.create_new_region(code=1, name="Москва")

@@ -15,7 +15,6 @@ logger = logging.getLogger(INFRASTRUCTURE)
 @final
 @dataclass(frozen=True, slots=True, kw_only=True)
 class SQLAlchemyUnitOfWork(UnitOfWorkProtocol):
-
     session: AsyncSession
 
     async def __aenter__(self) -> Self:
@@ -27,8 +26,9 @@ class SQLAlchemyUnitOfWork(UnitOfWorkProtocol):
             logger.warning(
                 "Transaction rolled back due to exception: %s - %s",
                 exc_type.__name__,
-                str(exc_val)
+                str(exc_val),
             )
+            # logger.warning(exc_val.to_dict())
             await self.rollback()
         else:
             await self.commit()

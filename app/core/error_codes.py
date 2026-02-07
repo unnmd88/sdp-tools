@@ -37,7 +37,6 @@ class ErrorCodes(Enum):
         public_message="Превышено время ожидания",
     )
 
-
     # ==================== ДОМЕННЫЕ ОШИБКИ ====================
     DOMAIN_ERROR = Error(
         code="domain_error",
@@ -117,7 +116,6 @@ class ErrorCodes(Enum):
         public_message="Требуется вход в систему.",
     )
 
-
     FORBIDDEN = Error(
         code="forbidden",
         private_message="Доступ запрещен",
@@ -128,7 +126,6 @@ class ErrorCodes(Enum):
         code="payload_too_large",
         private_message="Слишком большой объем данных",
         public_message="Слишком большой объем данных",
-
     )
 
     UNSUPPORTED_MEDIA_TYPE = Error(
@@ -154,7 +151,6 @@ class ErrorCodes(Enum):
         code="infrastructure_error",
         private_message="Ошибка инфраструктуры",
         public_message="Ошибка запроса. Попробуйте позже.",
-
     )
 
     TOKEN_ERROR = Error(
@@ -219,7 +215,6 @@ class ErrorCodes(Enum):
         public_message="Требуется вход в систему",
     )
 
-
     # ==================== АУТЕНТИФИКАЦИЯ И АВТОРИЗАЦИЯ ====================
     AUTHENTICATION_FAILED = Error(
         code="authentication_failed",
@@ -252,7 +247,6 @@ class ErrorCodes(Enum):
         public_message="Ошибка запроса. Попробуйте позже.",
     )
 
-
     # ==================== ВЕБ-СОКЕТЫ И REAL-TIME ====================
     WEBSOCKET_ERROR = Error(
         code="websocket_error",
@@ -272,7 +266,6 @@ class ErrorCodes(Enum):
         private_message="Операция не разрешена",
         public_message="Операция не разрешена",
     )
-
 
     # Property методы для удобного доступа
     @property

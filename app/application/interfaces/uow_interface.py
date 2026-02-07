@@ -3,7 +3,6 @@ from typing import Protocol, Self
 
 
 class UnitOfWorkProtocol(Protocol):
-
     @abstractmethod
     async def __aenter__(self) -> Self: ...
     @abstractmethod
@@ -12,4 +11,3 @@ class UnitOfWorkProtocol(Protocol):
     async def commit(self) -> None: ...
     @abstractmethod
     async def rollback(self) -> None: ...
-

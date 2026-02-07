@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from app_logging.dev.config import DOMAIN
 from application.dto.users import UserDTO
-from application.exceptions import  InactiveAccountError
+from application.exceptions import InactiveAccountError
 from domain.exceptions import DomainEntityNotFoundError
 from domain.repositories.users_repo_interface import UsersRepositoryProtocol
 

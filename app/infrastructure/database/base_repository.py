@@ -12,8 +12,12 @@ from sqlalchemy.sql.expression import update
 
 from app_logging.dev.config import INFRASTRUCTURE
 from application.interfaces.mappers.db import BaseDBMapperProtocol
-from infrastructure.exceptions import RepositoryError, RepositoryUpdateError, RepositoryIntegrityError, \
-    RepositoryConnectionError
+from infrastructure.exceptions import (
+    RepositoryError,
+    RepositoryUpdateError,
+    RepositoryIntegrityError,
+    RepositoryConnectionError,
+)
 
 EntityType = TypeVar("EntityType")
 ModelType = TypeVar("ModelType")
@@ -158,7 +162,7 @@ CreateDTOType = TypeVar("CreateDTOType")
 logger = logging.getLogger(INFRASTRUCTURE)
 
 
-class BaseSqlAlchemyRepository[ModelType, EntityType, CreateDTOType]:
+class BaseSqlAlchemyRepositoryAdapter[ModelType, EntityType, CreateDTOType]:
     """Базовый репозиторий для работы с базой данных через sqlalchemy."""
 
     def __init__(
@@ -195,7 +199,7 @@ class BaseSqlAlchemyRepository[ModelType, EntityType, CreateDTOType]:
         skip: int = 0,
         limit: int | None = None,
         order_by: list | None = None,
-        **filters
+        **filters,
     ) -> list[EntityType]:
         stmt = select(self._model).filter_by(**filters)
 
@@ -222,10 +226,7 @@ class BaseSqlAlchemyRepository[ModelType, EntityType, CreateDTOType]:
                 msg = text.split("DETAIL:")[1].strip()  # todo: убрать это костыль
             else:
                 msg = ""
-            raise RepositoryIntegrityError(
-                private_message=str(e),
-                public_message=msg
-            )
+            raise RepositoryIntegrityError(private_message=str(e), public_message=msg)
         except (OperationalError, DBAPIError) as e:
             if "connection" in str(e).lower() or "lost" in str(e).lower():
                 await self._session.invalidate()
@@ -247,8 +248,12 @@ class BaseSqlAlchemyRepository[ModelType, EntityType, CreateDTOType]:
             if hasattr(model, key):
                 setattr(model, key, value)
             else:
-                logger.error(f"У модели {self._model.__name__} отсутствует атрибут {key}")
-                exc = RepositoryError(private_message=f"У модели {self._model.__name__} отсутствует атрибут {key}")
+                logger.error(
+                    f"У модели {self._model.__name__} отсутствует атрибут {key}"
+                )
+                exc = RepositoryError(
+                    private_message=f"У модели {self._model.__name__} отсутствует атрибут {key}"
+                )
                 raise exc
 
         try:
@@ -265,4 +270,3 @@ class BaseSqlAlchemyRepository[ModelType, EntityType, CreateDTOType]:
             raise RepositoryError(private_message="Ошибка при работе с базой данных")
         except Exception:  # todo logging
             raise RepositoryError(private_message="Ошибка при работе с базой данных")
-

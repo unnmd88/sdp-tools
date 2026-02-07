@@ -13,7 +13,6 @@ logger = logging.getLogger(DOMAIN)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UserServiceImpl:
-
     user_repository: UsersRepositoryProtocol
 
     @async_handle_corrupted_data_in_repo(logger=logger)
@@ -36,7 +35,9 @@ class UserServiceImpl:
             raise InactiveAccountError(public_message=f"Пользователь не активен.")
         return user
 
-    async def change_password(self, user_id: int, hashed_password: bytes) -> UserEntity | None:
+    async def change_password(
+        self, user_id: int, hashed_password: bytes
+    ) -> UserEntity | None:
         return await self.user_repository.change_password(user_id, hashed_password)
 
     async def add_new_user(self, user_data: UserEntity) -> UserEntity:
@@ -45,4 +46,3 @@ class UserServiceImpl:
     @async_handle_corrupted_data_in_repo(logger=logger)
     async def get_user_by_filters(self, **filters) -> UserEntity | None:
         return await self.user_repository.get_user_by_filters(**filters)
-

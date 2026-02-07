@@ -39,5 +39,7 @@ class EnumValidator:
             )
             raise DomainValidationError(
                 context=ctx,
-                public_message=ErrorMessages.must_be_member_of_enum.format(self.field_name, list(self.enum_class)),
+                public_message=ErrorMessages.must_be_member_of_enum.format(
+                    self.field_name, list(self.enum_class)
+                ),
             )

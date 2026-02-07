@@ -16,11 +16,13 @@ def async_handle_corrupted_data_in_repo(logger: Logger = None):
             except DomainValidationError as exc:
                 new_exc = RepositoryCorruptedError(
                     private_message=f"Нарушены данные в репозитории. "
-                            f"Вероятно ручное вмешательство и корректировка данных в репозитории. "
-                            f"Данные о проваленной валидации: {exc.to_dict()}."
+                    f"Вероятно ручное вмешательство и корректировка данных в репозитории. "
+                    f"Данные о проваленной валидации: {exc.to_dict()}."
                 )
                 if logger:
                     logger.error(new_exc)
                 raise new_exc from exc
+
         return async_wrapper
+
     return decorator

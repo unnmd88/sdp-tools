@@ -18,7 +18,7 @@ class Entity(ABC):
 
     __public_attrs__ = BASE_PUBLIC_ATTRS
 
-    #TODO: Реализовать create_at и updated_at как value-object
+    # TODO: Реализовать create_at и updated_at как value-object
     created_at = ContractField(
         field_name=str(PublicAttrNamesEnum.created_at),
         use_cache=False,

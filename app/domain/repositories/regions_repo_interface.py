@@ -17,7 +17,5 @@ class RegionsRepositoryProtocol(Protocol):
         skip: int = 0,
         limit: int | None = None,
         order_by: list | None = None,
-        **filters
+        **filters,
     ) -> list[RegionEntity]: ...
-
-

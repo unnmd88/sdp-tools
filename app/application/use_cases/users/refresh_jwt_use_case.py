@@ -4,7 +4,9 @@ from dataclasses import dataclass
 from app_logging.dev.config import AUTH_LOGGER
 from application.dto.jwt_dto import TokenDataDTO, PayloadJWTDTO
 from application.interfaces import UserServiceProtocol
-from application.interfaces.services.issue_jwt_service_interface import IssueJWTServiceProtocol
+from application.interfaces.services.issue_jwt_service_interface import (
+    IssueJWTServiceProtocol,
+)
 
 from domain.enums.validation_err_messages import ErrorMessages
 from domain.exceptions import DomainEntityNotFoundError
@@ -15,12 +17,10 @@ logger = logging.getLogger(AUTH_LOGGER)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class RefreshJWTUseCaseImpl:
-
     user_service: UserServiceProtocol
     jwt_service: IssueJWTServiceProtocol
 
     async def __call__(self, user_id: int) -> TokenDataDTO:
-
         user = await self.user_service.get_user_by_id(user_id)
         if user is None:
             exc = DomainEntityNotFoundError(

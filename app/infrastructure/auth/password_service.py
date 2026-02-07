@@ -17,7 +17,6 @@ class BcryptPasswordService:
         )
 
 
-
 def hash_password(
     password: str,
 ) -> bytes:
@@ -25,4 +24,3 @@ def hash_password(
         password.encode("utf-8"),
         bcrypt.gensalt(),
     )
-

@@ -12,4 +12,9 @@ class UpdateRegionCommand:
     new_name: str | Keep = Keep.VALUE
 
 
+@dataclass(slots=True, kw_only=True, frozen=True)
+class CreateRegionCommand:
+    customer_id: int
 
+    code: int
+    name: str

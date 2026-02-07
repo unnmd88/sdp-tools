@@ -20,7 +20,8 @@ class RegionDTO:
 
 
 class UpdateRegionDTO(TypedDict):
-    """ DTO для обновления существующего региона. """
+    """DTO для обновления существующего региона."""
+
     name: str
     code: int
 

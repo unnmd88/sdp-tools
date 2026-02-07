@@ -25,9 +25,15 @@ class AuthenticationService:
     async def authenticate(self, auth_dto: UserAuthDTO) -> UserEntity:
         """Аутентификация пользователя"""
         logger.info("Аутентификация пользователя %r", auth_dto.username)
-        if (user := await self.user_service.get_user_by_username(username=auth_dto.username)) is None:
+        if (
+            user := await self.user_service.get_user_by_username(
+                username=auth_dto.username
+            )
+        ) is None:
             logger.info("Пользователь %r не найден в репозитории.", auth_dto.username)
-            raise AuthenticationError(private_message=ErrorMessages.invalid_username_or_password)
+            raise AuthenticationError(
+                private_message=ErrorMessages.invalid_username_or_password
+            )
         if not self.password_service.verify_password(
             password=auth_dto.password,
             hashed_password=user.password,

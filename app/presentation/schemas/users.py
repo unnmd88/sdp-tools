@@ -35,7 +35,6 @@ class ResponseUserSchema(BaseUserSchema):
 
 
 class CreateUserSchema(BaseUserSchema):
-
     password: str
 
 

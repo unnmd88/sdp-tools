@@ -25,6 +25,10 @@ class DatetimeValidators:
             contract_code=ErrorCodes.DOMAIN_VALIDATION.code,
             violation=Violations.invalid_type,
             value=value,
-            private_message=ErrorMessages.must_be_valid_datetime.format(self.field_name, value),
-            public_message=ErrorMessages.must_be_valid_datetime.format(self.field_name, value),
+            private_message=ErrorMessages.must_be_valid_datetime.format(
+                self.field_name, value
+            ),
+            public_message=ErrorMessages.must_be_valid_datetime.format(
+                self.field_name, value
+            ),
         )

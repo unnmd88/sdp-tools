@@ -1,23 +1,18 @@
-from typing import Annotated
-
 from fastapi import (
     APIRouter,
-    Depends,
     status,
 )
 
-from application.dto.jwt_dto import AccessJWTPayloadDTO
+
 from application.dto.users import UserDTO, ChangeUserPasswordDTO
 from application.services.user_service import UserServiceImpl
+from application.use_cases.users.change_password_use_case import ChangeUserPasswordUseCaseImpl
 
-from domain.enums.unsorted import TokenTypesEnum
 from presentation.api.api_v1.documentation.users.endpoints import GET_whoami
-from presentation.api.dependencies.di import (
-    jwt_decoder_factory,
-    get_user_service,
-)
-from presentation.api.dependencies.ioc import ChangePasswordUseCase, AccessTokenDep
 
+from dishka.integrations.fastapi import FromDishka, inject
+
+from presentation.api.fastapi_dependencies import AccessTokenDep
 from presentation.schemas.users import (
     ResponseUserSchema,
     ChangeUserPasswordBaseSchema,
@@ -37,12 +32,16 @@ router = APIRouter(
     summary="Данные о пользователе из access jwt",
     description=GET_whoami,
 )
+@inject
 async def whoami(
-    token_dto: AccessTokenDep,
-    user_service: Annotated[UserServiceImpl, Depends(get_user_service)],
+    decoded_token_dto: AccessTokenDep,
+    user_service: FromDishka[UserServiceImpl],
 ):
+    # TODO: Перевести на use_case, возвращать DTO
     return ResponseUserSchema.model_validate(
-        obj=UserDTO.from_entity(await user_service.get_user_by_id_or_raise(token_dto.user_id)),
+        obj=UserDTO.from_entity(
+            await user_service.get_user_by_id_or_raise(decoded_token_dto.user_id)
+        ),
         from_attributes=True,
     )
 
@@ -70,18 +69,18 @@ async def whoami(
     status_code=status.HTTP_202_ACCEPTED,
     response_model=ChangeUserPasswordBaseSchema,
 )
+@inject
 async def change_user_password(
-    token_dto: Annotated[
-        AccessJWTPayloadDTO,
-        Depends(jwt_decoder_factory(token_type=TokenTypesEnum.access)),
-    ],
-    change_password: ChangeUserPasswordBaseSchema,
-    use_case: ChangePasswordUseCase,
+    decoded_token_dto: AccessTokenDep,
+    change_password_schema: ChangeUserPasswordBaseSchema,
+    # use_case: ChangePasswordUseCase,
+    use_case: FromDishka[ChangeUserPasswordUseCaseImpl],
 ):
-    change_password_dto = ChangeUserPasswordDTO(**change_password.model_dump())
-    res_change_password_dto = await use_case(user_id=token_dto.user_id, change_password_dto=change_password_dto)
-
+    change_password_dto = ChangeUserPasswordDTO(**change_password_schema.model_dump())
+    res_change_password_dto: ChangeUserPasswordDTO = await use_case(
+        user_id=decoded_token_dto.user_id,
+        change_password_dto=change_password_dto,
+    )
     return ChangeUserPasswordBaseSchema.model_validate(
-        res_change_password_dto,
-        from_attributes=True
+        res_change_password_dto, from_attributes=True
     )

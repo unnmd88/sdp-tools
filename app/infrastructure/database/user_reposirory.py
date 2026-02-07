@@ -7,7 +7,7 @@ from app_logging.dev.config import INFRASTRUCTURE
 from domain.entities.user import UserEntity
 from infrastructure.database.mappers.users_mapper import UserDBMapper
 from infrastructure.database.models import User as UserModel
-from infrastructure.database.base_repository import BaseSqlAlchemyRepository
+from infrastructure.database.base_repository import BaseSqlAlchemyRepositoryAdapter
 from infrastructure.database.utils import handle_db_errors
 
 logger = logging.getLogger(INFRASTRUCTURE)
@@ -15,7 +15,7 @@ logger = logging.getLogger(INFRASTRUCTURE)
 
 class UsersSqlAlchemyRepository:
     def __init__(self, session: AsyncSession):
-        self._repo = BaseSqlAlchemyRepository[UserModel, UserEntity, UserDBMapper](
+        self._repo = BaseSqlAlchemyRepositoryAdapter[UserModel, UserEntity, UserDBMapper](
             session=session,
             model=UserModel,
             mapper=UserDBMapper(),
@@ -43,5 +43,7 @@ class UsersSqlAlchemyRepository:
         return await self._repo.add(user)
 
     @handle_db_errors(logger=logger)
-    async def change_password(self, user_id: int, hashed_password: bytes) -> UserEntity | None:
+    async def change_password(
+        self, user_id: int, hashed_password: bytes
+    ) -> UserEntity | None:
         return await self._repo.update(id=user_id, password=hashed_password)
