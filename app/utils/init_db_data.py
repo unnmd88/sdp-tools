@@ -1,14 +1,14 @@
 import asyncio
 
-from core.constants import (
+from domain.enums import (
     PassportGroups,
     PassportGroupsRoutes,
     RegionCodes,
     RegionNames,
     ServiceOrganizations,
 )
-from core.database.api import db_api
-from core.models import PassportGroup, Region, TrafficLightObject
+from domain.database import db_api
+from domain.models import PassportGroup, Region, TrafficLightObject
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select
@@ -34,12 +34,12 @@ PASSPORT_GROUPS = [
     ),
 ]
 TLO_DATA = [
-    ('413', ServiceOrganizations.CODD),
-    ('155', ServiceOrganizations.CODD),
-    ('11', ServiceOrganizations.CODD),
-    ('510', ServiceOrganizations.CODD),
-    ('!TEST', ServiceOrganizations.CODD),
-    ('!!TEST', ServiceOrganizations.CODD),
+    ("413", ServiceOrganizations.CODD),
+    ("155", ServiceOrganizations.CODD),
+    ("11", ServiceOrganizations.CODD),
+    ("510", ServiceOrganizations.CODD),
+    ("!TEST", ServiceOrganizations.CODD),
+    ("!!TEST", ServiceOrganizations.CODD),
 ]
 
 
@@ -53,18 +53,18 @@ async def add_tlo(session: AsyncSession):
                 region_id=pk_region77,
                 name=name,
                 service_organization=service_organization.CODD,
-                district='',
-                street='',
-                description='',
+                district="",
+                street="",
+                description="",
             )
         )
     try:
         await session.commit()
     except IntegrityError as e:
-        print(f'IntegrityError. Add tlo Failed: {e}.')
+        print(f"IntegrityError. Add tlo Failed: {e}.")
         await session.rollback()
     except Exception as e:
-        print(f'Add tlo Failed: {e}.')
+        print(f"Add tlo Failed: {e}.")
         await session.rollback()
 
 
@@ -74,7 +74,7 @@ async def add_regions_and_passport_groups(session: AsyncSession):
         session.add_all(PASSPORT_GROUPS)
         await session.commit()
     except IntegrityError:
-        print('Failed: already exists.')
+        print("Failed: already exists.")
         await session.rollback()
 
 
@@ -84,5 +84,5 @@ async def main():
         await add_tlo(session)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

@@ -1,13 +1,15 @@
 services:
   test_app:
     build:
-      dockerfile: docker-build/app/Dockerfile
+      dockerfile: docker-build/app-tests/Dockerfile
       context: .
     image: fastapi-sdp-tools:tests
     container_name: test_app
     environment:
       APP_CONFIG__DB__URL: postgresql+asyncpg://test1:1111@192.168.200.3:5432/test
       APP_CONFIG__DB__ECHO: 1
+      APP_CONFIG__default_superuser_creds__NAME: root
+      APP_CONFIG__default_superuser_creds__PASSWORD: sdp2025
     command: ["fastapi", "dev", "--host", "0.0.0.0", "main.py", "--port", "7000"]
 #    volumes:
 #      - ./app:/app/app

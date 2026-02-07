@@ -1,65 +1,112 @@
+import json
 import logging.config
 
-from core.config import API_V1_PATH, BASE_DIR
+from pythonjsonlogger.json import JsonFormatter
+
+from core.config import BASE_DIR
+
+print(BASE_DIR)
+print(
+    f"gg: {str(BASE_DIR)[1:].replace('/', '.')}.app_logging.dev.EnsureAsciiJsonFormatter"
+)
+
+LOGGING_DIR = BASE_DIR / "app_logging"
 
 LOGGING_CONFIG = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
         },
-        'file_users': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'users/logs/users.log',
-            'formatter': 'simple',
+        "RUD": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "app_logging/RUD.log",
+            "formatter": "simple2",
         },
-        'file_ovim_passports': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': API_V1_PATH / 'passports/logs/log.log',
-            'formatter': 'simple2',
+        "USERS_RUD": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "app_logging/USERS_RUD.log",
+            "formatter": "simple2",
         },
-        'file_passport_groups': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': API_V1_PATH / 'passport_groups/logs/log.log',
-            'formatter': 'simple2',
+        "domain": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "app_logging/domain.log",
+            "formatter": "json",
         },
-    },
-    'loggers': {
-        '': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': True,
+        "infrastructure": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": LOGGING_DIR / "infrastructure.log",
+            "formatter": "json",
         },
-        'users': {
-            'level': 'INFO',
-            'handlers': ['console', 'file_users'],
-            'propagate': True,
+        "auth": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "app_logging/auth.log",
+            "formatter": "simple2",
         },
-        'ovim_passports': {
-            'level': 'INFO',
-            'handlers': ['console', 'file_ovim_passports'],
-        },
-        'passport_groups': {
-            'level': 'INFO',
-            'handlers': ['console', 'file_passport_groups'],
+        "JWT": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "app_logging/jwt.log",
+            "formatter": "simple2",
         },
     },
-    'formatters': {
-        # "verbose": {
-        #     "format": "{name} {levelname} {asctime} {module} {lineno} {funcName} {message} ",
-        #     "style": "{",
-        # },
-        'simple': {
-            'format': '%(levelname)s %(message)s %(asctime)s %(filename)s %(lineno)s',
+    "loggers": {
+        "": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": True,
         },
-        'simple2': {
-            'format': '%(asctime)s %(levelname)s %(message)s %(filename)s %(lineno)s',
+        "common": {
+            "level": "INFO",
+            "handlers": ["RUD"],
+            "propagate": True,
+        },
+        "auth": {
+            "level": "INFO",
+            "handlers": ["auth"],
+            "propagate": True,
+        },
+        "jwt": {
+            "level": "INFO",
+            "handlers": ["JWT"],
+            "propagate": True,
+        },
+        "users": {
+            "level": "INFO",
+            "handlers": ["USERS_RUD"],
+            "propagate": True,
+        },
+        "domain": {
+            "level": "INFO",
+            "handlers": ["domain"],
+            "propagate": False,
+        },
+        "infrastructure": {
+            "level": "INFO",
+            "handlers": ["infrastructure"],
+            "propagate": False,
+        },
+    },
+    "formatters": {
+        "json": {
+            "()": "app.app_logging.formatters.EnsureAsciiJsonFormatter",  # "{ "app_logging/dev/EnsureAsciiJsonFormatter"}",
+            "format": "%(asctime)s %(levelname)s %(name)s %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "ensure_ascii": False,
+        },
+        "simple": {
+            "format": "%(levelname)s %(message)s %(asctime)s %(filename)s %(lineno)s",
+        },
+        "simple2": {
+            "format": "%(asctime)s %(levelname)s %(message)s %(filename)s %(lineno)s",
         },
     },
 }
@@ -67,9 +114,13 @@ LOGGING_CONFIG = {
 logging.config.dictConfig(LOGGING_CONFIG)
 
 
-USERS_LOGGER = 'users'
-OVIM_PASSPORTS_LOGGER = 'ovim_passports'
-PASSPORTS_OWNERS_LOGGER = 'passport_groups'
+INFRASTRUCTURE = "infrastructure"
+DOMAIN = "domain"
+COMMON_LOGGER = "common"
+USERS_LOGGER = "users"
+JWT_LOGGER = "jwt"
+AUTH_LOGGER = "auth"
+
 
 # def logging_configure(level=logging.DEBUG):
 #     console_handler = logging.StreamHandler()

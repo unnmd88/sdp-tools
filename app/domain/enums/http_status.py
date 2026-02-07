@@ -1,0 +1,125 @@
+from enum import IntEnum
+
+
+class StatusHTTP(IntEnum):
+    """
+    Простой Enum для HTTP статусов с префиксом HTTP_числовой_код.
+    Формат: HTTP_XXX_NAME, где XXX - числовой код.
+    """
+
+    """
+    Enum для HTTP статус кодов с числовым суффиксом в имени константы.
+    Формат: NAME_XXX, где XXX - код статуса.
+    """
+
+    # ============ ИНФОРМАЦИОННЫЕ ОТВЕТЫ (1xx) ============
+    CONTINUE_100 = 100
+    SWITCHING_PROTOCOLS_101 = 101
+    PROCESSING_102 = 102
+    EARLY_HINTS_103 = 103
+
+    # ============ УСПЕШНЫЕ ОТВЕТЫ (2xx) ============
+    OK_200 = 200
+    CREATED_201 = 201
+    ACCEPTED_202 = 202
+    NON_AUTHORITATIVE_INFORMATION_203 = 203
+    NO_CONTENT_204 = 204
+    RESET_CONTENT_205 = 205
+    PARTIAL_CONTENT_206 = 206
+    MULTI_STATUS_207 = 207
+    ALREADY_REPORTED_208 = 208
+    IM_USED_226 = 226
+
+    # ============ ПЕРЕНАПРАВЛЕНИЯ (3xx) ============
+    MULTIPLE_CHOICES_300 = 300
+    MOVED_PERMANENTLY_301 = 301
+    FOUND_302 = 302
+    SEE_OTHER_303 = 303
+    NOT_MODIFIED_304 = 304
+    USE_PROXY_305 = 305
+    TEMPORARY_REDIRECT_307 = 307
+    PERMANENT_REDIRECT_308 = 308
+
+    # ============ ОШИБКИ КЛИЕНТА (4xx) ============
+    BAD_REQUEST_400 = 400
+    UNAUTHORIZED_401 = 401
+    PAYMENT_REQUIRED_402 = 402
+    FORBIDDEN_403 = 403
+    NOT_FOUND_404 = 404
+    METHOD_NOT_ALLOWED_405 = 405
+    NOT_ACCEPTABLE_406 = 406
+    PROXY_AUTHENTICATION_REQUIRED_407 = 407
+    REQUEST_TIMEOUT_408 = 408
+    CONFLICT_409 = 409
+    GONE_410 = 410
+    LENGTH_REQUIRED_411 = 411
+    PRECONDITION_FAILED_412 = 412
+    PAYLOAD_TOO_LARGE_413 = 413
+    URI_TOO_LONG_414 = 414
+    UNSUPPORTED_MEDIA_TYPE_415 = 415
+    RANGE_NOT_SATISFIABLE_416 = 416
+    EXPECTATION_FAILED_417 = 417
+    IM_A_TEAPOT_418 = 418
+    MISDIRECTED_REQUEST_421 = 421
+    UNPROCESSABLE_ENTITY_422 = 422
+    LOCKED_423 = 423
+    FAILED_DEPENDENCY_424 = 424
+    TOO_EARLY_425 = 425
+    UPGRADE_REQUIRED_426 = 426
+    PRECONDITION_REQUIRED_428 = 428
+    TOO_MANY_REQUESTS_429 = 429
+    REQUEST_HEADER_FIELDS_TOO_LARGE_431 = 431
+    UNAVAILABLE_FOR_LEGAL_REASONS_451 = 451
+
+    # ============ ОШИБКИ СЕРВЕРА (5xx) ============
+    INTERNAL_SERVER_ERROR_500 = 500
+    NOT_IMPLEMENTED_501 = 501
+    BAD_GATEWAY_502 = 502
+    SERVICE_UNAVAILABLE_503 = 503
+    GATEWAY_TIMEOUT_504 = 504
+    HTTP_VERSION_NOT_SUPPORTED_505 = 505
+    VARIANT_ALSO_NEGOTIATES_506 = 506
+    INSUFFICIENT_STORAGE_507 = 507
+    LOOP_DETECTED_508 = 508
+    NOT_EXTENDED_510 = 510
+    NETWORK_AUTHENTICATION_REQUIRED_511 = 511
+
+    # # ============ ИНФОРМАЦИОННЫЕ (1xx) ============
+    # HTTP_100_CONTINUE = 100
+    # HTTP_101_SWITCHING_PROTOCOLS = 101
+    # HTTP_102_PROCESSING = 102
+    # HTTP_103_EARLY_HINTS = 103
+    #
+    # # ============ УСПЕШНЫЕ (2xx) ============
+    # HTTP_200_OK = 200
+    # HTTP_201_CREATED = 201
+    # HTTP_202_ACCEPTED = 202
+    # HTTP_203_NON_AUTHORITATIVE_INFO = 203
+    # HTTP_204_NO_CONTENT = 204
+    # HTTP_205_RESET_CONTENT = 205
+    # HTTP_206_PARTIAL_CONTENT = 206
+    #
+    # # ============ ПЕРЕНАПРАВЛЕНИЯ (3xx) ============
+    # HTTP_300_MULTIPLE_CHOICES = 300
+    # HTTP_301_MOVED_PERMANENTLY = 301
+    # HTTP_302_FOUND = 302
+    # HTTP_303_SEE_OTHER = 303
+    # HTTP_304_NOT_MODIFIED = 304
+    # HTTP_307_TEMPORARY_REDIRECT = 307
+    # HTTP_308_PERMANENT_REDIRECT = 308
+    #
+    # # ============ ОШИБКИ КЛИЕНТА (4xx) ============
+    # HTTP_400_BAD_REQUEST = 400
+    # HTTP_401_UNAUTHORIZED = 401
+    # HTTP_403_FORBIDDEN = 403
+    # HTTP_404_NOT_FOUND = 404
+    # HTTP_405_METHOD_NOT_ALLOWED = 405
+    # HTTP_409_CONFLICT = 409
+    # HTTP_422_UNPROCESSABLE_ENTITY = 422
+    # HTTP_429_TOO_MANY_REQUESTS = 429
+    #
+    # # ============ ОШИБКИ СЕРВЕРА (5xx) ============
+    # HTTP_500_INTERNAL_SERVER_ERROR = 500
+    # HTTP_502_BAD_GATEWAY = 502
+    # HTTP_503_SERVICE_UNAVAILABLE = 503
+    # HTTP_504_GATEWAY_TIMEOUT = 504

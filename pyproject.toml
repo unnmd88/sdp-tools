@@ -8,12 +8,16 @@ dependencies = [
     "alembic>=1.17.0",
     "asyncpg>=0.30.0",
     "bcrypt>=5.0.0",
+    "dishka>=1.7.2",
     "fastapi[standard]>=0.119.1",
     "httpx>=0.28.1",
     "pydantic-settings>=2.11.0",
     "pydantic[email]>=2.12.3",
     "pyjwt[crypto]>=2.10.1",
     "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
+    "python-dotenv>=1.2.1",
+    "python-json-logger>=4.0.0",
     "python-multipart>=0.0.20",
     "sqlalchemy[asyncio]>=2.0.44",
     "typer>=0.20.0",
@@ -22,6 +26,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "mypy>=1.19.1",
     "pytest>=8.4.2",
     "ruff>=0.14.1",
 ]
@@ -47,7 +52,7 @@ select = [
 ]
 
 [tool.ruff.format]
-quote-style = "single"
+quote-style = "double"
 indent-style = "space"
 docstring-code-format = true
 skip-magic-trailing-comma = false
@@ -55,3 +60,28 @@ skip-magic-trailing-comma = false
 # Pytest config
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+
+[tool.mypy]
+incremental = true                    # Инкрементальная проверка (быстрее)
+skip_cache_mtime_checks = true        # Пропустить проверки mtime (быстрее)
+
+# ==================== ОПЦИИ СТРОГОСТИ ====================
+strict = false
+
+files = [
+    "app/core/contracts",
+]
+
+# 🚫 Исключения (для скорости)
+exclude = [
+    "build/",
+    "dist/",
+    ".venv/",
+    ".uv/",
+    "__pycache__/",
+    ".*.py",
+    "migrations/",
+    "tests/",                         # Исключить тесты для скорости
+    "test_*.py",
+    "*_test.py",
+]

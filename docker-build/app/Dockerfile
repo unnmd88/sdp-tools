@@ -27,7 +27,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Then, add the rest of the project source code and install it
 # Installing separately from its dependencies allows optimal layer caching
 COPY ./app /sdp-tools-app/app
-COPY ./pyproject.toml ./uv.lock ./.python-version /sdp-tools-app
+COPY ./pyproject.toml ./uv.lock ./.python-version  /sdp-tools-app
+COPY prestart-app.sh .
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked
@@ -35,6 +36,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Place executables in the environment at the front of the path
 ENV PATH="/sdp-tools-app/.venv/bin:$PATH"
 ENV PYTHONPATH="/sdp-tools-app:/sdp-tools-app/app"
+
 
 
 # Reset the entrypoint, don't invoke `uv`
@@ -49,10 +51,12 @@ ENV PYTHONPATH="/sdp-tools-app:/sdp-tools-app/app"
 # Uses `--host 0.0.0.0` to allow access from outside the container
 # Note in production, you should use `fastapi run` instead
 
-WORKDIR /sdp-tools-app/app
+# WORKDIR /sdp-tools-app/app
+WORKDIR /sdp-tools-app
 
 RUN chmod +x prestart-app.sh
-ENTRYPOINT ["./prestart-app.sh"]
+#ENTRYPOINT ["./prestart-app.sh"]
 
 CMD ["fastapi", "dev", "--host", "0.0.0.0", "main.py", "--port", "8080"]
+# CMD ["fastapi", "dev", "main.py",]
 #CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
