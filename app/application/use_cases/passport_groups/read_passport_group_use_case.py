@@ -21,3 +21,16 @@ class ReadPassportGroupUseCaseImpl:
             raise_if_not_found=True,
         )
         return PassportGroupDTO.from_entity(region)
+
+    async def get_many(
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        order_by: list | None = None,
+    ) -> list[PassportGroupDTO]:
+        return [
+            PassportGroupDTO.from_entity(region)
+            for region in await self.passport_groups_service.get_many(
+                skip=skip, limit=limit, order_by=order_by
+            )
+        ]

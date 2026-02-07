@@ -61,19 +61,20 @@ class RegionsSqlAlchemyRepository:
         )
 
     async def update(self, entity: RegionEntity) -> RegionEntity:
-        model = await self._session.get(RegionModel, entity.id)
-        if model is None:
-            exc = RepositoryCorruptedError(
-                private_message="Не найдена запись в базе данных по id из существующей сущности, полученной из БД"
-            )
-            logger.critical(exc.to_dict())
-            raise exc
-        updated_model = self._base_repo_adapter.mapper.update_model(
-            model=model, entity=entity
-        )
-        await self._session.flush()
-        await self._session.refresh(updated_model)
-        return self._base_repo_adapter.mapper.to_entity(updated_model)
+        return await self._base_repo_adapter.update(entity)
+        # model = await self._session.get(RegionModel, entity.id)
+        # if model is None:
+        #     exc = RepositoryCorruptedError(
+        #         private_message="Не найдена запись в базе данных по id из существующей сущности, полученной из БД"
+        #     )
+        #     logger.critical(exc.to_dict())
+        #     raise exc
+        # updated_model = self._base_repo_adapter.mapper.update_model(
+        #     model=model, entity=entity
+        # )
+        # await self._session.flush()
+        # await self._session.refresh(updated_model)
+        # return self._base_repo_adapter.mapper.to_entity(updated_model)
 
     async def add(self, entity: RegionEntity) -> RegionEntity:
         return await self._base_repo_adapter.add(entity)

@@ -12,7 +12,7 @@ from application.interfaces.mappers.db import BaseDBMapperProtocol
 from infrastructure.exceptions import (
     RepositoryError,
     RepositoryIntegrityError,
-    RepositoryConnectionError,
+    RepositoryConnectionError, RepositoryCorruptedError,
 )
 
 EntityType = TypeVar("EntityType")
@@ -97,7 +97,7 @@ class BaseSqlAlchemyRepositoryAdapter[ModelType, EntityType, CreateDTOType]:
         except Exception:  # todo logging
             raise RepositoryError(private_message="Ошибка при работе с базой данных")
 
-    async def update(self, id: int, **fields) -> EntityType | None:
+    async def update_by_id(self, id: int, **fields) -> EntityType | None:
         stmt = select(self._model).filter_by(id=id).with_for_update()
         result = await self._session.execute(stmt)
         model = result.scalar_one_or_none()
@@ -132,13 +132,30 @@ class BaseSqlAlchemyRepositoryAdapter[ModelType, EntityType, CreateDTOType]:
         except Exception:  # todo logging
             raise RepositoryError(private_message="Ошибка при работе с базой данных")
 
+    async def update(self, entity: EntityType) -> EntityType | None:
+        model = await self._session.get(self._model, entity.id)
+        if model is None:
+            exc = RepositoryCorruptedError(
+                private_message=(
+                    f"Не найдена запись в базе данных по id из "
+                    f"существующей сущности {entity.__class__.__name__}, полученной из БД"
+                )
+            )
+            logger.critical(exc.to_dict())
+            raise exc
+        updated_model = self.mapper.update_model(
+            model=model, entity=entity
+        )
+        await self._session.flush()
+        await self._session.refresh(updated_model)
+        return self.mapper.to_entity(updated_model)
+
     async def delete(self, id: int) -> EntityType | None:
         try:
             model = await self._session.get(self._model, id)
 
             if model is None:
                 return None
-
             entity = self._mapper.to_entity(model)
             await self._session.delete(model)
             await self._session.flush()

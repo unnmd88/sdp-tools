@@ -16,7 +16,9 @@ from application.use_cases.admin.change_password_use_case import (
 )
 from application.use_cases.admin.create_user_use_case import CreateUserUseCaseImpl
 from application.use_cases.passport_groups.create_passport_group_use_case import CreatePassportGroupUseCaseImpl
+from application.use_cases.passport_groups.delete_passport_group_use_case import DeletePassportGroupUseCaseImpl
 from application.use_cases.passport_groups.read_passport_group_use_case import ReadPassportGroupUseCaseImpl
+from application.use_cases.passport_groups.update_passport_group_use_case import UpdatePassportGroupUseCaseImpl
 from application.use_cases.regions.create_region_use_case import CreateRegionUseCaseImpl
 from application.use_cases.regions.delete_region_use_case import DeleteRegionUseCaseImpl
 from application.use_cases.regions.read_region_use_case import ReadRegionUseCaseImpl
@@ -277,6 +279,32 @@ class UseCaseProvider(Provider):
         passport_groups_service: PassportGroupServiceImpl,
     ) -> CreatePassportGroupUseCaseImpl:
         return CreatePassportGroupUseCaseImpl(
+            uow=uow,
+            passport_groups_service=passport_groups_service,
+            user_service=user_service,
+        )
+
+    @provide(scope=Scope.REQUEST)
+    def update_passport_group_use_case(
+        self,
+        uow: SQLAlchemyUnitOfWork,
+        user_service: UserServiceImpl,
+        passport_groups_service: PassportGroupServiceImpl,
+    ) -> UpdatePassportGroupUseCaseImpl:
+        return UpdatePassportGroupUseCaseImpl(
+            uow=uow,
+            passport_groups_service=passport_groups_service,
+            user_service=user_service,
+        )
+
+    @provide(scope=Scope.REQUEST)
+    def delete_passport_group_use_case(
+        self,
+        uow: SQLAlchemyUnitOfWork,
+        user_service: UserServiceImpl,
+        passport_groups_service: PassportGroupServiceImpl,
+    ) -> DeletePassportGroupUseCaseImpl:
+        return DeletePassportGroupUseCaseImpl(
             uow=uow,
             passport_groups_service=passport_groups_service,
             user_service=user_service,

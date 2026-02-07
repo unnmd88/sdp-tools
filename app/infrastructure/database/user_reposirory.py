@@ -48,4 +48,4 @@ class UsersSqlAlchemyRepository:
     async def change_password(
         self, user_id: int, hashed_password: bytes
     ) -> UserEntity | None:
-        return await self._repo.update(id=user_id, password=hashed_password)
+        return await self._repo.update_by_id(id=user_id, password=hashed_password)
