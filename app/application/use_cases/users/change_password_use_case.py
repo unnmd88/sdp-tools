@@ -24,7 +24,7 @@ class ChangeUserPasswordUseCaseImpl:
     ) -> ChangeUserPasswordDTO:
         logger.info("Запрос на смену пароля с id=%r", user_id)
         async with self.uow:
-            user = await self.user_service.get_active_user_by_id_or_raise(user_id)
+            user = await self.user_service.get_active_user_by_id(user_id)
             logger.info("Пользователь c username=%r найден.", user.username)
             if not self.password_service.verify_password(
                 password=change_password_dto.old_password,
@@ -43,7 +43,7 @@ class ChangeUserPasswordUseCaseImpl:
             await self.user_service.change_password(
                 user_id=user_id, hashed_password=hashed_password
             )
-            user = await self.user_service.get_user_by_id_or_raise(user.id)
+            user = await self.user_service.get_user_by_id(user.id)
             if not self.password_service.verify_password(
                 password=change_password_dto.new_password,
                 hashed_password=user.password,

@@ -3,10 +3,12 @@ from .providers import (
     ConfigProvider,
     DatabaseProvider,
     RepositoryProvider,
-    ServiceProvider,
+    ServicesProvider,
     JWTProvider,
     AdminUseCasesProvider,
-    UseCaseProvider,
+    UsersUseCaseProvider,
+    PassportGroupUseCaseProvider,
+    RegionsUseCaseProvider,
 )
 
 
@@ -15,9 +17,11 @@ def create_container():
         ConfigProvider(),
         DatabaseProvider(),
         RepositoryProvider(),
-        ServiceProvider(),
+        ServicesProvider(),
         JWTProvider(),
-        UseCaseProvider(),
+        UsersUseCaseProvider(),
         AdminUseCasesProvider(),
+        PassportGroupUseCaseProvider(),
+        RegionsUseCaseProvider(),
     )
     return container

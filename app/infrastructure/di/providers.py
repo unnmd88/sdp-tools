@@ -1,12 +1,16 @@
-import logging
 from collections.abc import AsyncGenerator
 
 from dishka import Provider, Scope, provide
-from dishka.integrations.fastapi import DishkaRoute, FromDishka
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.ext.asyncio.engine import AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app_logging.dev.config import INFRASTRUCTURE
+from application.base_crud_use_cases import (
+    BaseReadUseCase,
+    BaseCreateUseCase,
+    BaseUpdateUseCase,
+    BaseDeleteUseCase,
+)
+from application.dto.passport_groups import PassportGroupDTO
+from application.dto.regions import RegionDTO
 from application.services.auth_service import AuthenticationService
 from application.services.passport_group_service import PassportGroupServiceImpl
 from application.services.regions_service import RegionsServiceImpl
@@ -15,16 +19,25 @@ from application.use_cases.admin.change_password_use_case import (
     ResetUserPasswordByAdminUseCaseImpl,
 )
 from application.use_cases.admin.create_user_use_case import CreateUserUseCaseImpl
-from application.use_cases.passport_groups.create_passport_group_use_case import CreatePassportGroupUseCaseImpl
-from application.use_cases.passport_groups.delete_passport_group_use_case import DeletePassportGroupUseCaseImpl
-from application.use_cases.passport_groups.read_passport_group_use_case import ReadPassportGroupUseCaseImpl
-from application.use_cases.passport_groups.update_passport_group_use_case import UpdatePassportGroupUseCaseImpl
-from application.use_cases.regions.create_region_use_case import CreateRegionUseCaseImpl
-from application.use_cases.regions.delete_region_use_case import DeleteRegionUseCaseImpl
-from application.use_cases.regions.read_region_use_case import ReadRegionUseCaseImpl
-from application.use_cases.regions.update_regions_use_case import (
-    UpdateRegionUseCaseImpl,
+from application.use_cases.passport_groups.passport_group_read_use_case import (
+    PassportGroupReadByNameUseCase,
 )
+from application.use_cases.passport_groups.types import (
+    PassportGroupReadUseCase,
+    PassportGroupCreateUseCase,
+    PassportGroupUpdateUseCase,
+    PassportGroupDeleteUseCase,
+)
+
+from application.use_cases.regions.region_read_use_case import (
+    RegionReadByCodeOrNameUseCase,
+)
+from application.use_cases.regions.types import (
+    RegionReadUseCase,
+    RegionCreateUseCase,
+    RegionUpdateUseCase,
+)
+
 from application.use_cases.users.change_password_use_case import (
     ChangeUserPasswordUseCaseImpl,
 )
@@ -35,11 +48,13 @@ from application.use_cases.users.refresh_jwt_use_case import RefreshJWTUseCaseIm
 from application.use_cases.users.user_login_and_issue_jwt_use_case import (
     UserLoginAndIssueJWTUseCaseImpl,
 )
-from infrastructure.auth.jwt.jwt_service import IssueJWTService, DecodeJWTService
-from infrastructure.auth.jwt.rules import IssueJWTSettings, DecodeJWTSettings
+from infrastructure.auth.jwt.jwt_service import IssueJWTService
+from infrastructure.auth.jwt.rules import IssueJWTSettings
 from infrastructure.auth.password_service import BcryptPasswordService
 from infrastructure.database.api import DatabaseAPI
-from infrastructure.database.passport_groups_repository import PassportGroupsSqlAlchemyRepository
+from infrastructure.database.passport_groups_repository import (
+    PassportGroupsSqlAlchemyRepository,
+)
 from infrastructure.database.regions_repository import RegionsSqlAlchemyRepository
 from infrastructure.database.uow import SQLAlchemyUnitOfWork
 from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
@@ -113,7 +128,7 @@ class JWTProvider(Provider):
         )
 
 
-class ServiceProvider(Provider):
+class ServicesProvider(Provider):
     # User/Auth section
     @provide(scope=Scope.REQUEST)
     def get_user_service(
@@ -137,14 +152,14 @@ class ServiceProvider(Provider):
     def get_regions_service(
         self, regions_repo: RegionsSqlAlchemyRepository
     ) -> RegionsServiceImpl:
-        return RegionsServiceImpl(regions_repository=regions_repo)
+        return RegionsServiceImpl(repository=regions_repo)
 
     # Passport-groups section
     @provide(scope=Scope.REQUEST)
     def passport_groups_service(
         self, passport_groups_repo: PassportGroupsSqlAlchemyRepository
     ) -> PassportGroupServiceImpl:
-        return PassportGroupServiceImpl(passport_group_repository=passport_groups_repo)
+        return PassportGroupServiceImpl(repository=passport_groups_repo)
 
 
 class AdminUseCasesProvider(Provider):
@@ -174,15 +189,134 @@ class AdminUseCasesProvider(Provider):
         )
 
 
-class UseCaseProvider(Provider):
-    # User/Auth section
+class PassportGroupUseCaseProvider(Provider):
+    @provide(scope=Scope.REQUEST)
+    def base_read_passport_groups_use_case(
+        self, passport_groups_service: PassportGroupServiceImpl
+    ) -> PassportGroupReadUseCase:
+        return BaseReadUseCase(
+            entity_service=passport_groups_service,
+            to_dto_mapper=PassportGroupDTO,
+        )
+
+    @provide(scope=Scope.REQUEST)
+    def read_passport_groups_by_name_use_case(
+        self, passport_groups_service: PassportGroupServiceImpl
+    ) -> PassportGroupReadByNameUseCase:
+        return PassportGroupReadByNameUseCase(pg_service=passport_groups_service)
+
+    @provide(scope=Scope.REQUEST)
+    def create_passport_group_use_case(
+        self,
+        uow: SQLAlchemyUnitOfWork,
+        user_service: UserServiceImpl,
+        passport_groups_service: PassportGroupServiceImpl,
+    ) -> PassportGroupCreateUseCase:
+        """Use case для создания PassportGroup"""
+        return BaseCreateUseCase(
+            uow=uow,
+            user_service=user_service,
+            entity_service=passport_groups_service,
+            to_dto_mapper=PassportGroupDTO,
+        )
+
+    @provide(scope=Scope.REQUEST)
+    def update_passport_group_use_case(
+        self,
+        uow: SQLAlchemyUnitOfWork,
+        user_service: UserServiceImpl,
+        passport_groups_service: PassportGroupServiceImpl,
+    ) -> PassportGroupUpdateUseCase:
+        return BaseUpdateUseCase(
+            uow=uow,
+            entity_service=passport_groups_service,
+            user_service=user_service,
+            to_dto_mapper=PassportGroupDTO,
+        )
+
+    @provide(scope=Scope.REQUEST)
+    def delete_passport_group_use_case(
+        self,
+        uow: SQLAlchemyUnitOfWork,
+        user_service: UserServiceImpl,
+        passport_groups_service: PassportGroupServiceImpl,
+    ) -> PassportGroupDeleteUseCase:
+        return BaseDeleteUseCase(
+            uow=uow,
+            entity_service=passport_groups_service,
+            user_service=user_service,
+            to_dto_mapper=PassportGroupDTO,
+        )
+
+
+class RegionsUseCaseProvider(Provider):
+    @provide(scope=Scope.REQUEST)
+    def base_read_regions_use_case(
+        self, regions_service: RegionsServiceImpl
+    ) -> RegionReadUseCase:
+        return BaseReadUseCase(
+            entity_service=regions_service,
+            to_dto_mapper=RegionDTO,
+        )
+
+    @provide(scope=Scope.REQUEST)
+    def read_passport_groups_by_code_or_name_use_case(
+        self,
+        regions_service: RegionsServiceImpl,
+    ) -> RegionReadByCodeOrNameUseCase:
+        return RegionReadByCodeOrNameUseCase(regions_service=regions_service)
+
+    @provide(scope=Scope.REQUEST)
+    def create_passport_group_use_case(
+        self,
+        uow: SQLAlchemyUnitOfWork,
+        user_service: UserServiceImpl,
+        regions_service: RegionsServiceImpl,
+    ) -> RegionCreateUseCase:
+        """Use case для создания PassportGroup"""
+        return BaseCreateUseCase(
+            uow=uow,
+            user_service=user_service,
+            entity_service=regions_service,
+            to_dto_mapper=RegionDTO,
+        )
+
+    @provide(scope=Scope.REQUEST)
+    def update_passport_group_use_case(
+        self,
+        uow: SQLAlchemyUnitOfWork,
+        user_service: UserServiceImpl,
+        regions_service: RegionsServiceImpl,
+    ) -> RegionUpdateUseCase:
+        return BaseUpdateUseCase(
+            uow=uow,
+            user_service=user_service,
+            entity_service=regions_service,
+            to_dto_mapper=RegionDTO,
+        )
+
+    @provide(scope=Scope.REQUEST)
+    def delete_passport_group_use_case(
+        self,
+        uow: SQLAlchemyUnitOfWork,
+        user_service: UserServiceImpl,
+        regions_service: RegionsServiceImpl,
+    ) -> PassportGroupDeleteUseCase:
+        return BaseDeleteUseCase(
+            uow=uow,
+            user_service=user_service,
+            entity_service=regions_service,
+            to_dto_mapper=RegionDTO,
+        )
+
+
+class UsersUseCaseProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def get_active_user_use_case(
         self, users_repo: UsersSqlAlchemyRepository
     ) -> GetActiveUserFromRepoUseCase:
         return GetActiveUserFromRepoUseCase(user_repository=users_repo)
 
-    # +
     @provide(scope=Scope.REQUEST)
     def get_login_and_jwt_use_case(
         self,
@@ -194,7 +328,6 @@ class UseCaseProvider(Provider):
             jwt_service=jwt_service,
         )
 
-    # +
     @provide(scope=Scope.REQUEST)
     def get_refresh_jwt_use_case(
         self,
@@ -206,7 +339,6 @@ class UseCaseProvider(Provider):
             user_service=user_service,
         )
 
-    # +
     @provide(scope=Scope.REQUEST)
     def get_change_password_use_case(
         self,
@@ -216,96 +348,4 @@ class UseCaseProvider(Provider):
     ) -> ChangeUserPasswordUseCaseImpl:
         return ChangeUserPasswordUseCaseImpl(
             uow=uow, user_service=user_service, password_service=password_service
-        )
-
-    # Regions section
-    @provide(scope=Scope.REQUEST)
-    def get_read_region_use_case(
-        self, regions_service: RegionsServiceImpl
-    ) -> ReadRegionUseCaseImpl:
-        return ReadRegionUseCaseImpl(regions_service=regions_service)
-
-    @provide(scope=Scope.REQUEST)
-    def get_update_region_use_case(
-        self,
-        uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
-        regions_service: RegionsServiceImpl,
-    ) -> UpdateRegionUseCaseImpl:
-        return UpdateRegionUseCaseImpl(
-            uow=uow,
-            regions_service=regions_service,
-            user_service=user_service,
-        )
-
-    @provide(scope=Scope.REQUEST)
-    def create_region_use_case(
-        self,
-        uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
-        regions_service: RegionsServiceImpl,
-    ) -> CreateRegionUseCaseImpl:
-        return CreateRegionUseCaseImpl(
-            uow=uow,
-            regions_service=regions_service,
-            user_service=user_service,
-        )
-
-    @provide(scope=Scope.REQUEST)
-    def delete_region_use_case(
-        self,
-        uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
-        regions_service: RegionsServiceImpl,
-    ) -> DeleteRegionUseCaseImpl:
-        return DeleteRegionUseCaseImpl(
-            uow=uow,
-            regions_service=regions_service,
-            user_service=user_service,
-        )
-
-    # Passport-groups section
-    @provide(scope=Scope.REQUEST)
-    def read_passport_groups_use_case(
-        self, passport_groups_service: PassportGroupServiceImpl
-    ) -> ReadPassportGroupUseCaseImpl:
-        return ReadPassportGroupUseCaseImpl(passport_groups_service=passport_groups_service)
-
-    @provide(scope=Scope.REQUEST)
-    def create_passport_group_use_case(
-        self,
-        uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
-        passport_groups_service: PassportGroupServiceImpl,
-    ) -> CreatePassportGroupUseCaseImpl:
-        return CreatePassportGroupUseCaseImpl(
-            uow=uow,
-            passport_groups_service=passport_groups_service,
-            user_service=user_service,
-        )
-
-    @provide(scope=Scope.REQUEST)
-    def update_passport_group_use_case(
-        self,
-        uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
-        passport_groups_service: PassportGroupServiceImpl,
-    ) -> UpdatePassportGroupUseCaseImpl:
-        return UpdatePassportGroupUseCaseImpl(
-            uow=uow,
-            passport_groups_service=passport_groups_service,
-            user_service=user_service,
-        )
-
-    @provide(scope=Scope.REQUEST)
-    def delete_passport_group_use_case(
-        self,
-        uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
-        passport_groups_service: PassportGroupServiceImpl,
-    ) -> DeletePassportGroupUseCaseImpl:
-        return DeletePassportGroupUseCaseImpl(
-            uow=uow,
-            passport_groups_service=passport_groups_service,
-            user_service=user_service,
         )

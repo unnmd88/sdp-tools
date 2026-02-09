@@ -9,7 +9,9 @@ from infrastructure.database.models import PassportGroup as PassportGroupModel
 
 @final
 @dataclass(frozen=True, slots=True)
-class PassportGroupsDBMapper(BaseDBMapperProtocol[PassportGroupModel, PassportGroupEntity]):
+class PassportGroupsDBMapper(
+    BaseDBMapperProtocol[PassportGroupModel, PassportGroupEntity]
+):
     @classmethod
     def to_entity(cls, model: PassportGroupModel) -> PassportGroupEntity:
         """ """
@@ -20,6 +22,7 @@ class PassportGroupsDBMapper(BaseDBMapperProtocol[PassportGroupModel, PassportGr
             created_at=model.created_at,
             updated_at=model.updated_at,
         )
+
     @classmethod
     def to_model(cls, entity: PassportGroupEntity) -> PassportGroupModel:
         """ """

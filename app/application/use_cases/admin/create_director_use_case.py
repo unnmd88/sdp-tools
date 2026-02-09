@@ -72,7 +72,7 @@ class CreateDirectorUseCase:
             email=email,
             firstname=first_name,
             lastname=last_name,
-            role=Roles.director,
+            role=Roles.DIRECTOR,
             organization=Organizations.SDP,
             is_active=True,
             phone_number=None,

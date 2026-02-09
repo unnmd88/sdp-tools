@@ -52,7 +52,7 @@ async def create_user_root(
                 password or settings.default_superuser_creds.password
             ),
             is_active=True,
-            role=Roles.superuser,
+            role=Roles.SUPERUSER,
             phone_number=None,
             telegram=None,
             description="Корневой пользователь системы",

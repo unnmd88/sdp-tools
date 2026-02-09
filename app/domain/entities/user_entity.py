@@ -141,7 +141,7 @@ class UserEntity(Entity):
 
     @property
     def is_superuser(self) -> bool:
-        return self._role == Roles.superuser
+        return self._role == Roles.SUPERUSER
 
     def invariant_names(self):
         if (self._username != self._lastname) and (self._username != self._firstname):
@@ -218,7 +218,7 @@ if __name__ == "__main__":
             organization=Organizations.SDP,
             password="118",
             is_active=True,
-            role=Roles.admin,
+            role=Roles.ADMIN,
             email=None,
             phone_number=None,
             telegram=None,

@@ -16,6 +16,7 @@ logger = logging.getLogger(INFRASTRUCTURE)
 
 class PassportGroupsSqlAlchemyRepository:
     model = PassportGroupModel
+
     def __init__(self, session: AsyncSession):
         self._base_repo_adapter = BaseSqlAlchemyRepositoryAdapter[
             PassportGroupModel, PassportGroupEntity, PassportGroupsDBMapper

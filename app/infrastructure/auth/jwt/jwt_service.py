@@ -255,7 +255,7 @@ if __name__ == "__main__":
         firstname="Junker",
         lastname="Junker",
         username="test",
-        role=Roles.superuser,
+        role=Roles.SUPERUSER,
         organization=Organizations.SDP,
         email="test@test.com",
         is_superuser=True,

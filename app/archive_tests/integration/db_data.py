@@ -19,7 +19,7 @@ def users_models():
             is_active=True,
             is_admin=True,
             is_superuser=True,
-            role=Roles.superuser,
+            role=Roles.SUPERUSER,
             phone_number="",
             telegram="",
             description=f"Тестовый юзер {i}",

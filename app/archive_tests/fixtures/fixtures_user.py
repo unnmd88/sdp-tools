@@ -21,7 +21,7 @@ def user_schemas() -> Sequence[UserSchema | UserFromDbFullSchema]:
             is_active=True,
             is_admin=True,
             is_superuser=True,
-            role=Roles.superuser,
+            role=Roles.SUPERUSER,
             organization=Organizations.SDP,
         ),
         UserFromDbFullSchema(
@@ -35,6 +35,6 @@ def user_schemas() -> Sequence[UserSchema | UserFromDbFullSchema]:
             is_active=True,
             is_admin=True,
             is_superuser=True,
-            role=Roles.admin,
+            role=Roles.ADMIN,
         ),
     ]

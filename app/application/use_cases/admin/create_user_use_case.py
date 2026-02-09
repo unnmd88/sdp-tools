@@ -27,7 +27,7 @@ class CreateUserUseCaseImpl:
     """Класс для создания нового пользователя системы."""
 
     require_roles: ClassVar[frozenset[Roles]] = frozenset(
-        [Roles.superuser, Roles.director]
+        [Roles.SUPERUSER, Roles.DIRECTOR]
     )
 
     uow: UnitOfWorkProtocol
@@ -40,7 +40,7 @@ class CreateUserUseCaseImpl:
             create_user_dto.customer_id,
         )
         async with self.uow:
-            customer = await self.user_service.get_user_by_id_or_raise(
+            customer = await self.user_service.get_user_by_id(
                 create_user_dto.customer_id
             )
             logger.info("Заказчик c username=%r найден.", customer.username)
@@ -58,7 +58,7 @@ class CreateUserUseCaseImpl:
             )
             logger.debug("Данные нового пользователя: %r", create_user_dto)
 
-            existing_user = await self.user_service.get_user_by_username(
+            existing_user = await self.user_service.try_get_user_by_username(
                 create_user_dto.username
             )
             if existing_user is not None:
@@ -75,7 +75,7 @@ class CreateUserUseCaseImpl:
             )
             if create_user_dto.email is not None:
                 if (
-                    await self.user_service.get_user_by_filters(
+                    await self.user_service.try_get_user_by_filters(
                         email=create_user_dto.email
                     )
                     is not None

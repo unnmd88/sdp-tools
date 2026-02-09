@@ -25,7 +25,7 @@ logger = logging.getLogger(USERS_LOGGER)
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ResetUserPasswordByAdminUseCaseImpl:
     require_roles: ClassVar[frozenset[Roles]] = frozenset(
-        [Roles.admin, Roles.superuser, Roles.director]
+        [Roles.ADMIN, Roles.SUPERUSER, Roles.DIRECTOR]
     )
 
     user_service: UserServiceProtocol
@@ -39,7 +39,7 @@ class ResetUserPasswordByAdminUseCaseImpl:
             reset_password_dto.customer_id,
         )
 
-        customer = await self.user_service.get_active_user_by_id_or_raise(
+        customer = await self.user_service.get_active_user_by_id(
             reset_password_dto.customer_id
         )
         logger.info("Пользователь-заказчик c username=%r найден.", customer.username)
@@ -53,7 +53,7 @@ class ResetUserPasswordByAdminUseCaseImpl:
             )
             raise PermissionDeniedError
 
-        subject = await self.user_service.get_user_by_username(
+        subject = await self.user_service.try_get_user_by_username(
             reset_password_dto.subject_username
         )
         if subject is None:
@@ -68,7 +68,7 @@ class ResetUserPasswordByAdminUseCaseImpl:
         await self.user_service.change_password(
             user_id=subject.id, hashed_password=new_hashed_password
         )
-        updated_subject = await self.user_service.get_user_by_id_or_raise(subject.id)
+        updated_subject = await self.user_service.get_user_by_id(subject.id)
         if not self.password_service.verify_password(
             password=new_password,
             hashed_password=updated_subject.password,

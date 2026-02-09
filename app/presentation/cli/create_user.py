@@ -30,7 +30,7 @@ def create_user(
     is_superuser: Annotated[
         bool, typer.Option(help='Bool flag "is_superuser" for user')
     ] = False,
-    role: Annotated[Roles, typer.Option(help="role for user")] = Roles.worker,
+    role: Annotated[Roles, typer.Option(help="role for user")] = Roles.SDP_WORKER,
     organization: Annotated[
         Organizations, typer.Option(help="organization for user")
     ] = Organizations.SDP,

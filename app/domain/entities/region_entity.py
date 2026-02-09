@@ -34,15 +34,11 @@ class RegionEntity(Entity):
         *,
         code: int,
         name: str,
-        created_at: datetime | None = None,
-        updated_at: datetime | None = None,
     ):
         return cls(
             id=None,
             code=code,
             name=name,
-            created_at=created_at,
-            updated_at=updated_at,
         )
 
     def __init__(

@@ -52,8 +52,6 @@ class PassportGroupEntity(Entity):
         self.name = name
 
 
-if __name__ == '__main__':
-    pg = PassportGroupEntity.create_new_passport_group(
-        name="test", description="test"
-    )
+if __name__ == "__main__":
+    pg = PassportGroupEntity.create_new_passport_group(name="test", description="test")
     print(pg)

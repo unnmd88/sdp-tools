@@ -12,7 +12,8 @@ from application.interfaces.mappers.db import BaseDBMapperProtocol
 from infrastructure.exceptions import (
     RepositoryError,
     RepositoryIntegrityError,
-    RepositoryConnectionError, RepositoryCorruptedError,
+    RepositoryConnectionError,
+    RepositoryCorruptedError,
 )
 
 EntityType = TypeVar("EntityType")
@@ -143,9 +144,7 @@ class BaseSqlAlchemyRepositoryAdapter[ModelType, EntityType, CreateDTOType]:
             )
             logger.critical(exc.to_dict())
             raise exc
-        updated_model = self.mapper.update_model(
-            model=model, entity=entity
-        )
+        updated_model = self.mapper.update_model(model=model, entity=entity)
         await self._session.flush()
         await self._session.refresh(updated_model)
         return self.mapper.to_entity(updated_model)

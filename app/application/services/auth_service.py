@@ -26,7 +26,7 @@ class AuthenticationService:
         """Аутентификация пользователя"""
         logger.info("Аутентификация пользователя %r", auth_dto.username)
         if (
-            user := await self.user_service.get_user_by_username(
+            user := await self.user_service.try_get_user_by_username(
                 username=auth_dto.username
             )
         ) is None:

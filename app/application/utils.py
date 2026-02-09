@@ -1,5 +1,5 @@
 import functools
-from collections.abc import Coroutine, Callable
+from collections.abc import Callable
 from logging import Logger
 from typing import Any
 

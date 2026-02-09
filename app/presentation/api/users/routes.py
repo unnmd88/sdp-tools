@@ -42,7 +42,7 @@ async def whoami(
     # TODO: Перевести на use_case, возвращать DTO
     return ResponseUserSchema.model_validate(
         obj=UserDTO.from_entity(
-            await user_service.get_user_by_id_or_raise(decoded_token_dto.user_id)
+            await user_service.get_user_by_id(decoded_token_dto.user_id)
         ),
         from_attributes=True,
     )

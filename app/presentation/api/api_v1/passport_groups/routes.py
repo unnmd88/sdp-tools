@@ -2,15 +2,22 @@ from collections.abc import Sequence
 
 from fastapi import APIRouter
 
-from fastapi.exceptions import HTTPException
 from starlette import status
 
-from application.use_cases.passport_groups.create_passport_group_use_case import CreatePassportGroupUseCaseImpl
-from application.use_cases.passport_groups.delete_passport_group_use_case import DeletePassportGroupUseCaseImpl
-from application.use_cases.passport_groups.read_passport_group_use_case import ReadPassportGroupUseCaseImpl
-from application.use_cases.passport_groups.update_passport_group_use_case import UpdatePassportGroupUseCaseImpl
-from domain.cqrs.passport_groups_commands import CreatePassportGroupCommand, UpdatePassportGroupCommand, \
-    DeletePassportGroupCommand
+from application.use_cases.passport_groups.passport_group_read_use_case import (
+    PassportGroupReadByNameUseCase,
+)
+from application.use_cases.passport_groups.types import (
+    PassportGroupReadUseCase,
+    PassportGroupCreateUseCase,
+    PassportGroupUpdateUseCase,
+    PassportGroupDeleteUseCase,
+)
+from domain.cqrs.passport_groups_commands import (
+    CreatePassportGroupCommand,
+    UpdatePassportGroupCommand,
+    DeletePassportGroupCommand,
+)
 from presentation.api.fastapi_dependencies import AccessTokenDep
 from presentation.schemas.passport_groups import (
     PassportGroupResponse,
@@ -35,11 +42,10 @@ router = APIRouter(
 @inject
 async def get_group_by_name(
     group_name: str,
-    read_passport_group_use_case: FromDishka[ReadPassportGroupUseCaseImpl],
+    read_passport_group_use_case: FromDishka[PassportGroupReadByNameUseCase],
 ) -> PassportGroupResponse:
     return PassportGroupResponse.model_validate(
-        await read_passport_group_use_case.by_name(group_name),
-        from_attributes=True
+        await read_passport_group_use_case(group_name), from_attributes=True
     )
 
 
@@ -67,7 +73,7 @@ async def get_group_by_name(
 )
 @inject
 async def get_all_groups(
-    read_passport_group_use_case: FromDishka[ReadPassportGroupUseCaseImpl],
+    read_passport_group_use_case: FromDishka[PassportGroupReadUseCase],
 ) -> Sequence[PassportGroupResponse]:
     return [
         PassportGroupResponse.model_validate(r, from_attributes=True)
@@ -83,12 +89,11 @@ async def get_all_groups(
 @inject
 async def create_passport_group(
     token_dto: AccessTokenDep,
-    create_passport_group_use_case: FromDishka[CreatePassportGroupUseCaseImpl],
+    create_passport_group_use_case: FromDishka[PassportGroupCreateUseCase],
     new_passport_group_schema: PassportGroupsCreate,
 ) -> PassportGroupResponse:
     command = CreatePassportGroupCommand(
-        customer_id=token_dto.user_id,
-        **new_passport_group_schema.model_dump()
+        customer_id=token_dto.user_id, **new_passport_group_schema.model_dump()
     )
     return PassportGroupResponse.model_validate(
         await create_passport_group_use_case(command),
@@ -106,7 +111,7 @@ async def update_group(
     name: str,
     token_dto: AccessTokenDep,
     update_data: PassportGroupsUpdate,
-    use_case: FromDishka[UpdatePassportGroupUseCaseImpl],
+    use_case: FromDishka[PassportGroupUpdateUseCase],
 ) -> PassportGroupResponse:
     command = UpdatePassportGroupCommand(
         customer_id=token_dto.user_id,
@@ -118,6 +123,7 @@ async def update_group(
         from_attributes=True,
     )
 
+
 @router.delete(
     "/{name}",
     status_code=status.HTTP_200_OK,
@@ -127,7 +133,7 @@ async def update_group(
 async def update_group(
     name: str,
     token_dto: AccessTokenDep,
-    use_case: FromDishka[DeletePassportGroupUseCaseImpl],
+    use_case: FromDishka[PassportGroupDeleteUseCase],
 ) -> PassportGroupResponse:
     command = DeletePassportGroupCommand(
         customer_id=token_dto.user_id,

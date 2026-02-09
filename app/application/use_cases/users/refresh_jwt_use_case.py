@@ -21,7 +21,7 @@ class RefreshJWTUseCaseImpl:
     jwt_service: IssueJWTServiceProtocol
 
     async def __call__(self, user_id: int) -> TokenDataDTO:
-        user = await self.user_service.get_user_by_id(user_id)
+        user = await self.user_service.try_get_user_by_id(user_id)
         if user is None:
             exc = DomainEntityNotFoundError(
                 message=f"Пользователь c id={user_id} не найден. В токене указан неверный id пользователя.",

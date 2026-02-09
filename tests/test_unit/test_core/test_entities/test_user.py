@@ -25,7 +25,7 @@ class TestUserEntity:
             is_active=True,
             is_admin=True,
             is_superuser=True,
-            role=Roles.superuser,
+            role=Roles.SUPERUSER,
             phone_number="",
             telegram="",
             description="",
@@ -41,7 +41,7 @@ class TestUserEntity:
         assert user.is_active is True
         assert user.is_admin is True
         assert user.is_superuser is True
-        assert user.role == Roles.superuser
+        assert user.role == Roles.SUPERUSER
         assert user.phone_number == ""
         assert user.telegram == ""
         assert user.description == ""

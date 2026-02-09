@@ -25,10 +25,10 @@ class Organizations(StrEnum):
 
 
 class Roles(StrEnum):
-    director = "director"
-    superuser = "superuser"
-    admin = "admin"
-    worker = "worker"
+    DIRECTOR = "director"
+    SUPERUSER = "superuser"
+    ADMIN = "admin"
+    SDP_WORKER = "sdp_worker"
 
 
 class RegionCodes(IntEnum):

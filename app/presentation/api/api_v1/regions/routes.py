@@ -2,12 +2,17 @@ from fastapi import APIRouter
 
 from starlette import status
 
-from application.use_cases.regions.create_region_use_case import CreateRegionUseCaseImpl
-from application.use_cases.regions.delete_region_use_case import DeleteRegionUseCaseImpl
-from application.use_cases.regions.read_region_use_case import ReadRegionUseCaseImpl
-from application.use_cases.regions.update_regions_use_case import (
-    UpdateRegionUseCaseImpl,
+
+from application.use_cases.regions.region_read_use_case import (
+    RegionReadByCodeOrNameUseCase,
 )
+from application.use_cases.regions.types import (
+    RegionReadUseCase,
+    RegionCreateUseCase,
+    RegionUpdateUseCase,
+    RegionDeleteUseCase,
+)
+
 from domain.cqrs.region_commands import (
     UpdateRegionCommand,
     CreateRegionCommand,
@@ -40,10 +45,11 @@ router = APIRouter(
 )
 @inject
 async def get_region_by_code_or_name(
-    code_or_name: str | int, read_region_use_case: FromDishka[ReadRegionUseCaseImpl]
+    code_or_name: str | int,
+    read_region_use_case: FromDishka[RegionReadByCodeOrNameUseCase],
 ) -> RegionResponse:
     return RegionResponse.model_validate(
-        await read_region_use_case.by_code_or_name(code_or_name),
+        await read_region_use_case(code_or_name),
         from_attributes=True,
     )
 
@@ -74,7 +80,7 @@ async def get_region_by_code_or_name(
 )
 @inject
 async def get_regions(
-    read_region_use_case: FromDishka[ReadRegionUseCaseImpl],
+    read_region_use_case: FromDishka[RegionReadUseCase],
 ):
     return [
         RegionResponse.model_validate(r, from_attributes=True)
@@ -93,7 +99,7 @@ async def get_regions(
 async def create_region(
     token_dto: AccessTokenDep,
     new_region_schema: RegionCreate,
-    use_case: FromDishka[CreateRegionUseCaseImpl],
+    use_case: FromDishka[RegionCreateUseCase],
 ) -> RegionResponse:
     command = CreateRegionCommand(
         customer_id=token_dto.user_id, **new_region_schema.model_dump()
@@ -116,10 +122,10 @@ async def update_region(
     token_dto: AccessTokenDep,
     code_or_name: str | int,
     update_data: RegionUpdate,
-    use_case: FromDishka[UpdateRegionUseCaseImpl],
+    use_case: FromDishka[RegionUpdateUseCase],
 ) -> RegionResponse:
     command = UpdateRegionCommand(
-        user_id=token_dto.user_id,
+        customer_id=token_dto.user_id,
         code_or_name=code_or_name,
         **update_data.model_dump(exclude_unset=True),
     )
@@ -140,7 +146,7 @@ async def update_region(
 async def delete_region(
     token_dto: AccessTokenDep,
     code_or_name: str | int,
-    use_case: FromDishka[DeleteRegionUseCaseImpl],
+    use_case: FromDishka[RegionDeleteUseCase],
 ):
     command = DeleteRegionCommand(
         customer_id=token_dto.user_id,
