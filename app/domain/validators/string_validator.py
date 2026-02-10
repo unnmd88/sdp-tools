@@ -13,6 +13,7 @@ from domain.value_objects.contract_violation_context_vo import (
 class StringValidator:
     min_length: int
     max_length: int
+    subject: str | None = None
 
     def __post_init__(self):
         if not isinstance(self.min_length, int):
@@ -46,6 +47,7 @@ class StringValidator:
             violation = Violations.invalid_length
             exc = DomainBusinessRuleError
         context = ContractViolationContextVO(
+            subject=self.subject,
             handler=f"{self.__class__.__name__!r}:{self.__call__.__name__!r}",
             contract_code=contract_code,
             violation=violation,

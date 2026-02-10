@@ -3,6 +3,7 @@ from enum import StrEnum
 
 class Violations(StrEnum):
     corrupted_data_in_repository = "corrupted_data_in_repository"
+    pattern_mismatch = "pattern_mismatch"
     invalid_length = "invalid_length"
     invalid_password_to_set = "invalid_password_to_set"
     invalid_type = "invalid_type"

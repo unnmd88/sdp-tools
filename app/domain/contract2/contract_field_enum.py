@@ -11,7 +11,7 @@ from domain.value_objects.contract_violation_context_vo import (
 )
 
 
-class ContractFieldEnum:
+class ContractFieldEnum[T]:
     def __init__(
         self,
         *,
@@ -29,7 +29,7 @@ class ContractFieldEnum:
     def __set_name__(self, owner, name):
         self.name = f"_{name}"
 
-    def __get__(self, obj, owner=None):
+    def __get__(self, obj, owner=None) -> T:
         if obj is None:
             return self
         return getattr(obj, self.name)
@@ -101,3 +101,4 @@ class ContractFieldEnum:
 
     def clear_cache(self):
         self._cache.clear()
+

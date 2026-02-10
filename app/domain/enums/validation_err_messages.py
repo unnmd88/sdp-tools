@@ -16,6 +16,7 @@ class ErrorMessages(StrEnum):
     cant_be_numeric = "Поле {!r} не может содержать только цифры: {}."
     cant_start_with_numeric = "Поле {!r} не может начинаться с цифры: {}."
     expected_type_string = "Для {!r} ожидается тип строка. Передано: {!r}."
+    invalid_type = "Недопустимый тип для {!r}: {}. Ожидается: {}"
     expected_type_positive_int = (
         "Для {} ожидается положительное целое число. Значение: {}."
     )
@@ -27,6 +28,7 @@ class ErrorMessages(StrEnum):
 
     invalid_enum_value = "Недопустимое значение для Enum-класса {}: {}."
     invalid_format = "Неверный формат {}: {}."
+    invalid_field_format = "Неверный формат данных поля {}."
 
     must_be_from_to_chars = "{} Должно содержать от {} до {} символов."
     cannot_be_equal = "Значение {} не может быть совпадать с {}."
@@ -65,6 +67,9 @@ class ErrorMessages(StrEnum):
     must_be_string = "Значение должно быть строковым типом."
     must_be_member_of_enum = "Значение {} должно быть одним из: {}."
 
+    regex_pattern_mismatch = "Значение поля {} не соответствует шаблону: {}."
+
+    string_for_field_cant_be_empty = "Строка у поля {} не может быть пустой."
     integer_too_small = "Число должно быть больше {}. Текущее значение: {}."
     integer_too_large = "Число должно быть меньше {}. Текущее значение: {}."
     string_too_short = (

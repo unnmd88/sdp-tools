@@ -120,11 +120,11 @@ class UserEntity(Entity):
         self.username = username
         self.firstname = firstname
         self.lastname = lastname
-        self.organization: Organizations = organization
+        self.organization = organization
         self.email = email
         self._password = PasswordVO(password=password, subject=self.__class__.__name__)
         self.is_active = is_active
-        self.role: Roles = role
+        self.role = role
         self.phone_number = phone_number
         self.telegram = telegram
         self.description = description

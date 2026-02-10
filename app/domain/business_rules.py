@@ -12,6 +12,9 @@ MIN_LEN_LASTNAME = 2
 MAX_LEN_LASTNAME = 16
 MAX_LEN_DESCRIPTION = 255
 
+MIN_LEN_TLO_NAME = 1
+MAX_LEN_TLO_NAME = 32
+
 EMAIL_PATTERN = re.compile(r"^\S+@\S+\.\S+$")
 FIRST_NAME_PATTERN = re.compile(r"^[a-zA-Zа-яА-Яё]+$")
 LAST_NAME_PATTERN = re.compile(r"^[a-zA-Zа-яА-Яё]+$")

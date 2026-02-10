@@ -16,6 +16,7 @@ class PasswordVO:
     subject: str
 
     def __post_init__(self):
+
         if self.password and isinstance(self.password, bytes):
             return
         private_message = ErrorMessages.expected_hashed_password.format(

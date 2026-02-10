@@ -20,6 +20,8 @@ class PublicAttrNamesEnum(StrEnum):
     description = "description"
     code = "code"
     name = "name"
+    region = "region"
+    type_controller = "type_controller"
 
 
 class PrivateAttrNamesEnum(StrEnum):

@@ -1,44 +1,47 @@
-from typing import Callable, Sequence, Any
+from typing import Callable, Sequence, Any, Protocol, runtime_checkable
 
 from domain.contract2.require import Require
 from domain.enums.violations import Violations
 from domain.exceptions import DomainContractViolationError, DomainValidationError
-from domain.primitives import FieldTypeValidator
 from domain.value_objects.contract_violation_context_vo import (
     ContractViolationContextVO,
 )
 
+@runtime_checkable
+class CacheProtocol(Protocol):
+    def __getitem__(self, key: Any) -> Any: ...
+    def __setitem__(self, key: Any, value: Any) -> None: ...
+    def __contains__(self, key: Any) -> bool: ...
+    def get(self, key: Any, default: Any = None) -> Any: ...
 
-class ContractField:
+
+class ContractFieldAsVO[T_ValueObject]:
     def __init__(
         self,
-        *,
+        *normalizers: Callable[[str], str],
+        value_object: type[T_ValueObject],
         field_name: str,
         nullable: bool = False,
         preprocess_value: Callable[[Any], Any] = None,
-        requires: Sequence[Require | Callable[[Any], bool]] = None,
-        postprocess_value: Callable[[Any], Any] = None,
         use_cache=False,
+        custom_cache: CacheProtocol = None,
     ):
+        for i, normalizer in enumerate(normalizers):
+            if not callable(normalizer):
+                raise TypeError(f"Все нормализаторы должны быть "
+                                f"вызываемыми объектами. Невалидный: {normalizer!r}, pos: {i}")
+        self._normalizers = tuple(normalizers)
+        self._value_object = value_object
         self._field_name = field_name
         self._nullable = nullable
-        self._preprocess = (
-            preprocess_value if preprocess_value is not None else lambda x: x
-        )  # Identity по умолчанию
-        self._requires = []
-        for r in requires or ():
-            if isinstance(r, Require):
-                self._requires.append(r)
-            elif callable(r):
-                self._requires.append(Require(handler=r))
-            else:
-                raise TypeError("requires должен быть Require или callable")
-        self._requires = tuple(self._requires)
-        self._postprocess = (
-            postprocess_value if postprocess_value is not None else lambda x: x
-        )  # Identity по умолчанию
+        self._preprocess = preprocess_value or (lambda x: x) # Identity по умолчанию
         self._use_cache = use_cache
-        self._cache = set()
+        if custom_cache is not None:
+            if not isinstance(custom_cache, CacheProtocol):
+                raise TypeError(f"cache_factory должен соответствовать протоколу {CacheProtocol.__name__}")
+            self._cache = custom_cache
+        else:
+            self._cache = dict()
 
     def __set_name__(self, owner, name):
         self.name = f"_{name}"
@@ -49,8 +52,27 @@ class ContractField:
         return getattr(obj, self.name)
 
     def __set__(self, instance, value):
+        if value is None:
+            if self._nullable:
+                return setattr(instance, self.name, value)
+            else:
+                current_error_context = ContractViolationContextVO(
+                    contract_code="nullable",
+                    violation=Violations.nullable_false,
+                    message=f"Значение {self._field_name!r} не может быть None",
+                    handler="check_nullable",
+                )
+                raise DomainValidationError(
+                    private_message=current_error_context.message,
+                    public_message=f"Значение не должно быть пустым.",
+                    context=current_error_context,
+                )
+        if self._use_cache and (vo_from_cache := self._cache.get(value)) is not None:
+            return setattr(instance, self.name, vo_from_cache)
+
+
         if (value is None and self._nullable) or (
-            self._use_cache and value in self._cache
+                self._use_cache and value in self._cache
         ):
             return setattr(instance, self.name, value)
         try:
