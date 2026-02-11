@@ -1,5 +1,5 @@
 from domain.repositories.base_repo_interface import BaseCrudProtocol
-from domain.tlo.entities.tlo import TrafficLightObjectEntity
+from domain.traffic_light_objects.traffic_light_object_entity import TrafficLightObjectEntity
 
 
 class TrafficLightObjectRepositoryProtocol(BaseCrudProtocol):

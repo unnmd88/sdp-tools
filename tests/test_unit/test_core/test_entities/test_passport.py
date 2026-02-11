@@ -1,4 +1,4 @@
-from domain.enums import PassportGroups
+from domain.kernel.enums import PassportGroups
 from domain.passports.entities.passport import PassportEntity
 import pytest
 

@@ -1,12 +1,9 @@
 from dataclasses import dataclass
-from typing import final, ClassVar
+from typing import final
 
-from application.dto.users import UpdateUserDTO
 from application.interfaces.mappers.db import BaseDBMapperProtocol
 
-
-from domain.enums.unsorted import Roles, Organizations
-from domain.entities.user_entity import UserEntity
+from domain.users.user_entity import UserEntity
 from infrastructure.database.models import User as UserModel
 
 

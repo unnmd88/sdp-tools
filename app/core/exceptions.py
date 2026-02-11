@@ -1,18 +1,9 @@
-import json
-from dataclasses import dataclass, is_dataclass, asdict
-from datetime import datetime
-from typing import Any, Protocol, runtime_checkable, ClassVar
-from typing import dataclass_transform
+from collections.abc import Sequence
+from dataclasses import is_dataclass
 
-# from .error_codes import ErrorData
+from typing import Any, Self
+
 from core.error_codes import ErrorCodes
-
-
-class ErrorContextAsAnyDataclassProtocol(Protocol):
-    """Protocol для аннотации любого dataclass экземпляра"""
-
-    __dataclass_fields__: ClassVar[dict]
-    __dataclass_params__: ClassVar[Any]
 
 
 class BaseAppError(Exception):
@@ -31,33 +22,50 @@ class BaseAppError(Exception):
         private_message: str | None = None,
         public_message: str | None = None,
         code: str | None = None,
-        context: ErrorContextAsAnyDataclassProtocol | dict[str, Any] | None = None,
+        request_id: str | None = None,
+        context: dict[str, Any] = None,
         **kwargs,
     ):
         self._private_message = private_message or self.DEFAULT_PRIVATE_MESSAGE
         self._public_message = public_message or self.DEFAULT_PUBLIC_MESSAGE
         self._code = code or self.DEFAULT_CODE
-        self._context = context
+        self._context = context if context is not None else {}
         self._extra = kwargs or {}
+        self._request_id = request_id
         super().__init__(self._private_message)
 
     def to_dict(self) -> dict[str, Any]:
         """Сериализация исключения в словарь."""
-        if is_dataclass(self._context):
-            ctx = asdict(self._context)
-        else:
-            ctx = self._context or {}
+
         return {
             "code": self._code,
+            "request_id": self._request_id,
             "private_message": self._private_message,
             "public_message": self._public_message,
-            "context": ctx,
+            "context": self._context,
             "exception_type": self.__class__.__name__,
             "extra": self.extra,
         }
 
+    def _keys_to_str(self, to_update: dict) -> Sequence[tuple[str, Any]]:
+        return [(str(k), v) for k, v in to_update.items()]
+
+    def _with_context_by_dict(self, to_update: dict) -> Self:
+        """Универсальный метод для добавления контекста."""
+        self._context.update(self._keys_to_str(to_update))
+        return self
+
+    def with_context(self, **kwargs) -> Self:
+        """Универсальный метод для добавления контекста."""
+        self._context.update(self._keys_to_str(kwargs))
+        return self
+
+    def with_request_id(self, request_id: str) -> Self:
+        """Добавляет ID запроса."""
+        return self.with_context(request_id=request_id)
+
     def update_context(
-        self, other: ErrorContextAsAnyDataclassProtocol | dict[str, Any]
+        self, other: dict[str, Any]
     ):
         if is_dataclass(other):
             self._context = other
@@ -77,7 +85,7 @@ class BaseAppError(Exception):
         return self._public_message
 
     @property
-    def context(self) -> ErrorContextAsAnyDataclassProtocol | dict[str, Any]:
+    def context(self) -> dict[str, Any]:
         return self._context
 
     def __str__(self) -> str:
@@ -90,4 +98,3 @@ class BaseAppError(Exception):
 if __name__ == "__main__":
     print(ErrorCodes.INTERNAL_ERROR.code)
     print(ErrorCodes.INTERNAL_ERROR.private_message)
-    print(ErrorCodes.INTERNAL_ERROR.http_status_code)

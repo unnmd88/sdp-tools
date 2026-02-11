@@ -1,11 +1,11 @@
 from typing import Protocol
 
-from domain.cqrs.passport_groups_commands import (
+from domain.pssport_groups.passport_groups_commands import (
     UpdatePassportGroupCommand,
     CreatePassportGroupCommand,
     DeletePassportGroupCommand,
 )
-from domain.entities.passport_group_entity import PassportGroupEntity
+from domain.pssport_groups.passport_group_entity import PassportGroupEntity
 
 
 class PassportGroupReadServiceProtocol(Protocol):

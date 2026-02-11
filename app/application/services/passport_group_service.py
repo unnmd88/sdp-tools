@@ -5,14 +5,14 @@ from typing import final
 from app_logging.dev.config import DOMAIN
 from application.helpers.entity_fetcher import EntityFetcher
 from application.utils import async_handle_corrupted_data_in_repo
-from domain.cqrs.passport_groups_commands import (
+from domain.kernel.enums.keep_value_enum import Keep
+from domain.pssport_groups.passport_groups_commands import (
     CreatePassportGroupCommand,
     UpdatePassportGroupCommand,
     DeletePassportGroupCommand,
 )
 
-from domain.entities.passport_group_entity import PassportGroupEntity
-from domain.enums.keep_value_enum import Keep
+from domain.pssport_groups.passport_group_entity import PassportGroupEntity
 from domain.exceptions import DomainEntityAlreadyExistsError
 from domain.repositories.passport_groups_repo_interface import (
     PassportGroupRepositoryProtocol,

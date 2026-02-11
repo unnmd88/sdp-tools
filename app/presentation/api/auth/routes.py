@@ -1,15 +1,11 @@
-from typing import Annotated
-
 from fastapi import APIRouter
 from starlette import status
 
 from application.dto.auth import UserAuthDTO
-from application.dto.jwt_dto import RefreshJWTPayloadDTO
 from application.use_cases.users.refresh_jwt_use_case import RefreshJWTUseCaseImpl
 from application.use_cases.users.user_login_and_issue_jwt_use_case import (
     UserLoginAndIssueJWTUseCaseImpl,
 )
-from domain.enums.unsorted import TokenTypesEnum
 from presentation.api.api_v1.documentation.auth_and_jwt.endpoints import (
     POST_LOGIN_user,
     POST_REFRESH,

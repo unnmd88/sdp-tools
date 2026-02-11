@@ -1,11 +1,11 @@
-from typing import Protocol, Any
+from typing import Protocol
 
-from domain.cqrs.region_commands import (
+from domain.regions.region_commands import (
     UpdateRegionCommand,
     CreateRegionCommand,
     DeleteRegionCommand,
 )
-from domain.entities.region_entity import RegionEntity
+from domain.regions.region_entity import RegionEntity
 
 
 class RegionsReadServiceProtocol(Protocol):

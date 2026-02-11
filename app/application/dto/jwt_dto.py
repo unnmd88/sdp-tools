@@ -1,8 +1,7 @@
 from dataclasses import dataclass, asdict
-from datetime import timedelta, datetime
+from datetime import datetime
 
-from domain.enums.unsorted import Roles, Organizations
-from domain.entities.user_entity import UserEntity
+from domain.kernel.enums.unsorted import Roles, Organizations
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)

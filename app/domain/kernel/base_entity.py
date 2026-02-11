@@ -6,8 +6,8 @@ from typing import Any
 
 from domain.contract2.contract_field import ContractField
 from domain.contract2.require import Require
-from domain.entities_public_attrs import BASE_PUBLIC_ATTRS
-from domain.enums.attrs_names import PublicAttrNamesEnum
+from domain.kernel.entities_public_attrs import BASE_PUBLIC_ATTRS
+from domain.kernel.enums.attrs_names import PublicAttrNamesEnum
 from domain.exceptions import DomainInvariantError
 from domain.validators.datetime_validators import DatetimeValidators
 from domain.value_objects.pk_id_vo import PkIdVO

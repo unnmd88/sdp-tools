@@ -8,7 +8,7 @@ from application.use_cases.admin.create_superuser_use_case import create_user_ro
 from fastapi.exceptions import HTTPException
 from rich import print
 
-from domain.enums import Roles, Organizations
+from domain.kernel.enums import Roles, Organizations
 
 
 app = typer.Typer(no_args_is_help=True)

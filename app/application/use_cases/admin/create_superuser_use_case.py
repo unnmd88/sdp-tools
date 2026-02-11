@@ -6,12 +6,11 @@ from sqlalchemy.exc import IntegrityError
 
 from app_logging.dev.config import USERS_LOGGER
 from core.config import settings
+from domain.exceptions import DomainValidationError
+from domain.kernel.enums.unsorted import Organizations, Roles
 
-from domain.enums import Organizations, Roles
-from domain.entities.user_entity import UserEntity
-from domain._exceptions.base import DomainValidationError
+from domain.users.user_entity import UserEntity
 from infrastructure.auth.password_service import hash_password
-from infrastructure.database.api import db_api
 from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
 
 

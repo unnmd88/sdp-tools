@@ -13,7 +13,7 @@ from application.use_cases.regions.types import (
     RegionDeleteUseCase,
 )
 
-from domain.cqrs.region_commands import (
+from domain.regions.region_commands import (
     UpdateRegionCommand,
     CreateRegionCommand,
     DeleteRegionCommand,

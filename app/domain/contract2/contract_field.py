@@ -1,9 +1,8 @@
 from typing import Callable, Sequence, Any
 
 from domain.contract2.require import Require
-from domain.enums.violations import Violations
+from domain.kernel.enums.violations import Violations
 from domain.exceptions import DomainContractViolationError, DomainValidationError
-from domain.primitives import FieldTypeValidator
 from domain.value_objects.contract_violation_context_vo import (
     ContractViolationContextVO,
 )

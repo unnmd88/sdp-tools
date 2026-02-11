@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from domain.enums.attrs_names import PublicAttrNamesEnum
+from domain.kernel.enums.attrs_names import PublicAttrNamesEnum
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)

@@ -1,6 +1,6 @@
-from domain.primitives.field_type_validator import FieldTypeValidator
-from domain.primitives.string_normalizer import StringNormalizer
-from domain.primitives.string_validator import StringValidator
+from domain.kernel.primitives.field_type_validator import FieldTypeValidator
+from domain.kernel.primitives.string_normalizer import StringNormalizer
+from domain.kernel.primitives.string_validator import StringValidator
 
 if __name__ == '__main__':
 

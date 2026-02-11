@@ -2,9 +2,9 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from core.error_codes import ErrorCodes
-from domain.enums.attrs_names import PublicAttrNamesEnum
-from domain.enums.validation_err_messages import ErrorMessages
-from domain.enums.violations import Violations
+from domain.kernel.enums.validation_err_messages import ErrorMessages
+
+from domain.kernel.enums.violations import Violations
 from domain.exceptions import DomainValidationError
 
 

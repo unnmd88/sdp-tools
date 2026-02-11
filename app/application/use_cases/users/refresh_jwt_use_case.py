@@ -8,9 +8,8 @@ from application.interfaces.services.issue_jwt_service_interface import (
     IssueJWTServiceProtocol,
 )
 
-from domain.enums.validation_err_messages import ErrorMessages
 from domain.exceptions import DomainEntityNotFoundError
-
+from domain.kernel.enums.validation_err_messages import ErrorMessages
 
 logger = logging.getLogger(AUTH_LOGGER)
 

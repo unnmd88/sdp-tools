@@ -1,8 +1,8 @@
 from collections.abc import Container
 from typing import Protocol
 
-from domain.entities import UserEntity
-from domain.enums.unsorted import Roles
+from domain.kernel.enums.unsorted import Roles
+from domain.users.user_entity import UserEntity
 
 
 class UserReadServiceProtocol(Protocol):

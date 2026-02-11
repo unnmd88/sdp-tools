@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 
 from annotated_types import MaxLen, MinLen
-from domain.enums.unsorted import (
+from domain.kernel.enums.unsorted import (
     PassportGroups,
     RegionCodes,
     RegionNames,

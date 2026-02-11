@@ -1,44 +1,43 @@
 import re
-from typing import Self
+from typing import Self, NoReturn
 
 from core.error_codes import ErrorCodes
-from domain.enums.validation_err_messages import ErrorMessages
-from domain.enums.violations import Violations
-from domain.exceptions import DomainValidationError, DomainBusinessRuleError, DomainContractViolationError
+from domain.kernel.enums.validation_err_messages import ErrorMessages
+from domain.kernel.enums.violations import Violations
+from domain.exceptions import DomainValidationError
 from domain.value_objects.contract_violation_context_vo import ContractViolationContextVO
 
 
 class StringValidator:
 
-    __slots__ = ("_value", "_field_name")
+    __slots__ = ("_value", )
 
-    def __init__(
-        self,
-        *,
-        value: str,
-        field_name: str,
-    ):
+    def __init__(self,value: str):
         self._value = value
-        self._field_name = field_name
 
     @classmethod
-    def validate_of(cls, value: str, field_name: str) -> Self:
-        return cls(value=value, field_name=field_name)
+    def validate_of(cls, value: str) -> Self:
+        return cls(value)
 
-    def ensure_not_empty(self, exception: type[DomainValidationError] = DomainValidationError,) -> Self:
+    def _raise_exception(
+        self,
+        *,
+        private_message: str,
+        public_message: str,
+        handler: str,
+        exception: type[DomainValidationError] = DomainValidationError
+    ) -> NoReturn:
+        context = ContractViolationContextVO(
+            handler=f"{self.__class__.__name__!r}:{handler!r}",
+            value=self._value,
+        )
+        raise exception(private_message=private_message, public_message=public_message, context=context)
+
+    def ensure_not_empty(self, exception: type[DomainValidationError] = DomainValidationError) -> Self:
         """Проверить, что не пустая строка."""
         if not self._value:
-            message = ErrorMessages.string_for_field_cant_be_empty.format(self._value)
-            contract_code = ErrorCodes.DOMAIN_VALIDATION.code
-            violation = Violations.cannot_be_empty
-            context = ContractViolationContextVO(
-                handler=f"{self.__class__.__name__!r}:{self.ensure_not_empty.__name__!r}",
-                contract_code=contract_code,
-                violation=violation,
-                value=self._value,
-                expected_type=str,
-                message=message,
-            )
+            message = ErrorMessages.cant_be_empty.format(self._value)
+
             raise exception(private_message=message, public_message=message, context=context)
         return self
 

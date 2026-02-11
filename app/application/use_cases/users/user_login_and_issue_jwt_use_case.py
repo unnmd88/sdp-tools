@@ -10,8 +10,7 @@ from application.interfaces import AuthServiceProtocol
 from application.interfaces.services.issue_jwt_service_interface import (
     IssueJWTServiceProtocol,
 )
-from domain.entities import UserEntity
-
+from domain.users.user_entity import UserEntity
 
 logger = logging.getLogger(AUTH_LOGGER)
 

@@ -5,7 +5,7 @@ from typing import Protocol, Self
 
 from application.interfaces import UserServiceProtocol
 from application.interfaces.uow_interface import UnitOfWorkProtocol
-from domain.enums.unsorted import Roles
+from domain.kernel.enums.unsorted import Roles
 
 
 class CommandProtocol(Protocol):

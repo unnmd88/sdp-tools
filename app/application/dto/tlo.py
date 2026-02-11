@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from domain.enums.unsorted import ServiceOrganizations
+from domain.kernel.enums.unsorted import ServiceOrganizations
 
 
 @dataclass

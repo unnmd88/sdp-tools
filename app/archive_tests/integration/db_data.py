@@ -1,7 +1,7 @@
 import random
 from collections.abc import Sequence
 
-from domain.enums import PassportGroups, ServiceOrganizations
+from domain.kernel.enums import PassportGroups, ServiceOrganizations
 from domain.models import Passport, PassportGroup, Region, TrafficLightObject, User
 from domain.users import Organizations
 from domain.users import Roles
