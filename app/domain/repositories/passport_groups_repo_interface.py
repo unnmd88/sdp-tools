@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from domain.entities.passport_group_entity import PassportGroupEntity
+from domain.pssport_groups.passport_group_entity import PassportGroupEntity
 
 
 class PassportGroupRepositoryProtocol(Protocol):

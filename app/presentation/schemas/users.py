@@ -1,15 +1,14 @@
 from typing import Annotated
 from annotated_types import MaxLen, MinLen
-from pydantic_core.core_schema import FieldValidationInfo
 from pydantic import (
     BaseModel,
     BeforeValidator,
     ConfigDict,
     EmailStr,
     Field,
-    field_validator,
 )
-from domain.enums.unsorted import Organizations, Roles
+
+from domain.kernel.enums.unsorted import Roles, Organizations
 
 
 class BaseUserSchema(BaseModel):

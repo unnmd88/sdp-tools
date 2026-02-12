@@ -7,14 +7,15 @@ from app_logging.dev.config import USERS_LOGGER
 from application.dto.users import UserDTO
 from application.exceptions import AuthenticationError
 from application.interfaces import PasswordServiceProtocol
-from domain.entities import UserEntity
-from domain.enums.attrs_names import PublicAttrNamesEnum
-from domain.enums.unsorted import Roles, Organizations
-from domain.enums.validation_err_messages import ErrorMessages
+
 from domain.exceptions import DomainEntityAlreadyExistsError, DomainError
+from domain.kernel.enums.attrs_names import PublicAttrNamesEnum
+from domain.kernel.enums.unsorted import Roles, Organizations
+from domain.kernel.enums.validation_err_messages import ErrorMessages
 from domain.repositories.users_repo_interface import UsersRepositoryProtocol
+from domain.users.user_entity import UserEntity
 from infrastructure.auth.password_service import BcryptPasswordService
-from infrastructure.database.api import db_api
+
 from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
 
 logger = logging.getLogger(USERS_LOGGER)

@@ -56,28 +56,6 @@ def validate_string_by_pattern(
     return re.match(pattern, string_to_validate) is not None
 
 
-def not_none_dataclass_instance_attrs_to_dict(
-    dataclass_instance,
-    *exclude_fields,
-    default_exclude_fields: frozenset | set | None = frozenset(
-        ("id", "_id", "filters_for_search")
-    ),
-) -> dict:
-    exclude = default_exclude_fields or frozenset()
-    if exclude_fields:
-        exclude = exclude | frozenset(exclude_fields)
-    return {
-        k: v
-        for k, v in asdict(dataclass_instance).items()
-        if v is not None and k not in exclude
-    }
-
-
-@checking_types(isinstance_of=str | set)
-def foo(value):
-    print(value)
-
-
 if __name__ == "__main__":
     foo("1")
     foo([2])

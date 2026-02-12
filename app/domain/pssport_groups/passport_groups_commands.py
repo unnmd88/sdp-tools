@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import ClassVar
 
-from domain.enums.keep_value_enum import Keep
+from domain.kernel.enums.keep_value_enum import Keep
 
 
 @dataclass(slots=True, kw_only=True, frozen=True)

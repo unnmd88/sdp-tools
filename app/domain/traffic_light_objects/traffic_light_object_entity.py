@@ -1,22 +1,19 @@
 from datetime import datetime
 
-from domain.business_rules import MIN_LEN_TLO_NAME, MAX_LEN_TLO_NAME
+from domain.kernel.business_rules import MIN_LEN_TLO_NAME, MAX_LEN_TLO_NAME
 from domain.contract2.contract_field import ContractField
 from domain.contract2.contract_field_enum import ContractFieldEnum
 from domain.contract2.require import Require
-from domain.entities.base_entity import Entity
-from domain.entities.region_entity import RegionEntity
-from domain.entities_public_attrs import TRAFFIC_LIGHT_OBJECTS_PUBLIC_ATTRS
-from domain.enums.attrs_names import PublicAttrNamesEnum
-from domain.enums.controller_modes import ControllerModes
-from domain.enums.controller_types import ControllerTypes
-from domain.enums.snmp_protocols import SnmpProtocols
-from domain.enums.unsorted import ServiceOrganizations
+from domain.kernel.base_entity import Entity
+from domain.regions.region_entity import RegionEntity
+from domain.kernel.entities_public_attrs import TRAFFIC_LIGHT_OBJECTS_PUBLIC_ATTRS
+from domain.kernel.enums import PublicAttrNamesEnum
+from domain.kernel.enums import ControllerModes
+from domain.kernel.enums.controller_types import ControllerTypes
+from domain.kernel.enums import SnmpProtocols
+from domain.kernel.enums import ServiceOrganizations
 from domain.exceptions import DomainContractViolationError
-from domain.validators.positive_int_validator import IntegerValidator
 from domain.validators.string_validator import StringValidator
-from domain.value_objects.address_vo import AddressVO
-from domain.value_objects.region_vo import RegionVo
 from domain.value_objects.type_controller_vo import TypeControllerVO
 
 """

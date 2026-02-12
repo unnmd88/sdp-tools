@@ -4,19 +4,17 @@ from typing import ClassVar
 
 from app_logging.dev.config import USERS_LOGGER
 from application.dto.users import (
-    ChangeUserPasswordDTO,
     ChangeUserPasswordByAdminDTO,
     ChangedUserPasswordByAdminDTO,
 )
 from application.exceptions import (
-    AuthenticationError,
     ApplicationLayerError,
     PermissionDeniedError,
 )
 from application.interfaces import UserServiceProtocol, PasswordServiceProtocol
-from domain.entities import UserEntity
-from domain.enums.unsorted import Roles
 from domain.exceptions import DomainEntityNotFoundError
+from domain.kernel.enums.unsorted import Roles
+from domain.users.user_entity import UserEntity
 from domain.value_objects.set_password_vo import SetPasswordVO
 
 logger = logging.getLogger(USERS_LOGGER)

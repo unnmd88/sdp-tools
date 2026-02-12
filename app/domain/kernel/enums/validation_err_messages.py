@@ -1,6 +1,6 @@
 from enum import StrEnum
 
-from domain.business_rules import (
+from domain.kernel.business_rules import (
     MIN_ID,
     MAX_ID,
     MIN_LEN_PASSWORD,
@@ -20,6 +20,7 @@ class ErrorMessages(StrEnum):
     expected_type_positive_int = (
         "Для {} ожидается положительное целое число. Значение: {}."
     )
+    none_not_allowed_for_field_this_entity = "None не допустимо поля {!r} сущности {!r}."
     expected_string_or_bytes = "Для {!r} ожидается строка или байты."
     expected_hashed_password = "Для {!r} ожидается хэшированный пароль."
 
@@ -72,11 +73,17 @@ class ErrorMessages(StrEnum):
     string_for_field_cant_be_empty = "Строка у поля {} не может быть пустой."
     integer_too_small = "Число должно быть больше {}. Текущее значение: {}."
     integer_too_large = "Число должно быть меньше {}. Текущее значение: {}."
+
+    must_be_gt = "Значение должно быть больше {}. Текущее значение: {}."
+    must_be_lt = "Значение должно быть меньше {}. Текущее значение: {}."
+    must_be_positive = "Значение должно быть положительным. Текущее значение: {}."
+
     string_too_short = (
         "Длина строки не может быть меньше {} символов. Текущая длина: {} символов."
     )
     string_too_long = (
         "Длина строки не может превышать {} символов. Текущая длина: {} символов."
     )
+    cant_be_empty = "Не может быть пустым."
 
     service_unavailable = "Сервис недоступен. Попробуйте позже."

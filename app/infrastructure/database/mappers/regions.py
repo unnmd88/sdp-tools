@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import final
 
 from application.interfaces.mappers.db import BaseDBMapperProtocol
-from domain.entities.region_entity import RegionEntity
+from domain.regions.region_entity import RegionEntity
 from infrastructure.database.models import Region as RegionModel
 
 

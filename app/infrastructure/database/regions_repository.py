@@ -1,15 +1,13 @@
 import logging
-from collections.abc import Mapping
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from app_logging.dev.config import INFRASTRUCTURE
-from domain.entities.region_entity import RegionEntity
+from domain.regions.region_entity import RegionEntity
 from infrastructure.database.base_repository import BaseSqlAlchemyRepositoryAdapter
 from infrastructure.database.mappers.regions import RegionDBMapper
 from infrastructure.database.models import Region as RegionModel
 from infrastructure.database.utils import handle_db_errors
-from infrastructure.exceptions import RepositoryCorruptedError
 
 logger = logging.getLogger(INFRASTRUCTURE)
 

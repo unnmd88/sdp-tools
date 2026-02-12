@@ -1,17 +1,14 @@
 import logging
-from collections.abc import Container, Coroutine, Callable, Awaitable
+from collections.abc import Container, Callable, Awaitable
 from dataclasses import dataclass
-from functools import wraps, lru_cache
-from typing import Literal
-import inspect
 
 from app_logging.dev.config import DOMAIN
 from application.exceptions import InactiveAccountError, PermissionDeniedError
 from application.utils import async_handle_corrupted_data_in_repo
-from domain.entities import UserEntity
-from domain.enums.unsorted import Roles
 from domain.exceptions import DomainEntityNotFoundError
+from domain.kernel.enums.unsorted import Roles
 from domain.repositories.users_repo_interface import UsersRepositoryProtocol
+from domain.users.user_entity import UserEntity
 
 logger = logging.getLogger(DOMAIN)
 

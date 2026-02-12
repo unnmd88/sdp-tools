@@ -1,11 +1,11 @@
 import random
 
-from domain.enums import (
+from domain.kernel.enums import (
     EntityIdRange,
     Organizations,
     Roles,
 )
-from domain.entities.user_entity import UserEntity
+from domain.users.user_entity import UserEntity
 
 
 def create_user_entity(

@@ -3,14 +3,10 @@ from dataclasses import dataclass
 
 from app_logging.dev.config import AUTH_LOGGER
 from application.dto.auth import UserAuthDTO
-from application.dto.users import UserDTO
 from application.exceptions import AuthenticationError, InactiveAccountError
 from application.interfaces import PasswordServiceProtocol, UserServiceProtocol
-from domain.entities import UserEntity
-from domain.enums.validation_err_messages import ErrorMessages
-from domain.exceptions import DomainEntityNotFoundError
-from domain.repositories.users_repo_interface import UsersRepositoryProtocol
-from infrastructure.exceptions import RepositoryError
+from domain.kernel.enums.validation_err_messages import ErrorMessages
+from domain.users.user_entity import UserEntity
 
 logger = logging.getLogger(AUTH_LOGGER)
 

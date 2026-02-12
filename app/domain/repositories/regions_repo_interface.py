@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from domain.entities.region_entity import RegionEntity
+from domain.regions.region_entity import RegionEntity
 
 
 class RegionsRepositoryProtocol(Protocol):

@@ -1,7 +1,7 @@
 from typing import Protocol
 
 from application.dto.auth import UserAuthDTO
-from domain.entities import UserEntity
+from domain.users.user_entity import UserEntity
 
 
 class AuthServiceProtocol(Protocol):

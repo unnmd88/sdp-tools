@@ -2,10 +2,10 @@ import random
 
 import pytest
 
-from domain.enums import EntityIdRange
-from domain.enums import Organizations
-from domain.enums import Roles
-from domain.entities.user_entity import UserEntity
+from domain.kernel.enums import EntityIdRange
+from domain.kernel.enums import Organizations
+from domain.kernel.enums import Roles
+from domain.users.user_entity import UserEntity
 from domain._exceptions.base import DomainValidationError
 from tests.utils.create_user_entity import create_user_entity
 

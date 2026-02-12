@@ -1,10 +1,9 @@
 import logging
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql.expression import update
 
 from app_logging.dev.config import INFRASTRUCTURE
-from domain.entities.user_entity import UserEntity
+from domain.users.user_entity import UserEntity
 from infrastructure.database.mappers.users_mapper import UserDBMapper
 from infrastructure.database.models import User as UserModel
 from infrastructure.database.base_repository import BaseSqlAlchemyRepositoryAdapter

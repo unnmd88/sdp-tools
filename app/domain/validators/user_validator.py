@@ -1,9 +1,10 @@
 from core.error_codes import ErrorCodes
-from domain.enums.validation_err_messages import ErrorMessages
-from domain.enums.attrs_names import PublicAttrNamesEnum
-from domain.enums.violations import Violations
+from domain.kernel.enums.attrs_names import PublicAttrNamesEnum
+from domain.kernel.enums.validation_err_messages import ErrorMessages
 
-from domain.business_rules import (
+from domain.kernel.enums.violations import Violations
+
+from domain.kernel.business_rules import (
     MIN_LEN_FIRSTNAME,
     MAX_LEN_FIRSTNAME,
     MIN_LEN_USERNAME,

@@ -3,7 +3,7 @@ import logging
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from app_logging.dev.config import INFRASTRUCTURE
-from domain.entities.passport_group_entity import PassportGroupEntity
+from domain.pssport_groups.passport_group_entity import PassportGroupEntity
 from infrastructure.database.base_repository import BaseSqlAlchemyRepositoryAdapter
 from infrastructure.database.mappers.passport_groups import PassportGroupsDBMapper
 

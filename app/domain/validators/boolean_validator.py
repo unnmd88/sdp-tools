@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from typing import Any
 
 from core.error_codes import ErrorCodes
-from domain.enums.validation_err_messages import ErrorMessages
-from domain.enums.violations import Violations
+from domain.kernel.enums.validation_err_messages import ErrorMessages
+from domain.kernel.enums.violations import Violations
 from domain.exceptions import DomainValidationError
 from domain.value_objects.contract_violation_context_vo import (
     ContractViolationContextVO,

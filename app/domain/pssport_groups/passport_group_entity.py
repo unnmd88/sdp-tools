@@ -2,9 +2,9 @@ from datetime import datetime
 
 from domain.contract2.contract_field import ContractField
 from domain.contract2.require import Require
-from domain.entities.base_entity import Entity
-from domain.entities_public_attrs import PASSPORT_GROUPS_PUBLIC_ATTRS
-from domain.enums.attrs_names import PublicAttrNamesEnum
+from domain.kernel.base_entity import Entity
+from domain.kernel.entities_public_attrs import PASSPORT_GROUPS_PUBLIC_ATTRS
+from domain.kernel.enums.attrs_names import PublicAttrNamesEnum
 from domain.validators.string_validator import StringValidator
 
 

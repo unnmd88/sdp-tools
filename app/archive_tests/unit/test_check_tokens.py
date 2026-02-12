@@ -1,7 +1,7 @@
 from contextlib import nullcontext
 
 import pytest
-from domain.enums.tokens import TokenTypes
+from domain.kernel.enums import TokenTypes
 from auth import check_token_type
 from fastapi import HTTPException
 

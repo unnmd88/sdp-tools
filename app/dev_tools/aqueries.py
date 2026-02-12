@@ -1,6 +1,6 @@
 import asyncio
 
-from domain.enums import ServiceOrganizations
+from domain.kernel.enums import ServiceOrganizations
 from domain.database import db_api as db_api_main
 from domain.database import DatabaseAPI
 from domain.models import Passport, PassportGroup, Region, TrafficLightObject, User

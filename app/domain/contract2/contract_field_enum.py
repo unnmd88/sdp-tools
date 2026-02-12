@@ -1,10 +1,8 @@
 from enum import Enum, StrEnum, IntEnum
-from typing import Callable, Sequence, Any
 
 from core.error_codes import ErrorCodes
-from domain.contract2.require import Require
-from domain.enums.validation_err_messages import ErrorMessages
-from domain.enums.violations import Violations
+from domain.kernel.enums.validation_err_messages import ErrorMessages
+from domain.kernel.enums.violations import Violations
 from domain.exceptions import DomainContractViolationError, DomainValidationError
 from domain.value_objects.contract_violation_context_vo import (
     ContractViolationContextVO,

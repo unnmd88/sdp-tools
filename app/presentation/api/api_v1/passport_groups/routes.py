@@ -13,7 +13,7 @@ from application.use_cases.passport_groups.types import (
     PassportGroupUpdateUseCase,
     PassportGroupDeleteUseCase,
 )
-from domain.cqrs.passport_groups_commands import (
+from domain.pssport_groups.passport_groups_commands import (
     CreatePassportGroupCommand,
     UpdatePassportGroupCommand,
     DeletePassportGroupCommand,

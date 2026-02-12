@@ -6,8 +6,8 @@ from application.dto.users import ChangeUserPasswordDTO
 from application.exceptions import AuthenticationError, ApplicationLayerError
 from application.interfaces import UserServiceProtocol, PasswordServiceProtocol
 from application.interfaces.uow_interface import UnitOfWorkProtocol
-from domain.entities import UserEntity
-from domain.enums.validation_err_messages import ErrorMessages
+from domain.kernel.enums.validation_err_messages import ErrorMessages
+from domain.users.user_entity import UserEntity
 from domain.value_objects.set_password_vo import SetPasswordVO
 
 logger = logging.getLogger(USERS_LOGGER)

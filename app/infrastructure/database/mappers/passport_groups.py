@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import final
 
 from application.interfaces.mappers.db import BaseDBMapperProtocol
-from domain.entities.passport_group_entity import PassportGroupEntity
+from domain.pssport_groups.passport_group_entity import PassportGroupEntity
 
 from infrastructure.database.models import PassportGroup as PassportGroupModel
 

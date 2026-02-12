@@ -1,14 +1,3 @@
-from collections.abc import Sequence
-from dataclasses import dataclass
-from typing import final
-
-from application.interfaces.mappers.db import BaseDBMapperProtocol
-from domain.enums.unsorted import ServiceOrganizations, RegionNames, ControllerTypes
-
-from infrastructure.database.models import (
-    TrafficLightObject as TrafficLightObjectModel,
-)
-
 #
 # @final
 # @dataclass(frozen=True, slots=True)

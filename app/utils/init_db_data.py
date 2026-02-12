@@ -1,6 +1,6 @@
 import asyncio
 
-from domain.enums import (
+from domain.kernel.enums import (
     PassportGroups,
     PassportGroupsRoutes,
     RegionCodes,

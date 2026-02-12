@@ -1,11 +1,12 @@
 import re
 
 from core.error_codes import ErrorCodes
-from domain.enums.attrs_names import PublicAttrNamesEnum
-from domain.enums.validation_err_messages import ErrorMessages
-from domain.enums.violations import Violations
+from domain.kernel.enums.attrs_names import PublicAttrNamesEnum
+from domain.kernel.enums.validation_err_messages import ErrorMessages
 
-from domain.business_rules import (
+from domain.kernel.enums.violations import Violations
+
+from domain.kernel.business_rules import (
     EMAIL_PATTERN,
     PHONE_NUMBER_PATTERN,
     TELEGRAM_PATTERN,

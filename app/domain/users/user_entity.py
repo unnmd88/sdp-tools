@@ -4,16 +4,16 @@ from datetime import datetime
 
 from core.error_codes import ErrorCodes
 from domain.contract2.contract_field_enum import ContractFieldEnum
-from domain.entities.base_entity import Entity
+from domain.kernel.base_entity import Entity
 from domain.contract2.contract_field import ContractField
 from domain.contract2.require import Require
-from domain.entities_public_attrs import USER_PUBLIC_ATTRS
-from domain.enums.attrs_names import PublicAttrNamesEnum
+from domain.kernel.entities_public_attrs import USER_PUBLIC_ATTRS
+from domain.kernel.enums.attrs_names import PublicAttrNamesEnum
 
-from domain.enums.unsorted import Organizations, Roles
+from domain.kernel.enums.unsorted import Organizations, Roles
 
-from domain.enums.validation_err_messages import ErrorMessages
-from domain.enums.violations import Violations
+from domain.kernel.enums.validation_err_messages import ErrorMessages
+from domain.kernel.enums.violations import Violations
 from domain.exceptions import DomainError, DomainInvariantError
 from domain.value_objects.password_vo import PasswordVO
 

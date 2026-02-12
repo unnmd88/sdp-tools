@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from domain.entities.user_entity import UserEntity
-from domain.enums.unsorted import Roles, Organizations
+from domain.kernel.enums.unsorted import Organizations, Roles
+from domain.users.user_entity import UserEntity
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)

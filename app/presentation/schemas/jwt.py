@@ -1,7 +1,6 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
 
-from domain.enums.unsorted import Roles, Organizations
-
+from domain.kernel.enums.unsorted import Roles, Organizations
 
 ACCESS_TOKEN_TYPE = "access"
 REFRESH_TOKEN_TYPE = "refresh"
