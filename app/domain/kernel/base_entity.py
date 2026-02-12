@@ -50,7 +50,7 @@ class Entity(ABC):
         updated_at: datetime | None,
     ):
         self._built_at = datetime.now()
-        self._id = PkIdVO(subject=self.__class__, value=id)
+        self._id = PkIdVO(value=id)
         self._created_at = created_at
         self._updated_at = updated_at
         self.check_invariant_datetime()

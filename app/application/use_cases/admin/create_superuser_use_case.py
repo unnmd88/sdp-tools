@@ -3,14 +3,17 @@ import logging
 from dataclasses import field, dataclass
 
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from app_logging.dev.config import USERS_LOGGER
 from core.config import settings
 from domain.exceptions import DomainValidationError
 from domain.kernel.enums.unsorted import Organizations, Roles
+from domain.repositories.users_repo_interface import UsersRepositoryProtocol
 
 from domain.users.user_entity import UserEntity
 from infrastructure.auth.password_service import hash_password
+from infrastructure.database.api import DatabaseAPI
 from infrastructure.database.user_reposirory import UsersSqlAlchemyRepository
 
 
@@ -28,27 +31,30 @@ class CreateUserRootResultDTO:
 
 async def create_user_root(
     *,
-    source: str,
+    user_repo: UsersRepositoryProtocol,
+    session: AsyncSession,
+    username: str = None,
     password: str = None,
 ):
-    username_root = settings.default_superuser_creds.name
+    username_root = username or settings.director_username
     result = CreateUserRootResultDTO(
         username=username_root,
     )
     logger.info(
-        "%r: Запрос на создание корневого пользователя системы %r",
-        source.upper(),
+        "%r: Запрос на создание корневого пользователя системы из скрипта с username: %r",
         username_root,
     )
+    passwd = password or settings.director_password
+    print(f"Пароль: {passwd}")
     try:
-        user_root: UserEntity = UserEntity(
-            firstname=None,
-            lastname=None,
+        user_root = UserEntity.create_new_user(
+            firstname="Директор",
+            lastname="Директор",
             username=username_root,
             organization=Organizations.SDP,
             email=None,
             password=hash_password(
-                password or settings.default_superuser_creds.password
+                password or settings.director_password
             ),
             is_active=True,
             role=Roles.SUPERUSER,
@@ -62,34 +68,68 @@ async def create_user_root(
         logger.warning("Ошибка: %s", str(e))
         return result
 
-    async with db_api.session_factory() as session:
-        user_repo = UsersSqlAlchemyRepository(session=session)
-        try:
-            root_already_exists: UserEntity = (
-                await user_repo.get_user_by_id_or_username_or_none(username_root)
+    users_already_exists = await user_repo.get_by_username(username_root)
+    if users_already_exists:
+        msg = f"Пользователь {users_already_exists.username}(id={users_already_exists.id}) существует"
+        logger.warning("Ошибка: %s", msg)
+        result.errors.append(msg)
+        result.id = users_already_exists.id
+    else:
+        created_user_root = await user_repo.add(user_root)
+        await session.commit()
+        created_user = await user_repo.get_by_username(username_root)
+        if created_user:
+            result.id = created_user_root.id
+            result.success = True
+            logger.info(
+                "Пользователь %r создан успешно: %r",
+                created_user_root.username,
+                created_user_root,
             )
-            if root_already_exists:
-                msg = f"Пользователь {root_already_exists.username}(id={root_already_exists.id}) существует"
-                logger.warning("Ошибка: %s", msg)
-                result.errors.append(msg)
-                result.id = root_already_exists.id
-            else:
-                created_user_root = await user_repo.add_user(user_root)
-                await session.commit()
-                result.id = created_user_root.id
-                result.success = True
-        except IntegrityError:
-            await session.rollback()
-            msg = "Ошибка: пользователь  существует"
-            logger.warning(msg)
-            result.errors.append(msg)
-    logger.info(
-        "Пользователь %r создан успешно: %r",
-        created_user_root.username,
-        created_user_root,
-    )
+        else:
+            result.success = False
+            result.errors.append("Не удалось создать пользователя")
+    return result
+
+    # try:
+    #     users_already_exists = await user_repo.get_by_username(username_root)
+    #     if users_already_exists:
+    #         msg = f"Пользователь {users_already_exists.username}(id={users_already_exists.id}) существует"
+    #         logger.warning("Ошибка: %s", msg)
+    #         result.errors.append(msg)
+    #         result.id = users_already_exists.id
+    #     else:
+    #         created_user_root = await user_repo.add(user_root)
+    #         await session.commit()
+    #         result.id = created_user_root.id
+    #         result.success = True
+    # except IntegrityError:
+    #     await session.rollback()
+    #     msg = "Ошибка: пользователь  существует"
+    #     logger.warning(msg)
+    #     result.errors.append(msg)
+    # logger.info(
+    #     "Пользователь %r создан успешно: %r",
+    #     created_user_root.username,
+    #     created_user_root,
+    # )
     return result
 
 
+async def main():
+    db_api = DatabaseAPI(
+        url=str(settings.db.url),
+        echo=settings.db.echo,
+        echo_pool=settings.db.echo_pool,
+        pool_size=settings.db.pool_size,
+        max_overflow=settings.db.max_overflow,
+    )
+    async with db_api.session_factory() as session:
+        repo = UsersSqlAlchemyRepository(session)
+        new_user = await create_user_root(user_repo=repo, session=session)
+    print(new_user)
+    return new_user
+
+
 if __name__ == "__main__":
-    asyncio.run(create_user_root(source="python-script"))
+    asyncio.run(main())

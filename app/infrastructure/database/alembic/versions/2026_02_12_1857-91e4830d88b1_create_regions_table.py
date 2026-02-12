@@ -1,26 +1,26 @@
-"""create Region table
+"""create regions table
 
-Revision ID: edbaad25bbfe
-Revises: 02220211904e
-Create Date: 2025-11-11 07:29:43.582323
+Revision ID: 91e4830d88b1
+Revises: 372a1039165d
+Create Date: 2026-02-12 18:57:31.204004
 
 """
 
-from collections.abc import Sequence
+from typing import Sequence, Union
 
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
+
 
 # revision identifiers, used by Alembic.
-revision: str = "edbaad25bbfe"
-down_revision: str | Sequence[str] | None = "02220211904e"
-branch_labels: str | Sequence[str] | None = None
-depends_on: str | Sequence[str] | None = None
+revision: str = "91e4830d88b1"
+down_revision: Union[str, Sequence[str], None] = "372a1039165d"
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
     """Upgrade schema."""
-
     op.create_table(
         "regions",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
@@ -40,5 +40,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
-
     op.drop_table("regions")

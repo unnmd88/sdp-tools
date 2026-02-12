@@ -1,21 +1,22 @@
-"""create PassportGroup table
+"""create passport groups table
 
-Revision ID: 2b8baff9d9d4
-Revises: 3ee3d6ea3f42
-Create Date: 2025-11-17 12:57:01.414882
+Revision ID: 34ba5aec79cf
+Revises: 91e4830d88b1
+Create Date: 2026-02-12 19:01:58.117281
 
 """
 
-from collections.abc import Sequence
+from typing import Sequence, Union
 
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
+
 
 # revision identifiers, used by Alembic.
-revision: str = "2b8baff9d9d4"
-down_revision: str | Sequence[str] | None = "3ee3d6ea3f42"
-branch_labels: str | Sequence[str] | None = None
-depends_on: str | Sequence[str] | None = None
+revision: str = "34ba5aec79cf"
+down_revision: Union[str, Sequence[str], None] = "91e4830d88b1"
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
@@ -23,8 +24,7 @@ def upgrade() -> None:
     op.create_table(
         "passport_groups",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("group_name", sa.String(), nullable=False),
-        sa.Column("group_name_route", sa.String(length=32), nullable=False),
+        sa.Column("name", sa.String(length=32), nullable=False),
         sa.Column("description", sa.Text(), server_default="", nullable=False),
         sa.Column(
             "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
@@ -33,10 +33,7 @@ def upgrade() -> None:
             "updated_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_passport_groups")),
-        sa.UniqueConstraint("group_name", name=op.f("uq_passport_groups_group_name")),
-        sa.UniqueConstraint(
-            "group_name_route", name=op.f("uq_passport_groups_group_name_route")
-        ),
+        sa.UniqueConstraint("name", name=op.f("uq_passport_groups_name")),
     )
 
 

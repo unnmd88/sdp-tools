@@ -1,16 +1,10 @@
-import functools
-import sys
-from collections.abc import AsyncGenerator, Callable
-from contextlib import asynccontextmanager
-from typing import Any
+from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
     create_async_engine,
 )
-
-from infrastructure.database.uow import SQLAlchemyUnitOfWork
 
 
 class DatabaseAPI:
@@ -44,21 +38,3 @@ class DatabaseAPI:
         async with self.session_factory() as session:
             yield session
 
-
-def async_session_factory(commit: bool = True, rollback: bool = True):
-    def wrapper(func: Callable) -> Callable:
-        @functools.wraps(func)
-        async def wrapped(*args, **kwargs) -> Any:
-            async with db_api.session_factory() as session:
-                try:
-                    return await func(*args, session=session, **kwargs)
-                except Exception:  # todo logging
-                    if rollback:
-                        await session.rollback()
-                finally:
-                    if commit:
-                        await session.commit()
-
-        return wrapped
-
-    return wrapper
