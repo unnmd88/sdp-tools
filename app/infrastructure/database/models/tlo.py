@@ -1,5 +1,4 @@
 from ipaddress import IPv4Address, IPv4Interface
-from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, String, Text, text
 from sqlalchemy.dialects.postgresql import INET, CIDR
@@ -13,9 +12,6 @@ from infrastructure.database.models.mixins.timestamp import (
     UpdatedAtMixin,
 )
 
-if TYPE_CHECKING:
-    from infrastructure.database.models import Region
-
 
 class TrafficLightObject(
     IntegerIdPkMixin,
@@ -23,42 +19,44 @@ class TrafficLightObject(
     UpdatedAtMixin,
     Base,
 ):
+    region_id: Mapped[int] = mapped_column(
+        ForeignKey("regions.id"),
+    )
+    created_by_user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"),
+    )
+    updated_by_user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"),
+    )
     name: Mapped[str] = mapped_column(
         String(32),
         unique=True,
     )
-    region_id: Mapped[int] = mapped_column(
-        ForeignKey("regions.id"),
+    traffic_controller_type: Mapped[str] = mapped_column(
+        String(32),
+        nullable=True,
     )
     latitude: Mapped[float] = mapped_column(default=0, server_default=text("0"))
     longitude: Mapped[float] = mapped_column(default=0, server_default=text("0"))
-    ipv4: Mapped[IPv4Interface | None] = mapped_column(
-        INET, server_default=text("Null"), default=None
-    )
-    gateway: Mapped[IPv4Interface | None] = mapped_column(
-        INET, server_default=text("Null"), default=None
-    )
-    mac_address: Mapped[IPv4Address | None] = mapped_column(
-        String(17), server_default=text("Null"), default=None
-    )
-    traffic_controller: Mapped[str | None]
+    # ipv4: Mapped[IPv4Interface | None] = mapped_column(
+    #     INET, server_default=text("Null"), default=None
+    # )
+    # gateway: Mapped[IPv4Interface | None] = mapped_column(
+    #     INET, server_default=text("Null"), default=None
+    # )
+    # mac_address: Mapped[IPv4Address | None] = mapped_column(
+    #     String(17), server_default=text("Null"), default=None
+    # )
     district: Mapped[str] = mapped_column(
         default="",
         server_default="",
     )
-    street: Mapped[str] = mapped_column(
-        Text,
+    address: Mapped[str] = mapped_column(
         nullable=False,
-    )
-
-    service_organization: Mapped[str] = mapped_column(
-        String(32),
         default="",
         server_default="",
     )
-    description: Mapped[str] = mapped_column(
-        Text,
+    note: Mapped[str] = mapped_column(
         default="",
         server_default="",
     )
-    # region: Mapped['Region'] = relationship()

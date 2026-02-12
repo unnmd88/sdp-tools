@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import ClassVar
 
 from app_logging.dev.config import USERS_LOGGER
-from application.dto.users import (
+from application.dto.users_dto import (
     ChangeUserPasswordByAdminDTO,
     ChangedUserPasswordByAdminDTO,
 )

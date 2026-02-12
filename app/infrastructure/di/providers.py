@@ -9,8 +9,8 @@ from application.base_crud_use_cases import (
     BaseUpdateUseCase,
     BaseDeleteUseCase,
 )
-from application.dto.passport_groups import PassportGroupDTO
-from application.dto.regions import RegionDTO
+from application.dto.passport_groups_dto import PassportGroupDTO
+from application.dto.regions_dto import RegionDTO
 from application.services.auth_service import AuthenticationService
 from application.services.passport_group_service import PassportGroupServiceImpl
 from application.services.regions_service import RegionsServiceImpl

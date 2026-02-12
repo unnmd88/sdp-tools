@@ -5,13 +5,12 @@ from domain.contract2.contract_field import ContractField
 from domain.contract2.contract_field_enum import ContractFieldEnum
 from domain.contract2.require import Require
 from domain.kernel.base_entity import Entity
+from domain.kernel.enums.controller_modes import ControllerModes
+from domain.kernel.enums.snmp_protocols import SnmpProtocols
+from domain.kernel.enums.unsorted import ServiceOrganizations
 from domain.regions.region_entity import RegionEntity
 from domain.kernel.entities_public_attrs import TRAFFIC_LIGHT_OBJECTS_PUBLIC_ATTRS
-from domain.kernel.enums import PublicAttrNamesEnum
-from domain.kernel.enums import ControllerModes
 from domain.kernel.enums.controller_types import ControllerTypes
-from domain.kernel.enums import SnmpProtocols
-from domain.kernel.enums import ServiceOrganizations
 from domain.exceptions import DomainContractViolationError
 from domain.validators.string_validator import StringValidator
 from domain.value_objects.type_controller_vo import TypeControllerVO
@@ -25,7 +24,6 @@ from domain.value_objects.type_controller_vo import TypeControllerVO
     - district: str VO округ
     - address: str VO адрес
     - service_organization: str VO обслуживающая организация
-    - main_mode: str VO основной режим работы
     - coordinates: VO tuple[float latitude, float longitude] координаты
     - status: str текущий статус
     - network: VO str сетевые настройки+оборудование
@@ -41,50 +39,35 @@ from domain.value_objects.type_controller_vo import TypeControllerVO
 
 
 class TrafficLightObjectEntity(Entity):
-    __public_attrs__ = TRAFFIC_LIGHT_OBJECTS_PUBLIC_ATTRS
+    """ Сущность светофорного объекта. """
 
-    name = ContractField(
-        field_name=str(PublicAttrNamesEnum.name),
-        nullable=False,
-        use_cache=True,
-        requires=[Require(handler=StringValidator(min_length=MIN_LEN_TLO_NAME, max_length=MAX_LEN_TLO_NAME))],
-    )
-    type_controller = ContractFieldEnum(
-        field_name=str(PublicAttrNamesEnum.type_controller),
-        nullable=True,
-        enum=TypeControllerVO
-    )
+    __public_attrs__ = TRAFFIC_LIGHT_OBJECTS_PUBLIC_ATTRS
 
     def __init__(
         self,
         *,
         id: int | None,
+        region_id: int,
+        created_by_user_id: int,
+        updated_by_user_id: int | None,
         name: str,
-        type_controller: str | ControllerTypes,
-        general_mode: str | ControllerModes,
-        snmp_protocol: str | SnmpProtocols,
-        region: RegionEntity,
+        traffic_controller_type: str | None, # api дира
+        latitude: float,
+        longitude: float,
         district: str,
         address: str,
-        service_organization: str | ServiceOrganizations,
+        note: str,
         created_at: datetime | None,
         updated_at: datetime | None,
-
     ):
-        super().__init__(id=id, created_at=None, updated_at=None)
-        if not isinstance(region, RegionEntity):
-            raise DomainContractViolationError(
-                private_message=f"region должен быть экземпляром RegionEntity, а не {RegionEntity.__name__!r}",
-                public_message=f"Ошибка валидации. Обратитесь к администратору.",
-            )
+        super().__init__(id=id, created_at=created_at, updated_at=updated_at)
+        self.region_id = region_id
+        self.traffic_controller_type = traffic_controller_type
+        self.created_by_user_id = created_by_user_id
+        self.updated_by_user_id = updated_by_user_id
         self.name = name
-        self.region = region
-        self.type_controller: ControllerTypes = type_controller
-        self.general_mode: ControllerModes = general_mode
-        self.snmp_protocol: SnmpProtocols = snmp_protocol
+        self.latitude = latitude
+        self.longitude = longitude
         self.district = district
         self.address = address
-        self.service_organization: ServiceOrganizations = service_organization
-
-
-    """ Сущность светофорного объекта. """
+        self.note = note

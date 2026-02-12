@@ -12,7 +12,7 @@ from application.dto.jwt_dto import (
     TokenDataDTO,
     PayloadJWTDTO,
 )
-from application.dto.users import UserDTO
+from application.dto.users_dto import UserDTO
 from domain.kernel.enums.unsorted import TokenTypesEnum, Roles, Organizations
 from domain.kernel.enums.validation_err_messages import ErrorMessages
 

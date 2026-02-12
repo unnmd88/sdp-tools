@@ -4,7 +4,7 @@ from application.base_crud_use_cases import (
     BaseUpdateUseCase,
     BaseDeleteUseCase,
 )
-from application.dto.regions import RegionDTO
+from application.dto.regions_dto import RegionDTO
 
 
 type RegionCreateUseCase = BaseCreateUseCase[RegionDTO]

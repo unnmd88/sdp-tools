@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, Depends
 
-from application.dto.users import ChangeUserPasswordByAdminDTO, CreateUserDTO
+from application.dto.users_dto import ChangeUserPasswordByAdminDTO, CreateUserDTO
 from application.use_cases.admin.create_user_use_case import CreateUserUseCaseImpl
 
 from presentation.api.fastapi_dependencies import AccessTokenDep

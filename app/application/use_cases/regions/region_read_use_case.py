@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from application.dto.regions import RegionDTO
+from application.dto.regions_dto import RegionDTO
 from application.interfaces.services.regions_service_interface import (
     RegionsReadServiceProtocol,
 )

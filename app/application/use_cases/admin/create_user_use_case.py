@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import ClassVar
 
 from app_logging.dev.config import USERS_LOGGER
-from application.dto.users import CreateUserDTO, UserDTO
+from application.dto.users_dto import CreateUserDTO, UserDTO
 from application.exceptions import PermissionDeniedError
 from application.interfaces import UserServiceProtocol
 

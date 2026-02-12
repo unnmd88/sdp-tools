@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 
 from app_logging.dev.config import AUTH_LOGGER
-from application.dto.auth import UserAuthDTO
+from application.dto.auth_dto import UserAuthDTO
 from application.exceptions import AuthenticationError, InactiveAccountError
 from application.interfaces import PasswordServiceProtocol, UserServiceProtocol
 from domain.kernel.enums.validation_err_messages import ErrorMessages

@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from application.dto.auth import UserAuthDTO
+from application.dto.auth_dto import UserAuthDTO
 from domain.users.user_entity import UserEntity
 
 

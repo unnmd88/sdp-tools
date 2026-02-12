@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from app_logging.dev.config import AUTH_LOGGER
 from application.dto.jwt_dto import TokenDataDTO, PayloadJWTDTO
 
-from application.dto.auth import UserAuthDTO
+from application.dto.auth_dto import UserAuthDTO
 
 from application.interfaces import AuthServiceProtocol
 from application.interfaces.services.issue_jwt_service_interface import (

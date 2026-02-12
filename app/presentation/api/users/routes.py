@@ -4,7 +4,7 @@ from fastapi import (
 )
 
 
-from application.dto.users import UserDTO, ChangeUserPasswordDTO
+from application.dto.users_dto import UserDTO, ChangeUserPasswordDTO
 from application.services.user_service import UserServiceImpl
 from application.use_cases.users.change_password_use_case import (
     ChangeUserPasswordUseCaseImpl,

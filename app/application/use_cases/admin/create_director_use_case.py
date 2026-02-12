@@ -4,7 +4,7 @@ import os
 from dataclasses import dataclass
 
 from app_logging.dev.config import USERS_LOGGER
-from application.dto.users import UserDTO
+from application.dto.users_dto import UserDTO
 from application.exceptions import AuthenticationError
 from application.interfaces import PasswordServiceProtocol
 

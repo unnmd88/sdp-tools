@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 
 from app_logging.dev.config import USERS_LOGGER
-from application.dto.users import ChangeUserPasswordDTO
+from application.dto.users_dto import ChangeUserPasswordDTO
 from application.exceptions import AuthenticationError, ApplicationLayerError
 from application.interfaces import UserServiceProtocol, PasswordServiceProtocol
 from application.interfaces.uow_interface import UnitOfWorkProtocol

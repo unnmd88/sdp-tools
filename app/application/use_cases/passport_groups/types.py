@@ -4,7 +4,7 @@ from application.base_crud_use_cases import (
     BaseUpdateUseCase,
     BaseDeleteUseCase,
 )
-from application.dto.passport_groups import PassportGroupDTO
+from application.dto.passport_groups_dto import PassportGroupDTO
 
 type PassportGroupCreateUseCase = BaseCreateUseCase[PassportGroupDTO]
 type PassportGroupReadUseCase = BaseReadUseCase[PassportGroupDTO]
