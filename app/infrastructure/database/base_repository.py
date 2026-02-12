@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from app_logging.dev.config import INFRASTRUCTURE
 from application.interfaces.mappers.db import BaseDBMapperProtocol
+from infrastructure.database.utils import handle_db_errors
 from infrastructure.exceptions import (
     RepositoryError,
     RepositoryIntegrityError,

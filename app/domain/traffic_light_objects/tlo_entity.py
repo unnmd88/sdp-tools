@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Self
 
 from domain.kernel.business_rules import MIN_LEN_TLO_NAME, MAX_LEN_TLO_NAME
 from domain.contract2.contract_field import ContractField
@@ -49,7 +50,7 @@ class TrafficLightObjectEntity(Entity):
         id: int | None,
         region_id: int,
         created_by_user_id: int,
-        updated_by_user_id: int | None,
+        updated_by_user_id: int,
         name: str,
         traffic_controller_type: str | None, # api дира
         latitude: float,
@@ -71,3 +72,34 @@ class TrafficLightObjectEntity(Entity):
         self.district = district
         self.address = address
         self.note = note
+
+    @classmethod
+    def create_new(
+        cls,
+        *,
+        region_id: int,
+        created_by_user_id: int,
+        updated_by_user_id: int,
+        name: str,
+        traffic_controller_type: str | None, # api дира
+        latitude: float,
+        longitude: float,
+        district: str,
+        address: str,
+        note: str,
+    ) -> Self:
+        return cls(
+            id=None,
+            region_id=region_id,
+            created_by_user_id=created_by_user_id,
+            updated_by_user_id=updated_by_user_id,
+            name=name,
+            traffic_controller_type=traffic_controller_type,
+            latitude=latitude,
+            longitude=longitude,
+            district=district,
+            address=address,
+            note=note,
+            created_at=None,
+            updated_at=None,
+        )

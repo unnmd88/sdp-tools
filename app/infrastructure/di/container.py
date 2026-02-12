@@ -9,6 +9,7 @@ from .providers import (
     UsersUseCaseProvider,
     PassportGroupUseCaseProvider,
     RegionsUseCaseProvider,
+    TrafficLightObjectsUseCaseProvider,
 )
 
 
@@ -23,5 +24,6 @@ def create_container():
         AdminUseCasesProvider(),
         PassportGroupUseCaseProvider(),
         RegionsUseCaseProvider(),
+        TrafficLightObjectsUseCaseProvider(),
     )
     return container

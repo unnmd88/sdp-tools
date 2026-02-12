@@ -62,8 +62,8 @@ class BaseReadUseCase[T_DTO: MapperToDTOProtocol]:
         order_by: list | None = None,
     ) -> list[T_DTO]:
         return [
-            self.to_dto_mapper.from_entity(region)
-            for region in await self.entity_service.get_many(
+            self.to_dto_mapper.from_entity(entity)
+            for entity in await self.entity_service.get_many(
                 skip=skip, limit=limit, order_by=order_by
             )
         ]

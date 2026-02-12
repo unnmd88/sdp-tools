@@ -44,5 +44,14 @@ PASSPORT_GROUPS_PUBLIC_ATTRS = BASE_PUBLIC_ATTRS + (
 )
 
 TRAFFIC_LIGHT_OBJECTS_PUBLIC_ATTRS = BASE_PUBLIC_ATTRS + (
-    PublicAttr(attr_name="_name", alias=str(PublicAttrNamesEnum.name)),
+    PublicAttr(attr_name="name", alias=str(PublicAttrNamesEnum.name)),
+    PublicAttr(attr_name="region_id", alias=str(PublicAttrNamesEnum.region_id)),
+    PublicAttr(attr_name="traffic_controller_type", alias=str(PublicAttrNamesEnum.traffic_controller_type)),
+    PublicAttr(attr_name="created_by_user_id", alias=str(PublicAttrNamesEnum.created_by_user_id)),
+    PublicAttr(attr_name="updated_by_user_id", alias=str(PublicAttrNamesEnum.updated_by_user_id)),
+    PublicAttr(attr_name="latitude", alias=str(PublicAttrNamesEnum.latitude)),
+    PublicAttr(attr_name="longitude", alias=str(PublicAttrNamesEnum.longitude)),
+    PublicAttr(attr_name="district", alias=str(PublicAttrNamesEnum.district)),
+    PublicAttr(attr_name="address", alias=str(PublicAttrNamesEnum.address)),
+    PublicAttr(attr_name="note", alias=str(PublicAttrNamesEnum.note)),
 )

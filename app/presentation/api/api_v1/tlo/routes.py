@@ -8,13 +8,18 @@ from fastapi import (
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
+from application.use_cases.tlo_use_cases.types import TrafficLightObjectsReadUseCase, TrafficLightObjectsCreateUseCase
+from domain.traffic_light_objects.tlo_commands import CreateTrafficLightObjectCommand
 from presentation.api.api_v1.tlo.schemas import (
     TrafficLightCreate,
     TrafficLightSchema,
     TrafficLightUpdate,
 )
 
-# from presentation.api.dependencies.dependencies import CrudTloUseCase
+from dishka.integrations.fastapi import FromDishka, inject
+
+from presentation.api.fastapi_dependencies import AccessTokenDep
+from presentation.schemas.traffic_light_objects import TrafficLightObjectCreate
 
 router = APIRouter(
     prefix="/traffic-light-objects",
@@ -33,15 +38,19 @@ async def get_traffic_light_object_by_id(
     # return await TloCrud.get_one_by_id_or_404(session, traffic_light_object_id)
 
 
-@router.get("/name/{name}")
-async def get_traffic_light_object_by_name(
-    tlo_name: str,
-    # use_case: TrafficLightObjectUseCase,
+@router.get(
+    "/",
+    status_code=status.HTTP_200_OK,
+)
+@inject
+async def get_list_traffic_light_objects(
+    use_case: FromDishka[TrafficLightObjectsReadUseCase],
 ):
-    # res = await use_case.get_tlo_by_name(tlo_name)
-    res = await use_case.get_base_tlo_by_name(tlo_name)
-    return res
-    return await TloCrud.get_one_by_id_or_404(session, traffic_light_object_id)
+    return await use_case.get_many()
+    return RegionResponse.model_validate(
+        await read_region_use_case(code_or_name),
+        from_attributes=True,
+    )
 
 
 @router.get("/{id}")
@@ -52,25 +61,31 @@ async def get_traffic_light_object_by_id(
     return await TloCrud.get_one_by_id_or_404(session, traffic_light_object_id)
 
 
-@router.get("/")
-async def get_traffic_light_objects(
-    # session: Annotated[AsyncSession, Depends(db_api.session_getter)],
-):
-    return await TloCrud.get_all(session)
-
-
 @router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
-    response_model=TrafficLightSchema,
+    # response_model=TrafficLightSchema,
 )
+@inject
 async def create_traffic_light_object(
-    traffic_light_object: TrafficLightCreate,
-    # session: Annotated[AsyncSession, Depends(db_api.session_getter)],
-) -> TrafficLightSchema:
-    await RegionsCrud.get_one_by_id_or_404(session, traffic_light_object.region_id)
-    tlo = await TloCrud.add(session, traffic_light_object)
-    return TrafficLightSchema.model_validate(tlo, from_attributes=True)
+    token_dto: AccessTokenDep,
+    new_traffic_light_object_schema: TrafficLightObjectCreate,
+    use_case: FromDishka[TrafficLightObjectsCreateUseCase],
+):
+    command = CreateTrafficLightObjectCommand(
+        customer_id=token_dto.user_id,
+        region_id=new_traffic_light_object_schema.region_id,
+        name=new_traffic_light_object_schema.name,
+        created_by_user_id=token_dto.user_id,
+        updated_by_user_id=token_dto.user_id,
+        traffic_controller_type=new_traffic_light_object_schema.traffic_controller_type,
+        latitude=new_traffic_light_object_schema.latitude,
+        longitude=new_traffic_light_object_schema.longitude,
+        district=new_traffic_light_object_schema.district,
+        address=new_traffic_light_object_schema.address,
+        note=new_traffic_light_object_schema.note,
+    )
+    await use_case(command)
 
 
 @router.patch(

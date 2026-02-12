@@ -6,6 +6,16 @@ class PublicAttrNamesEnum(StrEnum):
     built_at = "built_at"
     updated_at = "updated_at"
     created_at = "created_at"
+    region_id ="region_id"
+    traffic_controller_type ="traffic_controller_type"
+    created_by_user_id = "created_by_user_id"
+    updated_by_user_id = "updated_by_user_id"
+    latitude = "latitude"
+    longitude = "longitude"
+    district = "district"
+    address = "address"
+    note = "note"
+
 
     username = "username"
     firstname = "firstname"

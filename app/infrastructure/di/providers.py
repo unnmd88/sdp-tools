@@ -11,9 +11,11 @@ from application.base_crud_use_cases import (
 )
 from application.dto.passport_groups_dto import PassportGroupDTO
 from application.dto.regions_dto import RegionDTO
+from application.dto.tlo_dto import TrafficLightObjectDTO
 from application.services.auth_service import AuthenticationService
 from application.services.passport_group_service import PassportGroupServiceImpl
 from application.services.regions_service import RegionsServiceImpl
+from application.services.tlo_service import TrafficLightObjectServiceImpl
 from application.services.user_service import UserServiceImpl
 from application.use_cases.admin.change_password_use_case import (
     ResetUserPasswordByAdminUseCaseImpl,
@@ -37,6 +39,7 @@ from application.use_cases.regions.types import (
     RegionCreateUseCase,
     RegionUpdateUseCase,
 )
+from application.use_cases.tlo_use_cases.types import TrafficLightObjectsReadUseCase, TrafficLightObjectsCreateUseCase
 
 from application.use_cases.users.change_password_use_case import (
     ChangeUserPasswordUseCaseImpl,
@@ -52,6 +55,9 @@ from infrastructure.auth.jwt.jwt_service import IssueJWTService
 from infrastructure.auth.jwt.rules import IssueJWTSettings
 from infrastructure.auth.password_service import BcryptPasswordService
 from infrastructure.database.api import DatabaseAPI
+from infrastructure.database.base_adapter_wrapper import BaseRepositoryAdapterWrapper
+from infrastructure.database.mappers.tlo_mapper import TrafficLightObjectDBMapper
+from infrastructure.database.models import TrafficLightObject as TrafficLightObjectModel
 from infrastructure.database.passport_groups_repository import (
     PassportGroupsSqlAlchemyRepository,
 )
@@ -109,6 +115,14 @@ class RepositoryProvider(Provider):
         self, session: AsyncSession
     ) -> PassportGroupsSqlAlchemyRepository:
         return PassportGroupsSqlAlchemyRepository(session=session)
+
+    # @provide(scope=Scope.REQUEST)
+    # def traffic_light_objects_repository(self, session: AsyncSession) -> BaseRepositoryAdapterWrapper:
+    #     return BaseRepositoryAdapterWrapper(
+    #         session=session,
+    #         model=TrafficLightObjectModel,
+    #         mapper=TrafficLightObjectDBMapper(),
+    #     )
 
 
 class JWTProvider(Provider):
@@ -186,6 +200,41 @@ class AdminUseCasesProvider(Provider):
     ) -> ResetUserPasswordByAdminUseCaseImpl:
         return ResetUserPasswordByAdminUseCaseImpl(
             user_service=user_service, password_service=password_service
+        )
+
+
+class TrafficLightObjectsUseCaseProvider(Provider):
+    @provide(scope=Scope.REQUEST)
+    def base_read_traffic_light_object_use_case(
+        self, session: AsyncSession
+    ) -> TrafficLightObjectsReadUseCase:
+        repo_wrapper = BaseRepositoryAdapterWrapper(
+            session=session,
+            model=TrafficLightObjectModel,
+            mapper=TrafficLightObjectDBMapper(),
+        )
+        return BaseReadUseCase(
+            entity_service=TrafficLightObjectServiceImpl(repository=repo_wrapper),
+            to_dto_mapper=TrafficLightObjectDTO,
+        )
+
+    @provide(scope=Scope.REQUEST)
+    def base_create_traffic_light_object_use_case(
+        self,
+        user_service: UserServiceImpl,
+        uow: SQLAlchemyUnitOfWork,
+
+    ) -> TrafficLightObjectsCreateUseCase:
+        repo_wrapper = BaseRepositoryAdapterWrapper(
+            session=uow.session,
+            model=TrafficLightObjectModel,
+            mapper=TrafficLightObjectDBMapper(),
+        )
+        return BaseCreateUseCase(
+            uow=uow,
+            user_service=user_service,
+            entity_service=TrafficLightObjectServiceImpl(repository=repo_wrapper),
+            to_dto_mapper=TrafficLightObjectDTO,
         )
 
 
