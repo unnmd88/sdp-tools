@@ -1,4 +1,3 @@
-from core.http_codes import *
 
 from enum import Enum, StrEnum
 from typing import NamedTuple

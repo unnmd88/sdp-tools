@@ -2,10 +2,10 @@ import logging
 from dataclasses import dataclass
 
 from app_logging.dev.config import USERS_LOGGER
-from application.dto.users_dto import ChangeUserPasswordDTO
 from application.exceptions import AuthenticationError, ApplicationLayerError
 from application.interfaces import UserServiceProtocol, PasswordServiceProtocol
 from application.interfaces.uow_interface import UnitOfWorkProtocol
+from application.use_cases.users.commands import ChangeUserPasswordCommand
 from domain.kernel.enums.validation_err_messages import ErrorMessages
 from domain.users.user_entity import UserEntity
 from domain.value_objects.set_password_vo import SetPasswordVO
@@ -20,8 +20,8 @@ class ChangeUserPasswordUseCaseImpl:
     password_service: PasswordServiceProtocol
 
     async def __call__(
-        self, user_id, change_password_dto: ChangeUserPasswordDTO
-    ) -> ChangeUserPasswordDTO:
+        self, user_id, change_password_dto: ChangeUserPasswordCommand
+    ) -> bool:
         logger.info("Запрос на смену пароля с id=%r", user_id)
         async with self.uow:
             user = await self.user_service.get_active_user_by_id(user_id)

@@ -1,13 +1,12 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status
 
-from application.dto.users_dto import ChangeUserPasswordByAdminDTO, CreateUserDTO
-from application.use_cases.admin.create_user_use_case import CreateUserUseCaseImpl
+# from application.dtos.users_dto import ChangeUserPasswordByAdminDTO, CreateUserDTO
+from application.use_cases.users.admin.create_user_use_case import CreateUserUseCaseImpl
 
 from presentation.api.fastapi_dependencies import AccessTokenDep
 from presentation.schemas.users import (
     CreateUserSchema,
     ResponseUserSchema,
-    ChangeUserPasswordBaseSchema,
     UpdatedPasswordByAdminResponse,
 )
 from dishka.integrations.fastapi import FromDishka, inject

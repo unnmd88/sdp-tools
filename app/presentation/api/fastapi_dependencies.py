@@ -5,7 +5,7 @@ from fastapi.params import Form
 from dishka.integrations.fastapi import FromDishka
 
 from infrastructure.auth.jwt.jwt_service import DecodeJWTService
-from application.dto.jwt_dto import AccessJWTPayloadDTO, RefreshJWTPayloadDTO
+from application.dtos.jwt_dto import AccessJWTPayloadDTO, RefreshJWTPayloadDTO
 from core.config import settings
 from infrastructure.auth.jwt.rules import DecodeJWTSettings
 from presentation.schemas.auth import AuthSchema

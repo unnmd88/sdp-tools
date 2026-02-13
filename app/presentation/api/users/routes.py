@@ -4,8 +4,8 @@ from fastapi import (
 )
 
 
-from application.dto.users_dto import UserDTO, ChangeUserPasswordDTO
-from application.services.user_service import UserServiceImpl
+from application.dtos.user_dtos import UserResponseDTO
+from application.services.users_service.user_service import BaseReadUserServiceImpl
 from application.use_cases.users.change_password_use_case import (
     ChangeUserPasswordUseCaseImpl,
 )
@@ -37,12 +37,12 @@ router = APIRouter(
 @inject
 async def whoami(
     decoded_token_dto: AccessTokenDep,
-    user_service: FromDishka[UserServiceImpl],
+    user_service: FromDishka[BaseReadUserServiceImpl],
 ):
     # TODO: Перевести на use_case, возвращать DTO
     return ResponseUserSchema.model_validate(
-        obj=UserDTO.from_entity(
-            await user_service.get_user_by_id(decoded_token_dto.user_id)
+        obj=UserResponseDTO.from_entity(
+            await user_service.get_by_id(decoded_token_dto.user_id)
         ),
         from_attributes=True,
     )

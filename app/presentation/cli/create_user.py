@@ -3,7 +3,7 @@ from typing import Annotated
 
 import typer
 
-from application.use_cases.admin.create_superuser_use_case import create_user_root
+from application.use_cases.users.admin import create_user_root
 
 from fastapi.exceptions import HTTPException
 from rich import print

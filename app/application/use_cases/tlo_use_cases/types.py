@@ -1,5 +1,5 @@
 from application.base_crud_use_cases import BaseCreateUseCase, BaseReadUseCase
-from application.dto.tlo_dto import TrafficLightObjectDTO
+from application.dtos.tlo_dto import TrafficLightObjectDTO
 
 type TrafficLightObjectsCreateUseCase = BaseCreateUseCase[TrafficLightObjectDTO]
 type TrafficLightObjectsReadUseCase = BaseReadUseCase[TrafficLightObjectDTO]

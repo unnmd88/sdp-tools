@@ -2,19 +2,20 @@ import logging
 from dataclasses import dataclass
 
 from app_logging.dev.config import DOMAIN
-from application.dto.users_dto import UserDTO
+from application.dtos.user_dtos import UserResponseDTO
+
 from application.exceptions import InactiveAccountError
 from domain.exceptions import DomainEntityNotFoundError
-from domain.repositories.users_repo_interface import UsersRepositoryProtocol
+from domain.repositories.users_repo_interface import UsersReadRepositoryProtocol
 
 logger = logging.getLogger(DOMAIN)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class GetActiveUserFromRepoUseCase:
-    user_repository: UsersRepositoryProtocol
+    user_repository: UsersReadRepositoryProtocol
 
-    async def __call__(self, _id: int) -> UserDTO:
+    async def __call__(self, _id: int) -> UserResponseDTO:
         user = await self.user_repository.get_by_id(_id)
         if user is None:
             raise DomainEntityNotFoundError(
@@ -26,4 +27,4 @@ class GetActiveUserFromRepoUseCase:
                 private_message=f"Аккаунт пользователя с id={_id} не активен.",
                 public_message="Аккаунт не активен. Пожалуйста, свяжитесь с администратором.",
             )
-        return UserDTO.from_entity(user)
+        return UserResponseDTO.from_entity(user)

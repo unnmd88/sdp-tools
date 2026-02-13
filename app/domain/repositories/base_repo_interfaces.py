@@ -1,0 +1,29 @@
+from typing import Protocol
+
+
+class BaseReadRepositoryProtocol[T_Entity](Protocol):
+    async def get_by_id(self, region_id: int) -> T_Entity: ...
+    async def try_by_id(self, region_id: int) -> T_Entity | None: ...
+    async def get_filter_by(self, filters: dict) -> T_Entity: ...
+    async def try_filter_by(self, filters: dict) -> T_Entity | None: ...
+    async def get_many(
+        self,
+        skip: int,
+        limit: int,
+        order_by: list | None,
+        **filters
+    ) -> list[T_Entity]: ...
+
+
+class BaseWriteRepositoryProtocol[T_Entity](Protocol):
+    async def add(self, entity: T_Entity) -> T_Entity: ...
+    async def update(self, entity: T_Entity) -> T_Entity: ...
+    async def delete(self, _id: int) -> T_Entity: ...
+
+
+class BaseCrudRepositoryProtocol[T_Entity](
+    BaseReadRepositoryProtocol[T_Entity],
+    BaseWriteRepositoryProtocol[T_Entity],
+    Protocol,
+):
+   ...

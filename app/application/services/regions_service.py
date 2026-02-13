@@ -1,5 +1,6 @@
 import logging
 from dataclasses import dataclass
+from typing import ClassVar
 
 from app_logging.dev.config import DOMAIN
 from application.helpers.entity_fetcher import EntityFetcher
@@ -43,7 +44,7 @@ class RegionsServiceImpl:
 
     async def get_by_id(self, region_id: int) -> RegionEntity:
         return await self.fetcher.fetch(
-            fetch_method=self.repository.get_by_id,
+            fetch_method=self.repository.try_by_id,
             identifier=region_id,
             identifier_label="ID",
             raise_if_not_found=True,
@@ -51,14 +52,14 @@ class RegionsServiceImpl:
 
     async def try_by_id(self, region_id: int) -> RegionEntity | None:
         return await self.fetcher.fetch(
-            fetch_method=self.repository.get_by_id,
+            fetch_method=self.repository.try_by_id,
             identifier=region_id,
             identifier_label="ID",
         )
 
     async def get_by_code_or_name(self, code_or_name: int | str) -> RegionEntity:
         return await self.fetcher.fetch(
-            fetch_method=self.repository.get_by_filters,
+            fetch_method=self.repository.try_filter_by,
             identifier=self._check_and_build_criteria_for_search_by_code_or_name(
                 code_or_name
             ),
@@ -67,14 +68,13 @@ class RegionsServiceImpl:
 
     async def try_by_code_or_name(self, code_or_name: int | str) -> RegionEntity:
         return await self.fetcher.fetch(
-            fetch_method=self.repository.get_by_filters,
+            fetch_method=self.repository.try_filter_by,
             identifier=self._check_and_build_criteria_for_search_by_code_or_name(
                 code_or_name
             ),
             raise_if_not_found=False,
         )
 
-    @async_handle_corrupted_data_in_repo(logger=logger)
     async def get_many(
         self,
         skip: int = 0,

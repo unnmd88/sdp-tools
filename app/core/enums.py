@@ -30,3 +30,6 @@ class ContextKey(StrEnum):
     # Ошибки
     ERROR_CODE = "error_code"
     VIOLATION = "violation"
+
+    HANDLER = "handler"
+    ACTION = "action"

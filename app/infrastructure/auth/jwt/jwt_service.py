@@ -6,13 +6,13 @@ from typing import AnyStr
 import jwt
 
 from app_logging.dev.config import INFRASTRUCTURE
-from application.dto.jwt_dto import (
+from application.dtos.jwt_dto import (
     AccessJWTPayloadDTO,
     RefreshJWTPayloadDTO,
     TokenDataDTO,
     PayloadJWTDTO,
 )
-from application.dto.users_dto import UserDTO
+from application.dtos.user_dtos import UserResponseDTO
 from domain.kernel.enums.unsorted import TokenTypesEnum, Roles, Organizations
 from domain.kernel.enums.validation_err_messages import ErrorMessages
 
@@ -250,7 +250,7 @@ class IssueJWTService:
 
 
 if __name__ == "__main__":
-    _user_dto = UserDTO(
+    _user_dto = UserResponseDTO(
         id=1,
         firstname="Junker",
         lastname="Junker",

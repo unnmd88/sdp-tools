@@ -99,7 +99,7 @@ async def update_traffic_light_object(
     # session: Annotated[AsyncSession, Depends(db_api.session_getter)],
 ) -> TrafficLightSchema:
     tlo = await TloCrud.get_one_by_id_or_404(session, traffic_light_object_id)
-    updated_traffic_light_object = await TloCrud.update_by_id(
+    updated_traffic_light_object = await TloCrud.update_with_fields(
         session=session,
         db_model=tlo,
         to_update_model=traffic_light_object,

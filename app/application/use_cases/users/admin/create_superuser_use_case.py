@@ -9,7 +9,7 @@ from app_logging.dev.config import USERS_LOGGER
 from core.config import settings
 from domain.exceptions import DomainValidationError
 from domain.kernel.enums.unsorted import Organizations, Roles
-from domain.repositories.users_repo_interface import UsersRepositoryProtocol
+from domain.repositories.users_repo_interface import UsersReadRepositoryProtocol
 
 from domain.users.user_entity import UserEntity
 from infrastructure.auth.password_service import hash_password
@@ -31,7 +31,7 @@ class CreateUserRootResultDTO:
 
 async def create_user_root(
     *,
-    user_repo: UsersRepositoryProtocol,
+    user_repo: UsersReadRepositoryProtocol,
     session: AsyncSession,
     username: str = None,
     password: str = None,

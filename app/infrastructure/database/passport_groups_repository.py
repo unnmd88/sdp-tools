@@ -4,11 +4,11 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from app_logging.dev.config import INFRASTRUCTURE
 from domain.pssport_groups.passport_group_entity import PassportGroupEntity
-from infrastructure.database.base_repository import BaseSqlAlchemyRepositoryAdapter
+from infrastructure.database.base_repository import BaseCrudSqlAlchemyRepositoryAdapter
 from infrastructure.database.mappers.passport_groups import PassportGroupsDBMapper
 
 from infrastructure.database.models import PassportGroup as PassportGroupModel
-from infrastructure.database.utils import handle_db_errors
+from infrastructure.database.utils import async_handle_db_errors
 
 
 logger = logging.getLogger(INFRASTRUCTURE)
@@ -18,7 +18,7 @@ class PassportGroupsSqlAlchemyRepository:
     model = PassportGroupModel
 
     def __init__(self, session: AsyncSession):
-        self._base_repo_adapter = BaseSqlAlchemyRepositoryAdapter[
+        self._base_repo_adapter = BaseCrudSqlAlchemyRepositoryAdapter[
             PassportGroupModel, PassportGroupEntity, PassportGroupsDBMapper
         ](
             session=session,
@@ -27,15 +27,15 @@ class PassportGroupsSqlAlchemyRepository:
         )
         self._session = session
 
-    @handle_db_errors(logger=logger)
+    @async_handle_db_errors(logger=logger)
     async def get_by_id(self, id: int) -> PassportGroupEntity | None:
         return await self._base_repo_adapter.get_by_id(id)
 
-    @handle_db_errors(logger=logger)
+    @async_handle_db_errors(logger=logger)
     async def get_by_filters(self, filters: dict) -> PassportGroupEntity | None:
-        return await self._base_repo_adapter.get_one_or_none_by_filters(**filters)
+        return await self._base_repo_adapter.try_filter_by(**filters)
 
-    @handle_db_errors(logger=logger)
+    @async_handle_db_errors(logger=logger)
     async def get_many(
         self,
         skip: int = 0,

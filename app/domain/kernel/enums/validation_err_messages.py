@@ -24,6 +24,9 @@ class ErrorMessages(StrEnum):
     expected_string_or_bytes = "Для {!r} ожидается строка или байты."
     expected_hashed_password = "Для {!r} ожидается хэшированный пароль."
 
+    user_with_attr_not_found = "Пользователь с {}={} не найден."
+    user_not_found = "Пользователь с не найден."
+
     expected_bool = "Для {!r} ожидается булево значение."
     password_can_not_be_empty = "Пароль не может быть пустым."
 
@@ -53,7 +56,6 @@ class ErrorMessages(StrEnum):
         "Срок действия токена истек. Пожалуйста, войдите в систему."
     )
 
-    user_not_found = "Пользователь с {}={} не найден."
     account_is_blocked = "Аккаунт пользователя с {}={} заблокирован."
     has_not_access = "У пользователя с {}={} нет прав доступа."
 
@@ -62,6 +64,10 @@ class ErrorMessages(StrEnum):
 
     invalid_username_or_password = "Неверное имя пользователя или пароль."
     inactive_user = "Пользователь неактивен."
+    inactive_user_please_contact_support = "Пользователь неактивен. Пожалуйста, свяжитесь с администратором."
+    inactive_account = "Аккаунт неактивен."
+    permission_denied = "У вас нет прав на выполнение этого действия."
+    permission_denied_for_this_action = "У вас нет прав на выполнение этого действия: {}."
     already_exists = "{} с {}={} уже существует."
     must_be_bool = "Поле {} должно быть булевым значением"
     must_be_integer = "Значение должно быть целым числом."

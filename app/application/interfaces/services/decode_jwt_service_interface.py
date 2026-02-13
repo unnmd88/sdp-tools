@@ -1,6 +1,6 @@
 from typing import Protocol, runtime_checkable
 
-from application.dto.jwt_dto import AccessJWTPayloadDTO, RefreshJWTPayloadDTO
+from application.dtos.jwt_dto import AccessJWTPayloadDTO, RefreshJWTPayloadDTO
 from domain.kernel.enums.unsorted import TokenTypesEnum
 
 

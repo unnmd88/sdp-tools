@@ -15,19 +15,6 @@ class DomainError(BaseAppError):
     DEFAULT_PRIVATE_MESSAGE = ErrorCodes.DOMAIN_ERROR.private_message
     DEFAULT_PUBLIC_MESSAGE = ErrorCodes.DOMAIN_ERROR.public_message
 
-    def with_entity_context(
-        self,
-        *,
-        entity_name: str,
-        entity_id: str | int = None,
-    ) -> Self:
-        """Добавляет контекст сущности."""
-        self._with_context_by_dict({
-            ContextKey.ENTITY_NAME: entity_name,
-            ContextKey.ENTITY_ID: entity_id,
-        })
-        return self
-
 
 class DomainContractViolationError(DomainError):
     DEFAULT_CODE = ErrorCodes.DOMAIN_CONTRACT_VIOLATION.code
@@ -94,7 +81,7 @@ if __name__ == '__main__':
     try:
         e =  (
             DomainContractViolationError(public_message='test', private_message='public message test')
-            .with_entity_context(entity_name='test', entity_id=1)
+            .with_entity_context(entity='test', entity_id=1)
             .with_validator_if_has_not('test')
         )
         print(e)

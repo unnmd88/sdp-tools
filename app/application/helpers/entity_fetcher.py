@@ -23,18 +23,19 @@ class EntityFetcher[T_Entity]:
         *,
         raise_if_not_found: bool = False,
         identifier_label: str = "",
+        public_message: str = "Ресурс не найден.",
     ) -> T_Entity | None:
         entity = await fetch_method(identifier)
         if entity is None:
             if raise_if_not_found:
-                if isinstance(identifier, dict):
-                    search_criteria = " ".join(
-                        [f"{k}={v}" for k, v in identifier.items()]
-                    )
-                    msg = f"{self.user_friendly_entity_name} с {search_criteria} не найдена."
-                else:
-                    msg = f"{self.user_friendly_entity_name} с {identifier_label}={identifier} не найдена."
-                raise DomainEntityNotFoundError(public_message=msg)
+                # if isinstance(identifier, dict):
+                #     search_criteria = " ".join(
+                #         [f"{k}={v}" for k, v in identifier.items()]
+                #     )
+                #     msg = f"{self.user_friendly_entity_name} с {search_criteria} не найдена."
+                # else:
+                #     msg = f"{self.user_friendly_entity_name} с {identifier_label}={identifier} не найдена."
+                raise DomainEntityNotFoundError(public_message=public_message)
             else:
                 return None
         return entity

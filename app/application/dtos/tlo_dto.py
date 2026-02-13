@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from domain.kernel.enums.unsorted import ServiceOrganizations
-
 
 @dataclass
 class TrafficLightObjectDTO:

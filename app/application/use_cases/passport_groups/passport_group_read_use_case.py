@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from application.dto.passport_groups_dto import PassportGroupDTO
+from application.dtos.passport_groups_dto import PassportGroupDTO
 from application.interfaces.services.passport_groups_service_interface import (
     PassportGroupReadServiceProtocol,
 )

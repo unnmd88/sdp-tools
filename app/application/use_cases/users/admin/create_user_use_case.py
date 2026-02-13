@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from typing import ClassVar
 
 from app_logging.dev.config import USERS_LOGGER
-from application.dto.users_dto import CreateUserDTO, UserDTO
+from application.dtos.user_dtos import UserResponseDTO
+
 from application.exceptions import PermissionDeniedError
 from application.interfaces import UserServiceProtocol
 
@@ -12,6 +13,7 @@ from application.interfaces.services.password_service_interface import (
     PasswordServiceProtocol,
 )
 from application.interfaces.uow_interface import UnitOfWorkProtocol
+from application.use_cases.users.admin.commands import CreateUserCommand
 from domain.kernel.enums.unsorted import Roles
 
 from domain.users.user_entity import UserEntity
@@ -34,7 +36,7 @@ class CreateUserUseCaseImpl:
     user_service: UserServiceProtocol
     password_service: PasswordServiceProtocol
 
-    async def __call__(self, create_user_dto: CreateUserDTO) -> UserDTO:
+    async def __call__(self, create_user_dto: CreateUserCommand) -> UserResponseDTO:
         logger.info(
             "Запрос на создание нового пользователя системы. Заказчик(id)=%r",
             create_user_dto.customer_id,

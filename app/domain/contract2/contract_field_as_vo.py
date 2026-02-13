@@ -34,7 +34,7 @@ class DomainField[T_VO, T_Primitive]:
                         self._public_field_name, self._entity
                     ),
                     public_message=self._nullable_config.public_message,
-                ).with_field(self._public_field_name).with_entity_context(entity_name=self._entity)
+                ).with_field(self._public_field_name).with_entity_context(entity=self._entity)
 
         print(f"POINT 0, value: {value}")
         if self._vo_builder.is_vo_instance(value):
@@ -48,7 +48,7 @@ class DomainField[T_VO, T_Primitive]:
 
                 return setattr(instance, self.name, self._vo_builder(value))
             except DomainContractViolationError as e:
-                e.with_field(self._public_field_name).with_entity_context(entity_name=self._entity)
+                e.with_field(self._public_field_name).with_entity_context(entity=self._entity)
                 print("POINT EXCEPTION")
                 print(e)
                 print(e.to_dict())

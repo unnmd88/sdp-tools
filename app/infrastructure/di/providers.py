@@ -9,18 +9,18 @@ from application.base_crud_use_cases import (
     BaseUpdateUseCase,
     BaseDeleteUseCase,
 )
-from application.dto.passport_groups_dto import PassportGroupDTO
-from application.dto.regions_dto import RegionDTO
-from application.dto.tlo_dto import TrafficLightObjectDTO
-from application.services.auth_service import AuthenticationService
+from application.dtos.passport_groups_dto import PassportGroupDTO
+from application.dtos.regions_dto import RegionDTO
+from application.dtos.tlo_dto import TrafficLightObjectDTO
+from application.services.users_service.auth_service import AuthenticationServiceImpl
 from application.services.passport_group_service import PassportGroupServiceImpl
 from application.services.regions_service import RegionsServiceImpl
 from application.services.tlo_service import TrafficLightObjectServiceImpl
-from application.services.user_service import UserServiceImpl
-from application.use_cases.admin.change_password_use_case import (
-    ResetUserPasswordByAdminUseCaseImpl,
-)
-from application.use_cases.admin.create_user_use_case import CreateUserUseCaseImpl
+from application.services.users_service.user_service import BaseReadUserServiceImpl
+# from application.use_cases.users.admin import (
+#     ResetUserPasswordByAdminUseCaseImpl,
+# )
+from application.use_cases.users.admin.create_user_use_case import CreateUserUseCaseImpl
 from application.use_cases.passport_groups.passport_group_read_use_case import (
     PassportGroupReadByNameUseCase,
 )
@@ -55,7 +55,7 @@ from infrastructure.auth.jwt.jwt_service import IssueJWTService
 from infrastructure.auth.jwt.rules import IssueJWTSettings
 from infrastructure.auth.password_service import BcryptPasswordService
 from infrastructure.database.api import DatabaseAPI
-from infrastructure.database.base_adapter_wrapper import BaseRepositoryAdapterWrapper
+# from infrastructure.database.base_adapter_wrapper import BaseRepositoryAdapterWrapper
 from infrastructure.database.mappers.tlo_mapper import TrafficLightObjectDBMapper
 from infrastructure.database.models import TrafficLightObject as TrafficLightObjectModel
 from infrastructure.database.passport_groups_repository import (
@@ -147,19 +147,18 @@ class ServicesProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def get_user_service(
         self, users_repo: UsersSqlAlchemyRepository
-    ) -> UserServiceImpl:
-        return UserServiceImpl(user_repository=users_repo)
-
-    @provide(scope=Scope.REQUEST)
-    def get_auth_service(self, user_service: UserServiceImpl) -> AuthenticationService:
-        return AuthenticationService(
-            user_service=user_service,
-            password_service=BcryptPasswordService(),
-        )
+    ) -> BaseReadUserServiceImpl:
+        return BaseReadUserServiceImpl(user_repository=users_repo)
 
     @provide(scope=Scope.REQUEST)
     def get_password_service(self) -> BcryptPasswordService:
         return BcryptPasswordService()
+
+    @provide(scope=Scope.REQUEST)
+    def get_auth_service(
+        self, password_service: BcryptPasswordService
+    ) -> AuthenticationServiceImpl:
+        return AuthenticationServiceImpl(password_service=password_service)
 
     # Regions section
     @provide(scope=Scope.REQUEST)
@@ -182,7 +181,7 @@ class AdminUseCasesProvider(Provider):
     def get_create_user_use_case(
         self,
         uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
+        user_service: BaseReadUserServiceImpl,
         password_service: BcryptPasswordService,
     ) -> CreateUserUseCaseImpl:
         return CreateUserUseCaseImpl(
@@ -191,16 +190,17 @@ class AdminUseCasesProvider(Provider):
             password_service=password_service,
         )
 
-    # TODO: Проверить, что это работает
-    @provide(scope=Scope.REQUEST)
-    def get_reset_password_admin_use_case(
-        self,
-        user_service: UserServiceImpl,
-        password_service: BcryptPasswordService,
-    ) -> ResetUserPasswordByAdminUseCaseImpl:
-        return ResetUserPasswordByAdminUseCaseImpl(
-            user_service=user_service, password_service=password_service
-        )
+    # # TODO: Проверить, что это работает
+    # @provide(scope=Scope.REQUEST)
+    # def get_reset_password_admin_use_case(
+    #     self,
+    #     user_service: BaseReadUserServiceImpl,
+    #     password_service: BcryptPasswordService,
+    # ) -> ResetUserPasswordByAdminUseCaseImpl:
+    #     return ResetUserPasswordByAdminUseCaseImpl(
+    #         user_service=user_service, password_service=password_service
+    #     )
+    #
 
 
 class TrafficLightObjectsUseCaseProvider(Provider):
@@ -221,7 +221,7 @@ class TrafficLightObjectsUseCaseProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def base_create_traffic_light_object_use_case(
         self,
-        user_service: UserServiceImpl,
+        user_service: BaseReadUserServiceImpl,
         uow: SQLAlchemyUnitOfWork,
 
     ) -> TrafficLightObjectsCreateUseCase:
@@ -258,7 +258,7 @@ class PassportGroupUseCaseProvider(Provider):
     def create_passport_group_use_case(
         self,
         uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
+        user_service: BaseReadUserServiceImpl,
         passport_groups_service: PassportGroupServiceImpl,
     ) -> PassportGroupCreateUseCase:
         """Use case для создания PassportGroup"""
@@ -273,7 +273,7 @@ class PassportGroupUseCaseProvider(Provider):
     def update_passport_group_use_case(
         self,
         uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
+        user_service: BaseReadUserServiceImpl,
         passport_groups_service: PassportGroupServiceImpl,
     ) -> PassportGroupUpdateUseCase:
         return BaseUpdateUseCase(
@@ -287,7 +287,7 @@ class PassportGroupUseCaseProvider(Provider):
     def delete_passport_group_use_case(
         self,
         uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
+        user_service: BaseReadUserServiceImpl,
         passport_groups_service: PassportGroupServiceImpl,
     ) -> PassportGroupDeleteUseCase:
         return BaseDeleteUseCase(
@@ -319,7 +319,7 @@ class RegionsUseCaseProvider(Provider):
     def create_passport_group_use_case(
         self,
         uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
+        user_service: BaseReadUserServiceImpl,
         regions_service: RegionsServiceImpl,
     ) -> RegionCreateUseCase:
         """Use case для создания PassportGroup"""
@@ -334,7 +334,7 @@ class RegionsUseCaseProvider(Provider):
     def update_passport_group_use_case(
         self,
         uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
+        user_service: BaseReadUserServiceImpl,
         regions_service: RegionsServiceImpl,
     ) -> RegionUpdateUseCase:
         return BaseUpdateUseCase(
@@ -348,7 +348,7 @@ class RegionsUseCaseProvider(Provider):
     def delete_passport_group_use_case(
         self,
         uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
+        user_service: BaseReadUserServiceImpl,
         regions_service: RegionsServiceImpl,
     ) -> PassportGroupDeleteUseCase:
         return BaseDeleteUseCase(
@@ -369,19 +369,21 @@ class UsersUseCaseProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def get_login_and_jwt_use_case(
         self,
-        auth_service: AuthenticationService,
+        auth_service: AuthenticationServiceImpl,
         jwt_service: IssueJWTService,
+        user_reader: BaseReadUserServiceImpl,
     ) -> UserLoginAndIssueJWTUseCaseImpl:
         return UserLoginAndIssueJWTUseCaseImpl(
             auth_service=auth_service,
             jwt_service=jwt_service,
+            user_reader=user_reader,
         )
 
     @provide(scope=Scope.REQUEST)
     def get_refresh_jwt_use_case(
         self,
         jwt_service: IssueJWTService,
-        user_service: UserServiceImpl,
+        user_service: BaseReadUserServiceImpl,
     ) -> RefreshJWTUseCaseImpl:
         return RefreshJWTUseCaseImpl(
             jwt_service=jwt_service,
@@ -392,7 +394,7 @@ class UsersUseCaseProvider(Provider):
     def get_change_password_use_case(
         self,
         uow: SQLAlchemyUnitOfWork,
-        user_service: UserServiceImpl,
+        user_service: BaseReadUserServiceImpl,
         password_service: BcryptPasswordService,
     ) -> ChangeUserPasswordUseCaseImpl:
         return ChangeUserPasswordUseCaseImpl(

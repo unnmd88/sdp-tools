@@ -12,7 +12,7 @@ from domain.exceptions import DomainEntityAlreadyExistsError, DomainError
 from domain.kernel.enums.attrs_names import PublicAttrNamesEnum
 from domain.kernel.enums.unsorted import Roles, Organizations
 from domain.kernel.enums.validation_err_messages import ErrorMessages
-from domain.repositories.users_repo_interface import UsersRepositoryProtocol
+from domain.repositories.users_repo_interface import UsersReadRepositoryProtocol
 from domain.users.user_entity import UserEntity
 from infrastructure.auth.password_service import BcryptPasswordService
 
@@ -26,7 +26,7 @@ load_dotenv(".env.dev")
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreateDirectorUseCase:
-    user_repository: UsersRepositoryProtocol
+    user_repository: UsersReadRepositoryProtocol
     password_service: PasswordServiceProtocol
 
     async def __call__(

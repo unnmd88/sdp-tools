@@ -3,6 +3,7 @@ from dataclasses import is_dataclass
 
 from typing import Any, Self
 
+from core.enums import ContextKey
 from core.error_codes import ErrorCodes
 
 
@@ -63,6 +64,27 @@ class BaseAppError(Exception):
     def with_request_id(self, request_id: str) -> Self:
         """Добавляет ID запроса."""
         return self.with_context(request_id=request_id)
+
+    def with_entity_context(
+        self,
+        *,
+        entity: type,
+        entity_id: str | int = None,
+    ) -> Self:
+        """Добавляет контекст сущности."""
+        self._with_context_by_dict({
+            ContextKey.ENTITY_NAME: entity.__name__,
+            ContextKey.ENTITY_ID: entity_id,
+        })
+        return self
+
+    def with_handler_context(self, handler: Any) -> Self:
+        self._with_context_by_dict({ContextKey.HANDLER: handler})
+        return self
+
+    def with_action_context(self, action: Any) -> Self:
+        self._with_context_by_dict({ContextKey.ACTION: action})
+        return self
 
     def update_context(
         self, other: dict[str, Any]

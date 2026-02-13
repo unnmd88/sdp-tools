@@ -1,8 +1,11 @@
 from typing import Protocol
 
-from application.dto.auth_dto import UserAuthDTO
-from domain.users.user_entity import UserEntity
-
 
 class AuthServiceProtocol(Protocol):
-    async def authenticate(self, auth_dto: UserAuthDTO) -> UserEntity: ...
+    def authenticate(
+        self,
+        *,
+        plain_password: str,
+        hashed_password: bytes
+    ) -> bool: ...
+
